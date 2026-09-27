@@ -240,7 +240,7 @@ theorem step3_main
     rwa [← hZqH_eq] at h
   have hM_norm_Z : M ≤ Subgroup.normalizer Z :=
     (le_inf hM_norm_ZpH hM_norm_ZqH).trans
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup ZpH ZqH)
+      (Subgroup.inf_normalizer_le_normalizer_sup ZpH ZqH)
   -- `Z` is abelian (centers of `O_p,O_q` are commutative and commute), hence nilpotent.
   have hZp_comm : IsMulCommutative Zp := by
     rw [hZp_def]; unfold zCenterOpCoreSubgroup; infer_instance
@@ -793,7 +793,7 @@ theorem step4_qCentral_normalizes_no_pCentral
     -- Q ≤ C_H(⟨y⟩) ≤ N_H(⟨y⟩): qg commutes with y ⇒ with all of ⟨y⟩.
     have hQ_norm_y : (Q : Subgroup H) ≤ Subgroup.normalizer (Subgroup.zpowers y) := by
       intro qg hqg
-      apply centralizer_le_normalizer (Subgroup.zpowers y)
+      apply Subgroup.centralizer_le_normalizer
       rw [Subgroup.mem_centralizer_iff]
       intro w hw
       obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hw
@@ -1135,7 +1135,8 @@ theorem step5b_pType_no_qCentral
     have h2 := congrArg (Subgroup.subtype (PH : Subgroup H)) hcomm
     simpa using h2
   -- (iv) x ∈ N_H(V) = M.
-  have hx_in_NV : x ∈ Subgroup.normalizer V := centralizer_le_normalizer V hx_centralizes_V
+  have hx_in_NV : x ∈ Subgroup.normalizer V :=
+    Subgroup.centralizer_le_normalizer _ hx_centralizes_V
   have hx_in_M : x ∈ M := hM_eq_NV ▸ hx_in_NV
   -- (v) xM := ⟨x,_⟩ ∈ C_M(K₀) (Hall-Higman context). Then xM ∈ K₀ ⇒ x ∈ V.
   set xM : ↥M := ⟨x, hx_in_M⟩ with hxM_def
@@ -1218,7 +1219,7 @@ theorem step6_qCentral_not_normalizes_nontrivial_pSubgroup
   obtain ⟨x, hx_pcentral, hx_comm⟩ := exists_isPCentral_centralizing hp_dvd V hV_pgroup
   have hx_in_CV : x ∈ Subgroup.centralizer (V : Set H) := by
     rw [Subgroup.mem_centralizer_iff]; intro v hv; exact (hx_comm v hv).symm
-  have hx_in_NV : x ∈ Subgroup.normalizer V := centralizer_le_normalizer V hx_in_CV
+  have hx_in_NV : x ∈ Subgroup.normalizer V := Subgroup.centralizer_le_normalizer _ hx_in_CV
   have hx_in_M : x ∈ M := hNV_le hx_in_NV
   -- M is p-type: it is not q-type, since a q-type maximal contains no
   -- p-central element (Step 5b with p,q swapped), but x ∈ M is p-central.

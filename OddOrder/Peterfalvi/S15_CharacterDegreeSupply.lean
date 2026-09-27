@@ -887,7 +887,7 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
         (hyp.oddCardS _hG) hne
     have hAB0 : ClassFunction.inner lam.lambda lam.lambda.conj = 0 := by
       rw [OddOrder.RepresentationTheory.irr_cf_inner lam.lambda_irreducible
-        lam.lambda_irreducible.conj, if_neg (fun h => hlamNR h.symm)]
+        lam.lambda_irreducible.conj, ite_eq_right (fun h => hlamNR h.symm)]
     -- ── `S`-side dirr inputs via the Core fields
     have hAZ : core.tau1S lam.lambda ∈ ZIrr G := by
       rw [hlamEq]
@@ -977,7 +977,7 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
     have hCD0 : ClassFunction.inner (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ)
         (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ.conj) = 0 := by
       rw [hindconjeq, OddOrder.RepresentationTheory.irr_cf_inner hind hind.conj,
-        if_neg (fun h => hθTNR h.symm)]
+        ite_eq_right (fun h => hθTNR h.symm)]
     -- ── `T`-side dirr inputs via the pinned coherence carrier
     have hmemθ := hyp.induce_K_mem_zSpan_T _hG hvd θ hθirr hθQ
     have hmemθc := hyp.induce_K_mem_zSpan_T _hG hvd θ.conj hθirr.conj hθQc

@@ -242,7 +242,7 @@ theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
       ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ)] at hb
   have hI := congrArg (fun φ => ClassFunction.inner φ
     ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ)) hb
-  simp only [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_neg hne,
+  simp only [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, ite_eq_right hne,
     mul_zero] at hI
   exact absurd hI.symm (by
     rcases (h.columnFamily χ₂⁻¹).sign_eq with he | he <;> rw [he] <;> norm_num)
@@ -314,8 +314,8 @@ theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h
   rw [certainType_columnSum_conj]
   intro heq
   have h0 := columnFamily_mu_sum_inner h χ₂⁻¹ χ₂
-  rw [if_neg (column_inv_ne_self h hχ₂), heq, columnFamily_mu_sum_inner h χ₂ χ₂,
-    if_pos rfl] at h0
+  rw [ite_eq_right (column_inv_ne_self h hχ₂), heq, columnFamily_mu_sum_inner h χ₂ χ₂,
+    ite_eq_left rfl] at h0
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
 omit [Fintype G] in

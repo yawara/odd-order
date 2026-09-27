@@ -19,7 +19,7 @@ import Mathlib.LinearAlgebra.Span.Basic
 /-!
 # Auxiliary `Subgroup` lemmas
 
-mathlib v4.29.1 に不在の汎用 `Subgroup` 補題. 主に
+mathlib に不在の汎用 `Subgroup` 補題 (v4.34.1 で全宣言名の不在を再確認). 主に
 [`OddOrder/GroupTheory/ChermakDelgado.lean`](../GroupTheory/ChermakDelgado.lean) の
 支援目的だが, 他章でも独立に使う可能性があるため `OddOrder.Mathlib` 配下に切り出す
 ("mathlib upstream 候補" の慣用 dir).
@@ -34,6 +34,8 @@ mathlib v4.29.1 に不在の汎用 `Subgroup` 補題. 主に
   `C_G(C_G(C_G(H))) = C_G(H)`.
 * `Subgroup.centralizer_sup`: `C_G(H ⊔ K) = C_G(H) ⊓ C_G(K)`
   (mathlib には Subalgebra 版のみ).
+* `Subgroup.isMulCommutative_sup_of_le_centralizer`: 可換部分群 `H, K` で `H ≤ C_G(K)` なら
+  `H ⊔ K` も可換.
 * `Subgroup.card_quotient_lt_of_ne_bot`: a finite quotient by a nontrivial subgroup
   has strictly smaller cardinality.
 
@@ -41,7 +43,8 @@ mathlib v4.29.1 に不在の汎用 `Subgroup` 補題. 主に
 
 * `card_HK_mul_card_inf_eq_card_mul_card` → `Mathlib/GroupTheory/Coset/Card.lean`
 * `le_centralizer_centralizer`, `centralizer_centralizer_centralizer`,
-  `centralizer_sup` → `Mathlib/GroupTheory/Subgroup/Centralizer.lean`
+  `centralizer_sup`, `isMulCommutative_sup_of_le_centralizer`
+  → `Mathlib/GroupTheory/Subgroup/Centralizer.lean`
 -/
 
 namespace Subgroup
@@ -54,7 +57,7 @@ open scoped Pointwise
 group `G`, where `HK ⊆ G` is the set product (not generally a subgroup).
 無限群でも両辺はゼロで成立する.
 
-mathlib v4.29.1 不在 ── 関連 `index_inf_le`, `relIndex_inf_mul_relIndex` は部分対応のみ.
+mathlib v4.34.1 でも不在 ── 関連 `index_inf_le`, `relIndex_inf_mul_relIndex` は部分対応のみ.
 
 **証明戦略**: `H × K → HK` の準同型 (の corestriction) は H ⊓ K 加群作用で fiber が
 `|H ∩ K|` と分かる. mathlib 流には:
@@ -112,7 +115,7 @@ theorem card_HK_mul_card_inf_eq_card_mul_card (H K : Subgroup G) :
 
 /-- `H ≤ C_G(C_G(H))` for any subgroup `H` ── classical Galois connection (`le_centralizer_iff`).
 
-mathlib v4.29.1 不在: 既存 `Subgroup.le_centralizer` は `IsMulCommutative H` 仮定が必要だが,
+mathlib v4.34.1 でも不在 (`Submonoid` 版のみ): 既存 `Subgroup.le_centralizer` は `IsMulCommutative H` 仮定が必要だが,
 本補題は仮定なし. `Subgroup.closure_le_centralizer_centralizer` を `H = closure ↑H` に適用. -/
 theorem le_centralizer_centralizer (H : Subgroup G) :
     H ≤ centralizer (centralizer (H : Set G) : Set G) := by
@@ -133,7 +136,7 @@ theorem centralizer_centralizer_centralizer (H : Subgroup G) :
 
 /-- `C_G(H ⊔ K) = C_G(H) ⊓ C_G(K)`.
 
-mathlib v4.29.1 では `Subalgebra` 版 (`Algebra/Subalgebra/Centralizer.lean:19`) のみで,
+mathlib v4.34.1 でも `Subalgebra` 版 `Subalgebra.centralizer_coe_sup` のみで,
 `Subgroup` 版は不在. `Set.centralizer_union` + `Subgroup.centralizer_closure` から従う. -/
 theorem centralizer_sup (H K : Subgroup G) :
     centralizer ((H ⊔ K : Subgroup G) : Set G)
@@ -143,6 +146,21 @@ theorem centralizer_sup (H K : Subgroup G) :
   rw [hHK, centralizer_closure]
   ext g
   simp only [mem_centralizer_iff, Set.mem_union, mem_inf, or_imp, forall_and]
+
+/-- The join of two commutative subgroups is commutative when one of them centralizes the other.
+
+(Formerly three verbatim copies: `OddOrder.GroupTheory.isMulCommutative_sup_of_le_centralizer`,
+`OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer` and a private Higman copy.) -/
+theorem isMulCommutative_sup_of_le_centralizer {H K : Subgroup G}
+    (hH : IsMulCommutative H) (hK : IsMulCommutative K)
+    (hHK : H ≤ centralizer (K : Set G)) :
+    IsMulCommutative (H ⊔ K : Subgroup G) := by
+  rw [← le_centralizer_iff_isMulCommutative]
+  refine sup_le ?_ ?_
+  · rw [le_centralizer_iff]
+    exact sup_le (le_centralizer_iff_isMulCommutative.mpr hH) (le_centralizer_iff.mp hHK)
+  · rw [le_centralizer_iff]
+    exact sup_le hHK (le_centralizer_iff_isMulCommutative.mpr hK)
 
 /-- If `K ≤ C_G(F)`, then `K ∩ F`, viewed as a subgroup of `K`, lies in `Z(K)`. -/
 theorem inf_subgroupOf_le_center_of_le_centralizer {K F : Subgroup G}
@@ -326,8 +344,8 @@ theorem fixedPointsOfMulAut_conj_eq_center {G : Type*} [Group G] :
       _ = x := by group
 
 /-- **`Subgroup.centralizer` の bijective hom 像**: bijective `f : G →* G'` で
-`(centralizer s).map f = centralizer (f '' s)`. mathlib v4.29.1 では `≤` 方向のみ
-(`map_centralizer_le_centralizer_image`). -/
+`(centralizer s).map f = centralizer (f '' s)`. mathlib v4.34.1 でも `≤` 方向のみ
+(`Subgroup.map_centralizer_le_centralizer_image`). -/
 theorem map_centralizer_eq_of_bijective {G G' : Type*} [Group G] [Group G']
     (s : Set G) (f : G →* G') (hf : Function.Bijective f) :
     (Subgroup.centralizer s).map f = Subgroup.centralizer (f '' s) := by
@@ -346,7 +364,7 @@ theorem map_centralizer_eq_of_bijective {G G' : Type*} [Group G] [Group G']
 /-- **`p`-th power subgroup is characteristic** in CommGroup: for any `n : ℕ`, the range
 of `powMonoidHom n` (= `{x^n : x : M}` as subgroup of M) is characteristic in M.
 
-mathlib v4.29.1 不在の generic lemma. Lucchini K=⊥ (M abelian case で `φ(M) ⊴ G` を
+mathlib v4.34.1 でも不在の generic lemma. Lucchini K=⊥ (M abelian case で `φ(M) ⊴ G` を
 `characteristic in normal` 経由で得る) で使用. -/
 instance powMonoidHom_range_characteristic
     {M : Type*} [CommGroup M] (n : ℕ) :
@@ -719,7 +737,7 @@ theorem eq_bot_of_le_of_normal_of_normalCore_eq_bot {H B : Subgroup G} [B.Normal
 /-- **Dedekind / modular law for subgroups** (with normality of one summand).
 `E, A, M ≤ G`, `E ⊴ G`, `E ≤ M` ⇒ `M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A)`.
 
-mathlib v4.29.1 では `IsModularLattice (Subgroup G)` instance は `[CommGroup G]` 限定で,
+mathlib v4.34.1 でも `IsModularLattice (Subgroup G)` instance は `[CommGroup G]` 限定で,
 非可換群版は不在 (実際は片方正規で modular).
 
 **用途**: Lucchini Thm 2.20 (K=⊥ case) で `M ⊆ AE ⇒ M = E(A ∩ M)` を導出. -/

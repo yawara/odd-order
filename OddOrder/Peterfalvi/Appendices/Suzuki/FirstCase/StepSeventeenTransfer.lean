@@ -88,9 +88,9 @@ theorem mem_center_of_conj_mem_zpowers_of_orderOf_eq_three {z : A} (hz : orderOf
             group
           rw [hstep, ih]
           by_cases hm : Even m
-          · rw [if_pos hm, if_neg (by simp [Nat.even_add_one, hm])]
+          · rw [ite_eq_left hm, ite_eq_right (by simp [Nat.even_add_one, hm])]
             exact h3
-          · rw [if_neg hm, if_pos (by simp [Nat.even_add_one, hm])]
+          · rw [ite_eq_right hm, ite_eq_left (by simp [Nat.even_add_one, hm])]
             rw [show g * z⁻¹ * g⁻¹ = (g * z * g⁻¹)⁻¹ by group, h3, inv_inv]
       obtain ⟨k, hk⟩ := hodd g
       have hgn : g ^ orderOf g = 1 := pow_orderOf_eq_one g
@@ -98,7 +98,7 @@ theorem mem_center_of_conj_mem_zpowers_of_orderOf_eq_three {z : A} (hz : orderOf
         rw [hk]
         simp [parity_simps]
       have hfix := hpow (orderOf g)
-      rw [hgn, if_neg hne] at hfix
+      rw [hgn, ite_eq_right hne] at hfix
       simp only [one_mul, inv_one, mul_one] at hfix
       have hz2 : z * z = 1 := by
         nth_rewrite 1 [hfix]

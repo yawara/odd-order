@@ -71,7 +71,7 @@ theorem Hypothesis.muGrid_inner_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
       = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
           (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
     unfold Hypothesis.muGrid; rfl
-  rw [emj, OddOrder.RepresentationTheory.irreducibleCharacter_inner, if_pos rfl]
+  rw [emj, OddOrder.RepresentationTheory.irreducibleCharacter_inner, ite_eq_left rfl]
 
 open scoped FiniteInduce in
 /-- **§10 μ-grid cross-column orthogonality** (Peterfalvi (4.3.b)): certain-type characters from
@@ -155,7 +155,7 @@ theorem Hypothesis.muGrid_inner_within_column [Finite G] (hG : OddOrder.BG.IsMin
           (finCongr hcardW1.symm i') : ClassFunction ↥M ℂ) := by
     unfold Hypothesis.muGrid; rfl
   rw [emj, emj', OddOrder.RepresentationTheory.irreducibleCharacter_inner,
-    if_neg (fun heq => hrowne ((h.columnFamily _).injective heq))]
+    ite_eq_right (fun heq => hrowne ((h.columnFamily _).injective heq))]
 
 open scoped FiniteInduce in
 /-- **§10 μ-grid entries are irreducible** (Peterfalvi (4.3.b)): each `μ_{ij}` is an irreducible
@@ -312,8 +312,8 @@ theorem Hypothesis.muGrid_column_sum_inner_self [Finite G]
       (hyp.muGrid hG hodd i' j) = (if i' = i then 1 else 0) := by
     intro i i'
     by_cases h : i' = i
-    · subst h; rw [if_pos rfl]; exact hyp.muGrid_inner_self hG hodd i' j
-    · rw [if_neg h]; exact hyp.muGrid_inner_within_column hG hodd j (Ne.symm h)
+    · subst h; rw [ite_eq_left rfl]; exact hyp.muGrid_inner_self hG hodd i' j
+    · rw [ite_eq_right h]; exact hyp.muGrid_inner_within_column hG hodd j (Ne.symm h)
   have hrow : ∀ i : Fin hyp.w1, ClassFunction.inner (hyp.muGrid hG hodd i j)
       (∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) = 1 := by
     intro i
@@ -361,7 +361,7 @@ theorem Hypothesis.muGrid_inner_eq_zero_of_apply_one_ne [Finite G]
   have hμirr : IsIrreducibleCharacter (hyp.muGrid hG hodd i j) := by
     rw [emj]; exact OddOrder.RepresentationTheory.IrreducibleCharacter.isIrreducible _
   rw [OddOrder.RepresentationTheory.irr_cf_inner hμirr hχirr,
-    if_neg (fun heq => hne (by rw [heq]))]
+    ite_eq_right (fun heq => hne (by rw [heq]))]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `‖α_{ij}‖² = 2 + n²`**: the squared norm of the virtual character
@@ -388,7 +388,7 @@ theorem Hypothesis.muGridAlpha_inner_self [Finite G]
   have hA := hyp.muGrid_inner_self hG hodd i j
   have hB := hyp.muGrid_inner_self hG hodd i 0
   have hZ : ClassFunction.inner ζ ζ = 1 := by
-    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, ite_eq_left rfl]
   have hP := hyp.muGrid_inner_cross_column hG hodd i i hj0
   have hP' := hyp.muGrid_inner_cross_column hG hodd i i (Ne.symm hj0)
   have hQ := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ

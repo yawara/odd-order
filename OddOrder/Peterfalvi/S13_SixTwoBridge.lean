@@ -594,7 +594,7 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
             (hyp.alignedOmegaSigmaGrid hG hG.odd i' κ') = 0 := by
         intro i i' κ κ' hne
         rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i i' κ κ',
-          if_neg (fun hh => hne hh.2)]
+          ite_eq_right (fun hh => hne hh.2)]
       rcases bα with _ | _ <;> rcases bβ with _ | _
       · simp only [Hypothesis.columnRImage]
         rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,

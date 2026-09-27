@@ -756,10 +756,10 @@ theorem inner_eq_zero_of_three_equal_coeff [Fintype G] [Invertible (Nat.card G :
     refine Finset.sum_congr rfl fun α hα => ?_
     rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_sum_right,
       Finset.sum_eq_single α]
-    · rw [ClassFunction.inner_smul_right, horth α hα α hα, if_pos rfl, mul_one]
+    · rw [ClassFunction.inner_smul_right, horth α hα α hα, ite_eq_left rfl, mul_one]
     · intro β hβ hne
       rw [ClassFunction.inner_smul_right, horth α hα β hβ,
-        if_neg (fun h => hne h.symm)]
+        ite_eq_right (fun h => hne h.symm)]
       ring
     · intro habs
       exact absurd hα habs

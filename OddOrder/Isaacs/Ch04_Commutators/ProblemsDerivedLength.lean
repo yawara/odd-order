@@ -235,7 +235,7 @@ theorem regularPermAut_injective [Nontrivial D] :
       (fun ω => if ω = 1 then d else 1) := by rw [ha]; rfl
   have h2 := congrFun h1 a
   rw [regularPermAut_apply, inv_mul_cancel] at h2
-  simp only [if_neg hane] at h2
+  simp only [ite_eq_right hane] at h2
   exact hd h2
 
 end RegularPerm

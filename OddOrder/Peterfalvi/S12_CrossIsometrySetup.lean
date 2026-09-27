@@ -97,7 +97,7 @@ theorem typeII_tau_diff_inner_chiFam_eq_zero [Finite G]
   -- `‖ψ‖² = 2` (Dade isometry + distinct orthonormal irreducible pair)
   have hcross : ClassFunction.inner lam lam.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite ⟨lam, hlam_irr⟩ ⟨lam.conj, hlam_irr.conj⟩
-    rwa [if_neg (fun heq => hlamne (congrArg Subtype.val heq))] at h
+    rwa [ite_eq_right (fun heq => hlamne (congrArg Subtype.val heq))] at h
   have hcross' : ClassFunction.inner lam.conj lam = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hcross, star_zero]
   have hiso : ClassFunction.inner
@@ -200,7 +200,7 @@ theorem typeII_R_mem_inner_chiFam_eq_zero [Finite G]
     rw [((OddOrder.Peterfalvi.S06.ticVdiff
       (typeIIHypothesis46 hG hSmax hSII data.typeP)).chiFam_spec rfl
       (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
-        (typeIIHypothesis46 hG hSmax hSII data.typeP))).2.2.1, if_pos rfl]
+        (typeIIHypothesis46 hG hSmax hSII data.typeP))).2.2.1, ite_eq_left rfl]
   -- the integer inner product is `±1`
   obtain ⟨c, hc⟩ := inner_intCast_of_mem_ZIrr hαZ hPZ
   have hcne : c ≠ 0 := by
@@ -295,7 +295,7 @@ theorem typeII_R_mem_inner_chiFam_eq_zero [Finite G]
     intro β hβ hβne
     rw [hPeq, OddOrder.RepresentationTheory.inner_smul_right,
       (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg
-        (Set.mem_insert _ _)).orthonormal β hβ α hα, if_neg hβne]
+        (Set.mem_insert _ _)).orthonormal β hβ α hα, ite_eq_right hβne]
     simp
   rw [Finset.sum_eq_single α hsingle (fun h => absurd hα h)] at hk1
   rw [hPeq, OddOrder.RepresentationTheory.inner_smul_right, hα1, mul_one] at hk1
@@ -358,7 +358,7 @@ theorem typeII_T2_extension_lam_mem_span_RFamily [Finite G]
   -- `⟨λ, λ̄⟩ = 0`
   have hcross : ClassFunction.inner lam lam.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite ⟨lam, hlam_irr⟩ ⟨lam.conj, hlam_irr.conj⟩
-    rwa [if_neg (fun heq => hlamne (congrArg Subtype.val heq))] at h
+    rwa [ite_eq_right (fun heq => hlamne (congrArg Subtype.val heq))] at h
   -- lattice memberships
   have hchi_zSpan : lam ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥S)
       ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ)) :=
@@ -552,7 +552,7 @@ theorem Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero [Finite G] {M : Subgroup 
     change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
     rw [coh.coherent.extension_inner_eq _ _ (Submodule.subset_span hζS)
         (Submodule.subset_span hζcS),
-      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζcirr, if_neg (fun h => hζne h.symm)]
+      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζcirr, ite_eq_right (fun h => hζne h.symm)]
   -- `(ζ − ζ̄)^τ` vanishes on `V`, with `NC ≤ 2 < min(w₁, w₂)`
   have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
     hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
@@ -596,7 +596,7 @@ theorem Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero [Finite G] {M : Subgroup 
   have hsZ : tic.chiFam hVeq app (P j) ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (P j)
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (P j))
       (tic.chiFam hVeq app (P j)) = 1 := by
-    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(tic.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
 

@@ -554,7 +554,7 @@ theorem semidihedralRightParity_sigma (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
   have hσ1 : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
       Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
     fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
-  simp only [semidihedralRightParity, MonoidHom.coe_mk, OneHom.coe_mk, if_neg hσ1]
+  simp only [semidihedralRightParity, MonoidHom.coe_mk, OneHom.coe_mk, ite_eq_right hσ1]
 
 theorem semidihedralParity_reflection (n : ℕ) [NeZero n] (hn : 8 ∣ n)
     (x : Multiplicative (ZMod n)) :

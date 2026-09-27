@@ -336,7 +336,7 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
         (Submodule.subset_span hξ3)]
       have h := irreducibleCharacter_inner_eq_ite
         (⟨ξ, hξ.2.1⟩ : IrreducibleCharacter ↥hyp.S) ⟨ξ, hξ.2.1⟩
-      rwa [if_pos rfl] at h
+      rwa [ite_eq_left rfl] at h
     have hON2 : ∀ ξ ∈ hS4fin.toFinset, ∀ ξ' ∈ hS4fin.toFinset, ξ ≠ ξ' →
         ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ') = 0 := by
       intro ξ hξT ξ' hξ'T hne
@@ -783,13 +783,13 @@ theorem Hypothesis.sSet_coherent_indS_A_pinned [Finite G]
           (∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩)) hdiff
         simp only [ClassFunction.inner_sub_left] at hinner
         rw [hflip, ClassFunction.inner_neg_left,
-          hηcols k ⟨1, hyp.p_prime.one_lt⟩, if_neg hk1, neg_zero,
-          hηcols ⟨1, hyp.p_prime.one_lt⟩ ⟨1, hyp.p_prime.one_lt⟩, if_pos rfl,
-          hηcols j₂ ⟨1, hyp.p_prime.one_lt⟩, if_neg hj₂1] at hinner
+          hηcols k ⟨1, hyp.p_prime.one_lt⟩, ite_eq_right hk1, neg_zero,
+          hηcols ⟨1, hyp.p_prime.one_lt⟩ ⟨1, hyp.p_prime.one_lt⟩, ite_eq_left rfl,
+          hηcols j₂ ⟨1, hyp.p_prime.one_lt⟩, ite_eq_right hj₂1] at hinner
         -- so `⟨c(μ_{j₂}), η-col₁⟩ = −q`; but the dichotomy at `j₂` gives `0`
         rcases hyp.coherentIndS_muColumn_pin_of_irr hG hnoV chief c hξ hξirr hj₂0 with
           hc2 | ⟨k₂, hk₂0, hk₂j₂, hk₂conj, hc2⟩
-        · rw [hc2, hηcols j₂ ⟨1, hyp.p_prime.one_lt⟩, if_neg hj₂1] at hinner
+        · rw [hc2, hηcols j₂ ⟨1, hyp.p_prime.one_lt⟩, ite_eq_right hj₂1] at hinner
           rw [sub_zero] at hinner
           exact hqne (by linear_combination -hinner)
         · have hk₂1 : k₂ ≠ ⟨1, hyp.p_prime.one_lt⟩ := by
@@ -801,10 +801,10 @@ theorem Hypothesis.sSet_coherent_indS_A_pinned [Finite G]
               rw [← hk₂conj, ClassFunction.conj_conj]
             rw [hkconj] at h1
             have h2 := hμcols j₂ k
-            rw [if_neg hj₂k, h1, hμcols k k, if_pos rfl] at h2
+            rw [ite_eq_right hj₂k, h1, hμcols k k, ite_eq_left rfl] at h2
             exact hqne h2
           rw [hc2, ClassFunction.inner_neg_left,
-            hηcols k₂ ⟨1, hyp.p_prime.one_lt⟩, if_neg hk₂1, neg_zero, sub_zero] at hinner
+            hηcols k₂ ⟨1, hyp.p_prime.one_lt⟩, ite_eq_right hk₂1, neg_zero, sub_zero] at hinner
           exact hqne (by linear_combination -hinner)
       -- `p = 3`: otherwise `p ≥ 5` and a third column exists
       have hp3 : hyp.p = 3 := by

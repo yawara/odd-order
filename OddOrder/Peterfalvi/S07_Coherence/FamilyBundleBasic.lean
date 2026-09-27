@@ -183,8 +183,8 @@ theorem CharacterPsiDecomposition.Y_collapse_of_family
     simp only [hvc]
     rw [hiso_fam i hi j hj]
     by_cases h : i = j
-    · subst h; rw [if_pos rfl]; exact hmc i hi
-    · rw [if_neg h]; exact B.chiFam_pairwise i hi j hj h
+    · subst h; rw [ite_eq_left rfl]; exact hmc i hi
+    · rw [ite_eq_right h]; exact B.chiFam_pairwise i hi j hj h
   -- (2) orthogonal projection of `Y` onto the family.
   obtain ⟨c, Z, hc_def, hYsum, hZ⟩ :=
     exists_orthogonalProjection_of_orthogonal_family s vc mc Da.Y horth hmc_ne
@@ -248,14 +248,14 @@ theorem CharacterPsiDecomposition.Y_collapse_of_family
     have hrc_i : (rc i : ℂ) = (B.ratio i : ℂ) / (mc i : ℂ) := by
       simp only [hrc]; push_cast; ring
     by_cases h : i = i₁
-    · rw [h, if_pos rfl, mul_one, hlam_c]
+    · rw [h, ite_eq_left rfl, mul_one, hlam_c]
       have hrc_i1 : (rc i₁ : ℂ) = 1 / (mc i₁ : ℂ) := by
         simp only [hrc, B.ratio_one]; push_cast; ring
       rw [hrc_i1]
       field_simp
       ring
     · have key := hcross i hi h
-      rw [if_neg h, mul_zero, zero_sub, hlam_c, hrc_i]
+      rw [ite_eq_right h, mul_zero, zero_sub, hlam_c, hrc_i]
       field_simp
       linear_combination key
   -- (5) assemble the λ-form and apply the collapse.
@@ -269,10 +269,10 @@ theorem CharacterPsiDecomposition.Y_collapse_of_family
           (if i = i₁ then (a : ℂ) • vc i else 0) - lam_c • ((rc i : ℂ) • vc i) := by
       intro i _
       by_cases h : i = i₁
-      · rw [if_pos h, if_pos h, mul_one]; module
-      · rw [if_neg h, if_neg h, mul_zero]; module
+      · rw [ite_eq_left h, ite_eq_left h, mul_one]; module
+      · rw [ite_eq_right h, ite_eq_right h, mul_zero]; module
     rw [Finset.sum_congr rfl hsplit, Finset.sum_sub_distrib, Finset.sum_ite_eq' s i₁,
-      if_pos B.i₁_mem, ← Finset.smul_sum]
+      ite_eq_left B.i₁_mem, ← Finset.smul_sum]
   have hψ : (ClassFunction.inner (a • chi1 : ClassFunction L ℂ) (a • chi1)).re =
       (a : ℝ) ^ 2 * mc i₁ := by
     rw [show (a • chi1 : ClassFunction L ℂ) = (a : ℂ) • chi1 from

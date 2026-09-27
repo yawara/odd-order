@@ -193,10 +193,10 @@ theorem lem_1_8_relation
     intro a ha
     rw [Finset.sum_eq_single (⟨a, mem_irreducibleCharacters.mp ha⟩ : IrreducibleCharacter G)]
     · simp only [IrreducibleCharacter.coe_mk]
-      rw [irr_cf_inner ha ha, if_pos rfl, mul_one]
+      rw [irr_cf_inner ha ha, ite_eq_left rfl, mul_one]
     · intro b _ hb
       rw [irr_cf_inner ha (mem_irreducibleCharacters.mpr b.2),
-        if_neg (fun h => hb (Subtype.ext h).symm), mul_zero]
+        ite_eq_right (fun h => hb (Subtype.ext h).symm), mul_zero]
     · intro h; exact absurd (Finset.mem_univ _) h
   -- expand `⟨θ*, χ⟩ = ⟨1_G, χ⟩ + ⟨χ₁, χ⟩ − ⟨χ, χ⟩` (ground rewrite of `θ*`) and collapse each sum
   simp only [hdecomp, ClassFunction.inner_sub_left, ClassFunction.inner_add_left,

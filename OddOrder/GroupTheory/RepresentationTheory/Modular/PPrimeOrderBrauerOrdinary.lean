@@ -75,8 +75,8 @@ theorem pairingZero_eq_ite_of_not_dvd_card [IsAlgClosed (ResidueField 𝒪)]
   have hinv := sum_cartanMatrix_mul_pairingZero hp hω hω' hπ hlin hkerJ e μ₀ τ
   rw [Finset.sum_congr rfl fun ν (_ : ν ∈ Finset.univ) => by
     rw [cartanMatrix_eq_ite_of_not_dvd_card hp hω hω' hπ hlin hkerJ e hG ν τ],
-    Finset.sum_eq_single τ (fun ν _ hν => by rw [if_neg hν, Nat.cast_zero, zero_mul])
-      (fun h => absurd (Finset.mem_univ τ) h), if_pos rfl, Nat.cast_one, one_mul] at hinv
+    Finset.sum_eq_single τ (fun ν _ hν => by rw [ite_eq_right hν, Nat.cast_zero, zero_mul])
+      (fun h => absurd (Finset.mem_univ τ) h), ite_eq_left rfl, Nat.cast_one, one_mul] at hinv
   rw [hinv]
   exact if_congr eq_comm rfl rfl
 
@@ -92,8 +92,8 @@ theorem ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card [IsAlgClosed (Residu
   classical
   rw [ordinaryCombinationCoeff, Finset.sum_congr rfl fun τ (_ : τ ∈ Finset.univ) => by
     rw [pairingZero_eq_ite_of_not_dvd_card hp hω hω' hπ hlin hkerJ e hG τ μ₀],
-    Finset.sum_eq_single μ₀ (fun τ _ hτ => by rw [if_neg hτ, mul_zero])
-      (fun h => absurd (Finset.mem_univ μ₀) h), if_pos rfl, mul_one]
+    Finset.sum_eq_single μ₀ (fun τ _ hτ => by rw [ite_eq_right hτ, mul_zero])
+      (fun h => absurd (Finset.mem_univ μ₀) h), ite_eq_left rfl, mul_one]
 
 -- Instances driving the Cartan/decomposition matrices, as above.
 set_option linter.unusedDecidableInType false in

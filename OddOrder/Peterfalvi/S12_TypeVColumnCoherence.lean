@@ -395,7 +395,7 @@ theorem Hypothesis.SHC_tau_muColumnZero_sub_zeta [Finite G] {M : Subgroup G}
     rw [hyp.SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount hG coh hodd 0 hj0 hζS hζirr hζ1 hζne
       (hdeg 0) (hμ0 0) hnf hδj (hdζ 0) (h0ζ 0) hδpm hneq h8] at hpair
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left] at hpair
-    rw [hωψ 0 j, hωψ 0 0, if_neg hj0, if_pos rfl] at hpair
+    rw [hωψ 0 j, hωψ 0 0, ite_eq_right hj0, ite_eq_left rfl] at hpair
     have hn : ((n : ℕ) : ℂ) = 2 := by rw [hneq]; norm_num
     rw [hn] at hpair
     linear_combination (-1 / 2 : ℂ) * hpair
@@ -414,7 +414,7 @@ theorem Hypothesis.SHC_tau_muColumnZero_sub_zeta [Finite G] {M : Subgroup G}
     have h1 : ∀ i : Fin hyp.w1, ClassFunction.inner
         (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
         (hyp.alignedOmegaSigmaGrid hG hodd i 0) = 1 := fun i => by
-      rw [hψω i 0, if_pos rfl]
+      rw [hψω i 0, ite_eq_left rfl]
     rw [OddOrder.RepresentationTheory.inner_sum_right,
       Finset.sum_congr rfl (fun i _ => h1 i), hsum1]
   have hΩψ : ClassFunction.inner (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
@@ -426,10 +426,10 @@ theorem Hypothesis.SHC_tau_muColumnZero_sub_zeta [Finite G] {M : Subgroup G}
         (∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i' 0) = 1 := by
       intro i
       rw [OddOrder.RepresentationTheory.inner_sum_right, Finset.sum_eq_single i]
-      · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 0, if_pos ⟨rfl, rfl⟩]
+      · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 0, ite_eq_left ⟨rfl, rfl⟩]
       · intro i' _ hi'
         rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i' 0 0,
-          if_neg (fun hh => hi' hh.1.symm)]
+          ite_eq_right (fun hh => hi' hh.1.symm)]
       · intro hmem
         exact absurd (Finset.mem_univ _) hmem
     rw [inner_sum_left, Finset.sum_congr rfl (fun i _ => h1 i), hsum1]
@@ -495,7 +495,7 @@ theorem Hypothesis.muColumnSum_inner [Finite G]
   rw [inner_sum_left]
   by_cases hjk : j = k
   · subst hjk
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     have hrow : ∀ i : Fin hyp.w1, ClassFunction.inner (hyp.muGrid hG hodd i j)
         (∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) = 1 := by
       intro i
@@ -506,7 +506,7 @@ theorem Hypothesis.muColumnSum_inner [Finite G]
       · intro h; exact absurd (Finset.mem_univ _) h
     rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
       Fintype.card_fin, nsmul_eq_mul, mul_one]
-  · rw [if_neg hjk]
+  · rw [ite_eq_right hjk]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     exact Finset.sum_eq_zero fun i' _ => hyp.muGrid_inner_cross_column hG hodd i i' hjk
@@ -526,24 +526,24 @@ theorem Hypothesis.omegaSigmaColumnSum_inner [Finite G]
   rw [inner_sum_left]
   by_cases hjk : j = k
   · subst hjk
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     have hrow : ∀ i : Fin hyp.w1,
         ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i j)
           (∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i' j) = 1 := by
       intro i
       rw [OddOrder.RepresentationTheory.inner_sum_right, Finset.sum_eq_single i]
-      · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i j j, if_pos ⟨rfl, rfl⟩]
+      · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i j j, ite_eq_left ⟨rfl, rfl⟩]
       · intro i' _ hi'
         rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i' j j,
-          if_neg (fun hh => hi' hh.1.symm)]
+          ite_eq_right (fun hh => hi' hh.1.symm)]
       · intro h; exact absurd (Finset.mem_univ _) h
     rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
       Fintype.card_fin, nsmul_eq_mul, mul_one]
-  · rw [if_neg hjk]
+  · rw [ite_eq_right hjk]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     refine Finset.sum_eq_zero fun i' _ => ?_
-    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i' j k, if_neg (fun hh => hjk hh.2)]
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i' j k, ite_eq_right (fun hh => hjk hh.2)]
 
 open scoped FiniteInduce in
 /-- **§10 column ⊥ degree-distinct irreducible** (Peterfalvi (10.5)/(10.10.4)): the column
@@ -636,11 +636,11 @@ theorem Hypothesis.exists_muColumnSum_imageMap [Finite G]
     intro a b hab
     simp only [χ]
     rw [hyp.muColumnSum_inner hG hodd (e a).1 (e b).1,
-      if_neg (fun hv => hab (e.injective (Subtype.ext hv)))]
+      ite_eq_right (fun hv => hab (e.injective (Subtype.ext hv)))]
   have hnorm : ∀ a, ClassFunction.inner (χ a) (χ a) ≠ 0 := by
     intro a
     simp only [χ]
-    rw [hyp.muColumnSum_inner hG hodd (e a).1 (e a).1, if_pos rfl]
+    rw [hyp.muColumnSum_inner hG hodd (e a).1 (e a).1, ite_eq_left rfl]
     exact hw1C
   refine ⟨OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
     (fun a => (ClassFunction.inner (χ a) (χ a))⁻¹ • T a), fun j hj => ?_⟩
@@ -754,16 +754,16 @@ noncomputable def Hypothesis.typeV_caseC_coherence_engine [Finite G] {M : Subgro
   have hYfin : hyp.SHCSet.Finite := inducedFamily_finite.subset (fun φ hφ => hφ.1)
   have hXorth : ∀ x ∈ Xc, ∀ x' ∈ Xc, x ≠ x' → ClassFunction.inner x x' = 0 := by
     rintro x ⟨j, hj, rfl⟩ x' ⟨k, hk, rfl⟩ hne
-    rw [hyp.muColumnSum_inner hG hodd j k, if_neg (fun hv => hne (by rw [hv]))]
+    rw [hyp.muColumnSum_inner hG hodd j k, ite_eq_right (fun hv => hne (by rw [hv]))]
   have hXnorm : ∀ x ∈ Xc, ClassFunction.inner x x ≠ 0 := by
     rintro x ⟨j, hj, rfl⟩
-    rw [hyp.muColumnSum_inner hG hodd j j, if_pos rfl]
+    rw [hyp.muColumnSum_inner hG hodd j j, ite_eq_left rfl]
     exact hw1C
   have hYorth : ∀ y ∈ hyp.SHCSet, ∀ y' ∈ hyp.SHCSet, y ≠ y' →
       ClassFunction.inner y y' = 0 := fun y hy y' hy' hne =>
     inducedFamily_pairwiseOrthogonal hy.1 hy'.1 hne
   have hYnorm : ∀ y ∈ hyp.SHCSet, ClassFunction.inner y y ≠ 0 := fun y hy => by
-    rw [OddOrder.RepresentationTheory.irr_cf_inner hy.2.1 hy.2.1, if_pos rfl]
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hy.2.1 hy.2.1, ite_eq_left rfl]
     exact one_ne_zero
   have hglue :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthogonal
@@ -832,7 +832,7 @@ noncomputable def Hypothesis.typeV_caseC_coherence_engine [Finite G] {M : Subgro
         rw [ClassFunction.inner_sub_left,
           hyp.muColumnSum_inner hG hodd ⟨1, by omega⟩ ⟨1, by omega⟩,
           hyp.muColumnSum_inner hG hodd ⟨2, by omega⟩ ⟨1, by omega⟩,
-          if_pos rfl, if_neg (Fin.ne_of_val_ne (by simp)), sub_zero]
+          ite_eq_left rfl, ite_eq_right (Fin.ne_of_val_ne (by simp)), sub_zero]
       rw [h0, ClassFunction.inner_zero_left] at hip
       exact hw1C hip.symm
   -- (isometry) generator-level `⟨ν μ_j, ν μ_k⟩ = ⟨μ_j, μ_k⟩`, lifted to `ℤ[X]`
@@ -845,8 +845,8 @@ noncomputable def Hypothesis.typeV_caseC_coherence_engine [Finite G] {M : Subgro
     have hδδ : (δ : ℂ) * star (δ : ℂ) = 1 := by
       rcases hδpm with rfl | rfl <;> norm_num
     by_cases hjk : j = k
-    · rw [if_pos hjk, ← mul_assoc, hδδ, one_mul]
-    · rw [if_neg hjk, mul_zero, mul_zero]
+    · rw [ite_eq_left hjk, ← mul_assoc, hδδ, one_mul]
+    · rw [ite_eq_right hjk, mul_zero, mul_zero]
   have hinner : ∀ φ ψ : ClassFunction ↥M ℂ,
       φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) Xc →
       ψ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) Xc →

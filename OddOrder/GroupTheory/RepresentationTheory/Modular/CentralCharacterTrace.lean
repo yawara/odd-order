@@ -116,8 +116,8 @@ theorem centralScalar_classSum_mul_character_one (C : ConjClasses G) :
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [coeff_classSum]
   by_cases h : ConjClasses.mk g = C
-  · rw [if_pos h, if_pos h, one_mul]
-  · rw [if_neg h, if_neg h, zero_mul]
+  · rw [ite_eq_left h, ite_eq_left h, one_mul]
+  · rw [ite_eq_right h, ite_eq_right h, zero_mul]
 
 open scoped Classical in
 set_option backward.isDefEq.respectTransparency false in
@@ -138,10 +138,10 @@ theorem centralScalar_classSum_mul_character_one_out (C : ConjClasses G) :
         = if ConjClasses.mk g = C then (wedderburnRepresentation e i).character C.out else 0 := by
     intro g
     by_cases hg : ConjClasses.mk g = C
-    · rw [if_pos hg, if_pos hg]
+    · rw [ite_eq_left hg, ite_eq_left hg]
       exact character_eq_of_isConj (wedderburnRepresentation e i)
         (ConjClasses.mk_eq_mk_iff_isConj.mp (hg.trans hmk.symm))
-    · rw [if_neg hg, if_neg hg]
+    · rw [ite_eq_right hg, ite_eq_right hg]
   rw [Finset.sum_congr rfl fun g _ => hterm g, Finset.sum_ite, Finset.sum_const_zero, add_zero,
     Finset.sum_const, nsmul_eq_mul]
   congr 1
@@ -227,9 +227,9 @@ theorem sum_centralScalar_mul_character_eq_card_mul_coeff (C D : ConjClasses G) 
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _
     rw [horth]
     by_cases hg : IsConj z g
-    · rw [if_pos hg, if_pos hg,
+    · rw [ite_eq_left hg, ite_eq_left hg,
         coeff_center_of_mk_eq hw (ConjClasses.mk_eq_mk_iff_isConj.mpr hg.symm)]
-    · rw [if_neg hg, if_neg hg, mul_zero]
+    · rw [ite_eq_right hg, ite_eq_right hg, mul_zero]
   rw [Finset.sum_congr rfl fun g _ => hcol g]
   -- the surviving terms are the class of `z`, of size `|cl(z)|`
   rw [Finset.sum_ite, Finset.sum_const, Finset.sum_const_zero, add_zero, nsmul_eq_mul]

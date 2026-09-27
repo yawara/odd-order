@@ -35,15 +35,6 @@ universe u
 
 section /- 6B.8: Taussky-Todd の帰納法 (p. 196) -/
 
-/-- 中心に含まれる部分群は正規。 -/
-theorem normal_of_le_center {P : Type*} [Group P] {Z : Subgroup P}
-    (hZ : Z ≤ Subgroup.center P) : Z.Normal where
-  conj_mem n hn g := by
-    have hc := Subgroup.mem_center_iff.mp (hZ hn) g
-    have hfix : g * n * g⁻¹ = n := by rw [hc]; group
-    rw [hfix]
-    exact hn
-
 /-- `|P : P'| = 4` かつ `|P| ≥ 8` なら `P` は非可換 (`|P'| = |P|/4 ≥ 2`)。 -/
 theorem exists_ne_mul_comm_of_index_commutator_eq_four {P : Type*} [Group P] [Finite P]
     (hcard : 8 ≤ Nat.card P) (hidx : (commutator P).index = 4) :
@@ -106,7 +97,7 @@ theorem exists_index_two_zpowers_of_card_le (n : ℕ) :
       obtain ⟨z, hzP', hzZ, hzord⟩ := exists_orderOf_eq_two_mem_commutator_center hP
         (commutator_ne_bot_of_index_commutator_eq_four h8 hidx)
       have hZcenter : Subgroup.zpowers z ≤ Subgroup.center P := Subgroup.zpowers_le.mpr hzZ
-      have hZn : (Subgroup.zpowers z).Normal := normal_of_le_center hZcenter
+      have hZn : (Subgroup.zpowers z).Normal := Subgroup.normal_of_le_center hZcenter
       have hZcard : Nat.card ↥(Subgroup.zpowers z) = 2 := by rw [Nat.card_zpowers, hzord]
       have hZle : Subgroup.zpowers z ≤ commutator P := Subgroup.zpowers_le.mpr hzP'
       -- `|P/Z| = |P|/2`

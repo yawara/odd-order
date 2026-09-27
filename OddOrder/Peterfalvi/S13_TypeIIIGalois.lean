@@ -185,10 +185,10 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_columnZero_const [Finite G]
           (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ)) := by
     by_contra hne
     have h0 := hchi.2.2.1 (ρ 0, κ 0) (1, 1)
-    rw [if_neg hne, ← hprod 0 0, hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, hchi.1] at h0
+    rw [ite_eq_right hne, ← hprod 0 0, hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, hchi.1] at h0
     have htmem : trivialClassFunction G ∈ irreducibleCharacters G :=
       mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
-    rw [irr_cf_inner htmem htmem, if_pos rfl] at h0
+    rw [irr_cf_inner htmem htmem, ite_eq_left rfl] at h0
     exact one_ne_zero h0
   have hρ0 : ρ 0 = 1 := (Prod.mk.injEq _ _ _ _).mp h00 |>.1
   have hκ0 : κ 0 = 1 := (Prod.mk.injEq _ _ _ _).mp h00 |>.2
@@ -252,10 +252,10 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_const [Finite G]
           (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ)) := by
     by_contra hne
     have h0 := hchi.2.2.1 (ρ 0, κ 0) (1, 1)
-    rw [if_neg hne, ← hprod 0 0, hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, hchi.1] at h0
+    rw [ite_eq_right hne, ← hprod 0 0, hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, hchi.1] at h0
     have htmem : trivialClassFunction G ∈ irreducibleCharacters G :=
       mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
-    rw [irr_cf_inner htmem htmem, if_pos rfl] at h0
+    rw [irr_cf_inner htmem htmem, ite_eq_left rfl] at h0
     exact one_ne_zero h0
   have hρ0 : ρ 0 = 1 := (Prod.mk.injEq _ _ _ _).mp h00 |>.1
   have hκ0 : κ 0 = 1 := (Prod.mk.injEq _ _ _ _).mp h00 |>.2
@@ -299,10 +299,10 @@ theorem Hypothesis.alignedOmegaSigmaGrid_columnZero_sum_inner [Finite G]
   rw [inner_sum_left, Finset.sum_eq_single i]
   · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 j]
     by_cases hj : j = 0
-    · rw [if_pos ⟨rfl, hj.symm⟩, if_pos hj]
-    · rw [if_neg (fun hh => hj hh.2.symm), if_neg hj]
+    · rw [ite_eq_left ⟨rfl, hj.symm⟩, ite_eq_left hj]
+    · rw [ite_eq_right (fun hh => hj hh.2.symm), ite_eq_right hj]
   · intro r _ hri
-    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r i 0 j, if_neg (fun hh => hri hh.1)]
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r i 0 j, ite_eq_right (fun hh => hri hh.1)]
   · intro h; exact absurd (Finset.mem_univ _) h
 
 open scoped FiniteInduce in
@@ -368,7 +368,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_ortho
     have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hζirr
     have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
       mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
-    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    rw [irr_cf_inner hzmem htmem, ite_eq_right ?_]
     intro hcontra
     have h1 : ζ 1 = trivialClassFunction (↥M) 1 :=
       congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
@@ -541,21 +541,21 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_ortho
       hyp.alignedOmegaSigmaGrid_columnZero_sum_inner hG hodd i j, hn i j]
     rcases eq_or_ne j 0 with rfl | hj
     · rcases eq_or_ne i 0 with rfl | hi
-      · rw [hn00, if_pos rfl]; norm_num
-      · rw [hA i hi, hA1', if_pos rfl]; norm_num
+      · rw [hn00, ite_eq_left rfl]; norm_num
+      · rw [hA i hi, hA1', ite_eq_left rfl]; norm_num
     · rcases eq_or_ne i 0 with rfl | hi
-      · rw [hB j hj, hB0, if_neg hj]; norm_num
-      · rw [hC i j hi hj, hA1', hB0, if_neg hj]; norm_num
+      · rw [hB j hj, hB0, ite_eq_right hj]; norm_num
+      · rw [hC i j hi hj, hA1', hB0, ite_eq_right hj]; norm_num
   have hB1 : B = 1 := by omega
   -- conclusion: the row-`0` indicator
   intro i j
   rw [hn i j]
   rcases eq_or_ne i 0 with rfl | hi
   · rcases eq_or_ne j 0 with rfl | hj
-    · rw [hn00, if_pos rfl]; norm_num
-    · rw [hB j hj, hB1, if_pos rfl]; norm_num
+    · rw [hn00, ite_eq_left rfl]; norm_num
+    · rw [hB j hj, hB1, ite_eq_left rfl]; norm_num
   · rcases eq_or_ne j 0 with rfl | hj
-    · rw [hA i hi, hA0, if_neg hi]; norm_num
-    · rw [hC i j hi hj, hA0, hB1, if_neg hi]; norm_num
+    · rw [hA i hi, hA0, ite_eq_right hi]; norm_num
+    · rw [hC i j hi hj, hA0, hB1, ite_eq_right hi]; norm_num
 
 end OddOrder.Peterfalvi.S12

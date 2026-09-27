@@ -83,7 +83,7 @@ theorem counterexample_psi_constant_on_signalizer_coset [Finite G]
         (OddOrder.GroupTheory.maximalSubgroupsContaining
           (Subgroup.centralizer ({g} : Set G))).Nonempty := ⟨hgt, hne⟩
     have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase g = N₀ := by
-      have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase g = hcond.2.choose := dif_pos hcond
+      have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase g = hcond.2.choose := dite_eq_left hcond
       have hch : hcond.2.choose ∈ ({N₀} : Set (Subgroup G)) :=
         (Set.ext_iff.mp hN₀ _).mp hcond.2.choose_spec
       exact hb.trans (Set.mem_singleton_iff.mp hch)

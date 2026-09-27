@@ -57,8 +57,8 @@ theorem linearIndependent_representation_section [FiniteDimensional F V] [Finite
     rw [← map_mul]
     change ρ.character _ = _
     by_cases h : c = c'
-    · subst h; rw [if_pos rfl, mul_inv_cancel, char_one]
-    · rw [if_neg h]
+    · subst h; rw [ite_eq_left rfl, mul_inv_cancel, char_one]
+    · rw [ite_eq_right h]
       exact character_eq_zero_of_notMem_center ρ hf hcl ((hmem c c').not.mpr h)
   rw [Fintype.linearIndependent_iff]
   intro coef hcoef j
@@ -70,7 +70,7 @@ theorem linearIndependent_representation_section [FiniteDimensional F V] [Finite
   rw [hcoef, zero_mul, map_zero] at happ
   simp only [hTval, smul_ite, smul_zero] at happ
   rw [Finset.sum_ite_eq' Finset.univ j] at happ
-  simp only [Finset.mem_univ, if_true, smul_eq_mul] at happ
+  simp only [Finset.mem_univ, ite_true, smul_eq_mul] at happ
   exact (mul_eq_zero.mp happ.symm).resolve_right (finrank_cast_ne_zero ρ hf hcl)
 
 /-- **Spanning of central-coset images, for any section** (BG (2.11), Burnside spanning half). For

@@ -101,7 +101,7 @@ theorem pairingZero_eq_zero_of_centralCharacterAlg_ne {φ ν : ι}
       refine Finset.sum_congr rfl fun μ _ => ?_
       change Cmᵀ θ μ * b' μ = Cmᵀ θ μ * b μ
       by_cases hμ : μ ∈ X
-      · rw [hb']; simp only [hμ, if_true]
+      · rw [hb']; simp only [hμ, ite_true]
       · have hz : Cmᵀ θ μ = 0 := hzero μ θ fun heq =>
           hμ ((hmemX μ).mpr (heq.trans ((hmemX θ).mp hθ)))
         rw [hz, zero_mul, zero_mul]
@@ -113,7 +113,7 @@ theorem pairingZero_eq_zero_of_centralCharacterAlg_ne {φ ν : ι}
       · have hz : Cmᵀ θ μ = 0 := hzero μ θ fun heq =>
           hθ ((hmemX θ).mpr (heq.symm.trans ((hmemX μ).mp hμ)))
         rw [hz, zero_mul]
-      · rw [hb']; simp only [hμ, if_false, mul_zero]
+      · rw [hb']; simp only [hμ, ite_false, mul_zero]
   -- uniqueness
   have hbb : b = b' := by
     have hmul : ∀ x : ι → K, Bmᵀ.mulVec (Cmᵀ.mulVec x) = x := by
@@ -123,7 +123,7 @@ theorem pairingZero_eq_zero_of_centralCharacterAlg_ne {φ ν : ι}
   have hνX : ν ∉ X := fun hin => h ((hmemX ν).mp hin)
   have := congrFun hbb ν
   rw [hb'] at this
-  simp only [hνX, if_false] at this
+  simp only [hνX, ite_false] at this
   rw [hb] at this
   exact this
 

@@ -708,7 +708,7 @@ theorem caseB_per_phi_anchored_fromYset
   have hee : ClassFunction.inner η₁ η₁.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hη₁irr⟩ : IrreducibleCharacter ↥L)
       (⟨η₁.conj, hη₁irr.conj⟩ : IrreducibleCharacter ↥L)
-    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at h
     simpa using h
   have hval : η₁ (1 : ↥L) = η₁.conj (1 : ↥L) :=
     (hyp.Yset_apply_one hη₁).trans (hyp.Yset_apply_one hconj).symm
@@ -759,11 +759,11 @@ noncomputable def adjoin_irr_nonreal_of_supportedDecomposition
   have hχχ : ClassFunction.inner χ χ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
       (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
       (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hne : (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ.conj, hχirr.conj⟩ := by
     intro heq
     apply hχnonreal
@@ -773,13 +773,13 @@ noncomputable def adjoin_irr_nonreal_of_supportedDecomposition
   have hχχbar : ClassFunction.inner χ χ.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
       (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
-    rwa [if_neg hne] at h
+    rwa [ite_eq_right hne] at h
   have hχbarχ : ClassFunction.inner χ.conj χ = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hχχbar, star_zero]
   have hchi1chi1 : ClassFunction.inner chi1 chi1 = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨chi1, hchi1irr⟩ : IrreducibleCharacter ↥L)
       (⟨chi1, hchi1irr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   exact OddOrder.Peterfalvi.S07.retarget_isCoherent_of_supportedDecomposition hS₁ Da rfl
     hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY
     htau1_chi1 hgen
@@ -858,7 +858,7 @@ theorem caseB_inner_irr_columnSum_eq_zero
   have hkron := irreducibleCharacter_inner_eq_ite
     (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ : IrreducibleCharacter ↥L)
     ((h46.columnFamily χ₂).mu i)
-  rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
+  rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
   simpa using hkron
 
 omit [Invertible (Nat.card ↥H : ℂ)] in
@@ -934,7 +934,7 @@ theorem caseB_inner_irr_conj_columnSum_eq_zero
   have hkron := irreducibleCharacter_inner_eq_ite
     (⟨(ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj, hirr.conj⟩ : IrreducibleCharacter ↥L)
     ((h46.columnFamily χ₂).mu i)
-  rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
+  rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
   simpa using hkron
 
 /-- **(6.8.2) irreducible `X`-member ⊥ a certain-type column base** — the `χ`/`χ̄ ⊥ S₁` inputs

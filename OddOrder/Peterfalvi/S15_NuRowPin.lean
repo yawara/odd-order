@@ -69,7 +69,7 @@ theorem Hypothesis.nuRow_inner [Finite G] (hyp : Hypothesis (G := G))
       = if r = s then (hyp.p : ℂ) else 0 := by
   have := hyp.finiteG
   by_cases hrs : r = s
-  · subst hrs; rw [if_pos rfl, OddOrder.RepresentationTheory.inner_sum_left]
+  · subst hrs; rw [ite_eq_left rfl, OddOrder.RepresentationTheory.inner_sum_left]
     calc ∑ j : Fin hyp.p, ClassFunction.inner (hyp.nu r j) (∑ j' : Fin hyp.p, hyp.nu r j')
         = ∑ _j : Fin hyp.p, (1 : ℂ) := by
           refine Finset.sum_congr rfl fun j _ => ?_
@@ -77,11 +77,11 @@ theorem Hypothesis.nuRow_inner [Finite G] (hyp : Hypothesis (G := G))
             Finset.sum_congr rfl (fun j' _ => pins.nu_orthonormal r r j j')]
           simp
       _ = (hyp.p : ℂ) := by simp
-  · rw [if_neg hrs, OddOrder.RepresentationTheory.inner_sum_left]
+  · rw [ite_eq_right hrs, OddOrder.RepresentationTheory.inner_sum_left]
     refine Finset.sum_eq_zero fun j _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     exact Finset.sum_eq_zero fun j' _ => by
-      rw [pins.nu_orthonormal r s j j', if_neg (fun h => hrs h.1)]
+      rw [pins.nu_orthonormal r s j j', ite_eq_right (fun h => hrs h.1)]
 
 open scoped FiniteInduce in
 /-- **A ν-row sum is not irreducible**: `⟨ν_i, ν_i⟩ = p ≠ 1`, while irreducible characters have
@@ -92,7 +92,7 @@ theorem Hypothesis.nuRow_not_irreducible [Finite G] (hyp : Hypothesis (G := G))
   have := hyp.finiteG
   intro hirr
   have h1 := hirr.inner_self_eq_one
-  rw [hyp.nuRow_inner pins i i, if_pos rfl] at h1
+  rw [hyp.nuRow_inner pins i i, ite_eq_left rfl] at h1
   have : hyp.p = 1 := by exact_mod_cast h1
   exact absurd (this ▸ hyp.p_prime) Nat.not_prime_one
 
@@ -255,7 +255,7 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
   have hcross : ClassFunction.inner (coh.extension ζ) (coh.extension ζ.conj) = 0 := by
     rw [coh.extension_inner_eq ζ ζ.conj (Submodule.subset_span hζ)
       (Submodule.subset_span hζc), OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj,
-      if_neg (fun h => hnoReal hζ h.symm)]
+      ite_eq_right (fun h => hnoReal hζ h.symm)]
   intro i j
   have h := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
     hpsiZ hconjZ hpsi1 hconj1 hcross hvanish i j
@@ -417,7 +417,7 @@ theorem Hypothesis.etaRow_inner [Finite G] (hyp : Hypothesis (G := G)) (r s : Fi
       = if r = s then (hyp.p : ℂ) else 0 := by
   have := hyp.finiteG
   by_cases hrs : r = s
-  · subst hrs; rw [if_pos rfl, OddOrder.RepresentationTheory.inner_sum_left]
+  · subst hrs; rw [ite_eq_left rfl, OddOrder.RepresentationTheory.inner_sum_left]
     calc ∑ j : Fin hyp.p, ClassFunction.inner (hyp.eta r j) (∑ j' : Fin hyp.p, hyp.eta r j')
         = ∑ _j : Fin hyp.p, (1 : ℂ) := by
           refine Finset.sum_congr rfl fun j _ => ?_
@@ -426,18 +426,18 @@ theorem Hypothesis.etaRow_inner [Finite G] (hyp : Hypothesis (G := G)) (r s : Fi
               (fun j' _ => OddOrder.Peterfalvi.S16.eta_orthonormal hyp r r j j')]
           simp
       _ = (hyp.p : ℂ) := by simp
-  · rw [if_neg hrs, OddOrder.RepresentationTheory.inner_sum_left]
+  · rw [ite_eq_right hrs, OddOrder.RepresentationTheory.inner_sum_left]
     refine Finset.sum_eq_zero fun j _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     exact Finset.sum_eq_zero fun j' _ => by
-      rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp r s j j', if_neg (fun h => hrs h.1)]
+      rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp r s j j', ite_eq_right (fun h => hrs h.1)]
 
 open scoped FiniteInduce in
 /-- **η-row self-norm**: `⟨∑_j η_{rj}, ∑_j η_{rj}⟩ = p`.  Mirror of `etaColumn_inner_self`. -/
 theorem Hypothesis.etaRow_inner_self [Finite G] (hyp : Hypothesis (G := G)) (r : Fin hyp.q) :
     ClassFunction.inner (∑ j : Fin hyp.p, hyp.eta r j) (∑ j : Fin hyp.p, hyp.eta r j)
       = (hyp.p : ℂ) := by
-  rw [hyp.etaRow_inner r r, if_pos rfl]
+  rw [hyp.etaRow_inner r r, ite_eq_left rfl]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -512,12 +512,12 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
   have hi' : i' = i := by
     by_contra hne
     have h := hνrows i' i
-    rw [if_neg hne, ← hi'eq, ← hνdef, hνdef, hνrows i i, if_pos rfl] at h
+    rw [ite_eq_right hne, ← hi'eq, ← hνdef, hνdef, hνrows i i, ite_eq_left rfl] at h
     exact hpne h
   have hs' : s' = s := by
     by_contra hne
     have h := hνrows s' s
-    rw [if_neg hne, ← hs'eq, hseq, hνrows s s, if_pos rfl] at h
+    rw [ite_eq_right hne, ← hs'eq, hseq, hνrows s s, ite_eq_left rfl] at h
     exact hpne h
   rw [hi', hs'] at himg
   have hEsubset : ∀ α ∈ E, (∃ b : Fin hyp.p, α = hyp.eta i b) ∨
@@ -543,17 +543,17 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
         rcases hEsubset α hα with ⟨b', rfl⟩ | ⟨b', rfl⟩
         · rw [hη i i b' b]
           by_cases hbb : b' = b
-          · subst hbb; rw [if_pos ⟨rfl, rfl⟩, if_pos rfl]
-          · rw [if_neg (fun h => hbb h.2), if_neg (fun h => hbb (by
+          · subst hbb; rw [ite_eq_left ⟨rfl, rfl⟩, ite_eq_left rfl]
+          · rw [ite_eq_right (fun h => hbb h.2), ite_eq_right (fun h => hbb (by
               have := congrArg (fun f => ClassFunction.inner f (hyp.eta i b)) h
-              rw [hη i i b' b, hη i i b b, if_pos (⟨rfl, rfl⟩ : i = i ∧ b = b),
-                if_neg (fun hh => hbb hh.2)] at this
+              rw [hη i i b' b, hη i i b b, ite_eq_left (⟨rfl, rfl⟩ : i = i ∧ b = b),
+                ite_eq_right (fun hh => hbb hh.2)] at this
               exact absurd this zero_ne_one))]
-        · rw [ClassFunction.inner_neg_left, hη s i b' b, if_neg (fun h => hsi h.1), neg_zero,
-            if_neg (fun h => by
+        · rw [ClassFunction.inner_neg_left, hη s i b' b, ite_eq_right (fun h => hsi h.1), neg_zero,
+            ite_eq_right (fun h => by
               have := congrArg (fun f => ClassFunction.inner f (hyp.eta i b)) h
-              rw [ClassFunction.inner_neg_left, hη s i b' b, if_neg (fun hh => hsi hh.1),
-                neg_zero, hη i i b b, if_pos ⟨rfl, rfl⟩] at this
+              rw [ClassFunction.inner_neg_left, hη s i b' b, ite_eq_right (fun hh => hsi hh.1),
+                neg_zero, hη i i b b, ite_eq_left ⟨rfl, rfl⟩] at this
               exact absurd this zero_ne_one)]]
     rw [Finset.sum_ite_eq' E (hyp.eta i b) (fun _ => (1 : ℂ))]
   have hcoef_s : ∀ b : Fin hyp.p,
@@ -565,18 +565,18 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
         = ∑ α ∈ E, (if α = -hyp.eta s b then (-1 : ℂ) else 0) from
       Finset.sum_congr rfl fun α hα => by
         rcases hEsubset α hα with ⟨b', rfl⟩ | ⟨b', rfl⟩
-        · rw [hη i s b' b, if_neg (fun h => hsi h.1.symm), if_neg (fun h => by
+        · rw [hη i s b' b, ite_eq_right (fun h => hsi h.1.symm), ite_eq_right (fun h => by
             have := congrArg (fun f => ClassFunction.inner f (hyp.eta s b)) h
-            rw [hη i s b' b, if_neg (fun hh => hsi hh.1.symm),
-              ClassFunction.inner_neg_left, hη s s b b, if_pos ⟨rfl, rfl⟩] at this
+            rw [hη i s b' b, ite_eq_right (fun hh => hsi hh.1.symm),
+              ClassFunction.inner_neg_left, hη s s b b, ite_eq_left ⟨rfl, rfl⟩] at this
             exact absurd this (by norm_num))]
         · rw [ClassFunction.inner_neg_left, hη s s b' b]
           by_cases hbb : b' = b
-          · subst hbb; rw [if_pos ⟨rfl, rfl⟩, if_pos rfl]
-          · rw [if_neg (fun h => hbb h.2), neg_zero, if_neg (fun h => hbb (by
+          · subst hbb; rw [ite_eq_left ⟨rfl, rfl⟩, ite_eq_left rfl]
+          · rw [ite_eq_right (fun h => hbb h.2), neg_zero, ite_eq_right (fun h => hbb (by
               have := congrArg (fun f => ClassFunction.inner f (hyp.eta s b)) h
-              rw [ClassFunction.inner_neg_left, hη s s b' b, if_neg (fun hh => hbb hh.2),
-                neg_zero, ClassFunction.inner_neg_left, hη s s b b, if_pos ⟨rfl, rfl⟩] at this
+              rw [ClassFunction.inner_neg_left, hη s s b' b, ite_eq_right (fun hh => hbb hh.2),
+                neg_zero, ClassFunction.inner_neg_left, hη s s b b, ite_eq_left ⟨rfl, rfl⟩] at this
               exact absurd this (by norm_num)))]]
     rw [Finset.sum_ite_eq' E (-hyp.eta s b) (fun _ => (-1 : ℂ))]
   have hcoef_0 : ∀ (a : Fin hyp.q) (b : Fin hyp.p), a ≠ i → a ≠ s →
@@ -585,8 +585,8 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     rw [hEsum', OddOrder.RepresentationTheory.inner_sum_left]
     refine Finset.sum_eq_zero fun α hα => ?_
     rcases hEsubset α hα with ⟨b', rfl⟩ | ⟨b', rfl⟩
-    · rw [hη i a b' b, if_neg (fun h => hai h.1.symm)]
-    · rw [ClassFunction.inner_neg_left, hη s a b' b, if_neg (fun h => has h.1.symm), neg_zero]
+    · rw [hη i a b' b, ite_eq_right (fun h => hai h.1.symm)]
+    · rw [ClassFunction.inner_neg_left, hη s a b' b, ite_eq_right (fun h => has h.1.symm), neg_zero]
   -- column-uniformity of the indicators through the (3.7) exchange relation
   have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
@@ -609,7 +609,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     have h := hcol i b
     rw [hcoef_i b, hcoef_i ⟨0, hyp.p_prime.pos⟩] at h
     by_cases h1 : hyp.eta i b ∈ E <;> by_cases h2 : hyp.eta i ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
-      simp only [h1, h2, if_pos, if_false] at h ⊢ <;>
+      simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
         | exact Iff.rfl
         | exact absurd h one_ne_zero
@@ -620,29 +620,29 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     have h := hcol s b
     rw [hcoef_s b, hcoef_s ⟨0, hyp.p_prime.pos⟩] at h
     by_cases h1 : -hyp.eta s b ∈ E <;> by_cases h2 : -hyp.eta s ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
-      simp only [h1, h2, if_pos, if_false] at h ⊢ <;>
+      simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
         | exact Iff.rfl
         | exact absurd h (by norm_num)
   -- the isometry norm `‖c(ν_i)‖² = p`
   have hnorm : ClassFunction.inner (c.extension νrow) (c.extension νrow) = (hyp.p : ℂ) := by
     rw [c.extension_inner_eq νrow νrow (Submodule.subset_span hνmem)
-      (Submodule.subset_span hνmem), hνdef, hνrows i i, if_pos rfl]
+      (Submodule.subset_span hνmem), hνdef, hνrows i i, ite_eq_left rfl]
   -- injectivity of the two row enumerations
   have hinj_i : Function.Injective (fun b : Fin hyp.p => hyp.eta i b) := by
     intro b b' h
     by_contra hne
     have := congrArg (fun f => ClassFunction.inner f (hyp.eta i b')) h
-    rw [hη i i b b', hη i i b' b', if_pos (⟨rfl, rfl⟩ : i = i ∧ b' = b'),
-      if_neg (fun hh => hne hh.2)] at this
+    rw [hη i i b b', hη i i b' b', ite_eq_left (⟨rfl, rfl⟩ : i = i ∧ b' = b'),
+      ite_eq_right (fun hh => hne hh.2)] at this
     exact zero_ne_one this
   have hinj_s : Function.Injective (fun b : Fin hyp.p => -hyp.eta s b) := by
     intro b b' h
     by_contra hne
     have := congrArg (fun f => ClassFunction.inner f (-hyp.eta s b')) h
     simp only [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg] at this
-    rw [hη s s b b', hη s s b' b', if_pos (⟨rfl, rfl⟩ : s = s ∧ b' = b'),
-      if_neg (fun hh => hne hh.2)] at this
+    rw [hη s s b b', hη s s b' b', ite_eq_left (⟨rfl, rfl⟩ : s = s ∧ b' = b'),
+      ite_eq_right (fun hh => hne hh.2)] at this
     exact zero_ne_one this
   -- endgame: four cases on the two base indicators
   by_cases hsE : hyp.eta i ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
@@ -676,8 +676,8 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
         obtain ⟨b, -, rfl⟩ := hα
         obtain ⟨b', -, heq⟩ := hmem
         have := congrArg (fun f => ClassFunction.inner f (hyp.eta i b)) heq
-        rw [ClassFunction.inner_neg_left, hη s i b' b, if_neg (fun hh => hsi hh.1), neg_zero,
-          hη i i b b, if_pos (⟨rfl, rfl⟩ : i = i ∧ b = b)] at this
+        rw [ClassFunction.inner_neg_left, hη s i b' b, ite_eq_right (fun hh => hsi hh.1), neg_zero,
+          hη i i b b, ite_eq_left (⟨rfl, rfl⟩ : i = i ∧ b = b)] at this
         exact zero_ne_one this)]
       rw [Finset.sum_image (fun b _ b' _ h => hinj_i h),
         Finset.sum_image (fun b _ b' _ h => hinj_s h), Finset.sum_neg_distrib]
@@ -688,7 +688,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
       rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
         ClassFunction.inner_sub_right, hyp.etaRow_inner_self i, hyp.etaRow_inner_self s,
         hyp.etaRow_inner i s, hyp.etaRow_inner s i,
-        if_neg (fun h => hsi h.symm), if_neg hsi]
+        ite_eq_right (fun h => hsi h.symm), ite_eq_right hsi]
       ring
     rw [hnorm] at h2p
     have : (hyp.p : ℂ) = 0 := by linear_combination -h2p
@@ -855,12 +855,12 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     intro i i'
     rw [hrfeq i, hrfeq i', hνrows]
     by_cases hii : i = i'
-    · subst hii; rw [if_pos rfl, if_pos rfl]
-    · rw [if_neg (fun h => hii (hrfinj _ _ h)), if_neg hii]
+    · subst hii; rw [ite_eq_left rfl, ite_eq_left rfl]
+    · rw [ite_eq_right (fun h => hii (hrfinj _ _ h)), ite_eq_right hii]
   have hχorth : ∀ i j : Fin n, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 := by
-    intro i j hij; rw [hχpair, if_neg hij]
+    intro i j hij; rw [hχpair, ite_eq_right hij]
   have hχnorm : ∀ i : Fin n, ClassFunction.inner (χ i) (χ i) ≠ 0 := by
-    intro i; rw [hχpair, if_pos rfl]; exact hpne0
+    intro i; rw [hχpair, ite_eq_left rfl]; exact hpne0
   -- the canonical Fourier map and its member images
   set ν₀ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.T G :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
@@ -928,8 +928,8 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
             obtain ⟨j', rfl⟩ := hidxof b hb
             rw [hν₀apply i, hν₀apply j', hηrows, hχpair]
             by_cases hij : i = j'
-            · subst hij; rw [if_pos rfl, if_pos rfl]
-            · rw [if_neg (fun h => hij (hrfinj _ _ h)), if_neg hij]
+            · subst hij; rw [ite_eq_left rfl, ite_eq_left rfl]
+            · rw [ite_eq_right (fun h => hij (hrfinj _ _ h)), ite_eq_right hij]
         | zero => rw [map_zero, ClassFunction.inner_zero_left,
             ClassFunction.inner_zero_left]
         | add u v hu hv ihu ihv =>
@@ -1019,8 +1019,8 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
       have hce : (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
           = ∑ j : Fin hyp.p, hyp.nu ⟨2, h2lt⟩ j := sub_eq_zero.mp heq
       have hcontra := hνrows ⟨1, hyp.q_prime.one_lt⟩ ⟨2, h2lt⟩
-      rw [if_neg hne12, ← hce, hνrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩,
-        if_pos rfl] at hcontra
+      rw [ite_eq_right hne12, ← hce, hνrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩,
+        ite_eq_left rfl] at hcontra
       exact hpne0 hcontra
   -- assemble; the pin is `hν₀apply` at the `ν-row₁`-member index
   have hν1mem : (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j) ∈ F := by
@@ -1036,9 +1036,9 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
       rw [← hrfeq i₁, hχi₁]
     have h2 : (if rf i₁ = (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) then (hyp.p : ℂ) else 0)
         = (hyp.p : ℂ) := by
-      rw [← hνrows, hrows_eq, hνrows, if_pos rfl]
+      rw [← hνrows, hrows_eq, hνrows, ite_eq_left rfl]
     by_contra hne
-    rw [if_neg hne] at h2
+    rw [ite_eq_right hne] at h2
     exact hpne0 h2.symm
   refine ⟨{ nonzero := hnonzero
             extension := ν₀
@@ -1113,14 +1113,14 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
           (∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j)) hdiff
         simp only [ClassFunction.inner_sub_left] at hinner
         rw [hflip, ClassFunction.inner_neg_left,
-          hηrows s ⟨1, hyp.q_prime.one_lt⟩, if_neg hs1, neg_zero,
-          hηrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩, if_pos rfl,
-          hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hi₂1] at hinner
+          hηrows s ⟨1, hyp.q_prime.one_lt⟩, ite_eq_right hs1, neg_zero,
+          hηrows ⟨1, hyp.q_prime.one_lt⟩ ⟨1, hyp.q_prime.one_lt⟩, ite_eq_left rfl,
+          hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, ite_eq_right hi₂1] at hinner
         -- so `⟨c(ν_{i₂}), η-row₁⟩ = −p`; but the dichotomy at `i₂` gives `0`
         rcases hyp.coherentIndT_nuRow_pin_of_irr hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief c
             hξ hξirr hi₂0 with
           hc2 | ⟨s₂, hs₂0, hs₂i₂, hs₂conj, hc2⟩
-        · rw [hc2, hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hi₂1] at hinner
+        · rw [hc2, hηrows i₂ ⟨1, hyp.q_prime.one_lt⟩, ite_eq_right hi₂1] at hinner
           rw [sub_zero] at hinner
           exact hpne0 (by linear_combination -hinner)
         · have hs₂1 : s₂ ≠ ⟨1, hyp.q_prime.one_lt⟩ := by
@@ -1132,10 +1132,10 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
               rw [← hs₂conj, ClassFunction.conj_conj]
             rw [hsconj] at h1
             have h2 := hνrows i₂ s
-            rw [if_neg hi₂s, h1, hνrows s s, if_pos rfl] at h2
+            rw [ite_eq_right hi₂s, h1, hνrows s s, ite_eq_left rfl] at h2
             exact hpne0 h2
           rw [hc2, ClassFunction.inner_neg_left,
-            hηrows s₂ ⟨1, hyp.q_prime.one_lt⟩, if_neg hs₂1, neg_zero, sub_zero] at hinner
+            hηrows s₂ ⟨1, hyp.q_prime.one_lt⟩, ite_eq_right hs₂1, neg_zero, sub_zero] at hinner
           exact hpne0 (by linear_combination -hinner)
       -- `q = 3`: otherwise `q ≥ 5` and a third row exists
       have hq3 : hyp.q = 3 := by

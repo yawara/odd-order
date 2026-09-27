@@ -632,7 +632,7 @@ theorem SectionFourSetup.exists_stepThree_data (s4 : hyp.SectionFourSetup) {f g 
   · simpa using hcZ
   · rw [hkx]
     push_cast
-    ring
+    ring_nf
 
 include hyp in
 /-- **A `t`-commutator landing in `P` is trivial.**
@@ -950,7 +950,7 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
   -- the conjugator
   have hcP : (c : G) ∈ s4.P := hZP c.2 (by simpa using hcZ)
   have hkx' : k (x : G) = (z : G) ^ 3 * (c : G) := by
-    rw [hkx]; push_cast; ring
+    rw [hkx]; push_cast; ring_nf
   refine ⟨(x : G), hxQ, hxQ0, ?_⟩
   exact SectionFourSetup.mem_W_of_stepThree hyp s4 H hC2 M sfive hZ hm hQ0card hmu hl
     hcent hzV z.2 hzP hxQ hxQ0 x.2 hfx c.2 (by simpa using hcZ) hcP hkx'

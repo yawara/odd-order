@@ -140,7 +140,7 @@ theorem nonidentityZClassCoeffSum_cong_of_isTISubset [Finite G]
   have : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
   have hchar0 : ∀ g : G, ρ₀.character g = 1 := by
     intro g
-    simp [hρ₀, Representation.character]
+    simp [hρ₀, Representation.character, Representation.isTrivial_def]
   let C₁ : ConjClasses G := ConjClasses.mk z
   let C₂ : ConjClasses G := ConjClasses.mk z⁻¹
   let α : ℂ := ω ρ₀ C₁

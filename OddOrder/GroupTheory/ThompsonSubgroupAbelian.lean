@@ -281,22 +281,6 @@ theorem commute_commutatorElement_of_inv_mul_mem_centralizer
     commutatorElement_eq_one_iff_commute.mp hrot.symm
   exact (Commute.inv_left_iff.mp hfin).symm
 
-/-- 可換部分群同士の join は, 片方が他方を中心化すればまた可換 (一般形).
-
-⚠ 同内容の `OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer` が下流
-(BG Ch.4) に存在する — GroupTheory からは import 不可のため一般形を本 leaf に置く.
-下流側の dedup は issue 9403 に記録. -/
-theorem isMulCommutative_sup_of_le_centralizer {H K : Subgroup G}
-    (hH : IsMulCommutative H) (hK : IsMulCommutative K)
-    (hHK : H ≤ centralizer (K : Set G)) :
-    IsMulCommutative (H ⊔ K : Subgroup G) := by
-  rw [← le_centralizer_iff_isMulCommutative]
-  refine sup_le ?_ ?_
-  · rw [le_centralizer_iff]
-    exact sup_le (le_centralizer_iff_isMulCommutative.mpr hH) (le_centralizer_iff.mp hHK)
-  · rw [le_centralizer_iff]
-    exact sup_le hHK (le_centralizer_iff_isMulCommutative.mpr hK)
-
 /-- 可換性は部分群に遺伝する. -/
 theorem isMulCommutative_of_le {H K : Subgroup G} (hK : IsMulCommutative K)
     (hHK : H ≤ K) : IsMulCommutative H := by
@@ -433,7 +417,7 @@ theorem thompson_mem_maxAbelianIn [Finite G] {P A : Subgroup G} {x : G}
   have hCcomm : IsMulCommutative C := isMulCommutative_of_le hA.2.1 hCA
   have hMcent : M ≤ centralizer (C : Set G) := le_centralizer_iff.mp inf_le_right
   have hMCcomm : IsMulCommutative (M ⊔ C : Subgroup G) :=
-    isMulCommutative_sup_of_le_centralizer hM hCcomm hMcent
+    Subgroup.isMulCommutative_sup_of_le_centralizer hM hCcomm hMcent
   -- `|A| ≤ |M ⊔ C|`
   have hcard : Nat.card A ≤ Nat.card ↥(M ⊔ C) := by
     have h1 : Nat.card A = (C.subgroupOf A).index * Nat.card C := by
@@ -1054,19 +1038,10 @@ section GorensteinLemmaTwoEight
 
 open OddOrder.Isaacs.Ch04
 
-/-- 中心に含まれる部分群は正規. -/
-theorem normal_of_le_center' {C : Subgroup G} (hC : C ≤ center G) : C.Normal := by
-  constructor
-  intro c hc g
-  have hcen := Subgroup.mem_center_iff.mp (hC hc) g
-  have heq : g * c * g⁻¹ = c := by rw [hcen]; group
-  rw [heq]
-  exact hc
-
 /-- 中心的部分群は左スロットで吸収される: `C ≤ Z(G)` なら `⁅X ⊔ C, Y⁆ = ⁅X, Y⁆`. -/
 theorem commutator_sup_central_left {X Y C : Subgroup G} (hC : C ≤ center G) :
     ⁅X ⊔ C, Y⁆ = ⁅X, Y⁆ := by
-  have := normal_of_le_center' hC
+  have := Subgroup.normal_of_le_center hC
   refine le_antisymm ?_ (commutator_mono le_sup_left le_rfl)
   rw [commutator_le]
   intro g hg y hy
@@ -1244,7 +1219,7 @@ theorem iterCommutator_min_abelian_le_two {B A : Subgroup G} [B.Normal]
       rw [lowerCentralSeries_sup_eq_iterCommutator_sup hsup hB' hAcomm (m - 1) (by omega)]
       exact le_sup_left
     refine isMulCommutative_of_le ?_ hle
-    refine isMulCommutative_sup_of_le_centralizer h3'
+    refine Subgroup.isMulCommutative_sup_of_le_centralizer h3'
       (isMulCommutative_of_le inferInstance hB')
       (le_centralizer_iff.mpr (hB'.trans (center_le_centralizer _)))
   -- `n` の最小性 ⟹ `n ≤ m - 1` ⟹ `n ≤ 2`

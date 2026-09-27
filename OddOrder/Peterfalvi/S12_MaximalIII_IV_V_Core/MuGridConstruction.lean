@@ -300,8 +300,8 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
   rw [step1, step1, OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_inner_irreducibleCharacter,
     irreducibleCharacter_inner_eq_ite]
   by_cases hij : i = i' ∧ j = j'
-  · rw [if_pos hij, if_pos (by rw [hij.1, hij.2])]
-  · rw [if_neg hij, if_neg fun he => hij (hηinj i j i' j' he)]
+  · rw [ite_eq_left hij, ite_eq_left (by rw [hij.1, hij.2])]
+  · rw [ite_eq_right hij, ite_eq_right fun he => hij (hηinj i j i' j' he)]
 
 open scoped FiniteInduce in
 set_option backward.isDefEq.respectTransparency false in
@@ -417,8 +417,8 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
     have h1 : hyp.alignedOmegaSigmaGrid hG hodd i 0 = hyp.alignedOmegaSigmaGrid hG hodd i' 0 := by
       rw [hval i 0, hval i' 0, hii']
     have h2 := hyp.alignedOmegaSigmaGrid_inner hG hodd i i' 0 0
-    rw [if_neg (fun hh => hne hh.1), h1, hyp.alignedOmegaSigmaGrid_inner hG hodd i' i' 0 0,
-      if_pos ⟨rfl, rfl⟩] at h2
+    rw [ite_eq_right (fun hh => hne hh.1), h1, hyp.alignedOmegaSigmaGrid_inner hG hodd i' i' 0 0,
+      ite_eq_left ⟨rfl, rfl⟩] at h2
     exact one_ne_zero h2
   · -- `κ` injective (joint orthonormality at row `0`)
     intro j j' hjj'
@@ -426,8 +426,8 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
     have h1 : hyp.alignedOmegaSigmaGrid hG hodd 0 j = hyp.alignedOmegaSigmaGrid hG hodd 0 j' := by
       rw [hval 0 j, hval 0 j', hjj']
     have h2 := hyp.alignedOmegaSigmaGrid_inner hG hodd 0 0 j j'
-    rw [if_neg (fun hh => hne hh.2), h1, hyp.alignedOmegaSigmaGrid_inner hG hodd 0 0 j' j',
-      if_pos ⟨rfl, rfl⟩] at h2
+    rw [ite_eq_right (fun hh => hne hh.2), h1, hyp.alignedOmegaSigmaGrid_inner hG hodd 0 0 j' j',
+      ite_eq_left ⟨rfl, rfl⟩] at h2
     exact one_ne_zero h2
 
 open scoped FiniteInduce in

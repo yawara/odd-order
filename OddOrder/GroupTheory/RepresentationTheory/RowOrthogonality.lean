@@ -55,7 +55,7 @@ theorem characterTableRowOrthogonality :
         = ∑ g : G, ρ.character g * ρ.character g⁻¹ :=
       Finset.sum_congr rfl fun g _ => by rw [congrFun hχ g, ← character_inv ρ g]
     rw [characterTableRowPairing_eq_inv_card_sum, hsum, invOf_eq_inv,
-      Representation.char_orthonormal ρ ρ, if_pos ⟨Representation.Equiv.refl ρ⟩]
+      Representation.char_orthonormal ρ ρ, ite_eq_left ⟨Representation.Equiv.refl ρ⟩]
   · -- Off-diagonal entry `(χ, ψ)` with `χ ≠ ψ` equals `0`.
     obtain ⟨Vχ, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
     obtain ⟨Vψ, _, _, _, σ, hσ, hψ⟩ := ψ.isIrreducible
@@ -75,6 +75,6 @@ theorem characterTableRowOrthogonality :
       rw [congrFun hχ g, congrFun hψ g]
       exact (congrFun (Representation.char_iso φ) g).symm
     rw [characterTableRowPairing_eq_inv_card_sum, hsum, invOf_eq_inv,
-      Representation.char_orthonormal ρ σ, if_neg hnc]
+      Representation.char_orthonormal ρ σ, ite_eq_right hnc]
 
 end OddOrder.RepresentationTheory

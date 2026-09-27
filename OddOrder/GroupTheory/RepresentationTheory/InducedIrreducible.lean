@@ -224,7 +224,7 @@ theorem inner_induce_eq_zero_of_not_conj (θ ψ : IrreducibleCharacter H)
   apply mul_left_cancel₀ hcardH
   rw [mul_zero, card_mul_inner_induce]
   refine Finset.sum_eq_zero fun x _ => ?_
-  rw [← IrreducibleCharacter.coe_conjBy, irreducibleCharacter_inner_eq_ite, if_neg]
+  rw [← IrreducibleCharacter.coe_conjBy, irreducibleCharacter_inner_eq_ite, ite_eq_right]
   intro hθ
   exact h x (by rw [hθ]; simp)
 
@@ -292,7 +292,7 @@ theorem sq_mul_card_mul_card_eq_card_inertia_of_induce_eq_nsmul_sum
       intro χ hχ
       rw [inner_sum_right,
         Finset.sum_congr rfl fun ψ _ => irreducibleCharacter_inner_eq_ite χ ψ,
-        Finset.sum_ite_eq S χ (fun _ => (1 : ℂ)), if_pos hχ]
+        Finset.sum_ite_eq S χ (fun _ => (1 : ℂ)), ite_eq_left hχ]
     rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul, mul_one]
   rw [← card_mul_inner_self_induce_eq_card_inertia θ, hdec, ClassFunction.inner_smul_left,
     ClassFunction.inner_smul_right, hortho, star_natCast]
@@ -408,7 +408,7 @@ theorem orbitSum_inner_orbitSum_eq_zero_of_induce_ne [Finite H]
   obtain ⟨x, -, rfl⟩ := Finset.mem_image.mp hψ
   obtain ⟨y, -, rfl⟩ := Finset.mem_image.mp hψ'
   rw [← IrreducibleCharacter.coe_conjBy, ← IrreducibleCharacter.coe_conjBy,
-    irreducibleCharacter_inner_eq_ite, if_neg]
+    irreducibleCharacter_inner_eq_ite, ite_eq_right]
   intro heq
   refine hne ?_
   -- equal conjugates force equal inductions (`induce_conjBy_eq`)
@@ -915,11 +915,11 @@ theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
     have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction H ℂ))
         (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 := by
       rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
-        irreducibleCharacter_inner_eq_ite, if_neg hθ]
+        irreducibleCharacter_inner_eq_ite, ite_eq_right hθ]
     have hcf : ClassFunction.induce H (θ : ClassFunction H ℂ)
         = (trivialIrreducibleCharacter G : ClassFunction G ℂ) :=
       congrArg (fun c : IrreducibleCharacter G => (c : ClassFunction G ℂ)) h
-    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
+    rw [hcf, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl] at hzero
     exact one_ne_zero hzero
   -- Odd order gives `(Ind θ)‾ ≠ Ind θ`.
   have hnotreal := not_isReal_of_ne_trivial_of_odd_card' hodd hne_triv
@@ -933,7 +933,7 @@ theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
   have hii := irreducibleCharacter_inner_eq_ite
     (⟨ClassFunction.induce H (θ : ClassFunction H ℂ), hirr⟩ : IrreducibleCharacter G)
     ⟨ClassFunction.induce H ((θ : ClassFunction H ℂ).conj), hirr'⟩
-  rwa [if_neg (fun h => hne (congrArg (fun c : IrreducibleCharacter G =>
+  rwa [ite_eq_right (fun h => hne (congrArg (fun c : IrreducibleCharacter G =>
     (c : ClassFunction G ℂ)) h))] at hii
 
 omit hH [Fintype G] [Invertible (Nat.card G : ℂ)] in
@@ -1031,9 +1031,9 @@ theorem eq_inner_smul_of_inner_ne_zero
     ring
   have hab : a = b := by
     by_contra hab
-    exact hne (by rw [key, irreducibleCharacter_inner, if_neg hab, mul_zero])
+    exact hne (by rw [key, irreducibleCharacter_inner, ite_eq_right hab, mul_zero])
   subst hab
-  rw [key, irreducibleCharacter_inner, if_pos rfl, mul_one,
+  rw [key, irreducibleCharacter_inner, ite_eq_left rfl, mul_one,
     ← Int.cast_smul_eq_zsmul ℂ ε' (a : ClassFunction Γ ℂ),
     ← Int.cast_smul_eq_zsmul ℂ ε (a : ClassFunction Γ ℂ), smul_smul]
   congr 1

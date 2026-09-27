@@ -135,7 +135,7 @@ theorem sum_apply_eq_zero_of_ne_trivial {Γ : Type*} [Group Γ] [Fintype Γ]
     (hφ : φ ≠ trivialIrreducibleCharacter Γ) :
     ∑ g : Γ, (φ : ClassFunction Γ ℂ) g = 0 := by
   have h := irreducibleCharacter_inner φ (trivialIrreducibleCharacter Γ)
-  rw [if_neg hφ, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum] at h
+  rw [ite_eq_right hφ, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum] at h
   simp only [IrreducibleCharacter.coe_trivialIrreducibleCharacter, trivialClassFunction_apply,
     star_one, mul_one] at h
   have hS : (Nat.card Γ : ℂ) * (⅟(Nat.card Γ : ℂ) * ∑ g : Γ, (φ : ClassFunction Γ ℂ) g) = 0 := by

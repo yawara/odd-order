@@ -212,7 +212,6 @@ to a ring automorphism of the subalgebra `K[s] ⊆ ℂ` that restricts to `v` on
 
 section ComplexExtension
 
-set_option backward.isDefEq.respectTransparency.types false in
 /-- **Every automorphism of a subfield of `ℂ` extends to a ring automorphism of `ℂ`.** -/
 theorem exists_complexRingEquiv_extends (K : IntermediateField ℚ ℂ) (v : K ≃+* K) :
     ∃ σ : ℂ ≃+* ℂ, ∀ x : K, σ x = (v x : ℂ) := by

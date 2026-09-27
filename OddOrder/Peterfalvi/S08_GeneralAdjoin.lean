@@ -412,7 +412,7 @@ theorem crux1_of_memberFamily_general
     intro i hi j hj hij
     by_contra hne
     have h0 := horth i hi j hj
-    rw [if_neg hne, hij, horth j hj j hj, if_pos rfl] at h0
+    rw [ite_eq_right hne, hij, horth j hj j hj, ite_eq_left rfl] at h0
     exact one_ne_zero h0
   obtain ⟨c, Z, hc_coeff, hYsum, hZortho⟩ :=
     OddOrder.Peterfalvi.S08.exists_indexed_intProjection_of_orthonormal_ZIrr hDaY_ZIrr s
@@ -422,8 +422,8 @@ theorem crux1_of_memberFamily_general
     intro i hi
     rw [← hc_coeff i hi, hcoeffval i hi, hμeq]
     by_cases h : i = i₁
-    · simp only [if_pos h]; push_cast; ring
-    · simp only [if_neg h]; push_cast; ring
+    · simp only [ite_eq_left h]; push_cast; ring
+    · simp only [ite_eq_right h]; push_cast; ring
   have hY : Da.Y =
       (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (rc i) : ℝ) : ℂ)
         • hS₁.extension (χmem i)) + Z := by
@@ -432,7 +432,7 @@ theorem crux1_of_memberFamily_general
   have hψ : (ClassFunction.inner (a • χmem i₁ : ClassFunction L ℂ) (a • χmem i₁)).re
       = (a : ℝ) ^ 2 * 1 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), ClassFunction.inner_smul_left,
-      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl,
+      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, ite_eq_left rfl,
       star_natCast, mul_one,
       show (a : ℂ) * (a : ℂ) = (((a : ℝ) ^ 2 * 1 : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re]
   obtain ⟨hlam0, -⟩ := Da.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) ((a : ℤ) + μ) Z
@@ -717,7 +717,7 @@ noncomputable def adjoinPairCoherent_general
       from by push_cast; ring]
     rcases eq_or_ne i i₁ with h | h
     · subst h; field_simp
-    · rw [if_neg (fun hh : i₁ = i => h hh.symm), if_neg h]; field_simp
+    · rw [ite_eq_right (fun hh : i₁ = i => h hh.symm), ite_eq_right h]; field_simp
   have hcrux1 : ClassFunction.inner (τ (χ - a • χmem i₁)) (hS₁.extension (χmem i₁)) = -(a : ℂ) :=
     crux1_of_memberFamily_general hS₁ χ s χmem (fun i => (degMem i : ℝ) / (degMem i₁ : ℝ)) i₁ hi₁
       Da hDaY_ZIrr hmemS1 hmemortho hcoeffval htau1_memaχ (div_self hd1ne') hDeg

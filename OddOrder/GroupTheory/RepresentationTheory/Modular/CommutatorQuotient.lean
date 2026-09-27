@@ -47,7 +47,7 @@ theorem classCoeffPi_single (a : G) :
   rw [classCoeffPi_apply, classCoeffSum_single]
   by_cases h : ConjClasses.mk a = C
   · subst h; simp
-  · rw [if_neg h, Pi.single_eq_of_ne' h]
+  · rw [ite_eq_right h, Pi.single_eq_of_ne' h]
 
 theorem surjective_classCoeffPi : Function.Surjective (classCoeffPi k G) := by
   rw [← LinearMap.range_eq_top, eq_top_iff, ← (Pi.basisFun k (ConjClasses G)).span_eq,

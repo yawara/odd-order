@@ -107,8 +107,8 @@ theorem Xset_hasNoRealCharacters_caseB
     -- `columnSum χ₂⁻¹ = columnSum χ₂` would force `w₁ = 0` via the Gram entries.
     have hgram_self := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂
     have hgram_cross := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂⁻¹
-    rw [if_pos rfl] at hgram_self
-    rw [if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm] at hgram_cross
+    rw [ite_eq_left rfl] at hgram_self
+    rw [ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm] at hgram_cross
     -- `⟨columnSum χ₂, columnSum χ₂⟩ = ⟨columnSum χ₂, columnSum χ₂⁻¹⟩`, i.e. `w₁ = 0`.
     simp only [← OddOrder.Peterfalvi.S06.columnSum_def] at hgram_self hgram_cross
     rw [hreal] at hgram_cross
@@ -560,7 +560,7 @@ theorem caseB_S_pairwise_orthogonal
     · -- irreducible vs irreducible
       have h := irreducibleCharacter_inner_eq_ite
         (⟨x, hirrx⟩ : IrreducibleCharacter ↥L) ⟨y, hirry⟩
-      rwa [if_neg (fun he => hxy (congrArg Subtype.val he))] at h
+      rwa [ite_eq_right (fun he => hxy (congrArg Subtype.val he))] at h
 
 /-- **Peterfalvi (6.8.2) case-(B) norm-weighted member-family enumerator** (brick 2): the
 ψ-independent data of the norm-weighted (5.6) member family for an arbitrary finite `S₁ ⊆ S`.
@@ -604,7 +604,7 @@ theorem exists_sMemberOrthogonalFamilyW
     rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hS₁sub (hmemS1 j)) with
       ⟨χ₂, hχ₂, hcol⟩ | hirr
     · have hval := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂
-      rw [if_pos rfl] at hval
+      rw [ite_eq_left rfl] at hval
       simp only [← OddOrder.Peterfalvi.S06.columnSum_def] at hval
       rw [hcol] at hval
       rw [hval, Complex.natCast_re]
@@ -612,17 +612,17 @@ theorem exists_sMemberOrthogonalFamilyW
     · have hval : ClassFunction.inner (χmem j) (χmem j) = 1 := by
         have h := irreducibleCharacter_inner_eq_ite
           (⟨χmem j, hirr⟩ : IrreducibleCharacter ↥L) ⟨χmem j, hirr⟩
-        rwa [if_pos rfl] at h
+        rwa [ite_eq_left rfl] at h
       rw [hval]; norm_num
   · -- weighted Gram: diagonal the real squared norm, off-diagonal `0`.
     intro i j
     by_cases hij : i = j
     · subst hij
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       change ClassFunction.inner (χmem i) (χmem i)
         = (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ)
       rw [inner_self_eq_realCast (χmem i), Complex.ofReal_re]
-    · rw [if_neg hij]
+    · rw [ite_eq_right hij]
       exact caseB_S_pairwise_orthogonal hyp h46 hHK hW1
         (χmem i) (hS₁sub (hmemS1 i)) (χmem j) (hS₁sub (hmemS1 j)) (fun h => hij (hinj h))
 
@@ -667,11 +667,11 @@ theorem caseB_breakChar_fields
   have hreal : ¬ ClassFunction.IsReal ψ := by rw [hψeq]; exact caseB_irr_nonreal hyp hψirr'
   have hψψ : ClassFunction.inner ψ ψ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hψirr⟩ : IrreducibleCharacter ↥L) ⟨ψ, hψirr⟩
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hψbarψbar : ClassFunction.inner ψ.conj ψ.conj = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨ψ.conj, hψirr.conj⟩ : IrreducibleCharacter ↥L) ⟨ψ.conj, hψirr.conj⟩
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hψψbar : ClassFunction.inner ψ ψ.conj = 0 := by
     rw [hψeq]; exact caseB_irr_conj_inner hyp hψirr'
   have hψbarψ : ClassFunction.inner ψ.conj ψ = 0 := by
@@ -735,23 +735,23 @@ theorem caseB_breakChar_fields_columnBreak
   have hψψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) ≠ 0 := by
     rw [OddOrder.Peterfalvi.S06.columnSum_def,
-      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]
     exact hw1ne
   have hψbarψbar : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ≠ 0 := by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
-      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]
     exact hw1ne
   have hψbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) = 0 := by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
-      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂b)]
+      ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂b)]
   have hψψbar : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj = 0 := by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
-      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂b).symm]
+      ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂b).symm]
   have hreal : ¬ ClassFunction.IsReal (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) := by
     intro hr
     have heq : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
@@ -893,7 +893,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
   -- (8) package the output, converting the anchor `χmem i₁` to `η`.
   refine ⟨k, χmem, mc, deg, a, hinj, hrange, hmcpos,
-    fun j => by have h := hmemortho j j; rwa [if_pos rfl] at h,
+    fun j => by have h := hmemortho j j; rwa [ite_eq_left rfl] at h,
     fun j => by rw [hdeg_eq j, hi₁eq], by rw [hψratio, hi₁eq], hbound⟩
 
 /-- **(6.8.3) case-(B) norm-weighted member-family degree bound, reducible COLUMN break.**
@@ -1041,7 +1041,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
     hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
   -- (8) package the output, converting the anchor `χmem i₁` to `η`.
   refine ⟨k, χmem, mc, deg, a, hinj, hrange, hmcpos,
-    fun j => by have h := hmemortho j j; rwa [if_pos rfl] at h,
+    fun j => by have h := hmemortho j j; rwa [ite_eq_left rfl] at h,
     fun j => by rw [hdeg_eq j, hi₁eq], by rw [hψratio, hi₁eq], hbound⟩
 
 /-- **Peterfalvi (6.8.3) case-(B) norm-weighted member-family degree-square bound** (real form).

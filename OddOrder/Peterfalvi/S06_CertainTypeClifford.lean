@@ -58,7 +58,7 @@ theorem card_group_dvd_card_of_freeAction {G α : Type*} [Group G] [Finite G] [F
   have h1 : Fintype.card (MulAction.fixedBy α (1 : G)) = Fintype.card α := by
     have huniv : MulAction.fixedBy α (1 : G) = Set.univ := by
       ext a; simp
-    exact Fintype.card_congr ((Equiv.setCongr huniv).trans (Equiv.Set.univ α))
+    exact Fintype.card_congr ((Set.equivOfEq huniv).trans (Equiv.Set.univ α))
   have hsum : (∑ s : G, Fintype.card (MulAction.fixedBy α s)) = Fintype.card α :=
     (Finset.sum_eq_single (1 : G) h0 (fun h => absurd (Finset.mem_univ _) h)).trans h1
   rw [hsum] at key
@@ -847,11 +847,11 @@ theorem chiRestrict_injective [NeZero (Nat.card h.W1)] :
     rw [Finset.sum_congr rfl (fun i _ => irreducibleCharacter_inner_eq_ite _ _)]
     rw [Finset.sum_congr rfl (fun i _ => if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
       Finset.sum_ite_eq' Finset.univ (0 : Fin (Nat.card h.W1)) (fun _ => (1 : ℂ)),
-      if_pos (Finset.mem_univ _)]
+      ite_eq_left (Finset.mem_univ _)]
   have hRHS : (∑ i, ClassFunction.inner ((h.columnFamily χ₂').mu i : ClassFunction L ℂ)
       ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) = 0 := by
     refine Finset.sum_eq_zero (fun i _ => ?_)
-    rw [irreducibleCharacter_inner_eq_ite, if_neg (h.columnFamily_mu_ne (Ne.symm hne) i 0)]
+    rw [irreducibleCharacter_inner_eq_ite, ite_eq_right (h.columnFamily_mu_ne (Ne.symm hne) i 0)]
   rw [hLHS, hRHS] at key
   exact one_ne_zero key
 
@@ -997,8 +997,8 @@ theorem induce_ne_certainType_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
     rw [ClassFunction.inner_induce_eq_inner_restrict h.K (χ : ClassFunction ↥h.K ℂ)
       ((h.columnFamily χ₂).mu i : ClassFunction L ℂ), h.restrict_certainType_eq χ₂ i,
       ← h.coe_chiRestrict χ₂, irreducibleCharacter_inner_eq_ite,
-      if_neg (Ne.symm (hχ χ₂))]
-  rw [heq, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hinner
+      ite_eq_right (Ne.symm (hχ χ₂))]
+  rw [heq, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl] at hinner
   exact one_ne_zero hinner
 
 omit [Fintype ↥(h.W1 ⊔ h.W2)] in
@@ -1030,7 +1030,7 @@ theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : Irreducib
     obtain ⟨i, -, hi⟩ := Finset.exists_ne_zero_of_sum_ne_zero hcon
     refine ⟨χ₂, i, ?_⟩
     by_contra hne
-    rw [irreducibleCharacter_inner_eq_ite, if_neg hne] at hi
+    rw [irreducibleCharacter_inner_eq_ite, ite_eq_right hne] at hi
     exact hi rfl
   · -- `θ ∉ {χ_j}`: `Ind^L_K θ` is irreducible, hence equals `μ`
     push Not at hcase
@@ -1041,7 +1041,7 @@ theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : Irreducib
     rw [IrreducibleCharacter.coe_mk] at hite
     by_cases hEq : (⟨_, hirr⟩ : IrreducibleCharacter L) = μ
     · exact Subtype.ext_iff.mp hEq
-    · rw [if_neg hEq] at hite; exact absurd hite hcon
+    · rw [ite_eq_right hEq] at hite; exact absurd hite hcon
 
 /-! ### Peterfalvi (4.5)(b), reducible-induction count (mmd 04.6)
 
@@ -1077,7 +1077,7 @@ theorem induce_chiRestrict_not_isIrreducible [NeZero (Nat.card h.W1)]
     rw [IrreducibleCharacter.coe_mk, hsum, inner_sum_left,
       Finset.sum_congr rfl (fun i _ => irreducibleCharacter_inner_eq_ite _ _),
       Finset.sum_congr rfl (fun i _ => if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
-      Finset.sum_ite_eq' Finset.univ k (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ _)]
+      Finset.sum_ite_eq' Finset.univ k (fun _ => (1 : ℂ)), ite_eq_left (Finset.mem_univ _)]
   -- the irreducible would then equal both `μ_{0j}` and `μ_{1j}`
   have h1 : (1 : ℕ) < Nat.card h.W1 := h.one_lt_card_W1
   have heq : ∀ k : Fin (Nat.card h.W1),
@@ -1085,7 +1085,7 @@ theorem induce_chiRestrict_not_isIrreducible [NeZero (Nat.card h.W1)]
     intro k
     by_contra hne
     have hk := hinner k
-    rw [irreducibleCharacter_inner_eq_ite, if_neg hne] at hk
+    rw [irreducibleCharacter_inner_eq_ite, ite_eq_right hne] at hk
     exact one_ne_zero hk.symm
   have hcontra := (h.columnFamily χ₂).injective
     ((heq ⟨0, by omega⟩).symm.trans (heq ⟨1, h1⟩))

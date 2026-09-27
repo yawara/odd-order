@@ -567,7 +567,7 @@ theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
     rw [coh.coherent.extension_inner_eq _ _ (Submodule.subset_span hζS)
         (Submodule.subset_span hζcS),
       OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj,
-      if_neg (fun h => hζne h.symm)]
+      ite_eq_right (fun h => hζne h.symm)]
   -- `S`-side pieces: `λ`, `λ̄`, their coherent images (as in the (5.5) span lemma)
   have hSmodd : Odd (Nat.card ↥mp.S) :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card mp.S)
@@ -593,7 +593,7 @@ theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
   have hcd : ClassFunction.inner (c.extension lam) (c.extension lam.conj) = 0 := by
     rw [c.extension_inner_eq _ _ hlam_zspan hlamc_zspan,
       OddOrder.RepresentationTheory.irr_cf_inner hlam_irr hlam_irr.conj,
-      if_neg (fun h => hlamne h)]
+      ite_eq_right (fun h => hlamne h)]
   -- supports of the two differences
   have hsupp : (lam - lam.conj).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
       (centralizerSupport (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S))

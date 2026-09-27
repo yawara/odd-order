@@ -65,7 +65,7 @@ theorem inner_induce_induce_trivial_eq_zero
   rw [mul_zero, card_mul_inner_induce]
   refine Finset.sum_eq_zero fun x _ => ?_
   rw [← IrreducibleCharacter.coe_conjBy, IrreducibleCharacter.conjBy_trivial,
-    irreducibleCharacter_inner_eq_ite, if_neg hφ]
+    irreducibleCharacter_inner_eq_ite, ite_eq_right hφ]
 
 /-- **The trivial induced character is orthogonal to a nontrivial induced irreducible**, swapped
 form.  `⟨Ind_H^G 1_H, Ind_H^G φ⟩ = 0` for `φ ≠ 1_H`: every Mackey summand `⟨1_H, φ^{x⁻¹}⟩`
@@ -79,7 +79,7 @@ theorem inner_induce_trivial_induce_eq_zero
   apply mul_left_cancel₀ hcardH
   rw [mul_zero, card_mul_inner_induce]
   refine Finset.sum_eq_zero fun x _ => ?_
-  rw [← IrreducibleCharacter.coe_conjBy, irreducibleCharacter_inner_eq_ite, if_neg]
+  rw [← IrreducibleCharacter.coe_conjBy, irreducibleCharacter_inner_eq_ite, ite_eq_right]
   intro h
   refine hφ ?_
   have := congrArg (IrreducibleCharacter.conjBy (G := G) x) h.symm
@@ -119,7 +119,7 @@ theorem sum_inner_induce_induce_eq_index (ψ : IrreducibleCharacter ↥H) :
     intro x
     rw [Finset.sum_congr rfl fun φ _ => irreducibleCharacter_inner_eq_ite φ _]
     rw [Finset.sum_ite_eq' Finset.univ (IrreducibleCharacter.conjBy x⁻¹ ψ) (fun _ => (1 : ℂ))]
-    rw [if_pos (Finset.mem_univ _)]
+    rw [ite_eq_left (Finset.mem_univ _)]
   rw [Finset.sum_congr rfl fun x _ => hinner x, Finset.sum_const, Finset.card_univ]
   rw [nsmul_eq_mul, mul_one, ← Nat.card_eq_fintype_card, ← H.index_mul_card, Nat.cast_mul]
   ring
@@ -172,7 +172,7 @@ theorem card_induce_fiber_of_frobeniusGroup
         isIrreducibleCharacter_induce_of_frobeniusGroup hF ψ hψ
       have h := irreducibleCharacter_inner_eq_ite
         (⟨_, hφirr⟩ : IrreducibleCharacter G) ⟨_, hψirr⟩
-      rwa [if_neg (fun heq => hφ.2 (congrArg Subtype.val heq))] at h
+      rwa [ite_eq_right (fun heq => hφ.2 (congrArg Subtype.val heq))] at h
   rw [Finset.sum_congr rfl hfiber, Finset.sum_congr rfl hoff, Finset.sum_const,
     Finset.sum_const, nsmul_eq_mul, nsmul_eq_mul, mul_one, mul_zero, add_zero] at hsum
   exact_mod_cast hsum

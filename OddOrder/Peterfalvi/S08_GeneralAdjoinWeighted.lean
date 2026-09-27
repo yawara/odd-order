@@ -85,12 +85,12 @@ theorem exists_indexed_projection_of_orthogonal_ZIrr {G : Type*} [Group G] [Fint
   have hsum : ClassFunction.inner (∑ j ∈ s, (((cZ j : ℝ) / mc j : ℝ) : ℂ) • vc j) (vc i)
       = (cZ i : ℂ) := by
     rw [inner_sum_left, Finset.sum_eq_single i]
-    · rw [ClassFunction.inner_smul_left, horth i hi i hi, if_pos rfl]
+    · rw [ClassFunction.inner_smul_left, horth i hi i hi, ite_eq_left rfl]
       have hmci : (mc i : ℂ) ≠ 0 := by exact_mod_cast (hmc_pos i hi).ne'
       push_cast
       field_simp
     · intro j hj hji
-      rw [ClassFunction.inner_smul_left, horth j hj i hi, if_neg hji, mul_zero]
+      rw [ClassFunction.inner_smul_left, horth j hj i hi, ite_eq_right hji, mul_zero]
     · intro hni; exact absurd hi hni
   rw [hsum, hcZ i hi, sub_self]
 
@@ -215,7 +215,7 @@ theorem crux1_of_memberFamilyW_general
   obtain ⟨n₁, hn₁⟩ := ClassFunction.inner_mem_ZIrr_int (hνZ i₁ hi₁) (hνZ i₁ hi₁)
   have hmc₁C : ((mc i₁ : ℝ) : ℂ) = (n₁ : ℂ) := by
     have h := horth i₁ hi₁ i₁ hi₁
-    rw [if_pos rfl, hn₁] at h
+    rw [ite_eq_left rfl, hn₁] at h
     exact h.symm
   -- orthogonal integer projection of `Da.Y`
   obtain ⟨cZ, Z, hcZval, hYsum, hZortho⟩ :=
@@ -239,23 +239,23 @@ theorem crux1_of_memberFamilyW_general
     by_cases h : i = i₁
     · subst h
       have hci := hcoeff_eq i hi
-      rw [if_pos rfl] at hci
+      rw [ite_eq_left rfl] at hci
       have hciR : (cZ i : ℝ) = (a : ℝ) * mc i - (lam : ℝ) * (deg i : ℝ) := by
         have : (cZ i : ℂ) = (((a : ℝ) * mc i - (lam : ℝ) * (deg i : ℝ) : ℝ) : ℂ) := by
           rw [hci]; push_cast; ring
         exact_mod_cast this
-      rw [if_pos rfl, hciR]; field_simp
+      rw [ite_eq_left rfl, hciR]; field_simp
     · have hci := hcoeff_eq i hi
-      rw [if_neg h] at hci
+      rw [ite_eq_right h] at hci
       have hciR : (cZ i : ℝ) = -((lam : ℝ) * (deg i : ℝ)) := by
         have : (cZ i : ℂ) = -((lam : ℂ) * (deg i : ℂ)) := by rw [hci]; ring
         exact_mod_cast this
-      rw [if_neg h, hciR]; field_simp; ring
+      rw [ite_eq_right h, hciR]; field_simp; ring
   -- the anchor norm computation `‖a·χ₁‖² = a²·mc i₁`
   have hψ : (ClassFunction.inner (a • χmem i₁ : ClassFunction L ℂ) (a • χmem i₁)).re
       = (a : ℝ) ^ 2 * mc i₁ := by
     rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), ClassFunction.inner_smul_left,
-      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl,
+      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, ite_eq_left rfl,
       star_natCast]
     rw [show (a : ℂ) * ((a : ℂ) * (mc i₁ : ℂ)) = (((a : ℝ) ^ 2 * mc i₁ : ℝ) : ℂ) by
       push_cast; ring, Complex.ofReal_re]
@@ -569,7 +569,7 @@ noncomputable def xAdjoinStepW_k_general
   have hDaY_ZIrr : Da.Y ∈ ZIrr G := by
     rw [hYeq]; exact Submodule.sub_mem _ hDaX_ZIrr htau1_memaχ
   have hchi1chi1 : ClassFunction.inner (χmem i₁) (χmem i₁) = ((mc i₁ : ℝ) : ℂ) := by
-    rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]
+    rw [hmemortho i₁ hi₁ i₁ hi₁, ite_eq_left rfl]
   -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
   have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i)) = 0 :=
     fun i hi => OddOrder.Peterfalvi.S08.inner_decomposition_X_extension_member_eq_zero hS₁ Da
@@ -597,7 +597,7 @@ noncomputable def xAdjoinStepW_k_general
     rw [key]
     rcases eq_or_ne i i₁ with h | h
     · subst h; simp
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
+    · rw [ite_eq_right h, ite_eq_right (fun hc : i₁ = i => h hc.symm)]; ring
   -- crux1 via the weighted λ-form collapse.
   have hcrux1 : ClassFunction.inner (τ (χ - a • χmem i₁)) (hS₁.extension (χmem i₁))
       = -((a : ℂ) * ((mc i₁ : ℝ) : ℂ)) :=

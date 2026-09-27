@@ -546,7 +546,7 @@ theorem Hypothesis.induce_K_mem_zSpan_sSet_irr_T [Finite G]
       · by_cases heq : ClassFunction.induce HU (s : ClassFunction ↥HU ℂ)
             = ∑ j : Fin hyp.p, hyp.nu i j
         · refine ⟨k s * hyp.p, ?_⟩
-          rw [heq, hyp.nuRow_inner pins i i, if_pos rfl]
+          rw [heq, hyp.nuRow_inner pins i i, ite_eq_left rfl]
           push_cast
           ring
         · refine ⟨0, ?_⟩
@@ -563,7 +563,7 @@ theorem Hypothesis.induce_K_mem_zSpan_sSet_irr_T [Finite G]
     have hval : (k s₀ : ℂ) * ClassFunction.inner
         (ClassFunction.induce HU (s₀ : ClassFunction ↥HU ℂ))
         (∑ j : Fin hyp.p, hyp.nu i j) = (k s₀ : ℂ) * (hyp.p : ℂ) := by
-      rw [hνeq₀, hyp.nuRow_inner pins i i, if_pos rfl]
+      rw [hνeq₀, hyp.nuRow_inner pins i i, ite_eq_left rfl]
     have : ((n s₀ : ℕ) : ℂ) ≠ 0 := by
       rw [← hn s₀, hval]
       exact mul_ne_zero (Nat.cast_ne_zero.mpr hk₀)
@@ -740,7 +740,7 @@ theorem conj_eq_of_norm_one_conj_antisym {G : Type*} [Group G] [Finite G]
     rw [hAeq, hBeq, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_smul_right,
       OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible χB.isIrreducible,
-      if_pos h, star_intCast, mul_one] at hAB
+      ite_eq_left h, star_intCast, mul_one] at hAB
     exact (mul_ne_zero hεA0 hεB0) hAB
   -- the rearranged conjugation identity `Ā + A = B + B̄`
   rw [sub_eq_sub_iff_add_eq_add] at hconj
@@ -755,22 +755,22 @@ theorem conj_eq_of_norm_one_conj_antisym {G : Type*} [Group G] [Finite G]
     OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible χA.isIrreducible,
     OddOrder.RepresentationTheory.irr_cf_inner χB.isIrreducible χA.isIrreducible,
     OddOrder.RepresentationTheory.irr_cf_inner χB.isIrreducible.conj χA.isIrreducible,
-    if_pos rfl,
-    if_neg (show ¬ ((χB : ClassFunction G ℂ) = (χA : ClassFunction G ℂ)) from
+    ite_eq_left rfl,
+    ite_eq_right (show ¬ ((χB : ClassFunction G ℂ) = (χA : ClassFunction G ℂ)) from
       fun h => hχne h.symm)] at hkey
   -- case on the reality of `χA` and on the `χ̄B = χA` indicator
   by_cases hreal : ((χA : ClassFunction G ℂ)).conj = (χA : ClassFunction G ℂ)
   · -- real `χA`: `2εA = εB·[χ̄B = χA]`, impossible for `εA, εB = ±1`
     exfalso
-    rw [if_pos hreal] at hkey
+    rw [ite_eq_left hreal] at hkey
     by_cases hBcA : ((χB : ClassFunction G ℂ)).conj = (χA : ClassFunction G ℂ) <;>
-      [rw [if_pos hBcA] at hkey; rw [if_neg hBcA] at hkey] <;>
+      [rw [ite_eq_left hBcA] at hkey; rw [ite_eq_right hBcA] at hkey] <;>
       rcases hεA with h1 | h1 <;> rcases hεB with h2 | h2 <;>
       rw [h1, h2] at hkey <;> norm_num at hkey
   · -- non-real `χA`: `εA = εB·[χ̄B = χA]` forces the indicator `1` and `εA = εB`
-    rw [if_neg hreal] at hkey
+    rw [ite_eq_right hreal] at hkey
     by_cases hBcA : ((χB : ClassFunction G ℂ)).conj = (χA : ClassFunction G ℂ)
-    · rw [if_pos hBcA] at hkey
+    · rw [ite_eq_left hBcA] at hkey
       -- `χB = χ̄A` and `εA = εB`
       have hχBA : (χB : ClassFunction G ℂ) = ((χA : ClassFunction G ℂ)).conj := by
         rw [← hBcA, ClassFunction.conj_conj]
@@ -780,10 +780,10 @@ theorem conj_eq_of_norm_one_conj_antisym {G : Type*} [Group G] [Finite G]
       · rw [hAeq, ClassFunction.conj_intCast_smul, ClassFunction.inner_smul_left,
           OddOrder.RepresentationTheory.inner_smul_right,
           OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible χA.isIrreducible.conj,
-          if_neg (fun h => hreal h.symm), star_intCast]
+          ite_eq_right (fun h => hreal h.symm), star_intCast]
         ring
     · exfalso
-      rw [if_neg hBcA] at hkey
+      rw [ite_eq_right hBcA] at hkey
       exact hεA0 (by linear_combination hkey)
 
 open scoped FiniteInduce in
@@ -818,14 +818,14 @@ theorem inner_eq_zero_of_conj_diff_orthogonal {G : Type*} [Group G] [Finite G]
     rw [hAeq, ClassFunction.conj_intCast_smul, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_smul_right,
       OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible χA.isIrreducible.conj,
-      if_pos h, star_intCast, mul_one] at hAAc
+      ite_eq_left h, star_intCast, mul_one] at hAAc
     exact (mul_ne_zero hεA0 hεA0) hAAc
   have hCrealne : ((χC : ClassFunction G ℂ)) ≠ ((χC : ClassFunction G ℂ)).conj := by
     intro h
     rw [hCeq, ClassFunction.conj_intCast_smul, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_smul_right,
       OddOrder.RepresentationTheory.irr_cf_inner χC.isIrreducible χC.isIrreducible.conj,
-      if_pos h, star_intCast, mul_one] at hCCc
+      ite_eq_left h, star_intCast, mul_one] at hCCc
     exact (mul_ne_zero hεC0 hεC0) hCCc
   by_cases hAC : (χA : ClassFunction G ℂ) = (χC : ClassFunction G ℂ)
   · -- shared constituent: `h0 = ±2 ≠ 0`, contradiction
@@ -848,14 +848,14 @@ theorem inner_eq_zero_of_conj_diff_orthogonal {G : Type*} [Group G] [Finite G]
       OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible.conj χC.isIrreducible,
       OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible.conj
         χC.isIrreducible.conj,
-      if_pos hAC, if_neg hACc, if_neg hAcC, if_pos hAcCc] at h0
+      ite_eq_left hAC, ite_eq_right hACc, ite_eq_right hAcC, ite_eq_left hAcCc] at h0
     rcases hεA with h1 | h1 <;> rcases hεC with h2 | h2 <;>
       rw [h1, h2] at h0 <;> norm_num at h0
   · -- distinct constituents: the lead inner product vanishes
     rw [hAeq, hCeq, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_smul_right,
       OddOrder.RepresentationTheory.irr_cf_inner χA.isIrreducible χC.isIrreducible,
-      if_neg hAC, star_intCast]
+      ite_eq_right hAC, star_intCast]
     ring
 
 end OddOrder.Peterfalvi.S15

@@ -44,7 +44,7 @@ private theorem inner_eq_zero_of_ne_of_isIrreducible {L : Type*} [Group L] [Fint
     (hχ : IsIrreducibleCharacter χ) (hψ : IsIrreducibleCharacter ψ) (hne : χ ≠ ψ) :
     ClassFunction.inner χ ψ = 0 := by
   have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχ⟩ : IrreducibleCharacter L) ⟨ψ, hψ⟩
-  rwa [if_neg (fun heq => hne (congrArg Subtype.val heq))] at h
+  rwa [ite_eq_right (fun heq => hne (congrArg Subtype.val heq))] at h
 
 namespace Hypothesis79
 

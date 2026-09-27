@@ -85,8 +85,8 @@ theorem mem_of_blockOfIrr_eq_of_linkedClosed [Fact p.Prime] {Q : ι' → Prop}
       Finset.sum_congr rfl fun l _ => centralScalar_ordinaryIdempotent e l k,
       Finset.sum_ite_eq' (Finset.univ.filter Q) k (fun _ => (1 : K))]
     by_cases hk : Q k
-    · rw [if_pos (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk⟩), if_pos hk]
-    · rw [if_neg fun hc => hk (Finset.mem_filter.mp hc).2, if_neg hk]
+    · rw [ite_eq_left (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk⟩), ite_eq_left hk]
+    · rw [ite_eq_right fun hc => hk (Finset.mem_filter.mp hc).2, ite_eq_right hk]
   -- hence so is the `𝒪`-central character
   have h𝒪 : ∀ k : ι', centralScalar K
         ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e k).asAlgebraHom)
@@ -95,8 +95,8 @@ theorem mem_of_blockOfIrr_eq_of_linkedClosed [Fact p.Prime] {Q : ι' → Prop}
     refine FaithfulSMul.algebraMap_injective 𝒪 K ?_
     rw [algebraMap_centralScalar_eq e k f, hK k]
     by_cases hk : Q k
-    · rw [if_pos hk, if_pos hk, map_one]
-    · rw [if_neg hk, if_neg hk, map_zero]
+    · rw [ite_eq_left hk, ite_eq_left hk, map_one]
+    · rw [ite_eq_right hk, ite_eq_right hk, map_zero]
   -- and its reduction is the block character, which only depends on the block
   have hres : ∀ k : ι', MatrixModule.blockCharacter π hπ hlin (blockOfIrr e hπ hlin hnil k)
         ⟨MonoidAlgebra.mapRingHom G (residue 𝒪) (f : MonoidAlgebra 𝒪 G),
@@ -109,7 +109,7 @@ theorem mem_of_blockOfIrr_eq_of_linkedClosed [Fact p.Prime] {Q : ι' → Prop}
   have hcontra : residue 𝒪 (if Q i then (1 : 𝒪) else 0)
       = residue 𝒪 (if Q j then (1 : 𝒪) else 0) := by
     rw [← hres i, ← hres j, hij]
-  rw [if_pos hi, if_neg hj, map_one, map_zero] at hcontra
+  rw [ite_eq_left hi, ite_eq_right hj, map_one, map_zero] at hcontra
   exact one_ne_zero hcontra
 
 set_option maxHeartbeats 800000 in

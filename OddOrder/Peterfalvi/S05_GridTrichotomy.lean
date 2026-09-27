@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.CharP.CharAndCard
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Set.Card
 import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Common
@@ -287,11 +287,11 @@ theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Finite κ]
     obtain ⟨hPj, hQj⟩ := hboth
     have hGP : G P = c + s := by
       have hP : a P = c := by have h := hcol P.1; rwa [← hPj] at h
-      have := ha P; rw [if_pos rfl, if_neg (Ne.symm hPQ)] at this; rw [hP] at this
+      have := ha P; rw [ite_eq_left rfl, ite_eq_right (Ne.symm hPQ)] at this; rw [hP] at this
       linear_combination -this
     have hGQ : G Q = c - s := by
       have hQ : a Q = c := by have h := hcol Q.1; rwa [← hQj] at h
-      have := ha Q; rw [if_neg hPQ, if_pos rfl] at this; rw [hQ] at this
+      have := ha Q; rw [ite_eq_right hPQ, ite_eq_left rfl] at this; rw [hQ] at this
       linear_combination -this
     have hsum : G P + G Q = 2 * c := by linear_combination hGP + hGQ
     have hdiff : G P - G Q = 2 * s := by linear_combination hGP - hGQ
@@ -308,25 +308,26 @@ theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Finite κ]
       · have hQj : Q.2 ≠ j₀ := fun hQj => hboth ⟨hPj, hQj⟩
         have hGQ : G Q = -s := by
           have h0 : a Q = 0 := hoff Q.1 Q.2 hQj
-          have := ha Q; rw [if_neg hPQ, if_pos rfl, h0] at this; linear_combination -this
+          have := ha Q; rw [ite_eq_right hPQ, ite_eq_left rfl, h0] at this; linear_combination -this
         refine ⟨Q, P.1, by rw [hGQ]; rcases hs with h | h <;> simp [h], hQj, fun r hr => ?_⟩
         exact ⟨fun hrP => hr (congrArg Prod.fst hrP), fun hrQ => hQj (congrArg Prod.snd hrQ).symm⟩
       · have hGP : G P = s := by
           have h0 : a P = 0 := hoff P.1 P.2 hPj
-          have := ha P; rw [if_pos rfl, if_neg (Ne.symm hPQ), h0] at this; linear_combination -this
+          have := ha P
+          rw [ite_eq_left rfl, ite_eq_right (Ne.symm hPQ), h0] at this; linear_combination -this
         refine ⟨P, Q.1, by rw [hGP]; rcases hs with h | h <;> simp [h], hPj, fun r hr => ?_⟩
         exact ⟨fun hrP => hPj (congrArg Prod.snd hrP).symm, fun hrQ => hr (congrArg Prod.fst hrQ)⟩
     obtain ⟨r₁, r₂, hr12, hr1d, hr2d⟩ := exists_two_ne_ne h3 d
     have hG1 : G (r₁, j₀) ≠ 0 := by
       have := hcol r₁
-      rw [ha, if_neg (Ne.symm (hnonδ r₁ hr1d).1),
-        if_neg (Ne.symm (hnonδ r₁ hr1d).2)] at this
+      rw [ha, ite_eq_right (Ne.symm (hnonδ r₁ hr1d).1),
+        ite_eq_right (Ne.symm (hnonδ r₁ hr1d).2)] at this
       rw [show G (r₁, j₀) = c by linear_combination this]
       exact hc
     have hG2' : G (r₂, j₀) ≠ 0 := by
       have := hcol r₂
-      rw [ha, if_neg (Ne.symm (hnonδ r₂ hr2d).1),
-        if_neg (Ne.symm (hnonδ r₂ hr2d).2)] at this
+      rw [ha, ite_eq_right (Ne.symm (hnonδ r₂ hr2d).1),
+        ite_eq_right (Ne.symm (hnonδ r₂ hr2d).2)] at this
       rw [show G (r₂, j₀) = c by linear_combination this]
       exact hc
     have hsub : ({(r₁, j₀), (r₂, j₀), Off} : Set (ι × κ)) ⊆ {x | G x ≠ 0} := by

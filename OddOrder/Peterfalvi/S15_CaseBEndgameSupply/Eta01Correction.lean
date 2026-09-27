@@ -52,17 +52,17 @@ theorem Hypothesis.etaColumn_inner_eta01 [Finite G] (hyp : Hypothesis (G := G))
   rw [show hyp.eta01 = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hyp.p_prime.one_lt⟩ from rfl,
     OddOrder.RepresentationTheory.inner_sum_left]
   by_cases hc : c = ⟨1, hyp.p_prime.one_lt⟩
-  · rw [if_pos hc,
+  · rw [ite_eq_left hc,
       Finset.sum_eq_single_of_mem ⟨0, hyp.q_prime.pos⟩ (Finset.mem_univ _)
         (fun i _ hi => by
           rw [hyp.eta_orthonormal i ⟨0, hyp.q_prime.pos⟩ c ⟨1, hyp.p_prime.one_lt⟩,
-            if_neg (fun h => hi h.1)]),
+            ite_eq_right (fun h => hi h.1)]),
       hyp.eta_orthonormal ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.q_prime.pos⟩ c
-        ⟨1, hyp.p_prime.one_lt⟩, if_pos ⟨rfl, hc⟩]
-  · rw [if_neg hc]
+        ⟨1, hyp.p_prime.one_lt⟩, ite_eq_left ⟨rfl, hc⟩]
+  · rw [ite_eq_right hc]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [hyp.eta_orthonormal i ⟨0, hyp.q_prime.pos⟩ c ⟨1, hyp.p_prime.one_lt⟩,
-      if_neg (fun h => hc h.2)]
+      ite_eq_right (fun h => hc h.2)]
 
 open scoped FiniteInduce in
 /-- **Distinct nonzero `μ`-column sums are distinct**: for `c ≠ j` the sums `μ_c` and `μ_j` are
@@ -77,7 +77,7 @@ theorem Hypothesis.muColumnSum_ne_of_ne [Finite G] (hyp : Hypothesis (G := G))
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     refine Finset.sum_eq_zero fun k _ => ?_
-    rw [hyp.mu_orthonormal i k c j, if_neg (fun h => hcj h.2)]
+    rw [hyp.mu_orthonormal i k c j, ite_eq_right (fun h => hcj h.2)]
   rw [heq, hyp.muColumn_inner_self] at horth
   exact_mod_cast absurd horth (by
     exact_mod_cast (Nat.cast_ne_zero (R := ℂ)).mpr hyp.q_prime.pos.ne')
@@ -131,10 +131,10 @@ theorem CharacterDegreeCore.exists_eta01_column_data [Finite G]
       Or.inl rfl, hθP, hθeq.symm, ?_, ?_, ?_⟩
     · rw [hθeq.symm]
       exact fun h => hyp.muColumnSum_ne_of_ne hp21 h
-    · rw [hclean ⟨1, hyp.p_prime.one_lt⟩ hp1, hyp.etaColumn_inner_eta01, if_pos rfl]
+    · rw [hclean ⟨1, hyp.p_prime.one_lt⟩ hp1, hyp.etaColumn_inner_eta01, ite_eq_left rfl]
       norm_num
     · intro c hc0 hc1
-      rw [hclean c hc0, hyp.etaColumn_inner_eta01, if_neg hc1]
+      rw [hclean c hc0, hyp.etaColumn_inner_eta01, ite_eq_right hc1]
   · -- `p = 3` sign-flip branch: `j₀ = 2`, `δ = −1`, base column `c₀ = 1`
     obtain ⟨θ, hθirr, -, hθP, hθeq⟩ :=
       core.mu_j_linear_induced ⟨1, hyp.p_prime.one_lt⟩ hp1
@@ -144,7 +144,7 @@ theorem CharacterDegreeCore.exists_eta01_column_data [Finite G]
       exact fun h => hyp.muColumnSum_ne_of_ne (fun h' => hp21 h'.symm) h
     · rw [hflip ⟨2, h2lt⟩ ⟨1, hyp.p_prime.one_lt⟩ hp2 hp1 hp21,
         OddOrder.RepresentationTheory.ClassFunction.inner_neg_left,
-        hyp.etaColumn_inner_eta01, if_pos rfl]
+        hyp.etaColumn_inner_eta01, ite_eq_left rfl]
       norm_num
     · intro c hc0 hc2
       have hc1 : c = ⟨1, hyp.p_prime.one_lt⟩ := by
@@ -156,7 +156,7 @@ theorem CharacterDegreeCore.exists_eta01_column_data [Finite G]
       subst hc1
       rw [hflip ⟨1, hyp.p_prime.one_lt⟩ ⟨2, h2lt⟩ hp1 hp2 (fun h => hp21 h.symm),
         OddOrder.RepresentationTheory.ClassFunction.inner_neg_left,
-        hyp.etaColumn_inner_eta01, if_neg hp21, neg_zero]
+        hyp.etaColumn_inner_eta01, ite_eq_right hp21, neg_zero]
 
 end
 

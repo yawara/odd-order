@@ -52,7 +52,7 @@ theorem irreducibleCharacter_inner [Fintype G] [Invertible (Nat.card G : ℂ)]
     subst hχψ
     obtain ⟨V, _, _, _, ρ, hρ, hcoe⟩ := χ.isIrreducible
     have : Representation.IsIrreducible ρ := hρ
-    rw [if_pos rfl, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+    rw [ite_eq_left rfl, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
       invOf_eq_inv]
     have hsum : ∀ g : G,
         (χ : ClassFunction G ℂ) g * star ((χ : ClassFunction G ℂ) g) =
@@ -60,13 +60,13 @@ theorem irreducibleCharacter_inner [Fintype G] [Invertible (Nat.card G : ℂ)]
       intro g
       rw [congrFun hcoe g, ← character_inv ρ g]
     rw [Finset.sum_congr rfl (fun g _ => hsum g), ρ.char_orthonormal,
-      if_pos ⟨Representation.Equiv.refl ρ⟩]
+      ite_eq_left ⟨Representation.Equiv.refl ρ⟩]
   · -- Off-diagonal: distinct characters ⇒ non-isomorphic representations ⇒ the `0` branch.
     obtain ⟨Vχ, _, _, _, ρχ, hρχ, hcoeχ⟩ := χ.isIrreducible
     obtain ⟨Vψ, _, _, _, ρψ, hρψ, hcoeψ⟩ := ψ.isIrreducible
     have : Representation.IsIrreducible ρχ := hρχ
     have : Representation.IsIrreducible ρψ := hρψ
-    rw [if_neg hχψ, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+    rw [ite_eq_right hχψ, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
       invOf_eq_inv]
     have hsum : ∀ g : G,
         (χ : ClassFunction G ℂ) g * star ((ψ : ClassFunction G ℂ) g) =
@@ -74,7 +74,7 @@ theorem irreducibleCharacter_inner [Fintype G] [Invertible (Nat.card G : ℂ)]
       intro g
       rw [congrFun hcoeχ g, congrFun hcoeψ g, ← character_inv ρψ g]
     rw [Finset.sum_congr rfl (fun g _ => hsum g), ρχ.char_orthonormal]
-    rw [if_neg]
+    rw [ite_eq_right]
     rintro ⟨e⟩
     -- An equivalence `ρψ ≃ ρχ` forces equal characters, hence `ψ = χ`.
     apply hχψ
@@ -88,7 +88,7 @@ input assumed throughout `SecondOrthogonality.lean`, via `irreducibleCharacter_i
 theorem characterTableRowOrthogonality_holds [Fintype G] [Invertible (Nat.card G : ℂ)] :
     CharacterTableRowOrthogonality (G := G) := by
   refine ⟨fun χ => ?_, fun χ ψ hχψ => ?_⟩
-  · rw [characterTableRowPairing_eq_inner, irreducibleCharacter_inner, if_pos rfl]
-  · rw [characterTableRowPairing_eq_inner, irreducibleCharacter_inner, if_neg hχψ]
+  · rw [characterTableRowPairing_eq_inner, irreducibleCharacter_inner, ite_eq_left rfl]
+  · rw [characterTableRowPairing_eq_inner, irreducibleCharacter_inner, ite_eq_right hχψ]
 
 end OddOrder.RepresentationTheory

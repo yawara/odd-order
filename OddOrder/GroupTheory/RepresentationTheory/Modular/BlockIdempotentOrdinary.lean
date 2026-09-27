@@ -105,8 +105,8 @@ theorem mapRingHom_blockIdempotent_eq_sum [DecidableEq (Block πG hπG hlinG)]
       · exact Or.inl h
       · exact Or.inr (by linear_combination h)
     by_cases hiB : blockOfIrr e hπG hlinG hnilG i = B
-    · rw [if_pos hiB]
-      rw [if_pos hiB] at hres
+    · rw [ite_eq_left hiB]
+      rw [ite_eq_left hiB] at hres
       rcases hzero_or with h0 | h1
       · exfalso
         have hz0 : centralScalar K
@@ -116,8 +116,8 @@ theorem mapRingHom_blockIdempotent_eq_sum [DecidableEq (Block πG hπG hlinG)]
         rw [hz0, map_zero] at hres
         exact one_ne_zero hres.symm
       · exact h1
-    · rw [if_neg hiB]
-      rw [if_neg hiB] at hres
+    · rw [ite_eq_right hiB]
+      rw [ite_eq_right hiB] at hres
       rcases hzero_or with h0 | h1
       · exact h0
       · exfalso
@@ -134,8 +134,8 @@ theorem mapRingHom_blockIdempotent_eq_sum [DecidableEq (Block πG hπG hlinG)]
     intro i
     rw [hval i]
     by_cases hiB : blockOfIrr e hπG hlinG hnilG i = B
-    · rw [if_pos hiB, if_pos hiB, one_smul]
-    · rw [if_neg hiB, if_neg hiB, zero_smul]
+    · rw [ite_eq_left hiB, ite_eq_left hiB, one_smul]
+    · rw [ite_eq_right hiB, ite_eq_right hiB, zero_smul]
   rw [Finset.sum_congr rfl fun i (_ : i ∈ Finset.univ) => hsplit i]
   rw [Finset.sum_ite, Finset.sum_const_zero, add_zero]
 

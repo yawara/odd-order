@@ -14,9 +14,9 @@ import Mathlib.GroupTheory.Index
 `OddOrder.GroupTheory` shared module: the (internal, two-factor) **central product**
 of two subgroups `R₁ R₂ ≤ G`.
 
-mathlib v4.30.0-rc2 に二因子の内部 central product 述語 `IsCentralProduct` /
-`isCentralProduct` 不在を確認済 (`Mathlib/GroupTheory/` で 0 hits; mathlib が持つ
-`MonoidHom.CentralProduct` 系は別概念の外部構成).
+mathlib v4.34.1 に二因子の内部 central product 述語は不在 (`Mathlib/GroupTheory/` で
+`CentralProduct` 0 hits。近いのは外部構成の `MonoidHom.noncommCoprod` /
+`Subgroup.noncommPiCoprod` まで).
 
 **BG §4 Thm 4.16 case (2)** (Blackburn) — `r(R) ≤ 2` の `p`-群 `R` が
 `R = R₁ ∘ R₂` (`R₁` = exponent-`p` extraspecial of order `p³`, `R₂` cyclic with

@@ -240,7 +240,7 @@ theorem exists_eq_of_columns
         ∀ k : S, k ≠ i₀ → k ≠ i → k ≠ j → v k = 0 := by
     intro v r hvr hv0
     refine exists_pair_of_sum_sq_eq_three hg0 hgpos hv0 ?_ ?_
-    · rw [Finset.sum_congr rfl fun k _ => by rw [hvr k, sq], hpair r r, if_pos rfl]
+    · rw [Finset.sum_congr rfl fun k _ => by rw [hvr k, sq], hpair r r, ite_eq_left rfl]
       norm_num
     · rw [Finset.sum_congr rfl fun k _ => by rw [hvr k], hgpair r]
   obtain ⟨i, j, hii₀, hji₀, hij, hu₁i, hu₁j, hgj, hu₁off⟩ :=
@@ -250,17 +250,17 @@ theorem exists_eq_of_columns
   have hδ : (1 : ℤ) * (-1) = -1 := by norm_num
   -- `u_2` and `u_3` vanish at `i` and `j`.
   -- ⚠ the two pairings are discharged by `have := hpair 0 _` (defeq on the `![u₁, u₂, u₃]`
-  -- literal) plus an explicit `if_neg`, *not* by `simpa`: `simpa using hpair 0 2` makes Lean
+  -- literal) plus an explicit `ite_eq_right`, *not* by `simpa`: `simpa using hpair 0 2` makes Lean
   -- 4.33 emit 180 `Lean.Expr.appArg!` panics while still producing a correct proof
   -- (issue 0185).  Keep the explicit form.
   obtain ⟨hu₂i, hu₂j⟩ := eq_zero_of_dotProduct_eq_one hii₀ hji₀ hij hδ hu₁0 hu₁i hu₁j hu₁off
     hu₂0 hp₂ hq₂ hpq₂ hvp₂ hvq₂ hoff₂
     (by have h : (∑ k, u₁ k * u₂ k) = 1 + 2 * (if (0 : Fin 3) = 1 then 1 else 0) := hpair 0 1
-        rwa [if_neg (by decide), mul_zero, add_zero] at h)
+        rwa [ite_eq_right (by decide), mul_zero, add_zero] at h)
   obtain ⟨hu₃i, hu₃j⟩ := eq_zero_of_dotProduct_eq_one hii₀ hji₀ hij hδ hu₁0 hu₁i hu₁j hu₁off
     hu₃0 hp₃ hq₃ hpq₃ hvp₃ hvq₃ hoff₃
     (by have h : (∑ k, u₁ k * u₃ k) = 1 + 2 * (if (0 : Fin 3) = 2 then 1 else 0) := hpair 0 2
-        rwa [if_neg (by decide), mul_zero, add_zero] at h)
+        rwa [ite_eq_right (by decide), mul_zero, add_zero] at h)
   -- the two pairings against `u_1`, read on its three-element support
   have hau : 1 + 1 * a i + (-1) * a j = 2 := by
     have h := hapair 0

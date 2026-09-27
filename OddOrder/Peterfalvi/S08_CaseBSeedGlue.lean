@@ -72,8 +72,8 @@ theorem exists_glue_nu_Xset_Yset_via_map
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   -- the source: grid constituents `{μ_{ij}}` together with the irreducible `X`-members.
   set grid : Set (ClassFunction ↥L ℂ) :=
     Set.range (fun p : ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) × Fin (Nat.card h46.W1) =>
@@ -180,7 +180,7 @@ theorem caseB_member_seam_all_Yset
   have hηη : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   -- assemble: the `c = ⟨η₁, y⟩` terms cancel.
   rw [hX, ClassFunction.inner_add_left, hiso, ClassFunction.inner_smul_left, hcYiso]
   simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ η₁, ClassFunction.inner_sub_left,

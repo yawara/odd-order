@@ -89,8 +89,8 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
       smul_eq_mul]
     refine Finset.sum_congr rfl fun στ _ => ?_
     by_cases h : P στ
-    · simp only [hg, if_pos h]
-    · simp only [hg, if_neg h]
+    · simp only [hg, ite_eq_left h]
+    · simp only [hg, ite_eq_right h]
       ring
   · -- each surviving term picks up exactly `α a · β b`
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, algAutMulBilin_apply,
@@ -101,12 +101,12 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
     · have hgres : (g στ).1 a = α a ∧ (g στ).2 b = β b := by
         rcases hres στ h0 with h | h
         · have hPστ : P στ := h
-          simp only [hg, if_pos hPστ]
+          simp only [hg, ite_eq_left hPστ]
           exact ⟨(h a ha).1, (h b hb).2⟩
         · by_cases hPστ : P στ
-          · simp only [hg, if_pos hPστ]
+          · simp only [hg, ite_eq_left hPστ]
             exact ⟨(hPστ a ha).1, (hPστ b hb).2⟩
-          · simp only [hg, if_neg hPστ]
+          · simp only [hg, ite_eq_right hPστ]
             exact ⟨(h a ha).2, (h b hb).1⟩
       rw [map_mul, map_mul, hgres.1, hgres.2]
       ring
@@ -118,9 +118,9 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
     · rw [h0, zero_mul, zero_mul, mul_zero]
     · have hdiag : (g στ).1 a * (g στ).2 a = b := by
         by_cases hPστ : P στ
-        · simp only [hg, if_pos hPστ]
+        · simp only [hg, ite_eq_left hPστ]
           exact hab στ h0
-        · simp only [hg, if_neg hPστ]
+        · simp only [hg, ite_eq_right hPστ]
           rw [mul_comm]
           exact hab στ h0
       rw [map_mul, map_mul]

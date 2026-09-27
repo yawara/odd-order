@@ -65,11 +65,11 @@ variable {k}
 
 theorem coeff_classSum_of_isConj {g n : G} (h : IsConj g n) :
     (classSum k g : MonoidAlgebra k G).coeff n = 1 := by
-  classical rw [coeff_classSum, if_pos h]
+  classical rw [coeff_classSum, ite_eq_left h]
 
 theorem coeff_classSum_of_not_isConj {g n : G} (h : ¬ IsConj g n) :
     (classSum k g : MonoidAlgebra k G).coeff n = 0 := by
-  classical rw [coeff_classSum, if_neg h]
+  classical rw [coeff_classSum, ite_eq_right h]
 
 /-- Class sums are invariant under conjugation, i.e. they lie in the centre. -/
 theorem smul_classSum (h g : G) : h • (classSum k g : MonoidAlgebra k G) = classSum k g := by
@@ -145,7 +145,7 @@ theorem coeff_relTrace_single (P : Subgroup G) (g : G) (c : k) (n : G) :
     have := QuotientGroup.eq.mpr hmem
     simpa only [QuotientGroup.out_eq'] using this
   by_cases hc : ∃ u ∈ P, u * g * u⁻¹ = n
-  · rw [if_pos hc]
+  · rw [ite_eq_left hc]
     obtain ⟨u, hu, hun⟩ := hc
     set x₀ : ↥P ⧸ Q.subgroupOf P := QuotientGroup.mk ⟨u, hu⟩ with hx₀
     have hx₀val : rep x₀ * g * (rep x₀)⁻¹ = n := by
@@ -161,10 +161,10 @@ theorem coeff_relTrace_single (P : Subgroup G) (g : G) (c : k) (n : G) :
           _ = u * g * u⁻¹ := by rw [← hg]; group
       rw [hstep, hun]
     refine (Finset.sum_eq_single x₀ (fun y _ hy => ?_)
-      (fun h => absurd (Finset.mem_univ _) h)).trans (by rw [if_pos hx₀val])
-    exact if_neg fun hyn => hy (huniq y x₀ (hyn.trans hx₀val.symm))
-  · rw [if_neg hc]
-    exact Finset.sum_eq_zero fun x _ => if_neg fun hxn => hc ⟨rep x, hrepP x, hxn⟩
+      (fun h => absurd (Finset.mem_univ _) h)).trans (by rw [ite_eq_left hx₀val])
+    exact ite_eq_right fun hyn => hy (huniq y x₀ (hyn.trans hx₀val.symm))
+  · rw [ite_eq_right hc]
+    exact Finset.sum_eq_zero fun x _ => ite_eq_right fun hxn => hc ⟨rep x, hrepP x, hxn⟩
 
 /-- **The class sum is a relative trace**: `K̂ = Tr^G_{C_G(g)}(g)`.  This is the case `P = ⊤` of
 `coeff_relTrace_single`. -/
@@ -179,8 +179,8 @@ theorem relTrace_single_eq_classSum (g : G) :
   have hiff : (∃ u ∈ (⊤ : Subgroup G), u * g * u⁻¹ = n) ↔ IsConj g n := by
     simp only [Subgroup.mem_top, true_and, isConj_iff]
   by_cases h : IsConj g n
-  · rw [if_pos h, if_pos (hiff.mpr h)]
-  · rw [if_neg h, if_neg fun hh => h (hiff.mp hh)]
+  · rw [ite_eq_left h, ite_eq_left (hiff.mpr h)]
+  · rw [ite_eq_right h, ite_eq_right fun hh => h (hiff.mp hh)]
 
 section Span
 
@@ -217,11 +217,11 @@ theorem eq_sum_classSum [Fintype (ConjClasses G)] {x : MonoidAlgebra k G}
     by_cases hC : C = ConjClasses.mk n
     · have hcn : IsConj C.out n := by
         rw [← ConjClasses.mk_eq_mk_iff_isConj, hmkout]; exact hC
-      rw [if_pos hcn, if_pos hC, mul_one, hxconj _ _ hcn]
+      rw [ite_eq_left hcn, ite_eq_left hC, mul_one, hxconj _ _ hcn]
     · have hcn : ¬ IsConj C.out n := by
         intro h
         exact hC (by rw [← hmkout C, ConjClasses.mk_eq_mk_iff_isConj]; exact h)
-      rw [if_neg hcn, if_neg hC, mul_zero]
+      rw [ite_eq_right hcn, ite_eq_right hC, mul_zero]
   rw [Finset.sum_congr rfl fun C _ => hterm C]
   simp
 

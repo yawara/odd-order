@@ -498,9 +498,9 @@ theorem surjective_cosetProdRepHom [Fintype Q] (K : Subgroup Q) :
   change (∏ x ∈ Finset.univ.filter (fun x : Q => x * (t : Q)⁻¹ ∈ K),
       (if hx : cosetRep K x = x then h ⟨x, hx⟩ else 1)) = h t
   rw [Finset.prod_eq_single (t : Q)]
-  · rw [dif_pos t.2]
+  · rw [dite_eq_left t.2]
   · intro b hb hbt
-    refine dif_neg fun hbfix => hbt ?_
+    refine dite_eq_right fun hbfix => hbt ?_
     have hbrel : b * (t : Q)⁻¹ ∈ K := (Finset.mem_filter.mp hb).2
     have hcr := cosetRep_eq_of_rel (K := K) hbrel
     rwa [hbfix, t.2] at hcr
@@ -1189,7 +1189,7 @@ theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
     rcases Nat.eq_zero_or_pos j with rfl | hj0
     · simp
     · obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
-      simp only [if_neg (Nat.succ_ne_zero i), Nat.add_sub_cancel]
+      simp only [ite_eq_right (Nat.succ_ne_zero i), Nat.add_sub_cancel]
       rw [Nat.choose_succ_succ' k i]
       push_cast
       ring

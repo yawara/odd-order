@@ -96,8 +96,8 @@ theorem subsum_eq_column_of_third_column [Fintype G] [Fintype ↥L]
     obtain ⟨⟨b, i'⟩, rfl⟩ := this
     cases b <;>
       simp only [certainTypeRImage, ClassFunction.inner_smul_left, certainTypeOmegaSigma_inner]
-    · rw [if_neg (fun hc => hlk hc.1.symm), mul_zero]
-    · rw [if_neg (fun hc => hlj hc.1.symm), mul_zero]
+    · rw [ite_eq_right (fun hc => hlk hc.1.symm), mul_zero]
+    · rw [ite_eq_right (fun hc => hlj hc.1.symm), mul_zero]
   have hBksum : ∀ i, ClassFunction.inner ψk (certainTypeOmegaSigma h χl i) = 0 := by
     intro i
     rw [hEksum, inner_sum_left]
@@ -113,10 +113,10 @@ theorem subsum_eq_column_of_third_column [Fintype G] [Fintype ↥L]
         (certainTypeOmegaSigma h χl i) = -(if i' = i then (1 : ℂ) else 0) := by
       intro i'
       rw [ClassFunction.inner_sub_left, certainTypeOmegaSigma_inner, certainTypeOmegaSigma_inner,
-        if_neg (fun hc => hlk hc.1.symm)]
+        ite_eq_right (fun hc => hlk hc.1.symm)]
       by_cases hii : i' = i
-      · rw [if_pos ⟨rfl, hii⟩, if_pos hii]; ring
-      · rw [if_neg (fun hc => hii hc.2), if_neg hii]; ring
+      · rw [ite_eq_left ⟨rfl, hii⟩, ite_eq_left hii]; ring
+      · rw [ite_eq_right (fun hc => hii hc.2), ite_eq_right hii]; ring
     rw [certainTypeRImage_sum, ClassFunction.inner_smul_left, ← hδdef, inner_sum_left,
       Finset.sum_congr rfl (fun i' _ => key i')]
     simp
@@ -135,24 +135,24 @@ theorem subsum_eq_column_of_third_column [Fintype G] [Fintype ↥L]
       simp only [certainTypeR, Finset.mem_image, Finset.mem_univ, true_and] at this
       obtain ⟨⟨b, i'⟩, rfl⟩ := this
       by_cases hbi : (b, i') = ((false, i) : Bool × Fin (Nat.card h.W1))
-      · rw [hbi, if_pos rfl]
+      · rw [hbi, ite_eq_left rfl]
         change ClassFunction.inner (((h.columnFamily χl).sign : ℂ) • certainTypeOmegaSigma h χl i)
           (certainTypeOmegaSigma h χl i) = δ
-        rw [ClassFunction.inner_smul_left, certainTypeOmegaSigma_inner, if_pos ⟨rfl, rfl⟩,
+        rw [ClassFunction.inner_smul_left, certainTypeOmegaSigma_inner, ite_eq_left ⟨rfl, rfl⟩,
           hsignl, mul_one]
-      · rw [if_neg (fun hc => hbi (certainTypeRImage_injective h hlinv.symm hc))]
+      · rw [ite_eq_right (fun hc => hbi (certainTypeRImage_injective h hlinv.symm hc))]
         cases b <;>
           simp only [certainTypeRImage, ClassFunction.inner_smul_left,
             certainTypeOmegaSigma_inner, hsignl]
-        · rw [if_neg (fun hc => hbi (Prod.ext rfl hc.2)), mul_zero]
-        · rw [if_neg (fun hc => hlinv hc.1), mul_zero]
+        · rw [ite_eq_right (fun hc => hbi (Prod.ext rfl hc.2)), mul_zero]
+        · rw [ite_eq_right (fun hc => hlinv hc.1), mul_zero]
     rw [Finset.sum_congr rfl hterm, Finset.sum_ite_eq' El (a i) (fun _ => δ)]
   -- combine: `⟨ψl, ω_{χl,i}⟩ = δ`, so every `a i` lies in `El`
   have hmem : ∀ i, a i ∈ El := by
     intro i
     by_contra hno
     have h1 : ClassFunction.inner ψl (certainTypeOmegaSigma h χl i) = 0 := by
-      rw [hCl i, if_neg hno]
+      rw [hCl i, ite_eq_right hno]
     have h2 : ClassFunction.inner ψk (certainTypeOmegaSigma h χl i)
         - ClassFunction.inner ψl (certainTypeOmegaSigma h χl i) = -δ := by
       rw [← ClassFunction.inner_sub_left, hdiff']

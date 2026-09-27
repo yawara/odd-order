@@ -75,7 +75,7 @@ theorem exists_central_phi_data
       have h := irreducibleCharacter_inner_eq_ite
         (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
         (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
-      rwa [if_pos rfl] at h
+      rwa [ite_eq_left rfl] at h
     rw [hself, mul_one, star_ne_zero, hd]
     exact_mod_cast hdpos.ne'
   · rw [htrans]; exact hres
@@ -411,7 +411,7 @@ theorem caseB_member_anchored_image
   have hee : ClassFunction.inner η₁ η₁.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hη₁irr⟩ : IrreducibleCharacter ↥L)
       (⟨η₁.conj, hη₁irr.conj⟩ : IrreducibleCharacter ↥L)
-    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at h
     simpa using h
   have hval : η₁ (1 : ↥L) = η₁.conj (1 : ↥L) :=
     (hyp.Yset_apply_one hη₁).trans (hyp.Yset_apply_one hconj).symm
@@ -509,7 +509,7 @@ theorem caseB_anchoredImage_seam_all_Yset
   have hηη : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   -- assemble: the `c = ⟨η₁, y⟩` terms cancel.
   rw [hX, ClassFunction.inner_add_left, hiso, ClassFunction.inner_smul_left, hcYiso]
   simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ η₁, ClassFunction.inner_sub_left,
@@ -555,8 +555,8 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   obtain ⟨η', hη'Y, hη'ne⟩ :=
     Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega : 1 < hyp.Yset.ncard) η
   obtain ⟨d, hd_pos, hd_eq⟩ :=
@@ -589,7 +589,7 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
       ← Nat.cast_smul_eq_nsmul ℂ d' (cX.extension χ),
       ← Nat.cast_smul_eq_nsmul ℂ d (cX.extension χ.conj)]
     push_cast
-    ring
+    ring_nf
   have hYeq : cY.extension η - cY.extension η' = cY.extension ydiff := by
     rw [hydiff_def, map_sub]
   have hsrc0 : ClassFunction.inner xdiff ydiff = 0 :=
@@ -600,18 +600,20 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
     (u := (d' : ℝ)) (v := (d : ℝ))
     (by exact_mod_cast hd'_pos.ne') (by exact_mod_cast hd_pos.ne')
     (cY.extension_mem_ZIrr η hηs)
-    (by rw [cY.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη), if_pos rfl])
+    (by rw [cY.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη),
+      ite_eq_left rfl])
     (cY.extension_mem_ZIrr η' hη's)
     (by rw [cY.extension_inner_eq η' η' hη's hη's, hinner η' η' (hYirr η' hη'Y) (hYirr η' hη'Y),
-        if_pos rfl])
+        ite_eq_left rfl])
     (cX.extension_mem_ZIrr χ hχs)
-    (by rw [cX.extension_inner_eq χ χ hχs hχs, hinner χ χ hχirr hχirr, if_pos rfl])
+    (by rw [cX.extension_inner_eq χ χ hχs hχs, hinner χ χ hχirr hχirr, ite_eq_left rfl])
     (cX.extension_mem_ZIrr χ.conj hχ's)
     (by rw [cX.extension_inner_eq χ.conj χ.conj hχ's hχ's,
-        hinner χ.conj χ.conj hχirr.conj hχirr.conj, if_pos rfl])
+        hinner χ.conj χ.conj hχirr.conj hχirr.conj, ite_eq_left rfl])
     (by rw [cY.extension_inner_eq η η' hηs hη's, hinner η η' (hYirr η hη) (hYirr η' hη'Y),
-        if_neg (fun h => hη'ne h.symm)])
-    (by rw [cX.extension_inner_eq χ χ.conj hχs hχ's, hinner χ χ.conj hχirr hχirr.conj, if_neg hχne])
+        ite_eq_right (fun h => hη'ne h.symm)])
+    (by rw [cX.extension_inner_eq χ χ.conj hχs hχ's, hinner χ χ.conj hχirr hχirr.conj,
+      ite_eq_right hχne])
     (by
       rw [hXeq, hYeq, inner_conj_symm (cX.extension xdiff) (cY.extension ydiff),
         inner_extension_eq_inner_of_supported hyp.dade cX cY hx_supp hy_supp,

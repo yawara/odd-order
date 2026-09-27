@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.RingTheory.Polynomial.RationalRoot
 import Mathlib.Algebra.Order.BigOperators.Group.Multiset
 import Mathlib.Algebra.Polynomial.Monic
@@ -311,7 +311,7 @@ theorem isIntegral_rat_imp_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) :
   have hqℂ : (q : ℂ) = algebraMap ℚ ℂ q := (eq_ratCast (algebraMap ℚ ℂ) q).symm
   rw [hqℂ] at h
   have hQ : IsIntegral ℤ q :=
-    (isIntegral_algebraMap_iff (FaithfulSMul.algebraMap_injective ℚ ℂ)).mp h
+    isIntegral_algebraMap_iff.mp h
   -- `ℤ` is integrally closed in `ℚ` (it is a UFD), so `q = (n : ℚ)` for some `n : ℤ`.
   obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp hQ
   refine ⟨n, ?_⟩

@@ -363,7 +363,7 @@ theorem chiefFactor_H0supC_subgroupOf_normal [Finite G] {M : Subgroup G}
       ≤ Subgroup.normalizer ((chief.H0 ⊔ cSub data chief : Subgroup G) : Set G) :=
     le_trans (le_inf (le_trans (sup_le (U_le_M data) data.typeP.W1_le) chief.H0_normalized_by_M)
       (cSub_normalized_by_uW1 data chief))
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (cSub data chief))
+      (Subgroup.inf_normalizer_le_normalizer_sup chief.H0 (cSub data chief))
   -- `H ≤ N(H₀ ⊔ C)`: `H ≤ N(H₀)` and `h C h⁻¹ ⊆ H₀ C` via `⁅H, C⁆ ≤ H₀`.
   have hH :
       data.typeP.H ≤ Subgroup.normalizer ((chief.H0 ⊔ cSub data chief : Subgroup G) : Set G) := by
@@ -647,12 +647,12 @@ theorem chiefFactor_H0supUprime_subgroupOf_normal [Finite G] {M : Subgroup G}
     le_trans (le_inf (le_trans (sup_le (U_le_M data) data.typeP.W1_le)
         chief.H0_normalized_by_M)
       (uprimeSub_normalized_by_uW1 data))
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (uprimeSub data))
+      (Subgroup.inf_normalizer_le_normalizer_sup chief.H0 (uprimeSub data))
   have hH : data.typeP.H
       ≤ Subgroup.normalizer ((chief.H0 ⊔ uprimeSub data : Subgroup G) : Set G) :=
     le_trans (le_inf ((data.typeP.H_le.trans (derivedInG_le_self M)).trans chief.H0_normalized_by_M)
         (typeP_H_le_normalizer_uprimeSub data))
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (uprimeSub data))
+      (Subgroup.inf_normalizer_le_normalizer_sup chief.H0 (uprimeSub data))
   have hM'eq : derivedInG M = data.typeP.H ⊔ data.typeP.U := by
     rw [data.typeP.derivedInG_eq_fitting_sup_U, data.typeP.H_eq]
   have hMW1 : derivedInG M ⊔ data.typeP.W1 = M := by
@@ -724,7 +724,7 @@ theorem chiefFactor_H0supCprime_subgroupOf_normal [Finite G] {M : Subgroup G}
     le_trans (le_inf (le_trans (sup_le (U_le_M data) data.typeP.W1_le)
         chief.H0_normalized_by_M)
       (cprimeSub_normalized_by_uW1 data chief))
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (cprimeSub data chief))
+      (Subgroup.inf_normalizer_le_normalizer_sup chief.H0 (cprimeSub data chief))
   have hH : data.typeP.H
       ≤ Subgroup.normalizer ((chief.H0 ⊔ cprimeSub data chief : Subgroup G) : Set G) :=
     le_trans (le_sup_left : data.typeP.H ≤ data.H ⊔ cSub data chief)

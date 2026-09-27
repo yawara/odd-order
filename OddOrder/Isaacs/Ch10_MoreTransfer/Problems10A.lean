@@ -97,21 +97,13 @@ theorem IsRegularPGroup.quotient {p : ℕ} (hP : IsRegularPGroup p P) (N : Subgr
       rw [MonoidHom.map_closure]
       congr 1
       ext z
-      simp [Set.mem_image, eq_comm]
+      simp
     have hle := Subgroup.map_commutator (H₁ := Subgroup.closure ({x, y} : Set P))
       (H₂ := Subgroup.closure ({x, y} : Set P)) (QuotientGroup.mk' N)
     rw [hmap] at hle
     exact hle ▸ Subgroup.mem_map_of_mem _ hc
   · have h := congrArg (QuotientGroup.mk' N) hcpow
     simpa using h
-
-/-- 中心に含まれる部分群は正規。 -/
-private theorem normal_of_le_center {H : Subgroup P} (h : H ≤ Subgroup.center P) : H.Normal := by
-  refine ⟨fun n hn g => ?_⟩
-  have hc := Subgroup.mem_center_iff.mp (h hn) g
-  have hrw : g * n * g⁻¹ = n := by rw [hc]; group
-  rw [hrw]
-  exact hn
 
 /-- **10A.1 の核**: 極小反例の 2-群では `P'` の元は中心的で 2 乗が `1`。 -/
 private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group P] [Finite P]
@@ -127,7 +119,7 @@ private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group 
   obtain ⟨z, hzmem⟩ := w
   have hz1 : z ≠ 1 := fun h => hwne (Subtype.ext h)
   have hzc : z ∈ Subgroup.center P := hzmem.2
-  have : (Subgroup.zpowers z).Normal := normal_of_le_center (Subgroup.zpowers_le.mpr hzc)
+  have : (Subgroup.zpowers z).Normal := Subgroup.normal_of_le_center (Subgroup.zpowers_le.mpr hzc)
   have hPz : commutator P ≤ Subgroup.zpowers z := by
     refine hquot _ inferInstance fun h => hz1 ?_
     have hm := Subgroup.mem_zpowers z
@@ -137,7 +129,7 @@ private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group 
   have hz2 : z ^ 2 = 1 := by
     by_contra hne
     have : (Subgroup.zpowers (z ^ 2)).Normal :=
-      normal_of_le_center (Subgroup.zpowers_le.mpr (pow_mem hzc 2))
+      Subgroup.normal_of_le_center (Subgroup.zpowers_le.mpr (pow_mem hzc 2))
     have hz2le : commutator P ≤ Subgroup.zpowers (z ^ 2) := by
       refine hquot _ inferInstance fun h => hne ?_
       have hm := Subgroup.mem_zpowers (z ^ 2)
@@ -250,7 +242,7 @@ theorem IsRegularPGroup.subgroup {p : ℕ} (hP : IsRegularPGroup p P) (H : Subgr
     rw [MonoidHom.map_closure]
     congr 1
     ext z
-    simp [Set.mem_image, eq_comm]
+    simp
   have hmapc := Subgroup.map_commutator (H₁ := Subgroup.closure ({x, y} : Set ↥H))
     (H₂ := Subgroup.closure ({x, y} : Set ↥H)) H.subtype
   rw [hmapclose] at hmapc
@@ -399,7 +391,7 @@ private theorem pow_mul_eq_one_of_isRegularPGroup_aux.{u} (p : ℕ) [Fact p.Prim
           rw [MonoidHom.map_closure]
           congr 1
           ext z
-          simp [Set.mem_image, eq_comm]
+          simp
         rw [← hmap]
         exact ⟨w', htop ▸ Subgroup.mem_top w', rfl⟩
       have hcomm : (x : P ⧸ Ω) * (y : P ⧸ Ω) = (y : P ⧸ Ω) * (x : P ⧸ Ω) := by

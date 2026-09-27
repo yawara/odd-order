@@ -793,7 +793,7 @@ private lemma nonempty_mulEquiv_wreath_of_card_pow
   -- the p-part of (p²)! is p^(p+1)
   have hval : (Nat.card (Equiv.Perm (P ⧸ B))).factorization p = p + 1 := by
     rw [Nat.card_perm, hquot,
-      ← Nat.multiplicity_eq_factorization hp_prime (Nat.factorial_ne_zero _),
+      ← Nat.multiplicity_eq_factorization hp_prime,
       Nat.Prime.multiplicity_factorial_pow hp_prime]
     simp [Finset.sum_range_succ, Nat.add_comm]
   -- |P| divides (p²)!, forcing m = p

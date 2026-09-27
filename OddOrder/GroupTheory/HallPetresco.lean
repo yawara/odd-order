@@ -124,13 +124,13 @@ theorem map_evalWord_blk_eq {supports : List (Finset L)}
       = (supports.map fun S => if S ⊆ A then blockValue blk S else 1).prod := by
   refine congrArg List.prod (List.map_congr_left fun S hS => ?_)
   by_cases hSA : S ⊆ A
-  · rw [if_pos hSA]
+  · rw [ite_eq_left hSA]
     refine evalWord_congr slot fun c hc x hx => ?_
     rw [hblk S hS c hc] at hx
     simp [assign, hx, hSA hx]
-  · rw [if_neg hSA]
+  · rw [ite_eq_right hSA]
     refine evalWord_eq_one_of_not_subset (A := A) slot
-      (fun x hx => by simp only [assign, if_neg hx]) ?_
+      (fun x hx => by simp only [assign, ite_eq_right hx]) ?_
     intro c hc
     rw [hblk S hS c hc]
     exact hSA
@@ -198,7 +198,7 @@ theorem prod_level_eq_pow {A : Finset L} {k : ℕ} {F : Finset L → G} {v : G}
     (hF : ∀ S ∈ levelList L k, S ⊆ A → F S = v) :
     ((levelList L k).map fun S => if S ⊆ A then F S else 1).prod = v ^ A.card.choose k := by
   rw [prod_map_ite_eq_prod_filter (· ⊆ A) F,
-    List.prod_eq_pow_card _ v ?_, List.length_map, length_filter_levelList]
+    List.prod_eq_pow_length _ v ?_, List.length_map, length_filter_levelList]
   intro x hx
   obtain ⟨S, hS, rfl⟩ := List.mem_map.mp hx
   rw [List.mem_filter] at hS
@@ -340,7 +340,7 @@ include hblk hval in
 theorem hallValue_eq {S : Finset L} (hSne : S.Nonempty) :
     hallValue blk S.card = blockValue blk S := by
   have hex : ∃ T : Finset L, T.card = S.card ∧ T.Nonempty := ⟨S, rfl, hSne⟩
-  rw [hallValue, dif_pos hex]
+  rw [hallValue, dite_eq_left hex]
   exact blockValue_eq_of_card_eq hblk hval S.card _ S hex.choose_spec.1 rfl
     hex.choose_spec.2 hSne
 

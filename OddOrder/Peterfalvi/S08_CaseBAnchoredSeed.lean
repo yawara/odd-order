@@ -218,7 +218,7 @@ noncomputable def coherentCertainTypeSet_union_Yset_caseB
     have hmem2 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
         ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k := ⟨χ₂', hne', hdegm', hcseq⟩
     have hXimgeq : Ximg χ₂ = X' := by
-      simp only [hXimg, if_pos hmem2]; rw [hanc']; abel
+      simp only [hXimg, ite_eq_left hmem2]; rw [hanc']; abel
     exact ⟨by rw [hXimgeq]; exact hanc', by rw [hXimgeq]; exact hmix',
       by rw [hXimgeq]; exact hXZ', hsupp'⟩
   refine coherentCertainTypeSet_union_Yset_via_anchoredImages hyp h46 hHK hW1 cY hk hη₁
@@ -231,13 +231,13 @@ noncomputable def coherentCertainTypeSet_union_Yset_caseB
     by_cases hmem : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
         ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k
     · exact (key χ₂ hmem).2.2.1
-    · rw [hXimg]; simp only [if_neg hmem]; exact Submodule.zero_mem _
+    · rw [hXimg]; simp only [ite_eq_right hmem]; exact Submodule.zero_mem _
   · -- `hXmixed` (ungated; `⟨0, ·⟩ = 0` off the columns, seam-for-all-`y` on the columns).
     by_cases hmem : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
         ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k
     · exact caseB_anchoredImage_seam_all_Yset hyp h46 hW1 cY hη₁ (key χ₂ hmem).1
         (key χ₂ hmem).2.1 (key χ₂ hmem).2.2.2 hy
-    · rw [hXimg]; simp only [if_neg hmem]; rw [ClassFunction.inner_zero_left]
+    · rw [hXimg]; simp only [ite_eq_right hmem]; rw [ClassFunction.inner_zero_left]
 
 /-- **(6.8.2.3) per-member anchored image for an arbitrary `X`-member.**  Generalizes
 `caseB_column_anchored_full` from a certain-type column to **any** `χ ∈ Xset W₂` (reducible column
@@ -345,7 +345,7 @@ theorem inner_eq_of_anchored_varying
   have hηη : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hνν : ClassFunction.inner ν ν = 1 := by
     rw [hνdef, cY.extension_inner_eq η₁ η₁ (Submodule.subset_span hη₁)
       (Submodule.subset_span hη₁), hηη]
@@ -495,7 +495,7 @@ theorem caseBXsetExtension_grid
     ((h46.columnFamily χ₂).mu i)]
   rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
     ((h46.columnFamily χ₂).mu i), caseBXsetExtensionFun,
-    if_neg (grid_mu_notMem_Xset hyp h46 hW1 χ₂ i),
+    ite_eq_right (grid_mu_notMem_Xset hyp h46 hW1 χ₂ i),
     xChiExtension, LinearMap.restrictScalars_apply]
   conv_rhs => rw [← OddOrder.Peterfalvi.S05.irreducibleCharacterBasis_apply (G := ↥L)
     ((h46.columnFamily χ₂).mu i)]
@@ -537,7 +537,7 @@ theorem caseBXsetExtension_irr
   conv_lhs => rw [← hcoe, ← OddOrder.Peterfalvi.S05.irreducibleCharacterBasis_apply (G := ↥L)
     (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)]
   rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
-    (⟨χ, hirr⟩ : IrreducibleCharacter ↥L), caseBXsetExtensionFun, hcoe, if_pos hmem]
+    (⟨χ, hirr⟩ : IrreducibleCharacter ↥L), caseBXsetExtensionFun, hcoe, ite_eq_left hmem]
 
 /-- **The dichotomy extension realizes the anchored images on the whole `X`-set**: `ν χ = Ximg χ`
 for every `χ ∈ Xset W₂` (column or irreducible, via `caseB_S_member_column_or_irreducible`). -/
@@ -697,7 +697,7 @@ theorem caseBXimg_spec
   have : caseBXimg hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF hη₁
       cY hcYgood χ = (caseB_Xset_member_anchored hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime
         hW2comm hW2cenL hc2 hFPF hη₁ hχ cY hcYgood).choose := by
-    rw [caseBXimg, dif_pos hχ]
+    rw [caseBXimg, dite_eq_left hχ]
   rw [this]
   exact (caseB_Xset_member_anchored hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm
     hW2cenL hc2 hFPF hη₁ hχ cY hcYgood).choose_spec

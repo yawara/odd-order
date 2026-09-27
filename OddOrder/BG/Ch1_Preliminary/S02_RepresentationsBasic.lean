@@ -83,6 +83,9 @@ Theorem 2.6, Lemma 2.7).
 
 ## 結果別 mathlib カバレッジ / shared module 依存
 
+(mathlib 欄は v4.29.1 時点、2026-09-27 に v4.34.1 で再確認。`本 repo` 印は mathlib でなく
+本リポジトリの宣言)
+
 - Prop 2.1(a)
   - mathlib v4.29.1: `Representation.IsIrreducible` ✓
   - 新規 shared module: `AbsolutelyIrreducible.lean`
@@ -93,20 +96,20 @@ Theorem 2.6, Lemma 2.7).
   - mathlib v4.29.1: `LittleWedderburn` ✓ + Schur ✓
   - 新規 shared module: (上記流用)
 - Prop 2.2(a)
-  - mathlib v4.29.1: ✅ `CliffordMultiplicityOne.restriction_isIrreducible` (char-free)
+  - 本 repo: ✅ `CliffordMultiplicityOne.restriction_isIrreducible` (char-free)
   - 新規 shared module: `CliffordAlgClosed.lean`
 - Prop 2.2(b)
-  - mathlib v4.29.1: ✅ `CyclicExtension.exists_extension_of_nonempty_equiv_conjRep`
+  - 本 repo: ✅ `CyclicExtension.exists_extension_of_nonempty_equiv_conjRep`
     (任意標数)
   - 新規 shared module: `CyclicExtension.lean`
 - Lem 2.3
-  - mathlib v4.29.1: (上記 abs.irred. 経由)
+  - 本 repo: (上記 abs.irred. 経由)
   - 新規 shared module: —
 - Prop 2.4 (a-k)
   - mathlib v4.29.1: `Module.End.eigenspace` 基本
   - 新規 shared module: `EigenspaceUnderCyclicAction.lean`
 - Thm 2.5
-  - mathlib v4.29.1: `IsExtraspecial` ✓ (本 repo)
+  - 本 repo: `IsExtraspecial` ✓
   - 新規 shared module: `AutElementaryAbelian.lean` + Prop 2.4
 - Thm 2.6(a)(b)
   - mathlib v4.29.1: `Representation` + `Sylow` + GL(2,F)
@@ -117,7 +120,7 @@ Thm 2.5 ← §3 Thm 3.4, §15 Thm 15.7;
 Thm 2.6 ← §3 ×2, §4 Lem 4.17, **App.A Thm A.1**.
 
 mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
-(`SimpleModule/Basic.lean:582`) が Jacobson Density 本体.
+(`Mathlib/RingTheory/SimpleModule/Basic.lean`) が Jacobson Density 本体.
 
 ## 先行章依存 (BG §1, Isaacs Phase 1)
 

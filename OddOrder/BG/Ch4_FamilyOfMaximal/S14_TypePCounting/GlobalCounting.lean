@@ -165,8 +165,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
       apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
       apply Finsupp.ext; intro q; rw [Finsupp.single_apply]
       by_cases hq : r = q
-      · rw [if_pos hq, hq]
-      · rw [if_neg hq]
+      · rw [ite_eq_left hq, hq]
+      · rw [ite_eq_right hq]
         by_cases hqp : q.Prime
         · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
           have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
@@ -214,8 +214,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
       intro q
       rw [Finsupp.single_apply]
       by_cases hq : r = q
-      · rw [if_pos hq, hq]
-      · rw [if_neg hq]
+      · rw [ite_eq_left hq, hq]
+      · rw [ite_eq_right hq]
         by_cases hqp : q.Prime
         · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
           have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
@@ -610,8 +610,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
         apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
         apply Finsupp.ext; intro q; rw [Finsupp.single_apply]
         by_cases hq : r = q
-        · rw [if_pos hq, hq]
-        · rw [if_neg hq]
+        · rw [ite_eq_left hq, hq]
+        · rw [ite_eq_right hq]
           by_cases hqp : q.Prime
           · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
             exact (Set.mem_singleton_iff.mp (hR.1 q (Nat.mem_primeFactors.mpr

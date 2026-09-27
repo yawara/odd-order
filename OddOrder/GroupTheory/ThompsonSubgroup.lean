@@ -14,7 +14,7 @@ import OddOrder.GroupTheory.ElementaryAbelian
 `OddOrder.GroupTheory` shared module: Thompson subgroup `J(P)` の定義と基本性質.
 
 Isaacs, *Finite Group Theory* (2008), Chapter 7 (pp. 201-202) の中核 def.
-mathlib v4.29.1 に未収載 (`Thompson` 名はゼロ件). Ch.7, BG App.A, BG App.B (Puig 代替),
+mathlib v4.34.1 にも未収載 (`Thompson` 名はゼロ件). Ch.7, BG App.A, BG App.B (Puig 代替),
 BG §6, §8, §9 (Uniqueness Theorem) で繰り返し使われる shared concept として独立 module 化.
 
 ## Main definitions

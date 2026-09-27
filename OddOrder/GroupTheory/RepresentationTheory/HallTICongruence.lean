@@ -315,7 +315,7 @@ theorem nonidentityZClassCoeffSum_cong_hall [Finite G] {H Q Z : Subgroup G}
   set ρ₀ : Representation ℂ G ℂ := Representation.trivial ℂ G ℂ with hρ₀
   have : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
   have hchar0 : ∀ g : G, ρ₀.character g = 1 := by
-    intro g; simp [hρ₀, Representation.character]
+    intro g; simp [hρ₀, Representation.character, Representation.isTrivial_def]
   let C₁ : ConjClasses G := ConjClasses.mk z
   let C₂ : ConjClasses G := ConjClasses.mk z⁻¹
   let α : ℂ := ω ρ₀ C₁

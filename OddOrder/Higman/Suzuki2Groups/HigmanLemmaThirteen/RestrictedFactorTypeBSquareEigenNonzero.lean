@@ -65,11 +65,9 @@ private theorem transported_monomial_coordinate
         (conjugateTensorBasisOfLinearEquiv K eU).repr x q *
         (conjugateTensorBasisOfLinearEquiv K
           (LinearEquiv.refl (ZMod 2) K)).repr y q := by
-  induction x using TensorProduct.induction_on with
-  | zero => simp
+  induction x using TensorProduct.inductionOn with
   | tmul a u =>
-      induction y using TensorProduct.induction_on with
-      | zero => simp
+      induction y using TensorProduct.inductionOn with
       | tmul b beta =>
           simp only [LinearMap.baseChange_tmul, LinearMap.baseChange₂_tmul]
           rw [transported_repr_tmul, transported_repr_tmul,

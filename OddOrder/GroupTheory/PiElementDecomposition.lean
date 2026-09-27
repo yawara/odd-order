@@ -75,11 +75,11 @@ theorem mem_of_mem_primeFactors_natPiPart {π : Set ℕ} {n : ℕ} {p : ℕ}
   rw [natPiPart] at hpdvd
   obtain ⟨q, hq, hpq⟩ := Prime.exists_mem_finset_dvd hpp.prime hpdvd
   by_cases hqπ : q ∈ π
-  · rw [if_pos hqπ] at hpq
+  · rw [ite_eq_left hqπ] at hpq
     have hqp : q.Prime := Nat.prime_of_mem_primeFactors hq
     have heq : p = q := (Nat.prime_dvd_prime_iff_eq hpp hqp).mp (hpp.dvd_of_dvd_pow hpq)
     rw [heq]; exact hqπ
-  · rw [if_neg hqπ] at hpq
+  · rw [ite_eq_right hqπ] at hpq
     exact absurd (Nat.dvd_one.mp hpq) hpp.ne_one
 
 /-- The `π`-part and the `π′`-part of `n` are coprime. -/

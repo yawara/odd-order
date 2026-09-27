@@ -531,7 +531,7 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     rw [hcard, Nat.factorization_mul hpne hqne,
         Nat.Prime.factorization_pow hpprime] at hmul
     simp only [Finsupp.coe_add, Pi.add_apply, hqprime.factorization,
-               Finsupp.single_apply, if_neg (Ne.symm hpq)] at hmul
+               Finsupp.single_apply, ite_eq_right (Ne.symm hpq)] at hmul
     simpa using hmul
   -- Each Sylow q has order q.
   have hcard_Sq : ∀ R : Sylow q G, Nat.card (R : Subgroup G) = q := by
@@ -542,7 +542,7 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     rw [hcard, Nat.factorization_mul hpne hqne,
         Nat.Prime.factorization_pow hpprime] at hmul
     simp only [Finsupp.coe_add, Pi.add_apply, Finsupp.single_apply,
-               if_neg hpq] at hmul
+               ite_eq_right hpq] at hmul
     simpa [hqprime.factorization_self] using hmul
   -- np ∈ {1, q}.  np = 1 case: Sylow p normal, proper since |S| = p^a < |G|.
   -- np ≥ 2 case: np = q, then split D = ⊥ or D ≠ ⊥.

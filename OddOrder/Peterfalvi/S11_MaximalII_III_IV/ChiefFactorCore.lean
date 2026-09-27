@@ -406,7 +406,7 @@ theorem iSupIndep_of_noncommPiCoprod_injective_comm {K : Type*} [CommGroup K] {�
       Finset.prod_subtype (p := fun j => j ≠ i) (Finset.univ.erase i)
         (fun j => by simp only [Finset.mem_erase, Finset.mem_univ, and_true]) (fun j => (g j : K))]
     refine Finset.prod_congr rfl (fun a _ => ?_)
-    rw [hg]; simp only [a.2, dif_neg, not_false_iff]
+    rw [hg]; simp only [a.2, dite_eq_right, not_false_iff]
   have hsingle : Subgroup.noncommPiCoprod hcomm (Pi.mulSingle i ⟨x, hxi⟩) = x := by
     rw [Subgroup.noncommPiCoprod_mulSingle]
   have hgeq : g = Pi.mulSingle i ⟨x, hxi⟩ := hinj (hprodg.trans hsingle.symm)

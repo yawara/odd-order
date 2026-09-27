@@ -977,7 +977,7 @@ private theorem pRank_le_pRank_oPiCore_compl_of_nilpotent
   obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
   have hiff : Group.IsNilpotent N ↔
       ∀ (p' : ℕ) (_hp : Fact p'.Prime) (P : Sylow p' N), (↑P : Subgroup N).Normal :=
-    (Group.isNilpotent_of_finite_tfae (G := N)).out 0 3
+    (Group.isNilpotent_of_finite_tfae (G := N)).out 1 4
   have hSnorm : (S : Subgroup N).Normal := hiff.mp inferInstance q inferInstance S
   have hSpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (S : Subgroup N) := by
     intro r hr

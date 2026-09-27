@@ -125,9 +125,9 @@ theorem T_typeIII_ratio_le_of_sSide_gap [Finite G] [Fintype G] [Invertible (Nat.
     rw [hΓ₁def, ClassFunction.inner_sub_left, hsum_left calT1, hxcoe b hb,
       Finset.sum_eq_single b
         (fun a ha hab => by
-          rw [ClassFunction.inner_smul_left, horth a ha b hb, if_neg hab, mul_zero])
+          rw [ClassFunction.inner_smul_left, horth a ha b hb, ite_eq_right hab, mul_zero])
         (fun hbni => absurd hb hbni),
-      ClassFunction.inner_smul_left, horth b hb b hb, if_pos rfl, mul_one, sub_self]
+      ClassFunction.inner_smul_left, horth b hb b hb, ite_eq_left rfl, mul_one, sub_self]
   -- The projection sum is the `Y` in (13.18.d).  Its complement `Γ₁` is orthogonal to it
   -- because `Γ₁` is orthogonal to every member of `calT1`.
   have hΓ₁sum : ClassFunction.inner Γ₁
@@ -282,7 +282,7 @@ theorem gap_coefficients_nonzero_of_delta_parity [Fintype G]
   have hxcoe : ∀ a ∈ calT1, ClassFunction.inner Γ a = ((x a : ℝ) : ℂ) := by
     intro a ha
     rw [show x a = (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose by
-      simp only [x, dif_pos ha]]
+      simp only [x, dite_eq_left ha]]
     exact_mod_cast (ClassFunction.inner_mem_ZIrr_int hΓZ (hmemZ a ha)).choose_spec
   refine ⟨x, hxcoe, ?_⟩
   intro a ha hxa0
@@ -409,19 +409,19 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- `⟨ζ, ζ'⟩ = if ζ = ζ' then 1 else 0` (orthonormal irreducibles).
     have hsrc : ClassFunction.inner ζ ζ' = if ζ = ζ' then (1 : ℂ) else 0 := by
       by_cases hζζ' : ζ = ζ'
-      · subst hζζ'; rw [if_pos rfl]; exact (hirr ζ hζT).inner_self_eq_one
-      · rw [if_neg hζζ']; exact hyp07.pairwise_orthogonal hζT hζ'T hζζ'
+      · subst hζζ'; rw [ite_eq_left rfl]; exact (hirr ζ hζT).inner_self_eq_one
+      · rw [ite_eq_right hζζ']; exact hyp07.pairwise_orthogonal hζT hζ'T hζζ'
     rw [hiso, hsrc]
     -- The image equality `τ₁ζ = τ₁ζ'` iff `ζ = ζ'` (injectivity from the isometry).
     by_cases hζζ' : ζ = ζ'
-    · rw [if_pos hζζ', if_pos (by rw [hζζ'])]
-    · rw [if_neg hζζ', if_neg ?_]
+    · rw [ite_eq_left hζζ', ite_eq_left (by rw [hζζ'])]
+    · rw [ite_eq_right hζζ', ite_eq_right ?_]
       -- if `τ₁ζ = τ₁ζ'` then `⟨ζ,ζ'⟩ = ⟨τ₁ζ,τ₁ζ⟩ = ⟨ζ,ζ⟩ = 1 ≠ 0 = ⟨ζ,ζ'⟩`, contradiction.
       intro hab
       have h1 : ClassFunction.inner ζ ζ' = ClassFunction.inner ζ ζ := by
         rw [← hiso, ← hab,
           hτ.extension_inner_eq ζ ζ (Submodule.subset_span hζT) (Submodule.subset_span hζT)]
-      rw [hsrc, if_neg hζζ', (hirr ζ hζT).inner_self_eq_one] at h1
+      rw [hsrc, ite_eq_right hζζ', (hirr ζ hζT).inner_self_eq_one] at h1
       exact one_ne_zero h1.symm
   -- The coherent extension is injective on `calT1_set`: equality of two images would turn the
   -- source cross-inner-product `0` into the source self-inner-product `1`.
@@ -732,7 +732,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have hrow := tSide_beta_inner_eta_of_zeroColumn_projection
           hyp.base (tSideDadeMap hyp hG (ν0 - ζ)) hresidual.2
           ⟨1, by have := hyp.base.three_le_p; omega⟩
-        simpa only [if_neg hne0] using hrow
+        simpa only [ite_eq_right hne0] using hrow
       have hΓdef : betaData.Gamma =
           OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base -
               (trivialIrreducibleCharacter G : ClassFunction G ℂ) +

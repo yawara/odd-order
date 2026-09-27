@@ -98,13 +98,13 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_general_caseB
     rw [htaud, ClassFunction.inner_sub_right, hgood] at hconst
     linear_combination hconst
   have he₁e₁ : ClassFunction.inner (cY.extension η₁) (cY.extension η₁) = 1 := by
-    rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+    rw [hYon η₁ η₁ hη₁ hη₁, ite_eq_left rfl]
   refine ⟨?_, ?_⟩
   · intro η hη
     rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left]
     by_cases hee : η = η₁
     · subst hee; rw [hgood, he₁e₁]; ring
-    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, if_neg (Ne.symm hee)]; ring
+    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, ite_eq_right (Ne.symm hee)]; ring
   · have hsuppX : (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁).support
         ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=

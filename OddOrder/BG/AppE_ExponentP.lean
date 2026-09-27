@@ -455,7 +455,7 @@ theorem RegularOperatorSetup.card_sup_centralizer [Finite R]
       (le_inf (le_inf (inf_le_left.trans hST) inf_le_right) inf_le_left)
   rw [hinf] at hprod
   have hcard : Nat.card ↥(C ⊔ S) = Nat.card ↑((C : Set R) * (S : Set R)) :=
-    Nat.card_congr (Equiv.setCongr hcoe)
+    Nat.card_congr (Set.equivOfEq hcoe)
   rw [sup_comm, hcard, hprod, mul_comm]
 
 /-- `C_T(v)` computed inside `↥T`: it is `(T ⊓ C_R(v)).subgroupOf T`. -/

@@ -182,7 +182,7 @@ theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
         | zero =>
           rw [OddOrder.Peterfalvi.S07.pairUnion_succ]
           simp only [OddOrder.Peterfalvi.S07.pairUnion_zero,
-            OddOrder.Peterfalvi.S07.pairSet, hpr, if_pos rfl, hB']
+            OddOrder.Peterfalvi.S07.pairSet, hpr, ite_eq_left rfl, hB']
         | succ k ihk =>
           have hps : OddOrder.Peterfalvi.S07.pairSet (L := L) pr (k + 1)
               = OddOrder.Peterfalvi.S07.pairSet (L := L) pair' k := by
@@ -681,7 +681,7 @@ theorem ssetDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
     intro ζ hζ
     have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
       (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
-    rw [if_pos rfl] at h
+    rw [ite_eq_left rfl] at h
     simpa using h
   refine
     OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
@@ -795,7 +795,7 @@ theorem coherent_insert_pair_of_two_mul_lt_sum [Finite G] (hd : Odd hyp.d)
     intro ζ hζ
     have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
       (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
-    rw [if_pos rfl] at h
+    rw [ite_eq_left rfl] at h
     simpa using h
   have hmem : ∀ {i : ClassFunction ↥hyp.H ℂ}, i ∈ hS₁fin.toFinset → i ∈ S₁ :=
     fun hi => hS₁fin.mem_toFinset.mp hi
@@ -815,9 +815,9 @@ theorem coherent_insert_pair_of_two_mul_lt_sum [Finite G] (hd : Odd hyp.d)
     (fun _ hi => hS₁conj (hmem hi))
     (fun i hi j hj => by
       by_cases hij : i = j
-      · rw [if_pos hij, hij]
+      · rw [ite_eq_left hij, hij]
         exact hself (hS₁S (hmem hj))
-      · rw [if_neg hij]
+      · rw [ite_eq_right hij]
         exact hyp.Sset_pairwiseOrthogonal (hS₁S (hmem hi)) (hS₁S (hmem hj)) hij)
     (fun i hi => hyp.Sset_pairwiseOrthogonal (hS₁S (hmem hi))
       (hyp.conj_mem_Sset (hS₁S (hmem hi)))

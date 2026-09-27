@@ -223,7 +223,7 @@ theorem Hypothesis.mu_row0_ne [Finite G] (hyp : Hypothesis (G := G)) {j : Fin hy
   have hoff : OddOrder.RepresentationTheory.ClassFunction.inner (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)
       (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := by
     rw [hyp.mu_orthonormal]
-    exact if_neg (fun hc => hj hc.2)
+    exact ite_eq_right (fun hc => hj hc.2)
   rw [heq, hdiag] at hoff
   exact one_ne_zero hoff
 

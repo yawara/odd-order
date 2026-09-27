@@ -1124,7 +1124,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have hCMσ_norm : ((C ⊔ Mσ).subgroupOf M).Normal := by
           rw [Subgroup.normal_subgroupOf_iff_le_normalizer hCMσ_le_M]
           exact le_trans (le_inf hC_norm hM_norm_Mσ)
-            (Subgroup.normalizer_inf_normalizer_le_normalizer_sup C Mσ)
+            (Subgroup.inf_normalizer_le_normalizer_sup C Mσ)
         -- `C ⊔ M_σ = X ⊔ M_σ` (since `C = A ⊔ X` and `A ≤ M_σ`).
         have hA_le_Mσ : A ≤ Mσ := inf_le_right
         have hCMσ_eq : C ⊔ Mσ = X ⊔ Mσ := sup_eq_sup_of_eq_sup_of_le hCeq hA_le_Mσ
@@ -1245,7 +1245,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           orderOf_eq_card_of_forall_mem_zpowers hb]
       have hMFnorm_Y : MF M ≤ Subgroup.normalizer (Y : Set G) :=
         (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hMFY_comm).trans
-          (OddOrder.Isaacs.Ch07.centralizer_le_normalizer Y)
+          (Subgroup.centralizer_le_normalizer (Y : Set G))
       have hcardsup : Nat.card ↥(MF M ⊔ Y) = Nat.card ↥(MF M) * Nat.card ↥Y := by
         have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card (MF M) Y
         rw [hMFY_inf, Subgroup.card_bot, mul_one] at hprod

@@ -209,8 +209,8 @@ theorem coeff_conjLayer (h : G) (w : MonoidAlgebra R G) (i : ZMod p) (y : G) :
     rw [apply_ite (fun f : MonoidAlgebra R G => f.coeff y), MonoidAlgebra.coeff_single,
       Finsupp.single_apply, hzero]
     by_cases hx : x = y
-    · rw [if_pos hx, if_pos hx]
-    · rw [if_neg hx, if_neg hx, ite_self]
+    · rw [ite_eq_left hx, ite_eq_left hx]
+    · rw [ite_eq_right hx, ite_eq_right hx, ite_self]
   rw [hsum, Finset.sum_congr rfl (fun x _ => hterm x),
     Finset.sum_ite_eq' Finset.univ y
       (fun x : G => if conjLevel p h x = i then w.coeff x else 0)]
@@ -245,8 +245,8 @@ theorem conjLayer_conj_smul (hp : p.Prime) {h : G} (hh : IsOfFinOrder h)
       rwa [show h * (h⁻¹ * y * h) * h⁻¹ = y from by group] at this
     rw [hcoeff]
     by_cases hi : conjLevel p h (h⁻¹ * y * h) = i
-    · rw [if_pos hi, if_pos (by rw [hlev, hi])]
-    · rw [if_neg hi, if_neg (fun hcon => hi (by
+    · rw [ite_eq_left hi, ite_eq_left (by rw [hlev, hi])]
+    · rw [ite_eq_right hi, ite_eq_right (fun hcon => hi (by
         have := hlev.symm.trans hcon
         exact add_right_cancel this))]
 

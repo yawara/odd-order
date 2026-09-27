@@ -189,8 +189,8 @@ noncomputable def supportedProj (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ �
     (η : ClassFunction L ℂ) : ClassFunction L ℂ :=
   ⟨fun x => if x ∈ A then η x else 0, fun g h => by
     by_cases hg : g ∈ A
-    · simp only [if_pos hg, if_pos ((hA g h).mpr hg), η.conj_eq g h]
-    · simp only [if_neg hg, if_neg (fun hc => hg ((hA g h).mp hc))]⟩
+    · simp only [ite_eq_left hg, ite_eq_left ((hA g h).mpr hg), η.conj_eq g h]
+    · simp only [ite_eq_right hg, ite_eq_right (fun hc => hg ((hA g h).mp hc))]⟩
 
 omit [Fintype L] in
 open scoped Classical in
@@ -209,7 +209,7 @@ theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻�
   by_contra hxA
   apply hx
   change supportedProj A hA η x = 0
-  simp only [supportedProj_apply, if_neg hxA]
+  simp only [supportedProj_apply, ite_eq_right hxA]
 
 open scoped Classical in
 /-- **The supported projection preserves inner products against `CF(L,A)`.**  For `ψ` supported on
@@ -224,7 +224,7 @@ theorem inner_supportedProj [Invertible (Nat.card L : ℂ)] (A : Set L)
   simp only [ClassFunction.innerSum]
   refine Finset.sum_congr rfl fun x _ => ?_
   by_cases hx : x ∈ A
-  · rw [supportedProj_apply, if_pos hx]
+  · rw [supportedProj_apply, ite_eq_left hx]
   · have hψx : ψ x = 0 := by
       by_contra h0
       exact hx ((ClassFunction.mem_supportedSubmodule.mp hψ) (ClassFunction.mem_support.mpr h0))
@@ -249,7 +249,7 @@ theorem eq_zero_on_A_of_inner_zero [Invertible (Nat.card L : ℂ)] (A : Set L)
     eq_zero_of_mem_span_orthogonal (hspan (supportedProj_mem_supported A hA η))
       (fun v hv => by rw [inner_supportedProj A hA (hS_supp v hv) η]; exact horth v hv)
   have h0 : supportedProj A hA η x = 0 := by rw [hproj_zero]; rfl
-  rwa [supportedProj_apply, if_pos hx] at h0
+  rwa [supportedProj_apply, ite_eq_left hx] at h0
 
 /-- **Peterfalvi (7.7.a), the Gram entry.**  For a pairwise-orthogonal family
 `ζ : Fin (n+1) → CF(L)`
@@ -267,8 +267,8 @@ theorem inner_psi_zeta [Invertible (Nat.card L : ℂ)] {n : ℕ}
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
     horth 0 i (Ne.symm hi), mul_zero, sub_zero]
   by_cases hij : i = j
-  · rw [if_pos hij, hij]
-  · rw [if_neg hij, horth j i (fun h => hij h.symm)]
+  · rw [ite_eq_left hij, hij]
+  · rw [ite_eq_right hij, horth j i (fun h => hij h.symm)]
 
 /-- **Peterfalvi (7.7.a), the Gram sum.**  For a pairwise-orthogonal family `ζ` and `j ≥ 1`, pairing
 `ψ_j = ζ_j − d_j ζ_0` against any linear combination `Σ_{i ≥ 1} b_i ζ_i` picks out the diagonal:
@@ -286,9 +286,9 @@ theorem inner_psi_candidate [Invertible (Nat.card L : ℂ)] {n : ℕ}
   rw [inner_sum_right, Finset.sum_eq_single j
     (fun i hi hij => by
       rw [ClassFunction.inner_smul_right, inner_psi_zeta ζ d horth (Finset.mem_Ioi.mp hi).ne',
-        if_neg hij, mul_zero])
+        ite_eq_right hij, mul_zero])
     (fun hj_notin => absurd (Finset.mem_Ioi.mpr (Fin.pos_of_ne_zero hj)) hj_notin)]
-  rw [ClassFunction.inner_smul_right, inner_psi_zeta ζ d horth hj, if_pos rfl]
+  rw [ClassFunction.inner_smul_right, inner_psi_zeta ζ d horth hj, ite_eq_left rfl]
 
 /-- **Peterfalvi (7.7.a), the candidate-coefficient identity.**  With the (7.7.a) coefficients
 `b_i = star(c_i)/‖ζ_i‖²`, the pairing of `ψ_j` against the candidate `Σ_{i≥1} b_i ζ_i` recovers

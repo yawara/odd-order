@@ -280,11 +280,11 @@ theorem inner_conj_sub_eq_zero_of_notMem [Finite G]
   have h1 : ClassFunction.inner θ χ = 0 := by
     have h := OddOrder.RepresentationTheory.irr_cf_inner
       (mem_irreducibleCharacters.mpr hθ) (mem_irreducibleCharacters.mpr hχ.1)
-    rwa [if_neg (fun h : θ = χ => hθS (h.symm ▸ hχ))] at h
+    rwa [ite_eq_right (fun h : θ = χ => hθS (h.symm ▸ hχ))] at h
   have h2 : ClassFunction.inner θ χ.conj = 0 := by
     have h := OddOrder.RepresentationTheory.irr_cf_inner
       (mem_irreducibleCharacters.mpr hθ) (mem_irreducibleCharacters.mpr hχc.1)
-    rwa [if_neg (fun h : θ = χ.conj => hθS (h.symm ▸ hχc))] at h
+    rwa [ite_eq_right (fun h : θ = χ.conj => hθS (h.symm ▸ hχc))] at h
   rw [ClassFunction.inner_sub_right, h1, h2, sub_zero]
 
 /-- **Peterfalvi Part II, Ch. III, Theorem C, step (10)** (p. 116): if
@@ -323,7 +323,7 @@ theorem inner_constituent_extension_eq_zero [Finite G]
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr hf)
         (mem_irreducibleCharacters.mpr ξ.isIrreducible),
-      if_neg hne, mul_zero]
+      ite_eq_right hne, mul_zero]
   -- the conjugate member and its image `e_{χ̄} = ε'·ξ'`
   have hχc : χ.conj ∈ hyp.Sset := hyp.conj_mem_Sset hχ
   obtain ⟨ε', ξ', hε', hεξ'⟩ := hyp.extension_zsmul_irr hcoh hχc
@@ -338,7 +338,7 @@ theorem inner_constituent_extension_eq_zero [Finite G]
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr ξ.isIrreducible)
         (mem_irreducibleCharacters.mpr ξ.isIrreducible),
-      if_pos rfl, mul_one, star_intCast] at horth
+      ite_eq_left rfl, mul_one, star_intCast] at horth
     rcases hε with rfl | rfl <;> rcases hε' with rfl | rfl <;> norm_num at horth
   -- `⟨Ind θ, e_{χ̄} − e_χ⟩ = ⟨θ, χ̄ − χ⟩ = 0`
   have hdagger : ClassFunction.inner (ClassFunction.induce hyp.H θ)
@@ -356,7 +356,7 @@ theorem inner_constituent_extension_eq_zero [Finite G]
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr hf')
         (mem_irreducibleCharacters.mpr ξ.isIrreducible),
-      if_pos hfξ, if_neg (fun h => hff' (hfξ.trans h.symm)), mul_one, mul_zero,
+      ite_eq_left hfξ, ite_eq_right (fun h => hff' (hfξ.trans h.symm)), mul_one, mul_zero,
       add_zero, star_intCast]
   -- hence `⟨Ind θ, e_{χ̄}⟩ = ε ≠ 0`, forcing `f' = ξ'`
   have hIθχc : ClassFunction.inner (ClassFunction.induce hyp.H θ)
@@ -375,7 +375,7 @@ theorem inner_constituent_extension_eq_zero [Finite G]
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr hf')
         (mem_irreducibleCharacters.mpr ξ'.isIrreducible),
-      if_neg (fun h' => hξξ' (hfξ ▸ h')), if_neg hne, mul_zero, add_zero] at h
+      ite_eq_right (fun h' => hξξ' (hfξ ▸ h')), ite_eq_right hne, mul_zero, add_zero] at h
     rcases hε with rfl | rfl <;> norm_num at h
   -- degrees: `ε'·ξ'(1) = ε·ξ(1)`, both positive naturals, so `ξ(1) = ξ'(1)`
   obtain ⟨a, ha, haval⟩ := ξ.isIrreducible.exists_apply_one_eq_pos_natCast

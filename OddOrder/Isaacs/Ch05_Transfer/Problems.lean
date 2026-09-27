@@ -65,14 +65,6 @@ theorem transfer_eq_pow_index_of_le_center {G A : Type*} [Group G] [CommGroup A]
   transfer_eq_pow ϕ g
     (fun k g₀ hk => by rw [← mul_right_inj, ← (hH hk).comm, mul_inv_cancel_right])
 
-/-- `H ≤ Z(G)` なら `H ⊴ G`. -/
-theorem normal_of_le_center {G : Type*} [Group G] {H : Subgroup G}
-    (hH : H ≤ Subgroup.center G) : H.Normal :=
-  ⟨fun n hn g => by
-    have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hH hn) g
-    rw [hc, mul_assoc, mul_inv_cancel, mul_one]
-    exact hn⟩
-
 /-- **Isaacs Problem 5A.4(b)**: `H ≤ Z(G)`, `|G : H| = n`, `(|H|, n) = 1` なら
 `G = H × ker v` (`v` = transfer)。ここでは補群条件 `H ⊓ ker v = 1` と `H ⊔ ker v = ⊤` の形で
 述べる (`H ≤ Z(G)` なので直積になる)。
@@ -85,7 +77,7 @@ theorem inf_ker_transfer_eq_bot_of_le_center {G A : Type*} [Group G] [CommGroup 
     (ϕ : H →* A) (hϕ : Function.Injective ϕ)
     (hcop : Nat.Coprime (Nat.card H) H.index) :
     H ⊓ (transfer ϕ).ker = ⊥ := by
-  have := normal_of_le_center hH
+  have := Subgroup.normal_of_le_center hH
   rw [eq_bot_iff]
   rintro h ⟨hhH, hker⟩
   rw [Subgroup.mem_bot]
@@ -108,7 +100,7 @@ theorem sup_ker_transfer_eq_top_of_le_center {G A : Type*} [Group G] [CommGroup 
     {H : Subgroup G} [H.FiniteIndex] (hH : H ≤ Subgroup.center G)
     (ϕ : H →* A) (hcop : Nat.Coprime (Nat.card H) H.index) :
     H ⊔ (transfer ϕ).ker = ⊤ := by
-  have := normal_of_le_center hH
+  have := Subgroup.normal_of_le_center hH
   -- `x ↦ x ^ n` は `↥H` 上で単射, したがって全射
   have hfinj : Function.Injective
       (fun x : H => (⟨(x : G) ^ H.index, H.pow_mem x.2 _⟩ : H)) := by

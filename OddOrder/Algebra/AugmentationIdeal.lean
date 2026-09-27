@@ -19,8 +19,8 @@ import Mathlib.GroupTheory.Complement
 
 Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) §10C (pp. 307-324) の基盤:
 principal ideal theorem (Thm 10.18, Furtwängler) と Alperin-Kuo (Cor 10.28) が
-この API の上に立つ。mathlib v4.30.0-rc2 に群環の augmentation ideal は未収載
-(claim = issue 9108; 将来 upstream 候補)。
+この API の上に立つ。mathlib v4.34.1 にも群環の augmentation ideal は未収載 (あるのは汎用の
+`Ideal.IsAugmentation` 述語まで; claim = issue 9108; 将来 upstream 候補)。
 
 ## Main definitions
 
@@ -161,13 +161,13 @@ theorem linearIndependent_of_sub_one :
       rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.basis G ℤ 1 from
         by rw [MonoidAlgebra.basis_apply]; rfl]
       rw [Module.Basis.coord_apply, Module.Basis.repr_self,
-        Finsupp.single_apply, if_neg (fun h => j.2 h.symm)]
+        Finsupp.single_apply, ite_eq_right (fun h => j.2 h.symm)]
     rw [h1, h2, sub_zero]
     rcases eq_or_ne i j with rfl | hij
-    · rw [if_pos rfl, if_pos rfl, smul_eq_mul, mul_one]
-    · rw [if_neg (fun h => hij (Subtype.ext h)), if_neg hij, smul_zero]
+    · rw [ite_eq_left rfl, ite_eq_left rfl, smul_eq_mul, mul_one]
+    · rw [ite_eq_right (fun h => hij (Subtype.ext h)), ite_eq_right hij, smul_zero]
   rw [Finset.sum_congr rfl hterm, Finset.sum_ite_eq' s j (fun i => f i),
-    if_pos hj] at hc
+    ite_eq_left hj] at hc
   exact hc
 
 /-- **Isaacs Lemma 10.19**: the `g - 1` for `1 ≠ g ∈ G` form a `ℤ`-basis of the
@@ -857,15 +857,15 @@ theorem linearIndependent_of_sub_one_subgroup :
         by rw [MonoidAlgebra.basis_apply]; rfl]
       rw [Module.Basis.coord_apply, Module.Basis.repr_self,
         Finsupp.single_apply,
-        if_neg (fun h => j.2 (OneMemClass.coe_eq_one.mp h.symm))]
+        ite_eq_right (fun h => j.2 (OneMemClass.coe_eq_one.mp h.symm))]
     rw [h1, h2, sub_zero]
     rcases eq_or_ne i j with rfl | hij
-    · rw [if_pos rfl, if_pos rfl, smul_eq_mul, mul_one]
+    · rw [ite_eq_left rfl, ite_eq_left rfl, smul_eq_mul, mul_one]
     · have hne : (↑i.val : G) ≠ ↑j.val := fun h =>
         hij (Subtype.ext (Subtype.ext h))
-      rw [if_neg hne, if_neg hij, smul_zero]
+      rw [ite_eq_right hne, ite_eq_right hij, smul_zero]
   rw [Finset.sum_congr rfl hterm, Finset.sum_ite_eq' s j (fun i => f i),
-    if_pos hj] at hc
+    ite_eq_left hj] at hc
   exact hc
 
 /-- The elements `k - 1`, `1 ≠ k ∈ K`, form a `ℤ`-basis of the copy of

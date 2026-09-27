@@ -374,7 +374,7 @@ theorem exists_sMemberOrthonormalFamily (hyp : SibleyDadeHypothesis G L H)
     rw [irreducibleCharacter_inner_eq_ite (χmem i) (χmem j)]
     rcases eq_or_ne i j with h | h
     · subst h; simp
-    · rw [if_neg (fun he => h (hχinj he)), if_neg h]
+    · rw [ite_eq_right (fun he => h (hχinj he)), ite_eq_right h]
 
 /-- **(6.2) member-family degree data** (Frobenius case): integer degree ratios against a
 degree-`|W₁|` anchor.
@@ -453,14 +453,14 @@ theorem sBreakPair_fields (hyp : SibleyDadeHypothesis G L H)
       hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hχS1)
     have hne : ψ ≠ χ := fun h => hψnotS1 (by rw [h]; exact hχS1)
     have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hψirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hχirr⟩
-    rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
+    rwa [ite_eq_right (fun he => hne (congrArg Subtype.val he))] at h
   · intro χ hχS1
     have hχirr : IsIrreducibleCharacter χ :=
       hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hχS1)
     have hne : ψ.conj ≠ χ := fun h => hψcnotS1 (by rw [h]; exact hχS1)
     have h := irreducibleCharacter_inner_eq_ite (⟨ψ.conj, hψirr.conj⟩ : IrreducibleCharacter ↥L)
       ⟨χ, hχirr⟩
-    rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
+    rwa [ite_eq_right (fun he => hne (congrArg Subtype.val he))] at h
 
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 

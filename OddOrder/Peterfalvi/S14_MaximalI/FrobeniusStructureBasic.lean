@@ -310,14 +310,14 @@ theorem Sset_self_mem_constituents [Finite G] {L : Subgroup G} [Finite ↥L]
   have hone : ClassFunction.inner (φ₀ : ClassFunction ↥L ℂ) χ = 1 := by
     conv_lhs => rw [data.decomp]
     rw [inner_sum_right, Finset.sum_eq_single φ₀]
-    · rw [irreducibleCharacter_inner_eq_ite, if_pos rfl]
-    · intro φ _ hφne; rw [irreducibleCharacter_inner_eq_ite, if_neg (Ne.symm hφne)]
+    · rw [irreducibleCharacter_inner_eq_ite, ite_eq_left rfl]
+    · intro φ _ hφne; rw [irreducibleCharacter_inner_eq_ite, ite_eq_right (Ne.symm hφne)]
     · intro h; exact absurd hφ₀ h
   refine ⟨φ₀, ?_, hφ₀⟩
   by_contra hne'
   have h0 : ClassFunction.inner (φ₀ : ClassFunction ↥L ℂ) χ = 0 := by
     have hite := irreducibleCharacter_inner_eq_ite φ₀ (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_neg (fun h => hne' (by rw [h]))] at hite
+    rwa [ite_eq_right (fun h => hne' (by rw [h]))] at hite
   rw [hone] at h0
   exact one_ne_zero h0
 
@@ -444,7 +444,7 @@ theorem Sset_pairwiseOrthogonal [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
   obtain ⟨θ', hθ'_ne, rfl⟩ := hψ
   obtain ⟨ξ, hξcoe, _, _⟩ := frobenius_induce_char_singleton hodd hfrob θ hθ_ne
   obtain ⟨ξ', hξ'coe, _, _⟩ := frobenius_induce_char_singleton hodd hfrob θ' hθ'_ne
-  rw [← hξcoe, ← hξ'coe, irreducibleCharacter_inner_eq_ite, if_neg]
+  rw [← hξcoe, ← hξ'coe, irreducibleCharacter_inner_eq_ite, ite_eq_right]
   intro h
   exact hne (by rw [← hξcoe, ← hξ'coe, h])
 
@@ -605,7 +605,7 @@ theorem Sset_exists_orthonormalFamily [Finite G] {L : Subgroup G} (hyp : Hypothe
     rw [OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite (χmem i) (χmem j)]
     rcases eq_or_ne i j with h | h
     · subst h; simp
-    · rw [if_neg (fun he => h (hχinj he)), if_neg h]
+    · rw [ite_eq_right (fun he => h (hχinj he)), ite_eq_right h]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **A member's degree is `d·|L:K|`** (`d = θ(1)` the source degree) — the integer degree-ratio

@@ -77,9 +77,10 @@ theorem exists_card_sylow_mul_sum_ordinaryCharacter_one_mul [Fact p.Prime] (P : 
             ((n φ : ℕ) : 𝒪) else 0) := by
     intro φ
     by_cases hex : ∃ i, Q i ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ ≠ 0
-    · rw [if_pos hex, sum_decompositionMatrix_mul_ordinaryCharacter_of_linkedClosed hp hω hω' hπ
+    · rw [ite_eq_left hex,
+        sum_decompositionMatrix_mul_ordinaryCharacter_of_linkedClosed hp hω hω' hπ
         hlin hkerJ e hQ hex 1, hn φ]
-    · rw [if_neg hex, mul_zero,
+    · rw [ite_eq_right hex, mul_zero,
         sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero_of_not_exists hp hω hω' hπ hlin
           hkerJ e hex 1]
   have hrow : ∀ i : ι', ordinaryCharacter (𝒪 := 𝒪) e i x

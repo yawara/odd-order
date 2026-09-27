@@ -1078,7 +1078,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
               ({QuotientGroup.mk' (Subgroup.zpowers c) a, QuotientGroup.mk' (Subgroup.zpowers c) b,
                 QuotientGroup.mk' (Subgroup.zpowers c) z} : Set (R' ⧸ Subgroup.zpowers c))) := by
             refine Subgroup.isMulCommutative_closure ?_
-            intro x hx y hy
+            intro x hx y hy _
             simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx hy
             rcases hx with rfl | rfl | rfl <;> rcases hy with rfl | rfl | rfl <;>
               first

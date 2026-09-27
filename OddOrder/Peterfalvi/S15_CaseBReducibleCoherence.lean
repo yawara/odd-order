@@ -581,9 +581,9 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
           (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ) 0 := by
     intro i j
     by_cases hij : i = j
-    · subst hij; rw [if_pos rfl]
+    · subst hij; rw [ite_eq_left rfl]
       exact (OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos (hmemfam i)).1
-    · rw [if_neg hij]
+    · rw [ite_eq_right hij]
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
         (hmemfam i) (hmemfam j) (fun h => hij (hinj h))
   have hχcnotS₂ : (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupS hG)
@@ -844,12 +844,12 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
     intro i i'
     rw [hkfeq i, hkfeq i', hμcols]
     by_cases hii : i = i'
-    · subst hii; rw [if_pos rfl, if_pos rfl]
-    · rw [if_neg (fun h => hii (hkfinj _ _ h)), if_neg hii]
+    · subst hii; rw [ite_eq_left rfl, ite_eq_left rfl]
+    · rw [ite_eq_right (fun h => hii (hkfinj _ _ h)), ite_eq_right hii]
   have hχorth : ∀ i j : Fin n, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 := by
-    intro i j hij; rw [hχpair, if_neg hij]
+    intro i j hij; rw [hχpair, ite_eq_right hij]
   have hχnorm : ∀ i : Fin n, ClassFunction.inner (χ i) (χ i) ≠ 0 := by
-    intro i; rw [hχpair, if_pos rfl]; exact hqne0
+    intro i; rw [hχpair, ite_eq_left rfl]; exact hqne0
   -- the canonical Fourier map and its member images
   set ν₀ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥hyp.S G :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
@@ -909,8 +909,8 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
             obtain ⟨j', rfl⟩ := hidxof b hb
             rw [hν₀apply i, hν₀apply j', hηcols, hχpair]
             by_cases hij : i = j'
-            · subst hij; rw [if_pos rfl, if_pos rfl]
-            · rw [if_neg (fun h => hij (hkfinj _ _ h)), if_neg hij]
+            · subst hij; rw [ite_eq_left rfl, ite_eq_left rfl]
+            · rw [ite_eq_right (fun h => hij (hkfinj _ _ h)), ite_eq_right hij]
         | zero => rw [map_zero, ClassFunction.inner_zero_left,
             ClassFunction.inner_zero_left]
         | add u v hu hv ihu ihv =>
@@ -999,7 +999,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
       have hce : (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
           = ∑ i : Fin hyp.q, hyp.mu i ⟨2, h2lt⟩ := sub_eq_zero.mp heq
       have hcontra := hyp.muColumn_inner ⟨1, hyp.p_prime.one_lt⟩ ⟨2, h2lt⟩
-      rw [if_neg hne12, ← hce, hyp.muColumn_inner_self] at hcontra
+      rw [ite_eq_right hne12, ← hce, hyp.muColumn_inner_self] at hcontra
       exact hqne0 hcontra
   -- assemble; the pin is `hν₀apply` at the `μ-col₁`-member index
   have hμ1mem : (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩) ∈ F := by
@@ -1015,9 +1015,9 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
       rw [← hkfeq i₁, hχi₁]
     have h2 : (if kf i₁ = (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) then (hyp.q : ℂ) else 0)
         = (hyp.q : ℂ) := by
-      rw [← hμcols, hcols_eq, hμcols, if_pos rfl]
+      rw [← hμcols, hcols_eq, hμcols, ite_eq_left rfl]
     by_contra hne
-    rw [if_neg hne] at h2
+    rw [ite_eq_right hne] at h2
     exact hqne0 h2.symm
   refine ⟨{ nonzero := hnonzero
             extension := ν₀

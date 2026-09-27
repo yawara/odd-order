@@ -13,7 +13,7 @@ import OddOrder.Mathlib.Subgroup
 
 `OddOrder.GroupTheory` shared module: 'elementary abelian p-group' の概念.
 
-mathlib v4.29.1 にはこの概念 ("G abelian かつ ∀ x, x^p = 1") が無いため, 本リポジトリの
+mathlib (v4.34.1 で再確認) にはこの概念 ("G abelian かつ ∀ x, x^p = 1") が無いため, 本リポジトリの
 Ch.3 (Isaacs Thm 3.11), Ch.6 (6.9/6.15), Ch.7 (J(P) 定義) 共通の shared concept として
 独立 module に切り出す. BG App.A, App.B (Puig L(S)) も将来再利用する.
 
@@ -370,17 +370,6 @@ theorem isElementaryAbelian_card_prime_sq_of_card_le_prime_sq_of_not_isCyclic
   exact ⟨OddOrder.GroupTheory.IsElementaryAbelian.of_card_prime_sq_of_not_isCyclic
     hp hCard hNotCyclic, hCard⟩
 
-private theorem subgroup_normal_of_le_center {H : Subgroup G} (hH : H ≤ Subgroup.center G) :
-    H.Normal := by
-  refine ⟨fun n hn g => ?_⟩
-  have hn_center : n ∈ Subgroup.center G := hH hn
-  have hgn : g * n = n * g := Subgroup.mem_center_iff.mp hn_center g
-  have hconj : g * n * g⁻¹ = n := by
-    calc
-      g * n * g⁻¹ = n * g * g⁻¹ := by rw [hgn]
-      _ = n := by simp
-  rwa [hconj]
-
 /-- A nontrivial finite `p`-group contains a central subgroup of order `p`. -/
 theorem exists_subgroup_le_center_card_prime
     [Finite G] [Fact p.Prime] (hG : IsPGroup p G) [Nontrivial G] :
@@ -444,7 +433,7 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
       have hInf_eq_U : Z ⊓ U = U :=
         Subgroup.eq_of_le_of_card_ge inf_le_right (by rw [hInf_card, hU_card])
       exact hZU_ne (hInf_eq_Z.symm.trans hInf_eq_U)
-  have hZ_normal : Z.Normal := subgroup_normal_of_le_center hZ_le_center
+  have hZ_normal : Z.Normal := Subgroup.normal_of_le_center hZ_le_center
   let E : Subgroup G := Z ⊔ U
   have hE_card : Nat.card E = p ^ 2 := by
     have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card Z U
@@ -594,7 +583,7 @@ theorem IsElementaryAbelian.sup_of_le_centralizer {p : ℕ} {H K : Subgroup G}
       · exact hHK hyH x hxK
       · exact congrArg Subtype.val (hK.comm ⟨x, hxK⟩ ⟨y, hyK⟩)
   have hclosure_comm : IsMulCommutative (Subgroup.closure S) :=
-    Subgroup.isMulCommutative_closure hgen_comm
+    Subgroup.isMulCommutative_closure fun x hx y hy _ => hgen_comm x hx y hy
   refine ⟨?_, ?_⟩
   · intro x y
     have hx : (x : G) ∈ Subgroup.closure S := by

@@ -394,7 +394,7 @@ theorem SOf_H0C_eq_SOf_HC_union_sOf [Finite G] {M : Subgroup G} (hyp : Hypothesi
 theorem H0C_normalized_by_M {M : Subgroup G} (hyp : Hypothesis M) :
     M ≤ Subgroup.normalizer ((hyp.H0C : Subgroup G) : Set G) :=
   le_trans (le_inf hyp.chief.H0_normalized_by_M hyp.C_normalized_by_M)
-    (Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _)
+    (Subgroup.inf_normalizer_le_normalizer_sup _ _)
 
 /-- **`M` normalizes `H = M_F`** (the maximal nilpotent normal Hall subgroup). -/
 theorem H_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
@@ -410,7 +410,7 @@ theorem H_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
 theorem HC_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     M ≤ Subgroup.normalizer ((hyp.HC : Subgroup G) : Set G) :=
   le_trans (le_inf hyp.H_normalized_by_M hyp.C_normalized_by_M)
-    (Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _)
+    (Subgroup.inf_normalizer_le_normalizer_sup _ _)
 
 /-- `(H₀C).subgroupOf M` is normal in `↥M`. -/
 theorem H0C_subgroupOf_normal {M : Subgroup G} (hyp : Hypothesis M) :

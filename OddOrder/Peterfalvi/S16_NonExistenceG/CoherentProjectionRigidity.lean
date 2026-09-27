@@ -66,13 +66,13 @@ theorem etaGrid_projection_pythagorean [Finite G]
     · rw [inner_sum_left,
         Finset.sum_eq_single_of_mem l (Finset.mem_univ _) (fun j _ hjl => ?_)]
       · rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-          if_pos ⟨rfl, rfl⟩, mul_one]
+          ite_eq_left ⟨rfl, rfl⟩, mul_one]
       · rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-          if_neg (by rintro ⟨-, rfl⟩; exact hjl rfl), mul_zero]
+          ite_eq_right (by rintro ⟨-, rfl⟩; exact hjl rfl), mul_zero]
     · rw [inner_sum_left]
       refine Finset.sum_eq_zero fun j _ => ?_
       rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-        if_neg (by rintro ⟨rfl, -⟩; exact hik rfl), mul_zero]
+        ite_eq_right (by rintro ⟨rfl, -⟩; exact hik rfl), mul_zero]
   have hsum_sq : ∀ psi : ClassFunction G ℂ,
       (∀ (k : Fin hyp.q) (l : Fin hyp.p),
         ClassFunction.inner psi (hyp.eta k l) = (m k l : ℂ)) ->
@@ -328,13 +328,13 @@ theorem etaGrid_projection_sub_beta_norm_one [Finite G]
     · rw [inner_sum_left,
         Finset.sum_eq_single_of_mem l (Finset.mem_univ _) (fun j _ hjl => ?_)]
       · rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-          if_pos ⟨rfl, rfl⟩, mul_one]
+          ite_eq_left ⟨rfl, rfl⟩, mul_one]
       · rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-          if_neg (by rintro ⟨-, rfl⟩; exact hjl rfl), mul_zero]
+          ite_eq_right (by rintro ⟨-, rfl⟩; exact hjl rfl), mul_zero]
     · rw [inner_sum_left]
       refine Finset.sum_eq_zero fun j _ => ?_
       rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-        if_neg (by rintro ⟨rfl, -⟩; exact hik rfl), mul_zero]
+        ite_eq_right (by rintro ⟨rfl, -⟩; exact hik rfl), mul_zero]
   have hsum_sq : ∀ psi : ClassFunction G ℂ,
       (∀ (k : Fin hyp.q) (l : Fin hyp.p),
         ClassFunction.inner psi (hyp.eta k l) = (m k l : ℂ)) →

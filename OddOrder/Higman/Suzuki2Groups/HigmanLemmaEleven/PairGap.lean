@@ -872,8 +872,7 @@ private theorem conjugateTensorBasis_repr_frobeniusBaseChange
   change (conjugateTensorBasis K).repr
       (sigma.toLinearEquiv.baseChange (ZMod 2) K K K z) q =
     (conjugateTensorBasis K).repr z (q + i)
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | add x y hx hy =>
       simp only [map_add, Finsupp.add_apply, hx, hy]
   | tmul a x =>
@@ -952,8 +951,7 @@ private theorem conjugateTensorBasisAlong_repr_frobeniusBaseChange
   change frobeniusTensorCoordinatesAlong K L iota
       (sigma.toLinearEquiv.baseChange (ZMod 2) L K K z) q =
     frobeniusTensorCoordinatesAlong K L iota z (q + i)
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | add x y hx hy =>
       simp only [map_add, Pi.add_apply, hx, hy]
   | tmul a x =>

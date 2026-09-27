@@ -378,7 +378,7 @@ theorem tSideDadeMap_inner_trivial [Finite G]
         OddOrder.Peterfalvi.S04.adjointAverageFun side.dade
           (trivialClassFunction G) ⟨a.1, side.dade.subset_L a.2⟩ := by
     intro a
-    rw [OddOrder.Peterfalvi.S04.adjointAverageFun, dif_pos a.2]
+    rw [OddOrder.Peterfalvi.S04.adjointAverageFun, dite_eq_left a.2]
     simp only [trivialClassFunction_apply, Finset.sum_const, nsmul_eq_mul,
       mul_one, Finset.card_univ, ← Nat.card_eq_fintype_card]
     rw [inv_mul_cancel₀]

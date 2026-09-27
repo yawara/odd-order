@@ -580,7 +580,8 @@ theorem nineElevenTwoZeta_mem_xiSet (caseA : CliffordCaseAData chars)
         (hInHu data ⊔ cuInHuPair caseA i j)
         (nineElevenTwoPsi caseA θ hinv : ClassFunction
           ↥(hInHu data ⊔ cuInHuPair caseA i j) ℂ) := by rw [hζdef]
-    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ,
+      ite_eq_left rfl]
     exact one_ne_zero
   rw [xiSet, Set.mem_ofPred_eq]
   intro hsub

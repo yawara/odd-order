@@ -101,18 +101,18 @@ theorem sum_signRelationRow_mul {S : Finset κ} {ε c : κ → K} {j₀ : κ} (h
     rw [Finset.sum_congr rfl fun j _ => by
       rw [show (if i = j then ε j else 0) = (if j = i then ε i else 0) from by
         by_cases h : i = j
-        · rw [if_pos h, if_pos h.symm, h]
-        · rw [if_neg h, if_neg fun hc => h hc.symm]],
+        · rw [ite_eq_left h, ite_eq_left h.symm, h]
+        · rw [ite_eq_right h, ite_eq_right fun hc => h hc.symm]],
       sum_ite_eq_mul (S := S.erase j₀) i (ε i) (fun j => ε j * c j)]
     by_cases h : i ∈ S.erase j₀
-    · rw [if_pos h, if_pos h, ← mul_assoc, hε i hi, one_mul]
-    · rw [if_neg h, if_neg h]
+    · rw [ite_eq_left h, ite_eq_left h, ← mul_assoc, hε i hi, one_mul]
+    · rw [ite_eq_right h, ite_eq_right h]
   rw [hsplit, hfirst, herase]
   by_cases h : i = j₀
   · subst h
-    rw [if_neg (Finset.notMem_erase i S), if_pos rfl, mul_neg, ← mul_assoc, hε i hi, one_mul,
-      sub_neg_eq_add, zero_add]
-  · rw [if_pos (Finset.mem_erase.mpr ⟨h, hi⟩), if_neg h, zero_mul, sub_zero]
+    rw [ite_eq_right (Finset.notMem_erase i S), ite_eq_left rfl, mul_neg, ← mul_assoc, hε i hi,
+      one_mul, sub_neg_eq_add, zero_add]
+  · rw [ite_eq_left (Finset.mem_erase.mpr ⟨h, hi⟩), ite_eq_right h, zero_mul, sub_zero]
 
 /-- **The coordinates of `∑_{i ∈ S} a_i c_i` in the basic set** are `a_j ε_j - a_{j₀} ε_{j₀}`. -/
 theorem sum_mul_signRelationRow {S : Finset κ} {ε a : κ → K} {j₀ : κ} (hj₀ : j₀ ∈ S) {j : κ}
@@ -123,7 +123,7 @@ theorem sum_mul_signRelationRow {S : Finset κ} {ε a : κ → K} {j₀ : κ} (h
         - ∑ i ∈ S, (if i = j₀ then ε j₀ else 0) * a i := by
     rw [← Finset.sum_sub_distrib]
     exact Finset.sum_congr rfl fun i _ => by rw [signRelationRow]; ring
-  rw [hsplit, sum_ite_eq_mul j (ε j) a, sum_ite_eq_mul j₀ (ε j₀) a, if_pos hj, if_pos hj₀,
+  rw [hsplit, sum_ite_eq_mul j (ε j) a, sum_ite_eq_mul j₀ (ε j₀) a, ite_eq_left hj, ite_eq_left hj₀,
     mul_comm (ε j), mul_comm (ε j₀)]
 
 /-- **`C_𝓑 = D_𝓑ᵗ D_𝓑 = 1 + δ`.**  The `(j,k)` entry is `δ_{jk} ε_j ε_k` from the identity part
@@ -143,18 +143,18 @@ theorem sum_signRelationRow_mul_signRelationRow {S : Finset κ} {ε : κ → K} 
     exact Finset.sum_congr rfl fun i _ => by rw [signRelationRow, signRelationRow]; ring
   have h1 : (∑ i ∈ S, (if i = j then ε j else 0) * (if i = k then ε k else 0))
       = if j = k then 1 else 0 := by
-    rw [sum_ite_eq_mul j (ε j) (fun i => if i = k then ε k else 0), if_pos hjS]
+    rw [sum_ite_eq_mul j (ε j) (fun i => if i = k then ε k else 0), ite_eq_left hjS]
     by_cases h : j = k
     · subst h; simp [hε j hjS]
-    · rw [if_neg h, if_neg h, mul_zero]
+    · rw [ite_eq_right h, ite_eq_right h, mul_zero]
   have h2 : (∑ i ∈ S, (if i = j then ε j else 0) * (if i = j₀ then ε j₀ else 0)) = 0 := by
-    rw [sum_ite_eq_mul j (ε j) (fun i => if i = j₀ then ε j₀ else 0), if_pos hjS, if_neg hj,
-      mul_zero]
+    rw [sum_ite_eq_mul j (ε j) (fun i => if i = j₀ then ε j₀ else 0), ite_eq_left hjS,
+      ite_eq_right hj, mul_zero]
   have h3 : (∑ i ∈ S, (if i = j₀ then ε j₀ else 0) * (if i = k then ε k else 0)) = 0 := by
-    rw [sum_ite_eq_mul j₀ (ε j₀) (fun i => if i = k then ε k else 0), if_pos hj₀,
-      if_neg (fun h : j₀ = k => hk h.symm), mul_zero]
+    rw [sum_ite_eq_mul j₀ (ε j₀) (fun i => if i = k then ε k else 0), ite_eq_left hj₀,
+      ite_eq_right (fun h : j₀ = k => hk h.symm), mul_zero]
   have h4 : (∑ i ∈ S, (if i = j₀ then ε j₀ else 0) * (if i = j₀ then ε j₀ else 0)) = 1 := by
-    rw [sum_ite_eq_mul j₀ (ε j₀) (fun i => if i = j₀ then ε j₀ else 0), if_pos hj₀]
+    rw [sum_ite_eq_mul j₀ (ε j₀) (fun i => if i = j₀ then ε j₀ else 0), ite_eq_left hj₀]
     simp [hε j₀ hj₀]
   rw [hexp, h1, h2, h3, h4, sub_zero, sub_zero, add_comm]
 
@@ -290,14 +290,14 @@ theorem character_eq_sum_signRelationRow_mul_principalBasicSet
       signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j
         * principalBasicSet eG hπG hlinG hnilG t j₀ j g = 0 := by
     intro j _ hj
-    rw [principalBasicSet, if_neg (fun hc => hj (Finset.mem_erase.mpr ⟨hc.2, (hmem j).mpr hc.1⟩)),
-      mul_zero]
+    rw [principalBasicSet,
+      ite_eq_right (fun hc => hj (Finset.mem_erase.mpr ⟨hc.2, (hmem j).mpr hc.1⟩)), mul_zero]
   rw [← Finset.sum_subset (Finset.subset_univ (Sirr.erase j₀)) hout,
     Finset.sum_congr rfl fun j hj => by
       rw [show principalBasicSet eG hπG hlinG hnilG t j₀ j g
           = (wedderburnRepresentation eG j).character t
               * (wedderburnRepresentation eG j).character g from by
-        rw [principalBasicSet, if_pos ⟨(hmem j).mp (Finset.mem_of_mem_erase hj),
+        rw [principalBasicSet, ite_eq_left ⟨(hmem j).mp (Finset.mem_of_mem_erase hj),
           Finset.ne_of_mem_erase hj⟩]]]
   exact sum_signRelationRow_mul (S := Sirr)
     (ε := fun l => (wedderburnRepresentation eG l).character t)
@@ -391,8 +391,8 @@ theorem sum_basicSetMatrixOf_mul_principalBasicSet {a : ιG → κ → K}
       basicSetMatrixOf eG a t j₀ μ j
         * principalBasicSet eG hπG hlinG hnilG t j₀ j g = 0 := by
     intro j _ hj
-    rw [principalBasicSet, if_neg (fun hc => hj (Finset.mem_erase.mpr ⟨hc.2, (hmem j).mpr hc.1⟩)),
-      mul_zero]
+    rw [principalBasicSet,
+      ite_eq_right (fun hc => hj (Finset.mem_erase.mpr ⟨hc.2, (hmem j).mpr hc.1⟩)), mul_zero]
   have hεsq : ∀ l ∈ Sirr, (wedderburnRepresentation eG l).character t
       * (wedderburnRepresentation eG l).character t = 1 := fun l hl =>
     character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK
@@ -407,7 +407,7 @@ theorem sum_basicSetMatrixOf_mul_principalBasicSet {a : ιG → κ → K}
   have hη : ∀ j ∈ Sirr.erase j₀, principalBasicSet eG hπG hlinG hnilG t j₀ j g
       = (wedderburnRepresentation eG j).character t
         * (wedderburnRepresentation eG j).character g := fun j hj => by
-    rw [principalBasicSet, if_pos ⟨(hmem j).mp (Finset.mem_of_mem_erase hj),
+    rw [principalBasicSet, ite_eq_left ⟨(hmem j).mp (Finset.mem_of_mem_erase hj),
       Finset.ne_of_mem_erase hj⟩]
   have hU : ∀ j ∈ Sirr.erase j₀,
       basicSetMatrixOf eG a t j₀ μ j
@@ -537,8 +537,8 @@ theorem sum_decompositionMatrix_mul_basicSetMatrixOf {coef : ιG → κ → K}
     else 0 with hadef
   have hsupp : ∀ l : κ,
       blockOfIrr eG hπG hlinG hnilG l ≠ principalBlock πG hπG hlinG hnilG → a l = 0 := fun l hl =>
-    if_neg fun hc => hl ((hmem l).mp (Finset.mem_of_mem_erase hc))
-  have ha₀ : a j₀ = 0 := if_neg (Finset.notMem_erase j₀ Sirr)
+    ite_eq_right fun hc => hl ((hmem l).mp (Finset.mem_of_mem_erase hc))
+  have ha₀ : a j₀ = 0 := ite_eq_right (Finset.notMem_erase j₀ Sirr)
   have hvan : ∀ g : G, IsPRegular p g →
       (∑ l : κ, a l * (wedderburnRepresentation eG l).character g) = 0 := by
     intro g hg
@@ -552,13 +552,15 @@ theorem sum_decompositionMatrix_mul_basicSetMatrixOf {coef : ιG → κ → K}
       by_cases hl : l ∈ Sirr.erase j₀
       · rw [hadef]
         simp only
-        rw [if_pos hl, principalBasicSet, if_pos ⟨(hmem l).mp (Finset.mem_of_mem_erase hl),
+        rw [ite_eq_left hl, principalBasicSet,
+          ite_eq_left ⟨(hmem l).mp (Finset.mem_of_mem_erase hl),
           Finset.ne_of_mem_erase hl⟩]
         ring
       · rw [hadef]
         simp only
-        rw [if_neg hl, principalBasicSet,
-          if_neg fun hc => hl (Finset.mem_erase.mpr ⟨hc.2, (hmem l).mpr hc.1⟩), zero_mul, mul_zero]
+        rw [ite_eq_right hl, principalBasicSet,
+          ite_eq_right fun hc => hl (Finset.mem_erase.mpr ⟨hc.2, (hmem l).mpr hc.1⟩),
+          zero_mul, mul_zero]
     rw [Finset.sum_congr rfl fun l _ => (hkey l).trans (sub_mul _ _ _),
       Finset.sum_sub_distrib,
       character_eq_sum_signRelationRow_mul_principalBasicSet hp hx hω e eG hπG hlinG hπ hlin hkerJ
@@ -600,7 +602,7 @@ theorem sum_decompositionMatrix_mul_basicSetMatrixOf {coef : ιG → κ → K}
   have hj := congrFun hzero j
   rw [hadef] at hj
   simp only [Pi.zero_apply] at hj
-  rw [if_pos (Finset.mem_erase.mpr ⟨hjne, (hmem j).mpr hjB⟩)] at hj
+  rw [ite_eq_left (Finset.mem_erase.mpr ⟨hjne, (hmem j).mpr hjB⟩)] at hj
   have hεj : (wedderburnRepresentation eG j).character t ≠ 0 := by
     intro hc
     have := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ

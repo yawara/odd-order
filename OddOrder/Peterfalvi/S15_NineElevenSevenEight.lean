@@ -115,7 +115,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
     intro χ hχ
     have h := irreducibleCharacter_inner_eq_ite
       (⟨χ, hχ⟩ : IrreducibleCharacter ↥hyp.S) ⟨χ, hχ⟩
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   -- ── the explicit (9.11.2) TI-witness `U₁ = cuSubOf caseA 0`: `C ≤ U₁ ≤ U`, `[U:U₁] = a`
   have hq0 : 0 < (hyp.toTypesIIIIIIVSetupS hG).q :=
     (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos
@@ -449,8 +449,8 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
         rw [c₁.extension_inner_eq φ ξ (Submodule.subset_span hφ)
           (Submodule.subset_span hξ)]
         by_cases h : φ = ξ
-        · subst h; rw [if_pos rfl]; exact hON1 φ hφ
-        · rw [if_neg h]; exact hON2 φ hφ ξ hξ h)
+        · subst h; rw [ite_eq_left rfl]; exact hON1 φ hφ
+        · rw [ite_eq_right h]; exact hON2 φ hφ ξ hξ h)
       (by
         intro ξ hξF ξ' hξ'F
         have hξ := hS4sub (hS4fin.mem_toFinset.mp hξF)
@@ -459,9 +459,9 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
           (Submodule.subset_span hξ')]
         by_cases h : ξ = ξ'
         · subst h
-          rw [if_pos rfl]
+          rw [ite_eq_left rfl]
           exact hselfone (hS4fin.mem_toFinset.mp hξF).2.1
-        · rw [if_neg h]
+        · rw [ite_eq_right h]
           exact sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hξ.1 hξ'.1 h)
       (fun φ hφF ξ hξF => hcross φ (hS₂fin.mem_toFinset.mp hφF)
         ξ (hS4sub (hS4fin.mem_toFinset.mp hξF)))

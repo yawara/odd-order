@@ -984,13 +984,13 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) ≠ 0 := by
     rw [OddOrder.Peterfalvi.S06.columnSum_def,
-      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]
     exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have hχbarχbarne : ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj ≠ 0 := by
     rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_def,
-      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]
     exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have hχχbar : ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
@@ -998,7 +998,7 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner]
-    exact if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self
+    exact ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self
       (hyp.toHypothesis46 hG hG.odd) hχ₂).symm
   have hχbarχ : ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj
@@ -1006,7 +1006,7 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     rw [hconjcol, OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner]
-    exact if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self
+    exact ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self
       (hyp.toHypothesis46 hG hG.odd) hχ₂)
   -- χ-side support: the conjugate column difference is `A(M)`-supported, hence `A₀`-supported
   have hdiffsuppχ : (((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj

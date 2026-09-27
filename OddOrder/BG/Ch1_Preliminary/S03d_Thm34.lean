@@ -300,7 +300,6 @@ private lemma thm34_isExtraspecial_of_special {G : Type*} [Group G] [Finite G]
   exact IsExtraspecial.of_isSpecial_of_isCyclic_center hsp hnonab this
 
 open OddOrder.RepresentationTheory in
-set_option backward.isDefEq.respectTransparency false in
 /-- **BG Theorem 3.4, step 2 (Maschke selection).**  Over a field with `char F ∤ |G|` a
 finite-dimensional representation `ρ` is semisimple (Maschke).  If `ρ g₀ ≠ 1` then `g₀` acts
 nontrivially on some **irreducible** subrepresentation `W`: were `g₀` to fix every simple

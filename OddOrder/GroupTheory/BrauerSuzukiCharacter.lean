@@ -519,7 +519,7 @@ theorem theta_inner_self [Fintype ↥Q.N] [Invertible (Nat.card ↥Q.N : ℂ)]
   have hPP : ClassFunction.inner (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN)
       (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN) = 1 := by
     rw [OddOrder.RepresentationTheory.irr_cf_inner
-      (mem_irreducibleCharacters.mpr hirr) (mem_irreducibleCharacters.mpr hirr), if_pos rfl]
+      (mem_irreducibleCharacters.mpr hirr) (mem_irreducibleCharacters.mpr hirr), ite_eq_left rfl]
   rw [hTT, hTP, hPT, hPP]; norm_num
 
 /-! ### The induced character `θ* = Ind_N^G θ` (Gorenstein Lemma 1.5, analytic part) -/
@@ -564,12 +564,12 @@ theorem thetaStar_inner_trivial [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
       (ClassFunction.induce (Q.C.subgroupOf Q.N) (trivialClassFunction _))
       (trivialClassFunction ↥Q.N) = 1 := by
     rw [ClassFunction.induce_inner_trivial, OddOrder.RepresentationTheory.irr_cf_inner
-      trivialClassFunction_isIrreducible trivialClassFunction_isIrreducible, if_pos rfl]
+      trivialClassFunction_isIrreducible trivialClassFunction_isIrreducible, ite_eq_left rfl]
   have hP : ClassFunction.inner (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN)
       (trivialClassFunction ↥Q.N) = 0 := by
     rw [ClassFunction.induce_inner_trivial, OddOrder.RepresentationTheory.irr_cf_inner
       (mem_irreducibleCharacters.mpr Q.psiN_isIrr) trivialClassFunction_isIrreducible,
-      if_neg Q.psiN_ne_trivial]
+      ite_eq_right Q.psiN_ne_trivial]
   rw [hT, hP, sub_zero]
 
 /-- `θ ∈ ℤ[Irr N]` (virtual character): `θ = Ind 1_C − Ind ψ`, both induced characters. -/
@@ -611,7 +611,7 @@ theorem thetaStar_decomposition [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
   have hρnorm : ClassFunction.inner ρ ρ = 2 := by
     have h1G : ClassFunction.inner (trivialClassFunction G) (trivialClassFunction G) = 1 := by
       rw [OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
-        trivialClassFunction_isIrreducible, if_pos rfl]
+        trivialClassFunction_isIrreducible, ite_eq_left rfl]
     have hcross : ClassFunction.inner (trivialClassFunction G) Q.thetaStar = 1 := by
       rw [ClassFunction.inner_star_comm, Q.thetaStar_inner_trivial, star_one]
     rw [hρdef, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
@@ -626,7 +626,7 @@ theorem thetaStar_decomposition [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
   have hρtriv : ClassFunction.inner ρ (trivialClassFunction G) = 0 := by
     rw [hρdef, ClassFunction.inner_sub_left, Q.thetaStar_inner_trivial,
       OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
-        trivialClassFunction_isIrreducible, if_pos rfl, sub_self]
+        trivialClassFunction_isIrreducible, ite_eq_left rfl, sub_self]
   -- Fourier structure: ρ = c(α₀)·α₀ + c(β₀)·β₀
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hρZ
   have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hρnorm
@@ -650,12 +650,12 @@ theorem thetaStar_decomposition [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
   have hinnα : ClassFunction.inner ρ α₀ = (c α₀ : ℂ) := by
     rw [hrepr, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.irr_cf_inner hα₀ hα₀,
-      if_pos rfl, OddOrder.RepresentationTheory.irr_cf_inner hβ₀ hα₀,
-      if_neg (Ne.symm hαβ), mul_one, mul_zero, add_zero]
+      ite_eq_left rfl, OddOrder.RepresentationTheory.irr_cf_inner hβ₀ hα₀,
+      ite_eq_right (Ne.symm hαβ), mul_one, mul_zero, add_zero]
   have hinnβ : ClassFunction.inner ρ β₀ = (c β₀ : ℂ) := by
     rw [hrepr, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.irr_cf_inner hα₀ hβ₀,
-      if_neg hαβ, OddOrder.RepresentationTheory.irr_cf_inner hβ₀ hβ₀, if_pos rfl,
+      ite_eq_right hαβ, OddOrder.RepresentationTheory.irr_cf_inner hβ₀ hβ₀, ite_eq_left rfl,
       mul_zero, mul_one, zero_add]
   have hαnt : α₀ ≠ trivialClassFunction G := by
     intro h

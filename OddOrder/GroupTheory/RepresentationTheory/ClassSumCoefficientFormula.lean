@@ -189,9 +189,9 @@ theorem classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter
                     rw [Finset.mul_sum]
       _ = coeff Cs * cent := by
             rw [Finset.sum_eq_single Cs]
-            · rw [hcol Cs, if_pos rfl]
+            · rw [hcol Cs, ite_eq_left rfl]
             · intro C _ hC
-              rw [hcol C, if_neg hC, mul_zero]
+              rw [hcol C, ite_eq_right hC, mul_zero]
             · intro hCs
               exact (hCs (Finset.mem_univ Cs)).elim
   have hright :

@@ -739,7 +739,7 @@ theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
   apply Finset.sum_congr rfl
   intro b _
   by_cases hQ : ∃ x ∈ hyp.H a, IsConj (a.1 * x) b
-  · rw [if_pos hQ]
+  · rw [ite_eq_left hQ]
     obtain ⟨x₀, hx₀, hx₀conj⟩ := hQ
     have hcard : (Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b)).card
         = Nat.card (Subgroup.centralizer ({a.1} : Set G)) := by
@@ -759,7 +759,7 @@ theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
           Finset.sum_const _
       _ = (Nat.card (Subgroup.centralizer ({a.1} : Set G)) : ℂ) * F b := by
           rw [hcard, nsmul_eq_mul]
-  · rw [if_neg hQ]
+  · rw [ite_eq_right hQ]
     apply Finset.sum_eq_zero
     intro p hp
     exact absurd ⟨p.1, p.1.2, by
@@ -1279,7 +1279,7 @@ theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
       L.mul_mem (L.mul_mem (L.inv_mem l.2) hxL) l.2
     refine ⟨hconjL, ?_⟩
     have : (⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ : L) = l⁻¹ * ⟨x, hxL⟩ * l := by
-      apply Subtype.ext; push_cast; ring
+      apply Subtype.ext; push_cast; rfl
     rw [this]
     exact (hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩).mp hxN
   · rintro ⟨hconjL, hxN⟩
@@ -1289,7 +1289,7 @@ theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
     refine ⟨hxL, ?_⟩
     rw [hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩]
     have : (l⁻¹ * ⟨x, hxL⟩ * l : L) = ⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ := by
-      apply Subtype.ext; push_cast; ring
+      apply Subtype.ext; push_cast; rfl
     rw [this]; exact hxN
 
 /-- **Peterfalvi (2.10.1), `M(B^x) = M(B)^x`.**  Conjugation by `l ∈ L` carries `M(B)` to

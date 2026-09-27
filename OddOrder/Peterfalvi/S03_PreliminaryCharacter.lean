@@ -901,7 +901,7 @@ theorem mem_characterKernel_of_mem_characterKernel_induce
   have hfamcoe : ∀ ψ ∈ S, (fam ψ : ClassFunction ↥H ℂ) = ψ := by
     intro ψ hψ
     simp only [hfam]
-    rw [dif_pos (hmemirr ψ hψ)]
+    rw [dite_eq_left (hmemirr ψ hψ)]
   have hfamdeg : ∀ ψ ∈ S, (fam ψ : ClassFunction ↥H ℂ) 1 = (n : ℂ) := by
     intro ψ hψ
     rw [hfamcoe ψ hψ]

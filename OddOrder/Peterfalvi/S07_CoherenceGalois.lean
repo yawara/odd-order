@@ -155,7 +155,7 @@ theorem IsCoherent.extension_mapRingEquiv_comm
       rw [hτ.extension_inner_eq φ φ (Submodule.subset_span hφ) (Submodule.subset_span hφ)]
       have h := irreducibleCharacter_inner_eq_ite
         (⟨φ, hSirr hφ⟩ : IrreducibleCharacter ↥L) (⟨φ, hSirr hφ⟩ : IrreducibleCharacter ↥L)
-      rw [if_pos rfl] at h
+      rw [ite_eq_left rfl] at h
       exact h
     exact exists_zsmul_irreducibleCharacter_of_inner_self_one (hlat φ hφ) hnorm
   choose ε ξ hεpm hξrepr using hpm
@@ -285,9 +285,9 @@ theorem IsCoherent.extension_mapRingEquiv_comm
       (⟨ψ, hSirr hψ⟩ : IrreducibleCharacter ↥L) (⟨χ, hSirr hχ⟩ : IrreducibleCharacter ↥L)
     have h21 := irreducibleCharacter_inner_eq_ite
       (⟨χ, hSirr hχ⟩ : IrreducibleCharacter ↥L) (⟨ψ, hSirr hψ⟩ : IrreducibleCharacter ↥L)
-    rw [if_pos rfl] at h11 h22
-    rw [if_neg hψχ'] at h12
-    rw [if_neg (Ne.symm hψχ')] at h21
+    rw [ite_eq_left rfl] at h11 h22
+    rw [ite_eq_right hψχ'] at h12
+    rw [ite_eq_right (Ne.symm hψχ')] at h21
     have htwo : ClassFunction.inner (ψ - χ) (ψ - χ) = 2 := by
       rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
         ClassFunction.inner_sub_right, h11, h22, h12, h21]
@@ -324,22 +324,22 @@ theorem IsCoherent.extension_mapRingEquiv_comm
       ClassFunction.inner x (IrreducibleCharacter.galoisMap σc (ξ χ hχ) : ClassFunction G ℂ))
     hmain
   simp only [hexp (d ψ hψ) (d χ hχ)] at hcmp
-  rw [if_neg hB21] at hcmp
-  simp only [if_true] at hcmp
+  rw [ite_eq_right hB21] at hcmp
+  simp only [ite_true] at hcmp
   -- conclude: the goal reduces to `ξ_{χ^{σc}} = (ξ_χ)^{σc}`
   by_cases h31 : ξ _ hχu = IrreducibleCharacter.galoisMap σc (ξ χ hχ)
   · rw [huτχ, hτuχ, h31]
   · exfalso
-    rw [if_neg h31] at hcmp
+    rw [ite_eq_right h31] at hcmp
     by_cases h41 : ξ _ hψu = IrreducibleCharacter.galoisMap σc (ξ χ hχ)
-    · rw [if_pos h41] at hcmp
+    · rw [ite_eq_left h41] at hcmp
       have hsum : ((d ψ hψ + d χ hχ : ℕ) : ℂ) = 0 := by
         push_cast
         linear_combination hcmp
       have h0 : d ψ hψ + d χ hχ = 0 := Nat.cast_eq_zero.mp hsum
       have := hdpos ψ hψ
       omega
-    · rw [if_neg h41] at hcmp
+    · rw [ite_eq_right h41] at hcmp
       have hsum : ((d ψ hψ : ℕ) : ℂ) = 0 := by
         linear_combination hcmp
       have h0 : d ψ hψ = 0 := Nat.cast_eq_zero.mp hsum

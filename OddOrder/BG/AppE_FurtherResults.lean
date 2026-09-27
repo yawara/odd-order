@@ -202,7 +202,7 @@ theorem RegularOperatorSetup.sup_centralizer_eq_top [Finite R]
   have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card R₀' T
   rw [hR₀T, Subgroup.card_bot, mul_one, hyp.card_R₀_subgroupOf hR₀S] at hprod
   have hcong : Nat.card ↥(R₀' ⊔ T) = Nat.card ↥((R₀' : Set ↥S) * (T : Set ↥S)) :=
-    Nat.card_congr (Equiv.setCongr (Subgroup.mul_normal R₀' T))
+    Nat.card_congr (Set.equivOfEq (Subgroup.mul_normal R₀' T))
   -- `|S| = |T| · [S : T] = |T| · p`
   have hSc : Nat.card ↥T * T.index = Nat.card ↥S := T.card_mul_index
   rw [(hyp.card_omega1Center_and_index_centralizer hR₀S hS).2] at hSc

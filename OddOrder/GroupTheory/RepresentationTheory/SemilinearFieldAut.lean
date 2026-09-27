@@ -804,7 +804,7 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
       rw [Fintype.sum_prod_type]
       refine Finset.sum_congr rfl fun ρ _ => ?_
       rw [Finset.sum_ite_eq' Finset.univ (ρ * κ)
-        (fun β => μ ρ * (ρ z * β z)), if_pos (Finset.mem_univ _),
+        (fun β => μ ρ * (ρ z * β z)), ite_eq_left (Finset.mem_univ _),
         AlgEquiv.mul_apply, map_mul]
     rw [hsum1, hsum2, hcompat z]
     exact CharTwo.add_self_eq_zero _
@@ -813,7 +813,7 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
     intro γ
     have hd : lam γ * κ (lam (κ * γ)) + (if γ = γ * κ then μ γ else 0) = 0 :=
       autMulQuadratic_diag_eq_zero F _ hc γ
-    rwa [if_neg (fun h => hκ1 (left_eq_mul.mp h)), add_zero] at hd
+    rwa [ite_eq_right (fun h => hκ1 (left_eq_mul.mp h)), add_zero] at hd
   -- equation (4): off-diagonal coefficients are symmetric
   have h4 : ∀ α β : F ≃ₐ[ZMod 2] F, β ≠ α * κ →
       lam α * κ (lam (κ * β)) = lam β * κ (lam (κ * α)) := by
@@ -825,7 +825,7 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
     have hs : lam α * κ (lam (κ * β)) + (if β = α * κ then μ α else 0) =
         lam β * κ (lam (κ * α)) + (if α = β * κ then μ β else 0) :=
       autMulQuadratic_coeff_symm F _ hc α β
-    rwa [if_neg hβ, if_neg hαne, add_zero, add_zero] at hs
+    rwa [ite_eq_right hβ, ite_eq_right hαne, add_zero, add_zero] at hs
   -- pick the surviving index and kill all the others
   obtain ⟨α, hα⟩ : ∃ σ, lam σ ≠ 0 := by
     by_contra hall
@@ -908,7 +908,7 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
         refine Finset.sum_eq_zero fun στ hστ => ?_
         simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hστ
         rw [hc'def]
-        simp only [dif_neg hστ, zero_smul]
+        simp only [dite_eq_right hστ, zero_smul]
       rw [hz, add_zero,
         Finset.sum_subtype
           (p := fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
@@ -921,7 +921,7 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
         ← hc]
       refine Finset.sum_congr rfl fun q _ => ?_
       simp only [hc'def]
-      rw [dif_pos q.2]
+      rw [dite_eq_left q.2]
     intro q
     rcases eq_or_lt_of_le q.2 with heq | hlt
     · -- diagonal representative: `eqv`-equal means equal
@@ -930,7 +930,7 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
       have hval : c' (q.1.1, q.1.1) = c q := by
         rw [hc'def]
         have hle : eqv q.1.1 ≤ eqv q.1.1 := le_refl _
-        simp only [dif_pos hle]
+        simp only [dite_eq_left hle]
         exact congrArg c (Subtype.ext (Prod.ext rfl hqq))
       rw [hval] at hd
       exact hd
@@ -938,10 +938,10 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
       have hs := autMulQuadratic_coeff_symm F c' hsum q.1.1 q.1.2
       have h1 : c' (q.1.1, q.1.2) = c q := by
         rw [hc'def]
-        simp only [dif_pos q.2]
+        simp only [dite_eq_left q.2]
       have h2 : c' (q.1.2, q.1.1) = 0 := by
         rw [hc'def]
-        simp only [dif_neg (not_le.mpr hlt)]
+        simp only [dite_eq_right (not_le.mpr hlt)]
       rw [h1, h2] at hs
       exact hs
   -- size of the wedge = dimension of the quadratic-map space
@@ -1053,14 +1053,14 @@ theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F
   have hdiag : ∀ σ : F ≃ₐ[ZMod 2] F, (c + c₀) (σ, σ) = 0 := by
     intro σ
     have hlt : ¬ eqv σ < eqv σ := lt_irrefl _
-    simp only [Pi.add_apply, hcdef, if_neg hlt]
+    simp only [Pi.add_apply, hcdef, ite_eq_right hlt]
     exact CharTwo.add_self_eq_zero _
   have hsymm : ∀ σ τ : F ≃ₐ[ZMod 2] F, (c + c₀) (σ, τ) = (c + c₀) (τ, σ) := by
     intro σ τ
     rcases lt_trichotomy (eqv σ) (eqv τ) with hlt | heq | hgt
     · have hne : σ ≠ τ := fun h => absurd (congrArg eqv h) (ne_of_lt hlt)
       have hne' : τ ≠ σ := hne.symm
-      simp only [Pi.add_apply, hcdef, if_pos hlt, if_neg (asymm hlt), if_neg hne']
+      simp only [Pi.add_apply, hcdef, ite_eq_left hlt, ite_eq_right (asymm hlt), ite_eq_right hne']
       rw [zero_add]
       -- `c₀ (σ,τ) + c₀ (τ,σ) + c₀ (σ,τ) = c₀ (τ,σ)`
       rw [add_assoc, add_comm (c₀ (τ, σ)) (c₀ (σ, τ)), ← add_assoc,
@@ -1069,7 +1069,7 @@ theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F
       subst hst
       rfl
     · have hne : σ ≠ τ := fun h => absurd (congrArg eqv h) (ne_of_gt hgt)
-      simp only [Pi.add_apply, hcdef, if_neg (asymm hgt), if_pos hgt, if_neg hne]
+      simp only [Pi.add_apply, hcdef, ite_eq_right (asymm hgt), ite_eq_left hgt, ite_eq_right hne]
       rw [zero_add, add_comm (c₀ (τ, σ)) (c₀ (σ, τ)), add_assoc,
         CharTwo.add_self_eq_zero, add_zero]
   -- hence the two families have the same sum, and `c` is another expansion
@@ -1118,8 +1118,9 @@ theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F
         rcases lt_trichotomy (eqv στ.1) (eqv στ.2) with h | h | h
         · exact h
         · exact absurd (eqv.injective h) hoff
-        · exact absurd (by simp only [hcdef, if_neg (asymm h), if_neg hoff] : c στ = 0) hne
-      simp only [hcdef, if_neg (asymm hlt), if_neg (Ne.symm hoff)]
+        · exact absurd (by simp only [hcdef, ite_eq_right (asymm h),
+            ite_eq_right hoff] : c στ = 0) hne
+      simp only [hcdef, ite_eq_right (asymm hlt), ite_eq_right (Ne.symm hoff)]
     have h := autMulQuadratic_coeff_symm F _ hzero στ.1 στ.2
     rw [hswapzero, zero_mul, mul_zero, add_zero] at h
     rcases mul_eq_zero.mp (by linear_combination h :

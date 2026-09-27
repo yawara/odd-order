@@ -285,7 +285,7 @@ theorem forall_eq_one_of_leKer [Finite G] (R : Subgroup G) (hRQ : R ≤ hyp.Q)
       IrreducibleCharacter ↥hyp.H)
     (⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ, hindirr⟩ :
       IrreducibleCharacter ↥hyp.H)
-  rw [if_pos rfl] at hself
+  rw [ite_eq_left rfl] at hself
   simp only [IrreducibleCharacter.coe_mk] at hfrob hself
   have hfirst := hfrob.symm.trans hself
   have hbound := restrictionMultiplicity_mul_le_restrictionMultiplicity (G := ↥hyp.H) hHT
@@ -396,7 +396,7 @@ theorem Sset_pairwiseOrthogonal :
   intro χ ψ hχ hψ hne
   have hite := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
     (⟨χ, hχ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ψ, hψ.1⟩ : IrreducibleCharacter ↥hyp.H)
-  rw [if_neg (fun h => hne (congrArg Subtype.val h))] at hite
+  rw [ite_eq_right (fun h => hne (congrArg Subtype.val h))] at hite
   simpa using hite
 
 omit [Fintype G] [Fintype ↥hyp.H] in
@@ -557,7 +557,7 @@ theorem ssetOfQderDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
     intro ζ hζ
     have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
       (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
-    rw [if_pos rfl] at h
+    rw [ite_eq_left rfl] at h
     simpa using h
   refine
     OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
@@ -617,7 +617,7 @@ theorem ssetOf_Qder_coherent [Finite G] (hd : Odd hyp.d)
     intro ζ hζ
     have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
       (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
-    rw [if_pos rfl] at h
+    rw [ite_eq_left rfl] at h
     simpa using h
   refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
     { tau := hyp.tau
@@ -814,12 +814,12 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
       exact hconst k
     have hzero := irreducibleCharacter_inner_eq_ite (G := ↥(hyp.Q.subgroupOf hyp.H))
       φ (trivialIrreducibleCharacter _)
-    rw [if_neg hφne] at hzero
+    rw [ite_eq_right hφne] at hzero
     rw [hφeq, ClassFunction.inner_smul_left] at hzero
     have htriv_self := irreducibleCharacter_inner_eq_ite
       (G := ↥(hyp.Q.subgroupOf hyp.H))
       (trivialIrreducibleCharacter _) (trivialIrreducibleCharacter _)
-    rw [if_pos rfl] at htriv_self
+    rw [ite_eq_left rfl] at htriv_self
     rw [htriv_self, mul_one] at hzero
     exact hφ1ne hzero
   -- assemble the member `Ind_Q^H φ ∈ 𝒮(Q')`

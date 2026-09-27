@@ -106,7 +106,7 @@ theorem one_le_cartanMatrix_self (φ : ι) :
     Finset.sum_eq_zero fun i _ => by rw [hcol i, Nat.mul_zero]
   have hinv := sum_cartanMatrix_mul_pairingZero (K := K) hp hω hω' hπ hlin hkerJ e φ φ
   rw [Finset.sum_congr rfl fun μ (_ : μ ∈ Finset.univ) => by
-    rw [hCcol μ, Nat.cast_zero, zero_mul], Finset.sum_const_zero, if_pos rfl] at hinv
+    rw [hCcol μ, Nat.cast_zero, zero_mul], Finset.sum_const_zero, ite_eq_left rfl] at hinv
   exact zero_ne_one hinv
 
 /-! ### `C = 1` -/
@@ -171,9 +171,9 @@ theorem cartanMatrix_eq_ite_of_not_dvd_card [IsAlgClosed (ResidueField 𝒪)]
     rw [pow_two] at hdiag
     nlinarith [hdiag, h1, hpos]
   by_cases hμ : φ = μ
-  · rw [if_pos hμ, ← hμ]
+  · rw [ite_eq_left hμ, ← hμ]
     exact hcφφ
-  · rw [if_neg hμ]
+  · rw [ite_eq_right hμ]
     have hsplit : ∑ b ∈ Finset.univ.erase φ, c φ b * (n φ * n b) = 0 := by
       have hae := Finset.add_sum_erase Finset.univ (fun b => c φ b * (n φ * n b))
         (Finset.mem_univ φ)

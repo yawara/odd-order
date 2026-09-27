@@ -527,7 +527,7 @@ theorem sigmaLength_le_two_of_mem_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalS
     exact sigmaLength_cover_le_two_signalizer hG hM0.1 hNmax hM0.2 hx1 hxτ2 hx'N hcomm
   · have hRbot : Rsub hG (genuineSigmaDecomposition hG) x = ⊥ := by
       unfold Rsub
-      exact dif_neg (fun h => hgt h.2.2)
+      exact dite_eq_right (fun h => hgt h.2.2)
     rw [hRbot, Subgroup.mem_bot] at hx'
     rw [hx', mul_one]
     have hsl1 : sigmaLength x = 1 := hlen

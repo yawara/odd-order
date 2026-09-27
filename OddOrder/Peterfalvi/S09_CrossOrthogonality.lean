@@ -85,11 +85,11 @@ theorem orthonormal_vchar_diff_ortho
   -- Orthogonality forces distinct underlying irreducibles.
   have hμμ' : μ ≠ μ' := by
     intro h
-    rw [h, key ε ε' μ' μ', if_pos rfl, mul_one] at hab
+    rw [h, key ε ε' μ' μ', ite_eq_left rfl, mul_one] at hab
     exact (mul_ne_zero hε_ne hε'_ne) hab
   have hνν' : ν ≠ ν' := by
     intro h
-    rw [h, key δ δ' ν' ν', if_pos rfl, mul_one] at hcd
+    rw [h, key δ δ' ν' ν', ite_eq_left rfl, mul_one] at hcd
     exact (mul_ne_zero hδ_ne hδ'_ne) hcd
   -- Equal degree within each pair forces equal signs.
   obtain ⟨dμ, hdμpos, hdμ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast μ
@@ -110,7 +110,7 @@ theorem orthonormal_vchar_diff_ortho
     exact hcd1
   -- `⟨a, c⟩ = ε · δ · [μ = ν]`; it suffices to show `μ ≠ ν`.
   rw [key ε δ μ ν]
-  suffices hμν : μ ≠ ν by rw [if_neg hμν, mul_zero]
+  suffices hμν : μ ≠ ν by rw [ite_eq_right hμν, mul_zero]
   intro hμν
   -- Expand `⟨a − b, c − d⟩ = 0`; only the surviving cross-terms remain after `μ = ν`.
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
@@ -118,12 +118,12 @@ theorem orthonormal_vchar_diff_ortho
       key ε' δ μ' ν, key ε' δ' μ' ν'] at hdiff
   have h2 : μ ≠ ν' := by rw [hμν]; exact hνν'
   have h3 : μ' ≠ ν := by rw [hμν.symm]; exact fun h => hμμ' h.symm
-  rw [if_pos hμν, if_neg h2, if_neg h3] at hdiff
+  rw [ite_eq_left hμν, ite_eq_right h2, ite_eq_right h3] at hdiff
   by_cases h4 : μ' = ν'
-  · rw [if_pos h4, hεε', hδδ'] at hdiff
+  · rw [ite_eq_left h4, hεε', hδδ'] at hdiff
     have hx : (ε' : ℂ) * (δ' : ℂ) = 0 := by linear_combination hdiff / 2
     exact (mul_ne_zero hε'_ne hδ'_ne) hx
-  · rw [if_neg h4] at hdiff
+  · rw [ite_eq_right h4] at hdiff
     have hx : (ε : ℂ) * (δ : ℂ) = 0 := by linear_combination hdiff
     exact (mul_ne_zero hε_ne hδ_ne) hx
 

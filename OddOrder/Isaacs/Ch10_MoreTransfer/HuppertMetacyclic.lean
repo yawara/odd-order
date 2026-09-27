@@ -27,7 +27,7 @@ Theory", §10B: Huppert の定理に向けた main lemma。
 1. 位数 `p` の任意の `Y ⊴ N` で `P/Y` が nonabelian なら帰納。
 2. さもなくば `P' ≤ Y` が常に成立 → `|P'| = p` で `P'` は `N` の唯一の位数 `p`
    正規部分群 (`P'` cyclic の位数 `p` 部分群の一意性 =
-   `subgroup_eq_of_card_eq_prime_of_isCyclic`)。
+   mathlib `IsCyclic.subgroup_eq_iff_card_eq`)。
 3. `P' ≤ Z(P)` (`normal_le_center_of_card_eq_prime`)、`P` は class 2。
 4. `V := Ω₁(P)` は elementary abelian, `|V| = p²` (BG Lem 4.10 =
    `isElementaryAbelian_omega1_of_isMetacyclic`)。
@@ -150,11 +150,9 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
       exact hY₀card
     have := hP'cyc
     have hsub : Y₁.subgroupOf P' = Y₀.subgroupOf P' := by
-      refine subgroup_eq_of_card_eq_prime_of_isCyclic (p := p) ?_ ?_
-      · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₁le).toEquiv]
-        exact hY₁card
-      · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₀le).toEquiv]
-        exact hY₀card
+      refine IsCyclic.subgroup_eq_iff_card_eq.mpr ?_
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₁le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₀le).toEquiv, hY₁card, hY₀card]
     ext x
     constructor
     · intro hx

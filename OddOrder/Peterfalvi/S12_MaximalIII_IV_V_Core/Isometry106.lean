@@ -167,7 +167,7 @@ theorem Hypothesis.zeta_tau1_inner_self [Finite G] {M : Subgroup G}
   have hspan : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
   change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ) = 1
   rw [coh.coherent.extension_inner_eq _ _ hspan hspan,
-    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, ite_eq_left rfl]
 
 open scoped FiniteInduce in
 /-- **`ζ^{τ₁} ⊥ ζ̄^{τ₁}`** (Peterfalvi (10.6)(a) reduction): the coherent images of the degree-`w₁`
@@ -189,7 +189,7 @@ theorem Hypothesis.zeta_tau1_inner_conj [Finite G] {M : Subgroup G}
   have hspanc : ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζcS
   change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
   rw [coh.coherent.extension_inner_eq _ _ hspan hspanc,
-    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj, if_neg (Ne.symm hζne)]
+    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj, ite_eq_right (Ne.symm hζne)]
 
 open scoped FiniteInduce in
 /-- **`ζ^{τ₁} ⊥ μ_k^{τ₁}`** (Peterfalvi (10.6)(a) reduction): the coherent image of the degree-`w₁`
@@ -460,7 +460,7 @@ theorem OrthonormalCharacterImageFamily.elt_inner_eq_zero {M : Subgroup G} [Fini
   have hαZ : α ∈ ZIrr G := R.mem_ZIrr α hα
   have hα1 : ClassFunction.inner α α = 1 := by
     have := R.orthonormal α hα α hα
-    rwa [if_pos rfl] at this
+    rwa [ite_eq_left rfl] at this
   have hTZ : T ∈ ZIrr G := by
     rw [hTsum]
     exact Submodule.sum_mem _ fun β hβ => R.mem_ZIrr β hβ
@@ -469,7 +469,7 @@ theorem OrthonormalCharacterImageFamily.elt_inner_eq_zero {M : Subgroup G} [Fini
     · rw [hα1]
     · intro β hβ hne
       have := R.orthonormal α hα β hβ
-      rwa [if_neg (fun h => hne h.symm)] at this
+      rwa [ite_eq_right (fun h => hne h.symm)] at this
     · intro habs
       exact absurd hα habs
   -- `b := −(T − α)`; then `α − b = T`
@@ -553,7 +553,7 @@ theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
     change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
     rw [coh.coherent.extension_inner_eq _ _ (Submodule.subset_span hζS)
         (Submodule.subset_span hζcS),
-      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζcirr, if_neg (fun h => hζne h.symm)]
+      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζcirr, ite_eq_right (fun h => hζne h.symm)]
   -- `(ζ − ζ̄)^τ` vanishes on `V`, with `NC ≤ 2 < min(w₁, w₂)`.
   have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
     hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
@@ -596,7 +596,7 @@ theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   have hsZ : tic.chiFam hVeq app (a', b') ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (a', b')
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b'))
       (tic.chiFam hVeq app (a', b')) = 1 := by
-    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(tic.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
 open scoped FiniteInduce in

@@ -258,13 +258,13 @@ theorem inner_eta_eq_zero_of_vanish_of_inner_self_eq_two [Finite G]
     · rw [inner_sum_left,
         Finset.sum_eq_single_of_mem l (Finset.mem_univ _) (fun j _ hjl => ?_)]
       · rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-          if_pos ⟨rfl, rfl⟩, mul_one]
+          ite_eq_left ⟨rfl, rfl⟩, mul_one]
       · rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-          if_neg (by rintro ⟨-, rfl⟩; exact hjl rfl), mul_zero]
+          ite_eq_right (by rintro ⟨-, rfl⟩; exact hjl rfl), mul_zero]
     · rw [inner_sum_left]
       refine Finset.sum_eq_zero fun j _ => ?_
       rw [ClassFunction.inner_smul_left, eta_orthonormal hyp,
-        if_neg (by rintro ⟨rfl, -⟩; exact hik rfl), mul_zero]
+        ite_eq_right (by rintro ⟨rfl, -⟩; exact hik rfl), mul_zero]
   -- `⟨Y, η_kl⟩ = 0`
   have hYeta : ∀ (k : Fin hyp.q) (l : Fin hyp.p),
       ClassFunction.inner Y (hyp.eta k l) = 0 := by
@@ -422,7 +422,7 @@ theorem eta_diff_rigidity [Finite G]
     (fun pq => eta_mem_ZIrr hyp pq.1 pq.2)
     (fun a => by simpa using eta_orthonormal hyp a.1 a.1 a.2 a.2)
     (fun a b hab => by
-      rw [eta_orthonormal hyp a.1 b.1 a.2 b.2, if_neg ?_]
+      rw [eta_orthonormal hyp a.1 b.1 a.2 b.2, ite_eq_right ?_]
       rintro ⟨h1, h2⟩; exact hab (Prod.ext h1 h2))
     (by rw [hcardq]; exact hyp.three_le_q) (by rw [hcardp]; exact hyp.three_le_p)
     (by rw [hcardq]; exact hyp.q_odd) (by rw [hcardp]; exact hyp.p_odd)
@@ -473,7 +473,7 @@ theorem eta_diff_rigidity_col [Finite G]
     (fun pq => eta_mem_ZIrr hyp pq.1 pq.2)
     (fun a => by simpa using eta_orthonormal hyp a.1 a.1 a.2 a.2)
     (fun a b hab => by
-      rw [eta_orthonormal hyp a.1 b.1 a.2 b.2, if_neg ?_]
+      rw [eta_orthonormal hyp a.1 b.1 a.2 b.2, ite_eq_right ?_]
       rintro ⟨h1, h2⟩; exact hab (Prod.ext h1 h2))
     (by rw [hcardq]; exact hyp.three_le_q) (by rw [hcardp]; exact hyp.three_le_p)
     (by rw [hcardq]; exact hyp.q_odd) (by rw [hcardp]; exact hyp.p_odd)
@@ -575,7 +575,7 @@ theorem eta_orthogonal_of_norm_one_pair_vanish [Finite G]
     have hval2 : ClassFunction.inner psi psiConj = (εp : ℂ) * (εc : ℂ) := by
       rw [hpeq, hceq, ClassFunction.inner_smul_left,
         OddOrder.RepresentationTheory.inner_smul_right,
-        OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite, if_pos heq,
+        OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite, ite_eq_left heq,
         star_intCast, mul_one]
     rw [hval2] at hcross
     exact (mul_ne_zero hp0 hc0) hcross
@@ -606,11 +606,11 @@ theorem eta_orthogonal_of_norm_one_pair_vanish [Finite G]
   rw [hval χc εc] at hrel
   -- nonzero forces `χη = χp`; the relation then forces `χη = χc`; contradiction
   have hp_eq : χη = χp := by
-    by_contra hpne; rw [if_neg hpne, mul_zero] at hnz; exact hnz rfl
-  rw [if_pos hp_eq] at hnz hrel
+    by_contra hpne; rw [ite_eq_right hpne, mul_zero] at hnz; exact hnz rfl
+  rw [ite_eq_left hp_eq] at hnz hrel
   have hc_eq : χη = χc := by
     by_contra hcne
-    rw [if_neg hcne, mul_zero] at hrel
+    rw [ite_eq_right hcne, mul_zero] at hrel
     exact hnz hrel
   exact hχne (hp_eq ▸ hc_eq)
 

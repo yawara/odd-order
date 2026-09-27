@@ -99,10 +99,10 @@ theorem lambda_eq_zero_and_Z_eq_zero
           + (lam : ℝ) ^ 2 * ((rc i) ^ 2 * mc i) := by
       intro i hi
       by_cases h : i = i₁
-      · subst h; rw [if_pos rfl, if_pos rfl]; ring
-      · rw [if_neg h, if_neg h]; ring
+      · subst h; rw [ite_eq_left rfl, ite_eq_left rfl]; ring
+      · rw [ite_eq_right h, ite_eq_right h]; ring
     rw [Finset.sum_congr rfl key, Finset.sum_add_distrib, Finset.sum_ite_eq' s i₁,
-      if_pos hi₁, ← Finset.mul_sum]
+      ite_eq_left hi₁, ← Finset.mul_sum]
   -- Substitute `r i₁ · m i₁ = 1` and `‖ψ‖² = a²·m i₁`; obtain the quadratic `≤ 0`.
   set Dsum := ∑ i ∈ s, (rc i) ^ 2 * mc i with hDsum
   have hquad : (lam : ℝ) ^ 2 * Dsum - 2 * (lam : ℝ) * a + (ClassFunction.inner Z Z).re ≤ 0 := by
@@ -190,9 +190,9 @@ theorem Y_eq_nsmul_tau1_of_lambdaForm {a : ℕ} {chi1 : ClassFunction L ℂ}
       intro i _
       by_cases h : i = i₁
       · subst h; simp only [reduceIte]; push_cast; rw [sub_smul]; module
-      · simp only [if_neg h]; push_cast; rw [sub_smul]; module
+      · simp only [ite_eq_right h]; push_cast; rw [sub_smul]; module
     rw [Finset.sum_congr rfl hsplit, Finset.sum_sub_distrib,
-      Finset.sum_ite_eq' s i₁, if_pos hi₁, ← Finset.smul_sum]
+      Finset.sum_ite_eq' s i₁, ite_eq_left hi₁, ← Finset.smul_sum]
   -- Capstone forcing: `λ = 0` and `Z = 0`.
   obtain ⟨hlam0, hZ0⟩ :=
     D.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) lam Z vc mc rc hbridge horth hZ
@@ -970,8 +970,8 @@ theorem coherentImageMap_apply_eq {n : ℕ} {χ : Fin n → ClassFunction L ℂ}
     coherentImageMap (L := L) (G := G) χ X (χ k) = X k := by
   classical
   rw [coherentImageMap_apply, Finset.sum_eq_single k]
-  · rw [horthχ k k, if_pos rfl, one_smul]
-  · intro j _ hjk; rw [horthχ k j, if_neg (fun h => hjk h.symm), zero_smul]
+  · rw [horthχ k k, ite_eq_left rfl, one_smul]
+  · intro j _ hjk; rw [horthχ k j, ite_eq_right (fun h => hjk h.symm), zero_smul]
   · intro h; exact absurd (Finset.mem_univ k) h
 
 /-- **The two-family Fourier glue** `ν = νX-image on `range χX` ⊕ νY-image on `range χY``.
@@ -1034,15 +1034,15 @@ theorem exists_integralCharacterMap_glue_of_orthonormal
     intro i j
     rw [hXorth (χX i) (hχX_mem i) (χX j) (hχX_mem j)]
     by_cases hij : i = j
-    · rw [if_pos hij, if_pos (by rw [hij])]
-    · refine (if_neg ?_).trans (if_neg hij).symm
+    · rw [ite_eq_left hij, ite_eq_left (by rw [hij])]
+    · refine (ite_eq_right ?_).trans (ite_eq_right hij).symm
       exact fun hx => hij (hXfin.toFinset.equivFin.symm.injective (Subtype.ext hx))
   have horthY : ∀ i j, ClassFunction.inner (χY i) (χY j) = if i = j then (1 : ℂ) else 0 := by
     intro i j
     rw [hYorth (χY i) (hχY_mem i) (χY j) (hχY_mem j)]
     by_cases hij : i = j
-    · rw [if_pos hij, if_pos (by rw [hij])]
-    · refine (if_neg ?_).trans (if_neg hij).symm
+    · rw [ite_eq_left hij, ite_eq_left (by rw [hij])]
+    · refine (ite_eq_right ?_).trans (ite_eq_right hij).symm
       exact fun hy => hij (hYfin.toFinset.equivFin.symm.injective (Subtype.ext hy))
   have hXYfam : ∀ (i : Fin hXfin.toFinset.card) (j : Fin hYfin.toFinset.card),
       ClassFunction.inner (χX i) (χY j) = 0 :=
@@ -1197,8 +1197,8 @@ theorem eq_sum_inner_smul_of_mem_span {n : ℕ} {χ : Fin n → ClassFunction L 
   | mem x hx =>
       obtain ⟨k, rfl⟩ := hx
       rw [Finset.sum_eq_single k]
-      · rw [horthχ k k, if_pos rfl, one_smul]
-      · intro j _ hjk; rw [horthχ k j, if_neg (fun h => hjk h.symm), zero_smul]
+      · rw [horthχ k k, ite_eq_left rfl, one_smul]
+      · intro j _ hjk; rw [horthχ k j, ite_eq_right (fun h => hjk h.symm), zero_smul]
       · intro h; exact absurd (Finset.mem_univ k) h
   | zero => simp
   | add x y _ _ ihx ihy =>
@@ -1242,10 +1242,10 @@ theorem coherentImageMap_inner_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
   rw [ClassFunction.inner_smul_left, inner_sum_right]
   congr 1
   rw [Finset.sum_eq_single j]
-  · rw [OddOrder.RepresentationTheory.inner_smul_right, horthX j j, if_pos rfl, mul_one]
+  · rw [OddOrder.RepresentationTheory.inner_smul_right, horthX j j, ite_eq_left rfl, mul_one]
   · intro k _ hkj
     rw [OddOrder.RepresentationTheory.inner_smul_right, horthX j k,
-      if_neg (fun h => hkj h.symm), mul_zero]
+      ite_eq_right (fun h => hkj h.symm), mul_zero]
   · intro h; exact absurd (Finset.mem_univ j) h
 
 /-! ### The weighted (non-orthonormal) Fourier reconstruction

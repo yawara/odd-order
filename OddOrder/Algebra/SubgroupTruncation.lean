@@ -60,7 +60,7 @@ variable {H}
 
 theorem coeff_inclusionHom_of_mem {n : G} (hn : n ∈ H) (a : MonoidAlgebra R ↥H) :
     (inclusionHom H a).coeff n = a.coeff ⟨n, hn⟩ :=
-  Finsupp.mapDomain_apply Subtype.val_injective a.coeff ⟨n, hn⟩
+  Finsupp.mapDomain_apply_of_injective Subtype.val_injective a.coeff ⟨n, hn⟩
 
 theorem coeff_inclusionHom_of_notMem {n : G} (hn : n ∉ H) (a : MonoidAlgebra R ↥H) :
     (inclusionHom H a).coeff n = 0 :=
@@ -102,7 +102,7 @@ theorem subgroupTrunc_one : subgroupTrunc H (1 : MonoidAlgebra R G) = 1 := by
     Finsupp.single_apply]
   by_cases hn : (1 : ↥H) = n
   · subst hn; simp
-  · rw [if_neg hn, if_neg fun h : (1 : G) = (n : G) => hn (Subtype.ext h)]
+  · rw [ite_eq_right hn, ite_eq_right fun h : (1 : G) = (n : G) => hn (Subtype.ext h)]
 
 theorem inclusionHom_subgroupTrunc_coeff_eq (x : MonoidAlgebra R G) {n : G} (hn : n ∈ H) :
     (inclusionHom H (subgroupTrunc H x)).coeff n = x.coeff n := by

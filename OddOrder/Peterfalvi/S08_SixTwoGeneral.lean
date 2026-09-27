@@ -494,8 +494,8 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k_general
       = @ite ℂ (i = j) (Classical.propDecidable (i = j)) ((mc i : ℝ) : ℂ) 0 := by
     intro i j
     by_cases hij : i = j
-    · subst hij; rw [if_pos rfl]; exact hmcnorm i
-    · rw [if_neg hij]
+    · subst hij; rw [ite_eq_left rfl]; exact hmcnorm i
+    · rw [ite_eq_right hij]
       exact inducedKernelFamily_pairwise_orthogonal (hmemfam i) (hmemfam j)
         (fun h => hij (hinj h))
   -- (3) the anchor's index `i₁` in the enumeration (and eliminate `χ₁` in its favour)

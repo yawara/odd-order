@@ -104,7 +104,7 @@ open scoped Classical in
 theorem sectionProjectiveCharacter_eq_zero (hx : IsPElement p x) (μ : ι) {u : G}
     (hu : u ∉ pSection p x) :
     sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u = 0 :=
-  dif_neg hu
+  dite_eq_right hu
 
 open scoped Classical in
 /-- **`Φ^x_μ(u) = Φ_μ(y)` whenever `u` is conjugate to `x y`** with `y` a `p`-regular element of
@@ -115,7 +115,7 @@ theorem sectionProjectiveCharacter_of_isConj_mul (hx : IsPElement p x) (μ : ι)
       = projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y := by
   classical
   have hu : u ∈ pSection p x := (mem_pSection_iff hpC hx).mpr ⟨(y : G), y.2, hy, h⟩
-  rw [sectionProjectiveCharacter, dif_pos hu]
+  rw [sectionProjectiveCharacter, dite_eq_left hu]
   obtain ⟨hmem, hreg, hconj⟩ := ((mem_pSection_iff hpC hx).mp hu).choose_spec
   exact projectiveIndecomposableCharacter_eq_of_isConj_mul hpC hω hω' hπ hlin hkerJ e hx μ
     hreg hy (hconj.symm.trans h)

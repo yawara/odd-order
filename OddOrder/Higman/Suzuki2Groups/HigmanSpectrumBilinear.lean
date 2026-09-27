@@ -53,11 +53,9 @@ theorem baseChange_equivariant
     (u v : K ⊗[R] M) :
     T₂.baseChange K (b.baseChange K u v) =
       b.baseChange K (T₁.baseChange K u) (T₁.baseChange K v) := by
-  induction u using TensorProduct.induction_on with
-  | zero => simp
+  induction u using TensorProduct.inductionOn with
   | tmul a x =>
-      induction v using TensorProduct.induction_on with
-      | zero => simp
+      induction v using TensorProduct.inductionOn with
       | tmul c y => simp [h]
       | add v w hv hw => simp [hv, hw]
   | add u w hu hw => simp [hu, hw]
@@ -214,8 +212,7 @@ theorem zmodTwo_baseChange_self_eq_zero
     charP_of_injective_algebraMap (algebraMap (ZMod 2) K).injective 2
   have hsymm : ∀ x y, b x y = b y x :=
     zmodTwo_symmetric_of_self_eq_zero b hdiag
-  induction u using TensorProduct.induction_on with
-  | zero => simp
+  induction u using TensorProduct.inductionOn with
   | tmul a x => simp [hdiag]
   | add u v hu hv =>
       rw [LinearMap.map_add₂, LinearMap.map_add, LinearMap.map_add]
@@ -304,8 +301,7 @@ theorem baseChange_span_eq_top
         b.baseChange K z.1 z.2)
   have hsimple (a : K) (t : M ⊗[R] M) :
       f.baseChange K (a ⊗ₜ[R] t) ∈ S := by
-    induction t using TensorProduct.induction_on with
-    | zero => simp [S]
+    induction t using TensorProduct.inductionOn with
     | tmul x y =>
         apply Submodule.subset_span
         refine ⟨(a ⊗ₜ[R] x, 1 ⊗ₜ[R] y), ?_⟩
@@ -316,8 +312,7 @@ theorem baseChange_span_eq_top
   apply Submodule.eq_top_iff'.mpr
   intro z
   obtain ⟨t, rfl⟩ := hsurjK z
-  induction t using TensorProduct.induction_on with
-  | zero => simp
+  induction t using TensorProduct.inductionOn with
   | tmul a t => exact hsimple a t
   | add t w ht hw =>
       rw [map_add]

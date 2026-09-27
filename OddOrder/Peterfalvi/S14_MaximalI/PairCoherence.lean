@@ -93,7 +93,7 @@ theorem decomposition_inner_self_card {L : Subgroup G} [Finite G] {hyp : Hypothe
     intro φ hφ
     rw [inner_sum_right,
       Finset.sum_congr rfl fun φ' _ => irreducibleCharacter_inner_eq_ite φ φ',
-      Finset.sum_ite_eq data.constituents φ (fun _ => (1 : ℂ)), if_pos hφ]
+      Finset.sum_ite_eq data.constituents φ (fun _ => (1 : ℂ)), ite_eq_left hφ]
   rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul, mul_one]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -108,7 +108,7 @@ theorem decomposition_inner_conj_eq_zero {L : Subgroup G} [Finite G] {hyp : Hypo
   refine Finset.sum_eq_zero fun φ hφ => ?_
   rw [inner_sum_right]
   refine Finset.sum_eq_zero fun φ' hφ' => ?_
-  rw [← IrreducibleCharacter.conjPerm_apply_coe, irreducibleCharacter_inner_eq_ite, if_neg]
+  rw [← IrreducibleCharacter.conjPerm_apply_coe, irreducibleCharacter_inner_eq_ite, ite_eq_right]
   intro h
   exact data.conj_not_mem φ' hφ' φ hφ
     (by rw [h, IrreducibleCharacter.conjPerm_apply_coe])
@@ -231,7 +231,7 @@ noncomputable def RsetImageFamily {L : Subgroup G} [Finite G] {hyp : Hypothesis 
         have h1 := (R1 data φ.2).inner_self_of_mem hα
         rw [h0] at h1
         exact one_ne_zero h1.symm
-      rw [if_neg hαβ]
+      rw [ite_eq_right hαβ]
       exact h0
   image_eq := by
     have hdisj : ∀ x ∈ data.constituents.attach, ∀ y ∈ data.constituents.attach, x ≠ y →

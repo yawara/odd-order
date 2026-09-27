@@ -159,17 +159,17 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
     rw [show hyp.eta10 = hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ from rfl,
       OddOrder.RepresentationTheory.inner_sum_left]
     by_cases ha : a = ⟨1, hyp.q_prime.one_lt⟩
-    · rw [if_pos ha,
+    · rw [ite_eq_left ha,
         Finset.sum_eq_single_of_mem ⟨0, hyp.p_prime.pos⟩ (Finset.mem_univ _)
           (fun j _ hj => by
             rw [hyp.eta_orthonormal a ⟨1, hyp.q_prime.one_lt⟩ j ⟨0, hyp.p_prime.pos⟩,
-              if_neg (fun h => hj h.2)]),
+              ite_eq_right (fun h => hj h.2)]),
         hyp.eta_orthonormal a ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩,
-        if_pos ⟨ha, rfl⟩]
-    · rw [if_neg ha]
+        ite_eq_left ⟨ha, rfl⟩]
+    · rw [ite_eq_right ha]
       refine Finset.sum_eq_zero fun j _ => ?_
       rw [hyp.eta_orthonormal a ⟨1, hyp.q_prime.one_lt⟩ j ⟨0, hyp.p_prime.pos⟩,
-        if_neg (fun h => ha h.1)]
+        ite_eq_right (fun h => ha h.1)]
   -- the pinned (13.3.c)-`T` row: a nonzero row `r` and a sign `δ = ±1` with
   -- `⟨τ₁T(ν_r), η₁₀⟩ = δ`, all other nonzero rows `τ₁T`-orthogonal to `η₁₀`
   obtain ⟨r, δ, hr0, hδpm, hkeyr, hkey⟩ :
@@ -188,10 +188,10 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
       hclean | ⟨hq3, hflip⟩
     · -- clean branch: `r = 1`, `δ = 1`
       refine ⟨⟨1, hyp.q_prime.one_lt⟩, 1, h1q, Or.inl rfl, ?_, ?_⟩
-      · rw [hclean ⟨1, hyp.q_prime.one_lt⟩ h1q, hetaRow, if_pos rfl]
+      · rw [hclean ⟨1, hyp.q_prime.one_lt⟩ h1q, hetaRow, ite_eq_left rfl]
         norm_num
       · intro s hs0 hsr
-        rw [hclean s hs0, hetaRow, if_neg hsr]
+        rw [hclean s hs0, hetaRow, ite_eq_right hsr]
     · -- `q = 3` sign-flip branch: `r = 2`, `δ = −1` (row 2 flips onto η-row 1)
       have h2lt : 2 < hyp.q := by omega
       have h2q : (⟨2, h2lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
@@ -202,7 +202,7 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
         exact absurd (congrArg Fin.val h) (by norm_num)
       refine ⟨⟨2, h2lt⟩, -1, h2q, Or.inr rfl, ?_, ?_⟩
       · rw [hflip ⟨2, h2lt⟩ ⟨1, hyp.q_prime.one_lt⟩ h2q h1q h21,
-          ClassFunction.inner_neg_left, hetaRow, if_pos rfl]
+          ClassFunction.inner_neg_left, hetaRow, ite_eq_left rfl]
         norm_num
       · intro s hs0 hsr
         have hs1 : s = ⟨1, hyp.q_prime.one_lt⟩ := by
@@ -213,7 +213,7 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
           exact Fin.ext hv1
         subst hs1
         rw [hflip ⟨1, hyp.q_prime.one_lt⟩ ⟨2, h2lt⟩ h1q h2q (fun h => h21 h.symm),
-          ClassFunction.inner_neg_left, hetaRow, if_neg h21, neg_zero]
+          ClassFunction.inner_neg_left, hetaRow, ite_eq_right h21, neg_zero]
   -- (13.3.a)-at-`T`: `ν_r = Ind_K^T θ_r`, transported to the `Q`-spelling via `K = Q`
   obtain ⟨θr, hθrirr, hθr1, hνeqK⟩ := hyp.nu_i_isIndQD hG pins r hr0
   set θrQ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ :=
@@ -480,7 +480,7 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
             · by_cases heq : ClassFunction.induce HU (s' : ClassFunction ↥HU ℂ)
                   = ∑ j : Fin hyp.p, hyp.nu s₀ j
               · refine ⟨k s' * hyp.p, ?_⟩
-                rw [heq, hyp.nuRow_inner pins s₀ s₀, if_pos rfl]
+                rw [heq, hyp.nuRow_inner pins s₀ s₀, ite_eq_left rfl]
                 push_cast
                 ring
               · exact ⟨0, by rw [sSet_pairwiseOrthogonal data (hmem s' hpos.ne') hνmem heq,
@@ -495,7 +495,7 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
             exact_mod_cast hsumC
           have hn0 : n s = 0 := (Finset.sum_eq_zero_iff.mp hsumN) s (Finset.mem_univ s)
           have hcontra : ((n s : ℕ) : ℂ) ≠ 0 := by
-            rw [← hn s, heqrow, hyp.nuRow_inner pins s₀ s₀, if_pos rfl]
+            rw [← hn s, heqrow, hyp.nuRow_inner pins s₀ s₀, ite_eq_left rfl]
             exact mul_ne_zero (Nat.cast_ne_zero.mpr hkpos.ne')
               (Nat.cast_ne_zero.mpr hyp.p_prime.pos.ne')
           exact hcontra (by rw [hn0, Nat.cast_zero])
@@ -618,7 +618,7 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
     rw [show (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zetaNormSq i₁
         = ClassFunction.inner ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁)
             ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁) from rfl,
-      hζi₁, hyp.nuRow_inner pins r r, if_pos rfl]
+      hζi₁, hyp.nuRow_inner pins r r, ite_eq_left rfl]
   have hdegVal : (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁ 1
       = ((hyp.p * hyp.v : ℕ) : ℂ) := by
     rw [hζi₁, hyp.nuRow_apply_one hG pins r hr0]

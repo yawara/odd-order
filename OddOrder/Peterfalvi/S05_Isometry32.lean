@@ -58,13 +58,13 @@ theorem eq_zero_of_mem_of_inner_supported_eq_zero
   have hconj : ∀ g h : H, (if h * g * h⁻¹ ∈ A then f (h * g * h⁻¹) else 0)
       = (if g ∈ A then f g else (0 : ℂ)) := fun g h => by
     by_cases hg : g ∈ A
-    · rw [if_pos ((hAconj g h).mpr hg), if_pos hg, f.conj_eq]
-    · rw [if_neg (fun hc => hg ((hAconj g h).mp hc)), if_neg hg]
+    · rw [ite_eq_left ((hAconj g h).mpr hg), ite_eq_left hg, f.conj_eq]
+    · rw [ite_eq_right (fun hc => hg ((hAconj g h).mp hc)), ite_eq_right hg]
   let m : ClassFunction H ℂ := ⟨fun x => if x ∈ A then f x else 0, hconj⟩
   have hmval : ∀ g, m g = if g ∈ A then f g else 0 := fun _ => rfl
   have hmsupp : m.support ⊆ A := fun g hg => by
     by_contra hgA
-    exact (ClassFunction.mem_support.mp hg) (by rw [hmval, if_neg hgA])
+    exact (ClassFunction.mem_support.mp hg) (by rw [hmval, ite_eq_right hgA])
   -- `innerSum m f = ↑(∑_g 1_A(g) · ‖f g‖²)`, a sum of nonnegative reals
   have he : ClassFunction.innerSum m f
       = ((∑ g : H, (if g ∈ A then Complex.normSq (f g) else 0) : ℝ) : ℂ) := by
@@ -72,17 +72,17 @@ theorem eq_zero_of_mem_of_inner_supported_eq_zero
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [hmval]
     by_cases hg : g ∈ A
-    · rw [if_pos hg, if_pos hg, Complex.star_def, Complex.mul_conj]
-    · rw [if_neg hg, if_neg hg, zero_mul, Complex.ofReal_zero]
+    · rw [ite_eq_left hg, ite_eq_left hg, Complex.star_def, Complex.mul_conj]
+    · rw [ite_eq_right hg, ite_eq_right hg, zero_mul, Complex.ofReal_zero]
   -- `⟨m, f⟩ = 0 ⟹ ∑ ‖f‖²·1_A = 0 ⟹ each term 0`
   have h0 : ClassFunction.innerSum m f = 0 := by
     rw [← ClassFunction.card_mul_inner, hf m hmsupp, mul_zero]
   rw [he, Complex.ofReal_eq_zero] at h0
   have hterm := (Finset.sum_eq_zero_iff_of_nonneg fun g _ => by
     by_cases hg : g ∈ A
-    · rw [if_pos hg]; exact Complex.normSq_nonneg _
-    · rw [if_neg hg]).mp h0 a (Finset.mem_univ a)
-  rw [if_pos ha] at hterm
+    · rw [ite_eq_left hg]; exact Complex.normSq_nonneg _
+    · rw [ite_eq_right hg]).mp h0 a (Finset.mem_univ a)
+  rw [ite_eq_left ha] at hterm
   exact Complex.normSq_eq_zero.mp hterm
 
 /-- The linear functional `φ ↦ ⟨φ, f⟩` on class functions (linear in the *left* argument,
@@ -280,8 +280,8 @@ theorem beta_inner_eq_one_of_one_shared (hyp : TICyclicHypothesis G) [Fintype hy
     ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (hyp.beta hVeq app b₁ b₂) = 1 := by
   rw [hyp.beta_inner hVeq app ha₁ ha₂ hb₁ hb₂]
   rcases hshared with ⟨h1, h2⟩ | ⟨h1, h2⟩
-  · rw [if_pos h1, if_neg h2, if_neg (fun h => h2 h.2)]; norm_num
-  · rw [if_neg h1, if_pos h2, if_neg (fun h => h1 h.1)]; norm_num
+  · rw [ite_eq_left h1, ite_eq_right h2, ite_eq_right (fun h => h2 h.2)]; norm_num
+  · rw [ite_eq_right h1, ite_eq_left h2, ite_eq_right (fun h => h1 h.1)]; norm_num
 
 open Classical in
 /-- **Peterfalvi (3.5.2)** `L(ij, i'j')` for the `β_{ij}`: signed triples `A`, `A'` of two
@@ -315,7 +315,8 @@ theorem beta_inner_eq_zero_of_both_diff (hyp : TICyclicHypothesis G) [Fintype hy
     (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) (hb₁ : b₁ ≠ 1) (hb₂ : b₂ ≠ 1)
     (hd₁ : a₁ ≠ b₁) (hd₂ : a₂ ≠ b₂) :
     ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (hyp.beta hVeq app b₁ b₂) = 0 := by
-  rw [hyp.beta_inner hVeq app ha₁ ha₂ hb₁ hb₂, if_neg hd₁, if_neg hd₂, if_neg (fun h => hd₁ h.1)]
+  rw [hyp.beta_inner hVeq app ha₁ ha₂ hb₁ hb₂, ite_eq_right hd₁, ite_eq_right hd₂,
+    ite_eq_right (fun h => hd₁ h.1)]
   norm_num
 
 open Classical in
@@ -579,7 +580,7 @@ theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype 
       rw [hcells p q]
       exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _)))
   -- repackage the `gridFamily` orthonormality as a single `ite`, elaborated here (concrete index)
-  -- so the assembly's `if_neg` rewrites use the matching `Decidable` instance
+  -- so the assembly's `ite_eq_right` rewrites use the matching `Decidable` instance
   have hortho : ∀ a b, ClassFunction.inner
       (IsSignedTripleGrid.gridFamily z w φ a) (IsSignedTripleGrid.gridFamily z w φ b)
       = if a = b then 1 else 0 := fun a b => by
@@ -592,13 +593,13 @@ theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype 
         (if hq : pq.2 = 1 then trivialClassFunction G else -z ⟨pq.2, hq⟩)
       else (if hq : pq.2 = 1 then -w ⟨pq.1, hp⟩ else φ ⟨pq.1, hp⟩ ⟨pq.2, hq⟩) with hχdef
   have hχ11 : χ (1, 1) = trivialClassFunction G := by
-    simp only [hχdef, dif_pos]
+    simp only [hχdef, dite_eq_left]
   have hχp1 : ∀ (p) (hp : p ≠ 1), χ (p, 1) = -w ⟨p, hp⟩ := fun p hp => by
-    simp only [hχdef, dif_neg hp, dif_pos]
+    simp only [hχdef, dite_eq_right hp, dite_eq_left]
   have hχ1q : ∀ (q) (hq : q ≠ 1), χ (1, q) = -z ⟨q, hq⟩ := fun q hq => by
-    simp only [hχdef, dif_pos, dif_neg hq]
+    simp only [hχdef, dite_eq_left, dite_eq_right hq]
   have hχpq : ∀ (p q) (hp : p ≠ 1) (hq : q ≠ 1), χ (p, q) = φ ⟨p, hp⟩ ⟨q, hq⟩ := fun p q hp hq => by
-    simp only [hχdef, dif_neg hp, dif_neg hq]
+    simp only [hχdef, dite_eq_right hp, dite_eq_right hq]
   -- the gridFamily values, as themselves (definitional), and `1_G ⊥ signed`
   have hgw : ∀ p, w p = IsSignedTripleGrid.gridFamily z w φ (Sum.inl p) := fun _ => rfl
   have hgz : ∀ q, z q = IsSignedTripleGrid.gridFamily z w φ (Sum.inr (Sum.inl q)) := fun _ => rfl
@@ -640,37 +641,37 @@ theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype 
         rw [hχ1q q hq, hχ11, ClassFunction.inner_neg_left, (hsigz _).inner_trivial, neg_zero]
       · subst hp; subst hp'
         rw [hχ1q q hq, hχ1q q' hq', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
-          neg_neg, hgz, hgz, hortho, if_neg (by
+          neg_neg, hgz, hgz, hortho, ite_eq_right (by
             simp only [ne_eq, Sum.inr.injEq, Sum.inl.injEq, Subtype.mk.injEq]
             exact fun h => hab (by rw [h]))]
       · subst hp; subst hq'
         rw [hχ1q q hq, hχp1 p' hp', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
-          neg_neg, hgz, hgw, hortho, if_neg (by simp)]
+          neg_neg, hgz, hgw, hortho, ite_eq_right (by simp)]
       · subst hp
         rw [hχ1q q hq, hχpq p' q' hp' hq', ClassFunction.inner_neg_left, hgz, hgφ, hortho,
-          if_neg (by simp), neg_zero]
+          ite_eq_right (by simp), neg_zero]
       · subst hq; subst hp'; subst hq'
         rw [hχp1 p hp, hχ11, ClassFunction.inner_neg_left, (hsigw _).inner_trivial, neg_zero]
       · subst hq; subst hp'
         rw [hχp1 p hp, hχ1q q' hq', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
-          neg_neg, hgw, hgz, hortho, if_neg (by simp)]
+          neg_neg, hgw, hgz, hortho, ite_eq_right (by simp)]
       · subst hq; subst hq'
         rw [hχp1 p hp, hχp1 p' hp', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
-          neg_neg, hgw, hgw, hortho, if_neg (by
+          neg_neg, hgw, hgw, hortho, ite_eq_right (by
             simp only [ne_eq, Sum.inl.injEq, Subtype.mk.injEq]
             exact fun h => hab (by rw [h]))]
       · subst hq
         rw [hχp1 p hp, hχpq p' q' hp' hq', ClassFunction.inner_neg_left, hgw, hgφ, hortho,
-          if_neg (by simp), neg_zero]
+          ite_eq_right (by simp), neg_zero]
       · subst hp'; subst hq'
         rw [hχpq p q hp hq, hχ11, (hsigφ _ _).inner_trivial]
       · subst hp'
         rw [hχpq p q hp hq, hχ1q q' hq', ClassFunction.inner_neg_right, hgφ, hgz, hortho,
-          if_neg (by simp), neg_zero]
+          ite_eq_right (by simp), neg_zero]
       · subst hq'
         rw [hχpq p q hp hq, hχp1 p' hp', ClassFunction.inner_neg_right, hgφ, hgw, hortho,
-          if_neg (by simp), neg_zero]
-      · rw [hχpq p q hp hq, hχpq p' q' hp' hq', hgφ, hgφ, hortho, if_neg (by
+          ite_eq_right (by simp), neg_zero]
+      · rw [hχpq p q hp hq, hχpq p' q' hp' hq', hgφ, hgφ, hortho, ite_eq_right (by
           simp only [ne_eq, Sum.inr.injEq, Prod.mk.injEq, Subtype.mk.injEq]
           exact fun h => hab (by rw [h.1, h.2]))]
     intro a b
@@ -727,7 +728,7 @@ theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   obtain ⟨φ, hcells, hortho⟩ :=
     (hyp.Afam_isSignedTripleGrid hVeq app).symm_orthonormal_family hι hκ hz hw
   exact hyp.exists_chiFamily_of_decomposition hVeq app hcells
-    (fun a => by rw [hortho a a, if_pos rfl]) (fun a b h => by rw [hortho a b, if_neg h])
+    (fun a => by rw [hortho a a, ite_eq_left rfl]) (fun a b h => by rw [hortho a b, ite_eq_right h])
 
 open scoped Classical in
 /-- **Peterfalvi (3.5)**, two-column case `w₁ ≥ 5`, `w₂ = 3`: there is an orthonormal family
@@ -768,7 +769,7 @@ theorem exists_chiFamily_two_col (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   obtain ⟨w, φ, hcells, hortho⟩ :=
     (hyp.Afam_isSignedTripleGrid hVeq app).two_col_orthonormal_family_reindexed hι hκ2 hz
   exact hyp.exists_chiFamily_of_decomposition hVeq app hcells
-    (fun a => by rw [hortho a a, if_pos rfl]) (fun a b h => by rw [hortho a b, if_neg h])
+    (fun a => by rw [hortho a a, ite_eq_left rfl]) (fun a b h => by rw [hortho a b, ite_eq_right h])
 
 open scoped Classical in
 /-- **Peterfalvi (3.5)**, transpose case `w₁ = 3`, `w₂ ≥ 5`: the `W₁ ↔ W₂`-swapped counterpart of
@@ -841,9 +842,9 @@ theorem exists_chiFamily_transpose (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     rintro (p | q | ⟨p, q⟩) <;> rfl
   exact hyp.exists_chiFamily_of_decomposition hVeq app (z := wMeet) (w := wRow)
     (φ := fun p q => φT q p) hcells
-    (fun a => by rw [hgfeq a, horthoT (toT a) (toT a), if_pos rfl])
+    (fun a => by rw [hgfeq a, horthoT (toT a) (toT a), ite_eq_left rfl])
     (fun a b h => by rw [hgfeq a, hgfeq b, horthoT (toT a) (toT b),
-      if_neg (fun hh => h (htoT_inj hh))])
+      ite_eq_right (fun hh => h (htoT_inj hh))])
 
 open scoped Classical in
 /-- **Peterfalvi (3.5)** (full): for any admissible `W = W₁ × W₂` there is an orthonormal family

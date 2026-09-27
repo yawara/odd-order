@@ -718,15 +718,15 @@ theorem exists_fgh_mapsTo :
   obtain ⟨f₁, g₁, h₁, H₁⟩ := hyp.exists_fgh
   refine ⟨fun x => if x = 1 then 1 else f₁ x, g₁, h₁,
     ⟨fun x hxQ hx1 => ?_, fun x hxQ hx1 => ?_⟩, fun ρ hρQ => ?_⟩
-  · rw [if_neg hx1]
+  · rw [ite_eq_right hx1]
     exact H₁.mem x hxQ hx1
-  · rw [if_neg hx1]
+  · rw [ite_eq_right hx1]
     exact H₁.eq x hxQ hx1
   · change (if ρ = 1 then (1 : G) else f₁ ρ) ∈ hyp.Q
     by_cases hρ1 : ρ = 1
-    · rw [if_pos hρ1]
+    · rw [ite_eq_left hρ1]
       exact hyp.Q.one_mem
-    · rw [if_neg hρ1]
+    · rw [ite_eq_right hρ1]
       exact (H₁.mem ρ hρQ hρ1).1
 
 /-- **Peterfalvi Part II, Ch. IV §3, Corollary 2, straight off `IsStandardModel`**

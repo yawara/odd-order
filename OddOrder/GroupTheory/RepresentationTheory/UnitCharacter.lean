@@ -96,7 +96,7 @@ theorem sum_inv_pow_mul_pow {n : ℕ} (hn : 0 < n) {ζ x : K} (hζ : IsPrimitive
       exact h (by field_simp at hc; rw [← hc])
     have hpow : (ζ⁻¹ * x) ^ n = 1 := by
       rw [mul_pow, inv_pow, hζ.pow_eq_one, hx, inv_one, mul_one]
-    rw [geom_sum_eq hne, hpow, sub_self, zero_div, if_neg h]
+    rw [geom_sum_eq hne, hpow, sub_self, zero_div, ite_eq_right h]
 
 /-! ### The indicator lies in `ch_R(H)` -/
 

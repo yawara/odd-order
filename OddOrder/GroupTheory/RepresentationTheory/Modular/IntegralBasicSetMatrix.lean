@@ -130,10 +130,10 @@ theorem intCast_basicSetSign {u : G} {j : κ}
       * (wedderburnRepresentation eG j).character u = 1) :
     ((basicSetSign eG u j : ℤ) : K) = (wedderburnRepresentation eG j).character u := by
   rcases mul_self_eq_one_iff.mp hj with h | h
-  · rw [basicSetSign, if_pos h, Int.cast_one, h]
+  · rw [basicSetSign, ite_eq_left h, Int.cast_one, h]
   · have hne : (wedderburnRepresentation eG j).character u ≠ 1 := fun hc => by
       rw [hc] at h; norm_num at h
-    rw [basicSetSign, if_neg hne, Int.cast_neg, Int.cast_one, h]
+    rw [basicSetSign, ite_eq_right hne, Int.cast_neg, Int.cast_one, h]
 
 /-- The row `(D_𝓑)_{i·}` over `ℤ` casts to the row over `K`. -/
 theorem intCast_signRelationRow {u : G} {j₀ i j : κ}

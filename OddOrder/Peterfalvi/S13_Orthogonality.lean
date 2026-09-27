@@ -698,9 +698,10 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
     rw [Finset.sum_eq_single i
       (fun i' _ hne => by
         rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i' ⟨1, hw2⟩ ⟨1, hw2⟩,
-          if_neg (fun h => hne h.1.symm)])
+          ite_eq_right (fun h => hne h.1.symm)])
       (fun h => absurd (Finset.mem_univ i) h)]
-    rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i ⟨1, hw2⟩ ⟨1, hw2⟩, if_pos ⟨rfl, rfl⟩]
+    rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i ⟨1, hw2⟩ ⟨1, hw2⟩,
+      ite_eq_left ⟨rfl, rfl⟩]
   have hΩnorm : ClassFunction.inner Ω Ω = (hyp.base.w1 : ℂ) := by
     conv_lhs => rw [hΩdef]
     rw [OddOrder.RepresentationTheory.inner_sum_left,
@@ -787,9 +788,9 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
     intro j k
     by_cases hjk : j = k
     · subst hjk
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       exact hyp.base.muGrid_column_sum_inner_self hG hG.odd j
-    · rw [if_neg hjk, OddOrder.RepresentationTheory.inner_sum_left]
+    · rw [ite_eq_right hjk, OddOrder.RepresentationTheory.inner_sum_left]
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [OddOrder.RepresentationTheory.inner_sum_right]
       exact Finset.sum_eq_zero fun i' _ =>
@@ -801,7 +802,7 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
     rw [OddOrder.RepresentationTheory.inner_sum_left]
     by_cases hjk : j = k
     · subst hjk
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       have hrow : ∀ i : Fin hyp.base.w1,
           ClassFunction.inner (hyp.base.alignedOmegaSigmaGrid hG hG.odd i j)
             (∑ i' : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i' j) = 1 := by
@@ -810,17 +811,17 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
         rw [Finset.sum_eq_single i
           (fun i' _ hne => by
             rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i' j j,
-              if_neg (fun h => hne h.1.symm)])
+              ite_eq_right (fun h => hne h.1.symm)])
           (fun h => absurd (Finset.mem_univ i) h)]
-        rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i j j, if_pos ⟨rfl, rfl⟩]
+        rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i j j, ite_eq_left ⟨rfl, rfl⟩]
       rw [Finset.sum_congr rfl (fun i _ => hrow i)]
       simp
-    · rw [if_neg hjk]
+    · rw [ite_eq_right hjk]
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [OddOrder.RepresentationTheory.inner_sum_right]
       refine Finset.sum_eq_zero fun i' _ => ?_
       rw [hyp.base.alignedOmegaSigmaGrid_inner hG hG.odd i i' j k,
-        if_neg (fun h => hjk h.2)]
+        ite_eq_right (fun h => hjk h.2)]
   -- distinct members have distinct columns
   have hkfinj : ∀ i i' : Fin n, kf i = kf i' → i = i' := by
     intro i i' hk
@@ -832,13 +833,13 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
     intro i i'
     rw [hkfeq i, hkfeq i', hμcols]
     by_cases hii : i = i'
-    · subst hii; rw [if_pos rfl, if_pos rfl]
-    · rw [if_neg (fun h => hii (hkfinj _ _ h)), if_neg hii]
+    · subst hii; rw [ite_eq_left rfl, ite_eq_left rfl]
+    · rw [ite_eq_right (fun h => hii (hkfinj _ _ h)), ite_eq_right hii]
   have hw1ne0 : (hyp.base.w1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have hχorth : ∀ i j : Fin n, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 := by
-    intro i j hij; rw [hχpair, if_neg hij]
+    intro i j hij; rw [hχpair, ite_eq_right hij]
   have hχnorm : ∀ i : Fin n, ClassFunction.inner (χ i) (χ i) ≠ 0 := by
-    intro i; rw [hχpair, if_pos rfl]; exact hw1ne0
+    intro i; rw [hχpair, ite_eq_left rfl]; exact hw1ne0
   -- the canonical map and its member images
   set ν₀ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
@@ -896,8 +897,8 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
             obtain ⟨j', rfl⟩ := hidxof b hb
             rw [hν₀apply i, hν₀apply j', hΩcols, hχpair]
             by_cases hij : i = j'
-            · subst hij; rw [if_pos rfl, if_pos rfl]
-            · rw [if_neg (fun h => hij (hkfinj _ _ h)), if_neg hij]
+            · subst hij; rw [ite_eq_left rfl, ite_eq_left rfl]
+            · rw [ite_eq_right (fun h => hij (hkfinj _ _ h)), ite_eq_right hij]
         | zero => rw [map_zero, ClassFunction.inner_zero_left,
             ClassFunction.inner_zero_left]
         | add u v hu hv ihu ihv =>
@@ -980,9 +981,9 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
       rw [← hkfeq i₁, hχi₁]
     have h2 : (if kf i₁ = (⟨1, hw2⟩ : Fin hyp.base.w2) then (hyp.base.w1 : ℂ) else 0)
         = (hyp.base.w1 : ℂ) := by
-      rw [← hμcols, hcols_eq, hμcols, if_pos rfl]
+      rw [← hμcols, hcols_eq, hμcols, ite_eq_left rfl]
     by_contra hne
-    rw [if_neg hne] at h2
+    rw [ite_eq_right hne] at h2
     exact hw1ne0 h2.symm
   refine ⟨{ nonzero := c₀.nonzero
             extension := ν₀

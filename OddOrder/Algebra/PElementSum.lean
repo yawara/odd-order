@@ -67,15 +67,15 @@ theorem coeff_pElementSum (g : G) :
     simp
   rw [hL]
   by_cases hg : IsPElement p g
-  · rw [if_pos hg, Finset.sum_eq_single g]
+  · rw [ite_eq_left hg, Finset.sum_eq_single g]
     · simp
     · intro b _ hb
-      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg hb]
+      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, ite_eq_right hb]
     · intro h
       exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hg⟩) h
-  · rw [if_neg hg, Finset.sum_eq_zero]
+  · rw [ite_eq_right hg, Finset.sum_eq_zero]
     intro b hb
-    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, ite_eq_right]
     exact fun h => hg (h ▸ (Finset.mem_filter.mp hb).2)
 
 open scoped Classical in
@@ -89,15 +89,15 @@ theorem coeff_pRegularSum (g : G) :
     simp
   rw [hL]
   by_cases hg : IsPRegular p g
-  · rw [if_pos hg, Finset.sum_eq_single g]
+  · rw [ite_eq_left hg, Finset.sum_eq_single g]
     · simp
     · intro b _ hb
-      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg hb]
+      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, ite_eq_right hb]
     · intro h
       exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hg⟩) h
-  · rw [if_neg hg, Finset.sum_eq_zero]
+  · rw [ite_eq_right hg, Finset.sum_eq_zero]
     intro b hb
-    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, ite_eq_right]
     exact fun h => hg (h ▸ (Finset.mem_filter.mp hb).2)
 
 open scoped Classical in
@@ -174,14 +174,14 @@ theorem pElementSum_eq_sum_sylow {k : Type*} [Field k] [Fact p.Prime] [CharP k p
       Finset.sum_congr rfl fun P _ => coeff_subgroupSum (P : Subgroup G) g, Finset.sum_boole]
   rw [hsum]
   by_cases hg : IsPElement p g
-  · rw [if_pos hg]
+  · rw [ite_eq_left hg]
     have hcard : (Finset.univ.filter (fun P : Sylow p G => g ∈ (P : Subgroup G))).card
         = Nat.card {P : Sylow p G // g ∈ (P : Subgroup G)} := by
       rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     rw [hcard, ← Nat.cast_one (R := k)]
     exact ((CharP.natCast_eq_natCast k p).mpr
       (card_sylow_mem_modEq_one (isPGroup_zpowers_of_isPElement hg)).symm)
-  · rw [if_neg hg, Finset.filter_eq_empty_iff.mpr, Finset.card_empty, Nat.cast_zero]
+  · rw [ite_eq_right hg, Finset.filter_eq_empty_iff.mpr, Finset.card_empty, Nat.cast_zero]
     exact fun P _ hmem => hg (isPElement_of_mem_of_isPGroup P.isPGroup' hmem)
 
 /-! ### The sum of the Sylow sums is central over any base ring -/

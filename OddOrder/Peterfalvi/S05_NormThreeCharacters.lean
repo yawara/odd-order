@@ -103,9 +103,9 @@ theorem exists_signedTriple_of_inner_self_three [Invertible (Nat.card G : ℂ)]
     have haa : a ∈ irreducibleCharacters G := hsupp ha
     have hba : b ∈ irreducibleCharacters G := hsupp hb
     have e1 : ClassFunction.inner ((c a : ℂ) • a) a = (c a : ℂ) := by
-      rw [ClassFunction.inner_smul_left, irr_cf_inner haa haa, if_pos rfl, mul_one]
+      rw [ClassFunction.inner_smul_left, irr_cf_inner haa haa, ite_eq_left rfl, mul_one]
     have e2 : ClassFunction.inner ((c b : ℂ) • b) a = 0 := by
-      rw [ClassFunction.inner_smul_left, irr_cf_inner hba haa, if_neg (Ne.symm hab), mul_zero]
+      rw [ClassFunction.inner_smul_left, irr_cf_inner hba haa, ite_eq_right (Ne.symm hab), mul_zero]
     change (c a : ℂ) • a = (c b : ℂ) • b at hfab
     have hca0 : (c a : ℂ) = 0 := by rw [← e1, hfab, e2]
     exact hne a (Finset.mem_coe.mp ha) (by exact_mod_cast hca0)
@@ -133,7 +133,7 @@ theorem exists_signedTriple_of_inner_self_three [Invertible (Nat.card G : ℂ)]
     have hab : a ≠ b := fun h => hxy (by rw [h])
     change ClassFunction.inner ((c a : ℂ) • a) ((c b : ℂ) • b) = 0
     rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      irr_cf_inner haa hbb, if_neg hab, mul_zero, mul_zero]
+      irr_cf_inner haa hbb, ite_eq_right hab, mul_zero, mul_zero]
   · rw [Finset.sum_image hinj]; exact hrepr
 
 /- 3.5.2: the combinatorics of the sets `A_{ij}` -- the signed-irreducible API -/
@@ -182,12 +182,12 @@ theorem isSignedNontrivialIrr_inner [Invertible (Nat.card G : ℂ)] {x c : Class
     irr_cf_inner χ.mem_irreducibleCharacters ψ.mem_irreducibleCharacters
   have hXnegY : ¬ (X = -Y) := irreducibleCharacter_coe_ne_neg χ ψ
   rcases hxχ with rfl | rfl <;> rcases hcψ with rfl | rfl
-  · rw [hXY, if_neg hXnegY, sub_zero]
-  · rw [ClassFunction.inner_neg_right, hXY, neg_neg, if_neg hXnegY, zero_sub]
+  · rw [hXY, ite_eq_right hXnegY, sub_zero]
+  · rw [ClassFunction.inner_neg_right, hXY, neg_neg, ite_eq_right hXnegY, zero_sub]
   · rw [ClassFunction.inner_neg_left, hXY, neg_inj,
-      if_neg (fun h => hXnegY (neg_eq_iff_eq_neg.mp h)), zero_sub]
+      ite_eq_right (fun h => hXnegY (neg_eq_iff_eq_neg.mp h)), zero_sub]
   · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg, hXY, neg_inj,
-      neg_neg, if_neg (fun h => hXnegY (neg_eq_iff_eq_neg.mp h)), sub_zero]
+      neg_neg, ite_eq_right (fun h => hXnegY (neg_eq_iff_eq_neg.mp h)), sub_zero]
 
 omit [Fintype G] in
 /-- A signed nontrivial irreducible is not its own negative (it is nonzero). -/
@@ -204,7 +204,8 @@ open Classical in
 /-- A signed nontrivial irreducible has unit norm: `⟨x, x⟩ = 1`. -/
 theorem IsSignedNontrivialIrr.inner_self [Invertible (Nat.card G : ℂ)] {x : ClassFunction G ℂ}
     (hx : IsSignedNontrivialIrr x) : ClassFunction.inner x x = 1 := by
-  rw [isSignedNontrivialIrr_inner hx hx, if_pos rfl, if_neg (fun h => hx.ne_neg_self h), sub_zero]
+  rw [isSignedNontrivialIrr_inner hx hx, ite_eq_left rfl, ite_eq_right (fun h => hx.ne_neg_self h),
+    sub_zero]
 
 omit [Fintype G] in
 /-- A signed nontrivial irreducible is a virtual character (`x = ±χ`, both in `ℤ[Irr G]`). -/
@@ -223,7 +224,7 @@ theorem IsSignedNontrivialIrr.inner_trivial [Invertible (Nat.card G : ℂ)]
   obtain ⟨χ, hχ, hx⟩ := hx
   have h0 : ClassFunction.inner (χ : ClassFunction G ℂ) (trivialClassFunction G) = 0 := by
     rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter, irreducibleCharacter_inner,
-      if_neg hχ]
+      ite_eq_right hχ]
   rcases hx with rfl | rfl
   · exact h0
   · rw [ClassFunction.inner_neg_left, h0, neg_zero]
@@ -241,20 +242,20 @@ theorem orthonormal_option_trivial [Invertible (Nat.card G : ℂ)] {τ : Type*}
   cases a with
   | none =>
     cases b with
-    | none => rw [if_pos rfl]; exact inner_trivialClassFunction_self G
+    | none => rw [ite_eq_left rfl]; exact inner_trivialClassFunction_self G
     | some b =>
-      rw [if_neg (by simp)]
+      rw [ite_eq_right (by simp)]
       change ClassFunction.inner (trivialClassFunction G) (X b) = 0
       rw [OddOrder.RepresentationTheory.inner_conj_symm, (hsig b).inner_trivial, star_zero]
   | some a =>
     cases b with
-    | none => rw [if_neg (by simp)]; exact (hsig a).inner_trivial
+    | none => rw [ite_eq_right (by simp)]; exact (hsig a).inner_trivial
     | some b =>
       change ClassFunction.inner (X a) (X b) = _
       rw [hortho a b]
       by_cases h : a = b
-      · rw [if_pos h, if_pos (congrArg some h)]
-      · rw [if_neg h, if_neg (fun hh => h (Option.some.inj hh))]
+      · rw [ite_eq_left h, ite_eq_left (congrArg some h)]
+      · rw [ite_eq_right h, ite_eq_right (fun hh => h (Option.some.inj hh))]
 
 /-- A family `X : τ → ±Irr(G)` of signed nontrivial irreducibles is **orthonormal** as soon as it is
 *injective* and *no member is another's negative*: the diagonal inner products are `1` and the
@@ -270,8 +271,8 @@ theorem orthonormal_of_injective_of_no_neg [Invertible (Nat.card G : ℂ)] {τ :
       (∀ a b, a ≠ b → ClassFunction.inner (X a) (X b) = 0) := by
   classical
   refine ⟨fun a => (hsig a).inner_self, fun a b hab => ?_⟩
-  rw [isSignedNontrivialIrr_inner (hsig a) (hsig b), if_neg (fun h => hab (hinj h)),
-    if_neg (hneg a b), sub_zero]
+  rw [isSignedNontrivialIrr_inner (hsig a) (hsig b), ite_eq_right (fun h => hab (hinj h)),
+    ite_eq_right (hneg a b), sub_zero]
 
 /-- A *signed triple*: `β` is the sum of a 3-element set `A` of pairwise-orthogonal signed
 nontrivial irreducible characters.  This is the structure of each `β_{ij}` of Peterfalvi (3.5.1)
@@ -322,8 +323,8 @@ theorem IsSignedTriple.inner_self [Invertible (Nat.card G : ℂ)]
   nth_rewrite 2 [hA.sum_eq]
   rw [inner_sum_right]
   rw [Finset.sum_congr rfl (fun x hx => by
-    rw [hA.inner_right_signed (hA.signed x hx), if_pos hx,
-      if_neg (hA.neg_not_mem hx), sub_zero])]
+    rw [hA.inner_right_signed (hA.signed x hx), ite_eq_left hx,
+      ite_eq_right (hA.neg_not_mem hx), sub_zero])]
   rw [Finset.sum_const, nsmul_eq_mul, mul_one]
 
 /-- **Peterfalvi (3.5.2)** (no-negatives half): if two signed triples `β = ∑ A`, `β' = ∑ A'` have
@@ -340,10 +341,10 @@ theorem IsSignedTriple.no_neg_of_inner_one [Invertible (Nat.card G : ℂ)]
   have hcsig : IsSignedNontrivialIrr c := hA.signed c hcA
   -- `⟨β, c⟩ = 1` and `⟨β', c⟩ = -1`.
   have hbc : ClassFunction.inner β c = 1 := by
-    rw [hA.inner_right_signed hcsig, if_pos hcA, if_neg (hA.neg_not_mem hcA), sub_zero]
+    rw [hA.inner_right_signed hcsig, ite_eq_left hcA, ite_eq_right (hA.neg_not_mem hcA), sub_zero]
   have hcnA' : c ∉ A' := fun h => hA'.neg_not_mem h hcA'
   have hb'c : ClassFunction.inner β' c = -1 := by
-    rw [hA'.inner_right_signed hcsig, if_neg hcnA', if_pos hcA', zero_sub]
+    rw [hA'.inner_right_signed hcsig, ite_eq_right hcnA', ite_eq_left hcA', zero_sub]
   -- norms: `⟨β,β⟩ = ⟨β',β'⟩ = 3`, `⟨β',β⟩ = 1`.
   have hbb : ClassFunction.inner β β = 3 := by rw [hA.inner_self, hA.card_eq_three]; norm_num
   have hb'b' : ClassFunction.inner β' β' = 3 := by rw [hA'.inner_self, hA'.card_eq_three]; norm_num
@@ -386,7 +387,7 @@ theorem IsSignedTriple.L_of_inner_one [Invertible (Nat.card G : ℂ)]
   have key : ClassFunction.inner β' β = ((A ∩ A').card : ℂ) := by
     conv_lhs => rw [hA.sum_eq]
     rw [inner_sum_right, Finset.sum_congr rfl (fun x hx => by
-      rw [hA'.inner_right_signed (hA.signed x hx), if_neg (hno x hx), sub_zero]),
+      rw [hA'.inner_right_signed (hA.signed x hx), ite_eq_right (hno x hx), sub_zero]),
       Finset.sum_boole, Finset.filter_mem_eq_inter]
   have : ((A ∩ A').card : ℂ) = 1 := by rw [← key, inner_conj_symm β β', hinner, star_one]
   exact_mod_cast this

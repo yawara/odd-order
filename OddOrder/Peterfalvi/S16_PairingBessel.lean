@@ -456,10 +456,10 @@ theorem bessel_bound_of_inner_beta_zeta_ne_zero
     rw [(dataL.h78 hG).nu_isometry i j (Finset.mem_erase.mp hi).1 (Finset.mem_erase.mp hj).1]
     by_cases hij : i = j
     · subst hij
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       exact (dataL.h78 hG).zeta_inner_self_eq_one_of_irreducible
         (dataL.zeta_irreducible_at hG (Finset.mem_erase.mp hi).1)
-    · rw [if_neg hij]
+    · rw [ite_eq_right hij]
       exact induce_family_orthogonal_of_injective dataL.kernelIn dataL.θ dataL.inj i j hij
   -- `⟨v, v⟩ = Σ d_i²`.
   have hS : ClassFunction.inner v v
@@ -469,8 +469,8 @@ theorem bessel_bound_of_inner_beta_zeta_ne_zero
     rw [ClassFunction.inner_smul_left, inner_sum_right]
     rw [Finset.sum_eq_single_of_mem i hi (fun j hj hji => by
       rw [OddOrder.RepresentationTheory.inner_smul_right, hON i hi j hj,
-        if_neg (Ne.symm hji), mul_zero])]
-    rw [OddOrder.RepresentationTheory.inner_smul_right, hON i hi i hi, if_pos rfl,
+        ite_eq_right (Ne.symm hji), mul_zero])]
+    rw [OddOrder.RepresentationTheory.inner_smul_right, hON i hi i hi, ite_eq_left rfl,
       dataL.d_star, mul_one, sq]
   -- `Σ d_i² = (h_L − 1)/e_L` (the degree-square sum, ℂ-level).
   have hidx_ne : ((dataL.kernelIn).index : ℂ) ≠ 0 := by
@@ -508,7 +508,7 @@ theorem bessel_bound_of_inner_beta_zeta_ne_zero
     ((((dataM.h78 hG).complementIndex : ℕ) : ℚ) - 1)
     (by rw [Fintype.sum_unique (fun _ : Unit => (((a : ℝ) : ℂ)) • v)]; abel)
     (fun i _ j _ => by
-      rw [if_pos (Subsingleton.elim i j)]
+      rw [ite_eq_left (Subsingleton.elim i j)]
       exact hS.trans hm_cast.symm)
     (fun i _ => by
       rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hΓv, hS]

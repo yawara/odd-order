@@ -748,7 +748,7 @@ theorem coherent_of_subset_constant_degree (hd : Odd hyp.d)
     intro ζ hζ
     have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
       (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
-    rw [if_pos rfl] at h
+    rw [ite_eq_left rfl] at h
     simpa using h
   refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
     { tau := hyp.tau

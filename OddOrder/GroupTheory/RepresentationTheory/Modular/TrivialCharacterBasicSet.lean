@@ -96,7 +96,7 @@ theorem principalBasicSet_eq_one_of_trivial {i₀ j₀ : κ}
     (hi₀ : ∀ g : G, (wedderburnRepresentation eG i₀).character g = 1) (hne : i₀ ≠ j₀) (g : G) :
     principalBasicSet eG hπG hlinG hnilG t j₀ i₀ g = 1 := by
   classical
-  rw [principalBasicSet, if_pos ⟨hi₀B, hne⟩, hi₀, hi₀, one_mul]
+  rw [principalBasicSet, ite_eq_left ⟨hi₀B, hne⟩, hi₀, hi₀, one_mul]
 
 omit [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
   [Invertible (Nat.card G : K)] [Fintype ↥(centralizerOf t)] [Fintype κ] [DecidableEq κ]
@@ -149,19 +149,19 @@ theorem eq_zero_of_sum_principalBasicSet_eq_zero
     intro l g
     rw [ha l, principalBasicSet]
     by_cases hl : blockOfIrr eG hπG hlinG hnilG l = principalBlock πG hπG hlinG hnilG ∧ l ≠ j₀
-    · rw [if_pos hl, if_pos hl]; ring
-    · rw [if_neg hl, if_neg hl, zero_mul, mul_zero]
+    · rw [ite_eq_left hl, ite_eq_left hl]; ring
+    · rw [ite_eq_right hl, ite_eq_right hl, zero_mul, mul_zero]
   have hzero := eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero hp hx hω e eG hπG hlinG hπ hlin
     hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall ht1 hcart ht
     (a := a)
-    (fun l hl => by rw [ha l]; exact if_neg fun hc => hl hc.1)
+    (fun l hl => by rw [ha l]; exact ite_eq_right fun hc => hl hc.1)
     (fun g hg => by
       rw [Finset.sum_congr rfl fun l _ => hterm l g]; exact hvan g hg)
-    hj₀ (by rw [ha j₀]; exact if_neg fun hc => hc.2 rfl)
+    hj₀ (by rw [ha j₀]; exact ite_eq_right fun hc => hc.2 rfl)
   -- `a j = c j * ε_j` and `ε_j² = 1`
   have haj : c j * (wedderburnRepresentation eG j).character t = 0 := by
     have hj : a j = 0 := congrFun hzero j
-    rwa [ha j, if_pos ⟨hjB, hjne⟩] at hj
+    rwa [ha j, ite_eq_left ⟨hjB, hjne⟩] at hj
   have hεsq := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
     hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1 hcart hjB
   calc c j = c j * (wedderburnRepresentation eG j).character t
@@ -228,10 +228,10 @@ theorem eq_ite_of_sum_principalBasicSet_eq_one
       show (if l = i₀ then (1 : K) else 0) * principalBasicSet eG hπG hlinG hnilG t j₀ l g
           = if l = i₀ then principalBasicSet eG hπG hlinG hnilG t j₀ l g else 0 by
         by_cases hl : l = i₀
-        · rw [if_pos hl, if_pos hl, one_mul]
-        · rw [if_neg hl, if_neg hl, zero_mul],
+        · rw [ite_eq_left hl, ite_eq_left hl, one_mul]
+        · rw [ite_eq_right hl, ite_eq_right hl, zero_mul],
     Finset.sum_ite_eq' Finset.univ i₀ (principalBasicSet eG hπG hlinG hnilG t j₀ · g),
-    if_pos (Finset.mem_univ i₀),
+    ite_eq_left (Finset.mem_univ i₀),
     principalBasicSet_eq_one_of_trivial eG hπG hlinG hnilG hi₀B hi₀ hi₀ne g]
 
 end OddOrder.RepresentationTheory.Modular

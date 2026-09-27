@@ -241,6 +241,6 @@ theorem inner_compHom_mk'_irreducible_eq_zero_of_not_subset_ker {N : Subgroup G}
   have hne : inflate N χ ≠ ψ := fun heq =>
     hψ (heq ▸ subset_characterKernel_inflate N χ)
   rw [ClassFunction.inner_smul_left, ← inflate_coe N χ, irreducibleCharacter_inner_eq_ite,
-    if_neg hne, mul_zero]
+    ite_eq_right hne, mul_zero]
 
 end OddOrder.RepresentationTheory

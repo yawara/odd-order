@@ -929,7 +929,7 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
       (N := Q ⊔ R₁) (R := P) ?_ ?_ ?_ hPne ⟨p, Fact.out, hPcard⟩ ?_
     · exact (le_inf hQinv hPnormR₁).trans
-        (Subgroup.normalizer_inf_normalizer_le_normalizer_sup Q R₁)
+        (Subgroup.inf_normalizer_le_normalizer_sup Q R₁)
     · rw [disjoint_iff, inf_comm]
       exact OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hPp hQR₁cop
     · exact fun h => hQne (le_bot_iff.mp (le_sup_left.trans h.le))

@@ -117,13 +117,13 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
           (θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ))
         (trivialIrreducibleCharacter ↥hyp.base.T : ClassFunction ↥hyp.base.T ℂ) = 0 := by
       rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
-        irreducibleCharacter_inner_eq_ite, if_neg (hne θ hθ)]
+        irreducibleCharacter_inner_eq_ite, ite_eq_right (hne θ hθ)]
     have hcf : ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
           (θ : ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ)
         = (trivialIrreducibleCharacter ↥hyp.base.T : ClassFunction ↥hyp.base.T ℂ) :=
       congrArg (fun c : IrreducibleCharacter ↥hyp.base.T => (c : ClassFunction ↥hyp.base.T ℂ))
         hcontra
-    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
+    rw [hcf, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl] at hzero
     exact one_ne_zero hzero
   -- (a) `S03.HasNoRealCharacters calT1_set`: each member is a nontrivial irreducible of the odd
   -- `T`.
@@ -151,7 +151,7 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
       show ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ'.toClassFunction
           = ((⟨_, hψirr⟩ : IrreducibleCharacter ↥hyp.base.T) : ClassFunction ↥hyp.base.T ℂ)
             from rfl,
-      irreducibleCharacter_inner_eq_ite, if_neg]
+      irreducibleCharacter_inner_eq_ite, ite_eq_right]
     intro h
     exact hne' (congrArg
       (fun c : IrreducibleCharacter ↥hyp.base.T => (c : ClassFunction ↥hyp.base.T ℂ)) h)
@@ -650,7 +650,7 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
   have hcross : ClassFunction.inner (coh.extension ζ) (coh.extension ζ.conj) = 0 := by
     rw [coh.extension_inner_eq ζ ζ.conj (Submodule.subset_span hζ)
       (Submodule.subset_span hζc), OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj,
-      if_neg (fun h => hnoReal hζ h.symm)]
+      ite_eq_right (fun h => hnoReal hζ h.symm)]
   intro i j
   have h := eta_orthogonal_of_norm_one_pair_vanish hyp.base hpsiZ hconjZ hpsi1 hconj1
     hcross hvanish i j

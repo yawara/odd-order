@@ -868,8 +868,8 @@ noncomputable def coherentEqualDegree_fromDade
     intro i j
     rw [irreducibleCharacter_inner_eq_ite]
     by_cases h : i = j
-    · rw [if_pos h, if_pos (congrArg χ h)]
-    · rw [if_neg h, if_neg (fun he => h (hχinj he))]
+    · rw [ite_eq_left h, ite_eq_left (congrArg χ h)]
+    · rw [ite_eq_right h, ite_eq_right (fun he => h (hχinj he))]
   -- The supported difference generators `χⱼ − χ₀` of `ℤ[range χ]` (this is the support
   -- hypothesis directly, so the individual `χⱼ` need not be supported on `A`).
   have hdiff_supp : ∀ i, (irreducibleCharacterDifference χ i).support ⊆ supportInSubgroup A L :=

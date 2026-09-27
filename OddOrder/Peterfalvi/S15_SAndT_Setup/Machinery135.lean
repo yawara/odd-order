@@ -244,7 +244,7 @@ theorem Hypothesis.muColumn_inner_self [Finite G] (hyp : Hypothesis (G := G)) (j
     intro i
     rw [OddOrder.RepresentationTheory.inner_sum_right,
       Finset.sum_eq_single i
-        (fun k _ hki => by rw [hyp.mu_orthonormal i k j j, if_neg (fun h => hki h.1.symm)])
+        (fun k _ hki => by rw [hyp.mu_orthonormal i k j j, ite_eq_right (fun h => hki h.1.symm)])
         (fun h => absurd (Finset.mem_univ i) h),
       hyp.mu_orthonormal i i j j]
     simp
@@ -265,7 +265,7 @@ theorem Hypothesis.etaColumn_inner_self [Finite G] (hyp : Hypothesis (G := G)) (
     intro i
     rw [OddOrder.RepresentationTheory.inner_sum_right,
       Finset.sum_eq_single i
-        (fun k _ hki => by rw [hyp.eta_orthonormal i k j j, if_neg (fun h => hki h.1.symm)])
+        (fun k _ hki => by rw [hyp.eta_orthonormal i k j j, ite_eq_right (fun h => hki h.1.symm)])
         (fun h => absurd (Finset.mem_univ i) h),
       hyp.eta_orthonormal i i j j]
     simp
@@ -1188,7 +1188,7 @@ theorem chiRho_eq_self_of_H_eq_bot {G : Type*} [Group G] [Fintype G] {A : Set G}
     (hHbot : ∀ a : {a : G // a ∈ A}, H71.hyp.H a = ⊥)
     (χ : ClassFunction G ℂ) (a : L) (ha : (a : G) ∈ A) :
     H71.chiRho χ a = χ (a : G) := by
-  rw [OddOrder.Peterfalvi.S09.Hypothesis71.chiRho, dif_pos ha, hHbot ⟨(a : G), ha⟩,
+  rw [OddOrder.Peterfalvi.S09.Hypothesis71.chiRho, dite_eq_left ha, hHbot ⟨(a : G), ha⟩,
     Subgroup.card_bot, Nat.cast_one, inv_one, one_mul]
   simp only [Finset.univ_unique, Finset.sum_singleton]
   rw [show ((default : ↥(⊥ : Subgroup G)) : G) = 1 from

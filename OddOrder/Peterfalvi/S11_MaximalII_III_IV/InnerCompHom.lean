@@ -150,7 +150,8 @@ theorem hcZeta_mem_xiSet [Finite G] {M : Subgroup G}
     have hcoe : (ζ : ClassFunction ↥(huSub data) ℂ) = ClassFunction.induce
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsi chief θ) := by rw [hζdef]
-    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ,
+      ite_eq_left rfl]
     exact one_ne_zero
   -- Assume `H ⊆ Ker ζ` for contradiction; show `θ = 1`.
   rw [xiSet, Set.mem_ofPred_eq]

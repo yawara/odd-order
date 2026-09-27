@@ -84,10 +84,10 @@ theorem nonempty_characterDifferenceImage_of_irreducible
     fun h => hreal (congrArg Subtype.val h)
   have hcross : ClassFunction.inner χ χ.conj = 0 := by
     simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
-      ⟨χ.conj, hconjirr⟩ |>.trans (if_neg (Ne.symm hne))
+      ⟨χ.conj, hconjirr⟩ |>.trans (ite_eq_right (Ne.symm hne))
   have hcross' : ClassFunction.inner χ.conj χ = 0 := by
     simpa using irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
-      ⟨χ, hirr⟩ |>.trans (if_neg hne)
+      ⟨χ, hirr⟩ |>.trans (ite_eq_right hne)
   have hnorm2 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) = 2 := by
     rw [hisom, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_sub_right, hirr.inner_self_eq_one, hconjirr.inner_self_eq_one,

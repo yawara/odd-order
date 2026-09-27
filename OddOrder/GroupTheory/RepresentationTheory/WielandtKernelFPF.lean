@@ -194,7 +194,7 @@ theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) 
     rw [Pi.single_apply]
     by_cases h : j = i₀
     · subst h; simp
-    · rw [if_neg h] at hj ⊢; exact hj.symm
+    · rw [ite_eq_right h] at hj ⊢; exact hj.symm
   -- The single coordinate is `1` (`φ a i₀ = aug a = 1`).
   have hval : φ a i₀ = 1 := by rw [haug, hauga]
   rw [hval] at hsupp
@@ -236,7 +236,7 @@ theorem simplesAction_fixed_of_aug {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug
   rw [← haug, ← haug, AlgEquiv.apply_symm_apply, AlgEquiv.apply_symm_apply, Pi.single_eq_same,
     Pi.single_apply] at key
   by_contra h
-  rw [if_neg (Ne.symm h)] at key
+  rw [ite_eq_right (Ne.symm h)] at key
   exact zero_ne_one key
 
 omit [Fintype G] in

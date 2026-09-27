@@ -632,12 +632,12 @@ theorem columnFamily_cross_products_zero [NeZero (Nat.card h.W1)]
   have hself : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1)) (m : Fin (Nat.card
       h.W1)),
       ClassFunction.inner (d.mu m : ClassFunction L ℂ) (d.mu m : ClassFunction L ℂ) = 1 := by
-    intro d m; rw [irreducibleCharacter_inner, if_pos rfl]
+    intro d m; rw [irreducibleCharacter_inner, ite_eq_left rfl]
   have horth : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1))
       {m n : Fin (Nat.card h.W1)}, m ≠ n →
       ClassFunction.inner (d.mu m : ClassFunction L ℂ) (d.mu n : ClassFunction L ℂ) = 0 := by
     intro d m n hmn
-    rw [irreducibleCharacter_inner, if_neg (fun heq => hmn (d.injective heq))]
+    rw [irreducibleCharacter_inner, ite_eq_right (fun heq => hmn (d.injective heq))]
   refine pairwise_inner_eq_zero_of_orthogonal_signedDifference (Γ := L)
     (u := 1) (v := 1) one_ne_zero one_ne_zero
     ((h.columnFamily χ₂).mu k).mem_ZIrr (hself _ k)
@@ -677,7 +677,7 @@ theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
       exact (h.columnFamily_cross_products_zero hne hi hz).2.1
     · exact (h.columnFamily_cross_products_zero hne hi hi').1
   intro heq
-  rw [heq, irreducibleCharacter_inner, if_pos rfl] at hinner
+  rw [heq, irreducibleCharacter_inner, ite_eq_left rfl] at hinner
   exact one_ne_zero hinner
 
 omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] in
@@ -905,11 +905,11 @@ theorem certainTypeRestrictDiff_inner_basis [NeZero (Nat.card h.W1)]
       rcases (h.columnFamily l).sign_eq with hs | hs <;> rw [hs] <;> norm_num
     rw [← mul_assoc, hsign2, one_mul]
   · -- distinct columns: all four pairings vanish
-    rw [if_neg (h.columnFamily_mu_ne hl (h.w1CharEquiv.symm k) i),
-      if_neg (h.columnFamily_mu_ne hl 0 i),
-      if_neg (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
+    rw [ite_eq_right (h.columnFamily_mu_ne hl (h.w1CharEquiv.symm k) i),
+      ite_eq_right (h.columnFamily_mu_ne hl 0 i),
+      ite_eq_right (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
         (h.sdiffTICyclicHypothesis.omega_injective he)),
-      if_neg (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
+      ite_eq_right (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
         (h.sdiffTICyclicHypothesis.omega_injective he))]
     ring
 
@@ -947,7 +947,7 @@ theorem apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
       h.sdiffTICyclicHypothesis.W) (fun x _ t => ?_) (fun φ hφ => ?_) ?_
   · -- `W − W₂` is conjugation-closed in the abelian `W`, so `t * x * t⁻¹ = x`
     have hxx : t * x * t⁻¹ = x := by rw [mul_comm' t x, mul_assoc, mul_inv_cancel, mul_one]
-    rw [hxx]; assumption
+    rwa [hxx]
   · -- orthogonal to every `φ ∈ CF(W, W − W₂)` via `hL0`
     have := DFunLike.congr_fun hL0 ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
     simpa using this
@@ -996,7 +996,7 @@ theorem sigma_chiColumn_eq_certainType [NeZero (Nat.card h.W1)]
     rw [← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign
         ((h.columnFamily χ₂).mu i : ClassFunction L ℂ),
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_intCast,
-      irreducibleCharacter_inner, if_pos rfl]
+      irreducibleCharacter_inner, ite_eq_left rfl]
     rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> norm_num
   · -- value-match on `V ⊆ W − W₂` from the (1.3) masking
     intro v hv
@@ -1045,7 +1045,7 @@ theorem inner_omegaColumnDiff_restrict_eq_zero [NeZero (Nat.card h.W1)]
     SignedIrreducibleDifferenceFamily.classFunction_apply,
     SignedIrreducibleDifferenceFamily.classFunction_apply, ClassFunction.inner_sub_left,
     irreducibleCharacter_inner, irreducibleCharacter_inner,
-    if_neg (hμ l (h.w1CharEquiv.symm k)), if_neg (hμ l 0)]
+    ite_eq_right (hμ l (h.w1CharEquiv.symm k)), ite_eq_right (hμ l 0)]
   ring
 
 omit [Fintype ↥(h.W1 ⊔ h.W2)] in
@@ -1173,7 +1173,7 @@ theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
     have h2 := congrArg
       (fun f : ClassFunction L ℂ => ClassFunction.inner f (oneIrr : ClassFunction L ℂ)) hkey
     rw [(by rfl : (oneIrr : ClassFunction L ℂ) = trivialClassFunction L).symm,
-      irreducibleCharacter_inner oneIrr oneIrr, if_pos rfl,
+      irreducibleCharacter_inner oneIrr oneIrr, ite_eq_left rfl,
       ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left, irreducibleCharacter_inner] at h2
     exact h2
   rcases (h.columnFamily 1).sign_eq with hs | hs
@@ -1181,14 +1181,14 @@ theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
     rw [hs] at hinner
     have hP : (h.columnFamily 1).mu 0 = oneIrr := by
       by_contra hne
-      rw [if_neg hne] at hinner; norm_num at hinner
+      rw [ite_eq_right hne] at hinner; norm_num at hinner
     exact ⟨hs, by rw [hP]⟩
   · -- `δ_0 = -1` is impossible (a multiplicity is `0` or `1`)
     exfalso
     rw [hs] at hinner
     by_cases hP : (h.columnFamily 1).mu 0 = oneIrr
-    · rw [if_pos hP] at hinner; norm_num at hinner
-    · rw [if_neg hP] at hinner; norm_num at hinner
+    · rw [ite_eq_left hP] at hinner; norm_num at hinner
+    · rw [ite_eq_right hP] at hinner; norm_num at hinner
 
 /-! ### Peterfalvi (4.4): the `j = 0` certain-type characters are the `K`-trivial ones -/
 
@@ -1244,7 +1244,7 @@ theorem exists_certainType_zero_column_eq_of_subset_characterKernel [NeZero (Nat
           (h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
     refine h.toTICyclicHypothesis.eq_sigma_of_apply_eq_on_V rfl h.toTICyclicFullDadeApplication
       (h.chiColumn 1 i) χ.mem_ZIrr ?_ ?_
-    · rw [irreducibleCharacter_inner, if_pos rfl]
+    · rw [irreducibleCharacter_inner, ite_eq_left rfl]
     · intro v hv
       have hvW : v ∈ h.sdiffTICyclicHypothesis.W := h.toTICyclicHypothesis.V_subset_W hv
       -- decompose `v = x₀ · y₀` in `L` (`x₀, y₀` the `W₁`/`W₂` components)

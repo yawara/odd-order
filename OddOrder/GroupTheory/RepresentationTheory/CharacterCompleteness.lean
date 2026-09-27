@@ -150,7 +150,6 @@ theorem transportRep_character {W X : Type*} [AddCommGroup W] [Module ℂ W]
   change LinearMap.trace ℂ X (e.conj (σ g)) = LinearMap.trace ℂ W (σ g)
   exact LinearMap.trace_conj' (σ g) e
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Transporting an irreducible representation along a linear equivalence keeps it irreducible. -/
 theorem transportRep_isIrreducible {W X : Type*} [AddCommGroup W] [Module ℂ W]
     [AddCommGroup X] [Module ℂ X] (σ : Representation ℂ G W) (e : W ≃ₗ[ℂ] X)
@@ -198,7 +197,6 @@ section EqualCharacter
 variable {G : Type*} [Group G] {V W : Type*} [AddCommGroup V] [Module ℂ V]
   [AddCommGroup W] [Module ℂ W]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Irreducibility transports along an equivalence of representations.**  The underlying
 linear equivalence upgrades to a `ℂ[G]`-linear equivalence of the `asModule`s
 (`equivLinearMapAsModule`), and simplicity transports across it. -/
@@ -491,7 +489,6 @@ theorem ofSubmodulePrime_coe_smul {W : Type*} [AddCommGroup W] [Module ℂ W]
   | add x y hx hy => rw [add_smul, add_smul, AddSubmonoid.coe_add, hx, hy]
   | single g a => rw [Representation.single_smul, Representation.single_smul]; rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A `ℂ[G]`-submodule `N` of `ρ.asModule`, viewed as the subrepresentation `ofSubmodule' N`, has
 its `asModule` `ℂ[G]`-linearly isomorphic to `N`. The underlying map is the identity on the shared
 carrier (`↥N` and `↥(ofSubmodule' N).toSubmodule` are the same type definitionally); the only
@@ -510,7 +507,6 @@ noncomputable def ofSubmodulePrimeAsModuleEquiv {W : Type*} [AddCommGroup W] [Mo
     exact (ofSubmodulePrime_coe_smul ρ N c v).symm
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
-set_option backward.isDefEq.respectTransparency false in
 /-- For a simple `ℂ[G]`-submodule `N` of `ρ.asModule`, the subrepresentation `ofSubmodule' N` is
 irreducible. -/
 theorem ofSubmodulePrime_isIrreducible {W : Type*} [AddCommGroup W] [Module ℂ W]
@@ -536,7 +532,6 @@ theorem classFunctionOperator_ofSubmodulePrime_coe (f : ClassFunction G ℂ) {W 
   rw [LinearMap.smul_apply, LinearMap.smul_apply]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Completeness of irreducible characters.** If `f : ClassFunction G ℂ` is orthogonal to every
 irreducible character, then `f = 0`. Equivalently, the irreducible characters span the space of
 class functions.
@@ -729,10 +724,10 @@ theorem sum_inner_irreducibleCharacter_smul [Fintype G]
         ClassFunction.inner f (ψ : ClassFunction G ℂ)
       rw [map_sum]
       rw [Finset.sum_eq_single ψ]
-      · rw [map_smul, innerDual_apply, irreducibleCharacter_inner, if_pos rfl, smul_eq_mul,
+      · rw [map_smul, innerDual_apply, irreducibleCharacter_inner, ite_eq_left rfl, smul_eq_mul,
           mul_one]
       · intro χ _ hχψ
-        rw [map_smul, innerDual_apply, irreducibleCharacter_inner, if_neg hχψ, smul_eq_mul,
+        rw [map_smul, innerDual_apply, irreducibleCharacter_inner, ite_eq_right hχψ, smul_eq_mul,
           mul_zero]
       · intro hψ
         exact (hψ (Finset.mem_univ ψ)).elim

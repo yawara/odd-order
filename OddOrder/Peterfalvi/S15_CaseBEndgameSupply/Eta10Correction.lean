@@ -76,7 +76,7 @@ theorem Hypothesis.exists_qSharpBase_orthogonal_eta10_core [Finite G]
       OddOrder.RepresentationTheory.inner_sum_left]
     refine Finset.sum_eq_zero fun j _ => ?_
     rw [hyp.eta_orthonormal a i₁ j ⟨0, hyp.p_prime.pos⟩,
-      if_neg (fun h => ha h.1)]
+      ite_eq_right (fun h => ha h.1)]
   obtain ⟨s, hs0, hsOrth⟩ : ∃ s : Fin hyp.q,
       s ≠ ⟨0, hyp.q_prime.pos⟩ ∧
         ClassFunction.inner

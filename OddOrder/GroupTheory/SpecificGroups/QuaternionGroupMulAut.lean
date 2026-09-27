@@ -224,7 +224,7 @@ theorem card_dvd_three_of_odd_mulAutQuaternion
   -- Lagrange in the permutation group
   have hcard_range : Nat.card D = Nat.card ψ.range := by
     rw [Nat.card_congr (Equiv.ofInjective ψ hinj)]
-    exact Nat.card_congr (Equiv.setCongr (MonoidHom.coe_range ψ).symm)
+    exact Nat.card_congr (Set.equivOfEq (MonoidHom.coe_range ψ).symm)
   have hdvd6 : Nat.card D ∣ 6 := by
     rw [hcard_range, ← hcard_perm]
     exact Subgroup.card_subgroup_dvd_card ψ.range
@@ -250,7 +250,7 @@ theorem card_dvd_three_of_odd_mulAut_of_mulEquiv {Q : Type*} [Group Q]
   have hχinj : Function.Injective χ := (MulAut.congr e).injective.comp hφ
   have hcard : Nat.card D = Nat.card χ.range := by
     rw [Nat.card_congr (Equiv.ofInjective χ hχinj)]
-    exact Nat.card_congr (Equiv.setCongr (MonoidHom.coe_range χ).symm)
+    exact Nat.card_congr (Set.equivOfEq (MonoidHom.coe_range χ).symm)
   rw [hcard]
   exact card_dvd_three_of_odd_mulAutQuaternion χ.range (hcard ▸ hodd)
 

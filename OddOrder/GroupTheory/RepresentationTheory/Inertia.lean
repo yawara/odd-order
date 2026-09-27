@@ -24,7 +24,7 @@ The **inertia group** of `θ` in `G` is the stabilizer:
 
 Peterfalvi notation `I_G(θ)`. Used heavily in §3 (1.5)/(1.7) (Clifford) and §4-§8.
 
-## mathlib v4.29.1 状況
+## mathlib 状況 (v4.34.1 で再確認)
 
 mathlib に「class function 上の G-action」「Inertia group」は不在 (Peterfalvi audit
 2026-05-23 確認済). 本モジュールで新規定義.

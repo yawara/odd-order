@@ -7,7 +7,7 @@ import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.Analysis.Normed.Field.Lemmas
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Subgroup.Centralizer
@@ -634,8 +634,8 @@ theorem conjugacyClassSize_mul_characterTableColumnGram_apply
   by_cases hψη : ψ = η
   · subst η
     simpa only [characterTableClassSizeSquareMatrix, Matrix.diagonal_mul,
-      Matrix.diagonal_apply_eq, if_true] using hentry
-  · rw [if_neg hψη]
+      Matrix.diagonal_apply_eq, ite_true] using hentry
+  · rw [ite_eq_right hψη]
     simpa only [characterTableClassSizeSquareMatrix, Matrix.diagonal_mul,
       Matrix.diagonal_apply_ne _ hψη] using hentry
 
@@ -832,7 +832,7 @@ theorem characterTableSquareColumnPairing_eq_zero_of_ne_of_weightedRowOrthogonal
   let := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
   have hmul :=
     conjugacyClassSize_mul_characterTableColumnGram_apply (G := G) idx hrow ψ η
-  rw [if_neg hψη] at hmul
+  rw [ite_eq_right hψη] at hmul
   have hclass_ne : (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr (conjugacyClassSize_pos (G := G) (idx.rowColumnEquiv ψ)).ne'
   have hgram :
@@ -860,7 +860,7 @@ theorem characterTableSquareColumnPairing_diag_of_weightedRowOrthogonality
   let := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
   have hmul :=
     conjugacyClassSize_mul_characterTableColumnGram_apply (G := G) idx hrow ψ ψ
-  rw [if_pos rfl] at hmul
+  rw [ite_eq_left rfl] at hmul
   have hclass_ne : (conjugacyClassSize (idx.rowColumnEquiv ψ) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr (conjugacyClassSize_pos (G := G) (idx.rowColumnEquiv ψ)).ne'
   have hgram :
@@ -1160,7 +1160,7 @@ theorem column_orthogonality_cases
     have hpsi : ψh = ηg := by
       change idx.rowColumnEquiv.symm Ch = idx.rowColumnEquiv.symm Cg
       rw [hCheq]
-    rw [if_pos hpsi] at hentry
+    rw [ite_eq_left hpsi] at hentry
     -- hentry: (|Ch| : ℂ) * pairing = |G|. Use |Ch| = |Cg|.
     have hSize_eq : (conjugacyClassSize Ch : ℂ) = (conjugacyClassSize Cg : ℂ) := by
       rw [hCheq]
@@ -1189,7 +1189,7 @@ theorem column_orthogonality_cases
       change idx.rowColumnEquiv.symm Ch ≠ idx.rowColumnEquiv.symm Cg
       intro he
       exact hCne (idx.rowColumnEquiv.symm.injective he)
-    rw [if_neg hpsi_ne] at hentry
+    rw [ite_eq_right hpsi_ne] at hentry
     exact (mul_eq_zero.mp hentry).resolve_left hsize_h_ne
 
 /-- Named-column form of the diagonal second orthogonality relation. -/

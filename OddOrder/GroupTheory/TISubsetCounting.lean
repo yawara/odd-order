@@ -165,7 +165,7 @@ theorem induce_apply_of_mem_conj {k : Type*} [Field k] [Fintype G]
       = if y⁻¹ * x ∈ L then α ⟨a, hAL ha⟩ else 0 := by
     intro x
     by_cases hx : y⁻¹ * x ∈ L
-    · rw [if_pos hx]
+    · rw [ite_eq_left hx]
       -- `x⁻¹ g x = (y⁻¹x)⁻¹ a (y⁻¹x) ∈ A` by `L`-stability
       have hxa : x⁻¹ * g * x = (y⁻¹ * x)⁻¹ * a * (y⁻¹ * x) := by
         rw [hg]; group
@@ -185,7 +185,7 @@ theorem induce_apply_of_mem_conj {k : Type*} [Field k] [Fintype G]
       simp only [Subgroup.coe_mul, Subgroup.coe_inv]
       rw [hxa]
       group
-    · rw [if_neg hx]
+    · rw [ite_eq_right hx]
       by_cases hmemL : x⁻¹ * g * x ∈ L
       · rw [OddOrder.RepresentationTheory.ClassFunction.induceTerm_of_mem α hmemL]
         -- the value vanishes: `x⁻¹gx ∉ A`, else the TI condition forces `y⁻¹x ∈ L`

@@ -296,7 +296,6 @@ theorem actionCommutator_conjNormal_map_subtype_eq {G : Type*} [Group G] (H R : 
       Subgroup.subset_closure ⟨⟨a, ha⟩, ⟨b, hb⟩, rfl⟩, ?_⟩
     rw [Subgroup.coe_subtype, hval]
 
-set_option backward.isDefEq.respectTransparency.types false in
 /-- **BG Prop 1.6(b), subgroup-commutator form** ⭐: `H ⊴ G`, `R ≤ G`, coprime orders, `G`
 solvable ⟹ `⁅⁅H, R⁆, R⁆ = ⁅H, R⁆`.
 

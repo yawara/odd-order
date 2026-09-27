@@ -173,12 +173,12 @@ theorem classSum_mul (Ci Cj : ConjClasses G) :
     intro Cs
     rw [MonoidAlgebra.coeff_smul_apply, coeff_classSum, smul_eq_mul]
     by_cases hCs : ConjClasses.mk w = Cs
-    · rw [if_pos hCs, if_pos hCs.symm, mul_one]
-    · rw [if_neg hCs, if_neg (fun h => hCs h.symm), mul_zero]
+    · rw [ite_eq_left hCs, ite_eq_left hCs.symm, mul_one]
+    · rw [ite_eq_right hCs, ite_eq_right (fun h => hCs h.symm), mul_zero]
   rw [Finset.sum_congr rfl (fun Cs _ => hterm Cs),
     Finset.sum_ite_eq' Finset.univ (ConjClasses.mk w)
       (fun Cs => (classSum Ci * classSum Cj : ℂ[G]).coeff Cs.out)]
-  rw [if_pos (Finset.mem_univ _)]
+  rw [ite_eq_left (Finset.mem_univ _)]
   exact classSum_mul_apply_out Ci Cj w
 
 end StructureCoeff

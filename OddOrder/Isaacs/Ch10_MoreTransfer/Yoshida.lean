@@ -447,7 +447,7 @@ theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
   -- Step 4: the trivial double-coset factor lies outside the image of M
   set q₁ : DoubleCoset.Quotient (Pg : Set G) N := DoubleCoset.mk Pg N 1 with hq₁_def
   have hyN : q₁.out ∈ N := by
-    obtain ⟨h₀, k₀, hh₀, hk₀, hout⟩ := DoubleCoset.mk_out_eq_mul Pg N 1
+    obtain ⟨h₀, hh₀, k₀, hk₀, hout⟩ := DoubleCoset.mk_out_eq_mul Pg N 1
     rw [hq₁_def, hout]
     exact N.mul_mem (N.mul_mem (hPN hh₀) N.one_mem) hk₀
   have hJy_idx : ((conjSubgroup q₁.out N ⊓ Pg).subgroupOf Pg).index = 1 := by

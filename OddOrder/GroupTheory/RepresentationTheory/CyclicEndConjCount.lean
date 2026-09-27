@@ -124,7 +124,7 @@ theorem sum_ne_pairs_eq {h : ℕ} [NeZero h] (n : ZMod h → ℤ)
     intro m
     by_cases hm : m = 0
     · subst hm; simp
-    · rw [if_neg hm, Finset.sum_boole]
+    · rw [ite_eq_right hm, Finset.sum_boole]
       exact_mod_cast card_filter_ne_shift_eq_two n (H m hm)
   rw [Finset.sum_congr rfl fun m _ => step2 m, Finset.sum_ite, Finset.sum_const_zero, zero_add,
     Finset.sum_const, smul_eq_mul, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ 0),

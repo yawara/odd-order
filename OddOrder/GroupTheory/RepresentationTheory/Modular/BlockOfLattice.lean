@@ -122,7 +122,8 @@ theorem apply_eq_zero_of_blockOfLattice_ne
     (hne : blockOfLattice K ψ hEnd hf π hπ hlin hnil ≠ B) :
     ψ (fB : MonoidAlgebra 𝒪 G) = 0 :=
   apply_eq_zero_of_reduce_centralScalar_eq_zero K ψ hEnd f hker hidem
-    (by rw [reduce_centralScalar_blockIdempotent K ψ hEnd hf π hπ hlin hnil hfB hB, if_neg hne])
+    (by rw [reduce_centralScalar_blockIdempotent K ψ hEnd hf π hπ hlin hnil hfB hB,
+      ite_eq_right hne])
 
 set_option maxHeartbeats 1000000 in
 -- Same instance chains as above.
@@ -137,7 +138,7 @@ theorem apply_eq_id_of_blockOfLattice_eq
     (heq : blockOfLattice K ψ hEnd hf π hπ hlin hnil = B) :
     ψ (fB : MonoidAlgebra 𝒪 G) = LinearMap.id :=
   apply_eq_id_of_reduce_centralScalar_ne_zero K ψ hEnd f hker hidem
-    (by rw [reduce_centralScalar_blockIdempotent K ψ hEnd hf π hπ hlin hnil hfB hB, if_pos heq]
+    (by rw [reduce_centralScalar_blockIdempotent K ψ hEnd hf π hπ hlin hnil hfB hB, ite_eq_left heq]
         exact one_ne_zero)
 
 end OddOrder.RepresentationTheory.Modular

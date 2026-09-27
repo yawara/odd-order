@@ -76,7 +76,7 @@ theorem sum_ite_mem_center (S : G → Prop) [DecidablePred S]
     have hconj : (MulAut.conj u).toEquiv g = u * g * u⁻¹ := by simp [MulAut.conj_apply]
     rw [hconj, if_congr (hS u g) rfl rfl]
     by_cases h0 : S g
-    · simp only [h0, if_true]
+    · simp only [h0, ite_true]
       rw [← map_mul, ← map_mul]
       congr 1
       group
@@ -101,8 +101,8 @@ theorem coeff_classSum (C : ConjClasses G) (x : G) :
     rw [apply_ite (fun f : MonoidAlgebra k G => f.coeff x), MonoidAlgebra.of_apply,
       MonoidAlgebra.coeff_single, Finsupp.single_apply, hzero]
     by_cases hg : g = x
-    · rw [if_pos hg, if_pos hg]
-    · rw [if_neg hg, if_neg hg, ite_self]
+    · rw [ite_eq_left hg, ite_eq_left hg]
+    · rw [ite_eq_right hg, ite_eq_right hg, ite_self]
   rw [hsum, Finset.sum_congr rfl (fun g _ => hterm g),
     Finset.sum_ite_eq' Finset.univ x (fun g => if ConjClasses.mk g = C then (1 : k) else 0)]
   simp
@@ -122,8 +122,8 @@ theorem coeff_classSum_mul (C : ConjClasses G) (w : MonoidAlgebra k G) (g : G) :
       show (if ConjClasses.mk v = C then (MonoidAlgebra.of k G) v else 0) * w
           = if ConjClasses.mk v = C then MonoidAlgebra.single v (1 : k) * w else 0 by
         by_cases h : ConjClasses.mk v = C
-        · rw [if_pos h, if_pos h]; rfl
-        · rw [if_neg h, if_neg h, zero_mul]]
+        · rw [ite_eq_left h, ite_eq_left h]; rfl
+        · rw [ite_eq_right h, ite_eq_right h, zero_mul]]
     rw [← Finset.sum_filter]
   rw [hL, MonoidAlgebra.coeff_sum, Finset.sum_apply']
   refine Finset.sum_congr rfl fun v _ => ?_
@@ -190,7 +190,7 @@ theorem classSum_mem_center (C : ConjClasses G) :
       ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨h⁻¹, by group⟩)
     rw [hclass]
     by_cases h0 : ConjClasses.mk g = C
-    · simp only [h0, if_true]
+    · simp only [h0, ite_true]
       rw [← map_mul, ← map_mul]
       congr 1
       group

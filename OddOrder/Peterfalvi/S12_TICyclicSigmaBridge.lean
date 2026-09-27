@@ -326,7 +326,7 @@ theorem ticyclic_eq_sigma_omega_of_eqOn_V
   have hηZ : η ∈ ZIrr G := by
     rw [hηchi]; exact (hyp.chiFam_spec hVeq app).2.1 _
   have hη1 : ClassFunction.inner η η = 1 := by
-    rw [hηchi, (hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [hηchi, (hyp.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   -- `η` agrees with `ω` on `V` ((3.2.c)), so `ψ = η − φ` vanishes on `V`
   have hηV : ∀ (v : G) (hv : v ∈ hyp.V),
       η v = (hyp.omega ξ : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ := fun v hv =>
@@ -423,7 +423,7 @@ theorem ticyclic_sigma_omega_eq_of_V_eq
     (ξ.comp (Subgroup.inclusion hW.ge))
     (hyp₁.sigma_mem_ZIrr hVeq₁ app₁
       (IsIrreducibleCharacter.mem_ZIrr (hyp₁.omega ξ).2)) ?_ ?_
-  · rw [hyp₁.sigma_inner hVeq₁ app₁, irreducibleCharacter_inner_eq_ite, if_pos rfl]
+  · rw [hyp₁.sigma_inner hVeq₁ app₁, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl]
   · intro v hv₂
     have hv₁ : v ∈ hyp₁.V := hV ▸ hv₂
     rw [hyp₁.sigma_apply_irreducibleCharacter_of_mem_V hVeq₁ app₁ (hyp₁.omega ξ) hv₁,

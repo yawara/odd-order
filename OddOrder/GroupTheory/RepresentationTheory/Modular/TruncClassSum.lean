@@ -57,8 +57,8 @@ theorem coeff_truncClassSum (C : ConjClasses G) (x : H) :
     rw [apply_ite (fun f : MonoidAlgebra k H => f.coeff x), MonoidAlgebra.of_apply,
       MonoidAlgebra.coeff_single, Finsupp.single_apply, hzero]
     by_cases hh : h = x
-    · rw [if_pos hh, if_pos hh]
-    · rw [if_neg hh, if_neg hh, ite_self]
+    · rw [ite_eq_left hh, ite_eq_left hh]
+    · rw [ite_eq_right hh, ite_eq_right hh, ite_self]
   rw [hsum, Finset.sum_congr rfl (fun h _ => hterm h),
     Finset.sum_ite_eq' Finset.univ x
       (fun h : H => if ConjClasses.mk (h : G) = C then (1 : k) else 0)]
@@ -92,7 +92,7 @@ theorem truncClassSum_mem_center (C : ConjClasses G) :
       exact ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨(u : G)⁻¹, by group⟩)
     rw [hclass]
     by_cases h0 : ConjClasses.mk (h : G) = C
-    · simp only [h0, if_true]
+    · simp only [h0, ite_true]
       rw [MonoidAlgebra.of_apply, MonoidAlgebra.of_apply, MonoidAlgebra.of_apply,
         MonoidAlgebra.single_mul_single, MonoidAlgebra.single_mul_single, one_mul]
       congr 1

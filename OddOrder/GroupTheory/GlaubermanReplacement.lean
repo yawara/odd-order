@@ -287,34 +287,6 @@ theorem commutator_commutator_eq_of_normal {B : Subgroup G} [B.Normal]
         rw [h2, mul_one]
     _ = ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ := by group
 
-/-- `⁅⊥, H⁆ = ⊥`. -/
-theorem commutator_bot_left_eq (H : Subgroup G) :
-    (⁅(⊥ : Subgroup G), H⁆ : Subgroup G) = ⊥ := by
-  refine le_bot_iff.mp ?_
-  rw [commutator_le]
-  intro g hg b _
-  rw [Subgroup.mem_bot.mp hg]
-  simp
-
-/-- 生成元が pairwise 可換なら closure は abelian. -/
-theorem isMulCommutative_closure_of_forall_commute {S : Set G}
-    (h : ∀ a ∈ S, ∀ b ∈ S, Commute a b) : IsMulCommutative (closure S) := by
-  rw [← le_centralizer_iff_isMulCommutative]
-  have h1 : ∀ g ∈ S, closure S ≤ centralizer ({g} : Set G) := by
-    intro g hg
-    refine (closure_le _).mpr ?_
-    intro a ha
-    rw [SetLike.mem_coe, mem_centralizer_iff]
-    intro w hw
-    rw [Set.mem_singleton_iff.mp hw]
-    exact ((h a ha g hg).symm.eq)
-  refine (closure_le _).mpr ?_
-  intro g hg
-  rw [SetLike.mem_coe, mem_centralizer_iff]
-  intro m hm
-  have h2 : m ∈ centralizer ({g} : Set G) := h1 g hg hm
-  exact (mem_centralizer_iff.mp h2 g (Set.mem_singleton g)).symm
-
 /-- **G Lem 2.5(ii) の半分** (element 形): `⁅k,α⁆` が `k` と可換なら
 `⁅k⁻¹, α⁆ = ⁅k, α⁆⁻¹`. -/
 theorem commutatorElement_inv_left_eq {k α : G} (h : Commute ⁅k, α⁆ k) :
@@ -362,7 +334,7 @@ theorem case_two_commute {B A : Subgroup G} [B.Normal]
       commutator_mem_commutator (commutator_mem_commutator hx hv') hu'
     exact ((mem_centralizer_iff.mp (hK2cent hk2) u' hu').symm)
   -- 商 Q = G/B' での対称性
-  have hBcN : (⁅B, B⁆ : Subgroup G).Normal := normal_of_le_center' hB'
+  have hBcN : (⁅B, B⁆ : Subgroup G).Normal := Subgroup.normal_of_le_center hB'
   set π := QuotientGroup.mk' (⁅B, B⁆ : Subgroup G) with hπdef
   have hQB : ∀ b₁ ∈ B, ∀ b₂ ∈ B, Commute (π b₁) (π b₂) := by
     intro b₁ hb₁ b₂ hb₂
@@ -461,8 +433,8 @@ theorem glauberman_replacement_case_two [Finite G] {B A : Subgroup G} [B.Normal]
   obtain ⟨x, hxB, hnc⟩ := exists_not_le_centralizer_elementCommutator
     (by rw [hiter2] at h2ne ⊢; exact h2ne)
   have hMcomm : IsMulCommutative (elementCommutator x A) := by
-    refine isMulCommutative_closure_of_forall_commute ?_
-    rintro - ⟨a, ha, rfl⟩ - ⟨b, hb, rfl⟩
+    refine Subgroup.isMulCommutative_closure ?_
+    rintro - ⟨a, ha, rfl⟩ - ⟨b, hb, rfl⟩ -
     exact case_two_commute hB' hA.2.1 h3 hodd hxB ha hb
   have hMR : elementCommutator x A ≤ ⁅B, A⁆ := by
     refine (closure_le _).mpr ?_
@@ -489,7 +461,7 @@ theorem glauberman_replacement_aux [Finite G] [Group.IsNilpotent G]
     refine ⟨k + 1, Nat.succ_pos k, ?_⟩
     have hbot : iterCommutator B A (k + 1) = ⊥ := by
       rw [iterCommutator_succ, hk]
-      exact commutator_bot_left_eq A
+      exact Subgroup.commutator_bot_left A
     rw [hbot]
     exact bot_isMulCommutative
   set n := Nat.find hex with hndef

@@ -82,11 +82,9 @@ theorem baseChange₂_equivariant
     (u : A ⊗[R] M) (v : A ⊗[R] N) :
     Tₚ.baseChange A (b.baseChange₂ A u v) =
       b.baseChange₂ A (Tₘ.baseChange A u) (Tₙ.baseChange A v) := by
-  induction u using TensorProduct.induction_on with
-  | zero => simp
+  induction u using TensorProduct.inductionOn with
   | tmul a x =>
-      induction v using TensorProduct.induction_on with
-      | zero => simp
+      induction v using TensorProduct.inductionOn with
       | tmul c y => simp [h]
       | add v w hv hw => simp [hv, hw]
   | add u w hu hw => simp [hu, hw]
@@ -129,8 +127,7 @@ theorem baseChange₂_span_eq_top
         b.baseChange₂ A z.1 z.2)
   have hsimple (a : A) (t : M ⊗[R] N) :
       f.baseChange A (a ⊗ₜ[R] t) ∈ S := by
-    induction t using TensorProduct.induction_on with
-    | zero => simp [S]
+    induction t using TensorProduct.inductionOn with
     | tmul x y =>
         apply Submodule.subset_span
         refine ⟨(a ⊗ₜ[R] x, 1 ⊗ₜ[R] y), ?_⟩
@@ -141,8 +138,7 @@ theorem baseChange₂_span_eq_top
   apply Submodule.eq_top_iff'.mpr
   intro z
   obtain ⟨t, rfl⟩ := hsurjA z
-  induction t using TensorProduct.induction_on with
-  | zero => simp
+  induction t using TensorProduct.inductionOn with
   | tmul a t => exact hsimple a t
   | add t w ht hw =>
       rw [map_add]
@@ -183,8 +179,7 @@ theorem frobeniusScalarBaseChange_smul
     (c : L) (z : L ⊗[ZMod 2] V) :
     frobeniusScalarBaseChange L (c • z) =
       c ^ 2 • frobeniusScalarBaseChange L z := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a v => simp [TensorProduct.smul_tmul', smul_eq_mul, mul_pow]
   | add x y hx hy => simp [smul_add, hx, hy]
 
@@ -201,11 +196,9 @@ theorem frobeniusScalarBaseChange_bilin
       B.baseChange L
         (frobeniusScalarBaseChange L x)
         (frobeniusScalarBaseChange L y) := by
-  induction x using TensorProduct.induction_on with
-  | zero => simp
+  induction x using TensorProduct.inductionOn with
   | tmul a u =>
-      induction y using TensorProduct.induction_on with
-      | zero => simp
+      induction y using TensorProduct.inductionOn with
       | tmul b v => simp [mul_pow]
       | add y z hy hz => simp [hy, hz]
   | add x z hx hz => simp [hx, hz]
@@ -349,8 +342,7 @@ theorem invariants_baseChangeRepresentation_eq_bot
         = TensorProduct.piRight F K K (fun _ : G => V)
             (LinearMap.lTensor K (invariantsObstruction ρ) x) := by
     intro x
-    induction x using TensorProduct.induction_on with
-    | zero => simp
+    induction x using TensorProduct.inductionOn with
     | tmul a v =>
         funext g
         simp [invariantsObstruction, hρ', LinearMap.pi_apply, LinearMap.sub_apply,
@@ -394,8 +386,7 @@ theorem finrank_invariants_baseChangeRepresentation
       = e.toLinearMap ∘ₗ TensorProduct.AlgebraTensorModule.lTensor K K f := by
     apply LinearMap.ext
     intro x
-    induction x using TensorProduct.induction_on with
-    | zero => simp
+    induction x using TensorProduct.inductionOn with
     | tmul a v =>
         funext g
         simp only [hf, he, invariantsObstruction, LinearMap.pi_apply, LinearMap.sub_apply,
@@ -460,8 +451,7 @@ private theorem baseChangeCoordinate_apply_baseChange
     (z : K ⊗[F] V) :
     baseChangeCoordinate (F := F) (K := K) (V := V) b i (T.baseChange K z) =
       T (baseChangeCoordinate (F := F) (K := K) (V := V) b i z) := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp [baseChangeCoordinate]
+  induction z using TensorProduct.inductionOn with
   | tmul a v => simp [baseChangeCoordinate]
   | add x y hx hy => simp [hx, hy]
 

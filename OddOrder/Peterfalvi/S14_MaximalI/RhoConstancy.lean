@@ -173,7 +173,7 @@ theorem coherent_extension_constituent_mem_span_Rset {L : Subgroup G} [Finite G]
   have hχχbar :
       ClassFunction.inner (φ : ClassFunction ↥L ℂ) (φ : ClassFunction ↥L ℂ).conj = 0 := by
     have h0 := irreducibleCharacter_inner_eq_ite φ (IrreducibleCharacter.conjPerm ↥L φ)
-    rw [if_neg hφne] at h0
+    rw [ite_eq_right hφne] at h0
     rwa [IrreducibleCharacter.conjPerm_apply_coe] at h0
   -- (5.5): `coh.extension φ ∈ ℤ[R₁(φ)]`; and `R₁(φ) ⊆ R(χ) = Rset data`.
   have h55 := coherent_extension_mem_span_imageFamily hyp coh φ hφmem
@@ -372,7 +372,7 @@ theorem induce_apply_eq_self_of_mem_tiSubset {A : Set G} {L : Subgroup G}
       = if x ∈ L then α ⟨a, haL⟩ else 0 := by
     intro x
     by_cases hx : x ∈ L
-    · rw [if_pos hx]
+    · rw [ite_eq_left hx]
       have haxL : x⁻¹ * a * x ∈ L := hAL (hnorm x hx a ha)
       rw [ClassFunction.induceTerm_of_mem _ haxL]
       have harg : (⟨x⁻¹ * a * x, haxL⟩ : ↥L)
@@ -380,7 +380,7 @@ theorem induce_apply_eq_self_of_mem_tiSubset {A : Set G} {L : Subgroup G}
         apply Subtype.ext; simp [inv_inv]
       rw [harg]
       exact α.conj_eq ⟨a, haL⟩ ⟨x⁻¹, L.inv_mem hx⟩
-    · rw [if_neg hx]
+    · rw [ite_eq_right hx]
       by_cases hax : x⁻¹ * a * x ∈ L
       · rw [ClassFunction.induceTerm_of_mem _ hax]
         have hnotA : x⁻¹ * a * x ∉ A := fun hV =>
@@ -528,8 +528,8 @@ theorem restrict_eq_of_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hypot
     intro φ hφ
     rw [dχ.decomp, inner_sum_right,
       Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
-        rw [irreducibleCharacter_inner, if_neg (Ne.symm hne)]),
-      irreducibleCharacter_inner, if_pos rfl]
+        rw [irreducibleCharacter_inner, ite_eq_right (Ne.symm hne)]),
+      irreducibleCharacter_inner, ite_eq_left rfl]
   -- per-`ψ` value of `⟨Res_K φ, ψ⟩`, independent of the constituent `φ`.
   have hval : ∀ φ ∈ dχ.constituents, ∀ ψ : IrreducibleCharacter ↥K,
       ClassFunction.inner (ClassFunction.restrict K (φ : ClassFunction ↥L ℂ))
@@ -538,11 +538,11 @@ theorem restrict_eq_of_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hypot
     intro φ hφ ψ
     rw [← hfrob φ ψ]
     by_cases hc : ∃ g : ↥L, IrreducibleCharacter.conjBy g θ = ψ
-    · rw [if_pos hc]
+    · rw [ite_eq_left hc]
       obtain ⟨g, rfl⟩ := hc
       rw [IrreducibleCharacter.coe_conjBy, ClassFunction.induce_conjBy_eq, ← hchi_eq]
       exact hmult φ hφ
-    · rw [if_neg hc]
+    · rw [ite_eq_right hc]
       by_contra hne
       refine hc ?_
       have hoθ : IrreducibleCharacter.LiesOver K φ θ := by
@@ -724,14 +724,14 @@ theorem constituents_not_inHKernel {L : Subgroup G} [Finite G] (hyp : Hypothesis
   -- `⟨χ, φ⟩ = ⟨θ, Res_K φ⟩ = star(φ(1)) · ⟨θ, 1_K⟩ = 0` (`θ ≠ 1_K`).
   have hzero : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 0 := by
     rw [hchi_eq, ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
-      OddOrder.RepresentationTheory.inner_smul_right, irreducibleCharacter_inner, if_neg hθ_ne,
-      mul_zero]
+      OddOrder.RepresentationTheory.inner_smul_right, irreducibleCharacter_inner,
+      ite_eq_right hθ_ne, mul_zero]
   -- `⟨χ, φ⟩ = 1` (multiplicity-one constituent), contradiction.
   have hone : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 1 := by
     rw [dχ.decomp, inner_sum_left,
       Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
-        rw [irreducibleCharacter_inner, if_neg hne]),
-      irreducibleCharacter_inner, if_pos rfl]
+        rw [irreducibleCharacter_inner, ite_eq_right hne]),
+      irreducibleCharacter_inner, ite_eq_left rfl]
   rw [hone] at hzero
   exact one_ne_zero hzero
 
@@ -780,7 +780,7 @@ theorem not_inHKernel_imp_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hy
   rw [(data _ ⟨θ, hθ_ne, rfl⟩).decomp, inner_sum_right]
   refine Finset.sum_eq_zero fun φ' hφ' => ?_
   have hne : φ ≠ φ' := by rintro rfl; exact hnotin hφ'
-  rw [irreducibleCharacter_inner, if_neg hne]
+  rw [irreducibleCharacter_inner, ite_eq_right hne]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Pin (c') partition characterization** (genuine, both directions): the off-kernel irreducibles
@@ -831,8 +831,8 @@ theorem constituents_eq_of_mem {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
         (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ)) = 1 := by
       rw [dη.decomp, inner_sum_right,
         Finset.sum_eq_single_of_mem φ hη (fun φ' _ hne => by
-          rw [irreducibleCharacter_inner, if_neg (Ne.symm hne)]),
-        irreducibleCharacter_inner, if_pos rfl]
+          rw [irreducibleCharacter_inner, ite_eq_right (Ne.symm hne)]),
+        irreducibleCharacter_inner, ite_eq_left rfl]
     have hrel : ClassFunction.inner (φ : ClassFunction ↥L ℂ)
         (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ))
         = ClassFunction.inner
@@ -884,7 +884,7 @@ theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp 
       · intro hφ
         refine ⟨cap φ, ⟨φ, hφ, rfl⟩, ?_⟩
         have hcapφ : cap φ = ⟨(not_inHKernel_imp_mem_constituents hyp data hφ).choose,
-            (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose⟩ := dif_pos hφ
+            (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose⟩ := dite_eq_left hφ
         rw [hcapφ]
         exact (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose_spec
       · rintro ⟨χs, ⟨φ', _, rfl⟩, hmem⟩

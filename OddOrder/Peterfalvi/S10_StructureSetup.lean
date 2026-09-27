@@ -1033,14 +1033,14 @@ theorem ftSupportKernel_eq_bot_of_not_escaping {M : Subgroup G} {A : Set G} {x :
     (hx : x ∉ OddOrder.GroupTheory.escapingCentralizerSet M A) :
     ftSupportKernel M A x = ⊥ := by
   unfold ftSupportKernel
-  rw [if_neg hx]
+  rw [ite_eq_right hx]
 
 /-- On the escaping set the faithful kernel is the BG signalizer. -/
 theorem ftSupportKernel_eq_of_escaping {M : Subgroup G} {A : Set G} {x : G}
     (hx : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A) :
     ftSupportKernel M A x = OddOrder.BG.Ch4.S16.FT_signalizer x := by
   unfold ftSupportKernel
-  rw [if_pos hx]
+  rw [ite_eq_left hx]
 
 /-- The escaping-set membership (hence the faithful kernel) only depends on the point, not on
 which support set `A ∋ x` it is tested against: for `x ∈ A₁ ⊆ A`,
@@ -1118,11 +1118,11 @@ theorem ftSupportKernel_congr_of_subset {M : Subgroup G} {A A₁ : Set G} (hA₁
   classical
   by_cases hc : Subgroup.centralizer ({x} : Set G) ≤ M
   · rw [ftSupportKernel, ftSupportKernel,
-      if_neg (fun h : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A => h.2 hc),
-      if_neg (fun h : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A₁ => h.2 hc)]
+      ite_eq_right (fun h : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A => h.2 hc),
+      ite_eq_right (fun h : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A₁ => h.2 hc)]
   · rw [ftSupportKernel, ftSupportKernel,
-      if_pos (show x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A from ⟨hA₁A hx, hc⟩),
-      if_pos (show x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A₁ from ⟨hx, hc⟩)]
+      ite_eq_left (show x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A from ⟨hA₁A hx, hc⟩),
+      ite_eq_left (show x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A₁ from ⟨hx, hc⟩)]
 
 namespace DadeSupportHypothesisData
 

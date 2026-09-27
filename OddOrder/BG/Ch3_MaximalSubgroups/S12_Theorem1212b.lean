@@ -511,7 +511,7 @@ theorem E_le_normalizer_sylow_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOd
   have : Group.IsNilpotent ↥(Ch2.S08.fittingInG E) := Ch2.S08.fittingInG_isNilpotent E
   set SF : Sylow p ↥(Ch2.S08.fittingInG E) := S.subtype hSFE with hSFdef
   have hSF_norm : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Normal := by
-    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(Ch2.S08.fittingInG E))).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(Ch2.S08.fittingInG E))).out 1 4
     exact htfae.mp inferInstance p ⟨Fact.out⟩ SF
   have : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Characteristic :=
     Sylow.characteristic_of_normal SF hSF_norm

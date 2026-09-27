@@ -104,7 +104,7 @@ private lemma natCard_cycleType_mul_eq {p : ℕ} [Fact p.Prime] (hp3 : 3 ≤ p) 
   classical
   have hp : p.Prime := Fact.out
   have h := Perm.card_of_cycleType_mul_eq (α := Fin (p + 1)) ({p} : Multiset ℕ)
-  rw [if_pos ?side] at h
+  rw [ite_eq_left ?side] at h
   case side =>
     constructor
     · rw [Multiset.sum_singleton, Fintype.card_fin]; omega

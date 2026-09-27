@@ -956,7 +956,7 @@ theorem Rsub_eq_inf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Rsub hG D x = OddOrder.BG.Ch3.S10.Msigma
       (((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose)
       ⊓ Subgroup.centralizer ({x} : Set G) := by
-  rw [Rsub, dif_pos ⟨hx, hlen, hgt⟩]
+  rw [Rsub, dite_eq_left ⟨hx, hlen, hgt⟩]
 
 /-- **Packaged neighbour data for `R(x)`** (the multi-maximal case): the unique `N = N(x)` of
 Theorem 14.4 together with `R(x) = N_σ ∩ C_G(x)`, `C_G(x) ≤ N`, `π(⟨x⟩) ⊆ τ₂(N)`, and the
@@ -1020,7 +1020,7 @@ theorem isPiElement_sigmaCompl_of_mem_Rsub [Finite G]
           Nat.card_pos.ne'⟩)
     rw [hσeq] at hqσM
     exact tau2_subset_sigma_compl N (hπτ2 q hqπ) hqσM
-  · rw [Rsub, dif_neg (fun h => hgt h.2.2), Subgroup.mem_bot] at hr
+  · rw [Rsub, dite_eq_right (fun h => hgt h.2.2), Subgroup.mem_bot] at hr
     rw [hr, orderOf_one, Nat.primeFactors_one] at hp
     simp at hp
 
@@ -1079,7 +1079,7 @@ theorem Rsub_ncard_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hpos : 0 < (maximalSigmaSubgroupsOfElement x).ncard := by
       rw [Set.ncard_pos hfin]; exact hne
     have h1 : (maximalSigmaSubgroupsOfElement x).ncard = 1 := by omega
-    rw [h1, Rsub, dif_neg (fun h => hgt h.2.2)]
+    rw [h1, Rsub, dite_eq_right (fun h => hgt h.2.2)]
     simp
 
 /-- **BG Lemma 14.5(a)** (mmd L3919): for distinct `σ`-length-one elements `x`, `y`, the cosets
@@ -1190,7 +1190,7 @@ theorem xRsub_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- `x = y'' ∈ R(y) ⊆ (N_y)_σ`, so `|𝓜_σ(y)| > 1` and `N_y ∈ 𝓜_σ(x)`.
       have hgty : 1 < (maximalSigmaSubgroupsOfElement y).ncard := by
         by_contra h
-        rw [Rsub, dif_neg (fun hc => h hc.2.2), Subgroup.mem_bot] at hy''R
+        rw [Rsub, dite_eq_right (fun hc => h hc.2.2), Subgroup.mem_bot] at hy''R
         exact hx1 (hxy''.trans hy''R)
       obtain ⟨N_y, hNymax, hCyNy, hReqy, _, _⟩ := exists_neighbor_eq_Rsub hG D hy hgty
       have hx_in_NySigma : x ∈ OddOrder.BG.Ch3.S10.Msigma N_y := by
@@ -1212,7 +1212,7 @@ theorem xRsub_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [hd, Subgroup.mem_bot] at hmem
       exact hy1 (by simpa using congrArg (Subgroup.subtype N_x) hmem)
     · -- single-maximal case (`x' = 1`, `g = x`): forces `σ(M_x) = σ(M_y)`, a contradiction.
-      rw [Rsub, dif_neg (fun hc => hgtx hc.2.2), Subgroup.mem_bot] at hx'R
+      rw [Rsub, dite_eq_right (fun hc => hgtx hc.2.2), Subgroup.mem_bot] at hx'R
       rw [hx'R, mul_one] at hpg hyg
       have hpmem : p ∈ (orderOf x).primeFactors := by
         have := hyg hpy

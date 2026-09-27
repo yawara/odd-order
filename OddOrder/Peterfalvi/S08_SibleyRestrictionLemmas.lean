@@ -253,7 +253,8 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_of_frobenius
     simpa using h
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
     ← Nat.cast_smul_eq_nsmul ℂ a η, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
-    hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, if_neg (Ne.symm hne), if_pos rfl]
+    hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, ite_eq_right (Ne.symm hne),
+    ite_eq_left rfl]
   ring
 
 /-- **(6.8.1) cross-diagonal/`Y`-difference isometry**, case (A) / c2 mirror of
@@ -312,7 +313,8 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_c2_caseA
     simpa using h
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
     ← Nat.cast_smul_eq_nsmul ℂ a η, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
-    hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, if_neg (Ne.symm hne), if_pos rfl]
+    hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, ite_eq_right (Ne.symm hne),
+    ite_eq_left rfl]
   ring
 
 /-- **(6.8.1) norm of the cross-diagonal image** (mmd 04.8 L176: `‖χ₁−aη₁‖² = 1+a²`).  For
@@ -525,11 +527,11 @@ theorem coeff_eq_neg_or_edge_of_frobenius
     have h0 : ClassFunction.inner (hyp.coherentYset.extension η)
         (hyp.coherentYset.extension η') = 0 := by
       rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
-        (Submodule.subset_span hη'), hYon η η' hη hη', if_neg hne]
+        (Submodule.subset_span hη'), hYon η η' hη hη', ite_eq_right hne]
     have h1 : ClassFunction.inner (hyp.coherentYset.extension η)
         (hyp.coherentYset.extension η') = 1 := by
       rw [heq, hyp.coherentYset.extension_inner_eq η' η' (Submodule.subset_span hη')
-        (Submodule.subset_span hη'), hYon η' η' hη' hη', if_pos rfl]
+        (Submodule.subset_span hη'), hYon η' η' hη' hη', ite_eq_left rfl]
     rw [h1] at h0; exact one_ne_zero h0
   -- coefficient values `⟨v, η^{τ₁}⟩`.
   have hcoeff : ∀ η ∈ hyp.Yset,
@@ -537,8 +539,8 @@ theorem coeff_eq_neg_or_edge_of_frobenius
         = ((if η = η₁ then bb else bb + a : ℤ) : ℂ) := by
     intro η hη
     by_cases hee : η = η₁
-    · subst hee; rw [if_pos rfl]; exact hbb
-    · rw [if_neg hee]
+    · subst hee; rw [ite_eq_left rfl]; exact hbb
+    · rw [ite_eq_right hee]
       have hsuppd : (η - η₁).support ⊆
           OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
         hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη₁)
@@ -569,7 +571,7 @@ theorem coeff_eq_neg_or_edge_of_frobenius
       (Submodule.subset_span (hmemt.mp hη')), hYon η η' (hmemt.mp hη) (hmemt.mp hη')]
     by_cases hee : η = η'
     · subst hee; simp
-    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η' hη' h))]
+    · rw [ite_eq_right hee, ite_eq_right (fun h => hee (hEinj_t η hη η' hη' h))]
   have hη₁t : η₁ ∈ hyp.Yset_finite.toFinset := hmemt.mpr hη₁
   have hβval : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
       ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) ψ
@@ -580,7 +582,7 @@ theorem coeff_eq_neg_or_edge_of_frobenius
     rw [hcoeff η (hmemt.mp hη)]
     by_cases hee : η = η₁
     · subst hee; simp
-    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
+    · rw [ite_eq_right hee, ite_eq_right (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
   -- Bessel + norm ⟹ the integer norm inequality.
   have hbessel := OddOrder.RepresentationTheory.sum_sq_le_inner_self_re horth
     (hyp.tau (χ₁ - a • η₁)) hβval
@@ -599,13 +601,13 @@ theorem coeff_eq_neg_or_edge_of_frobenius
       intro η hη
       by_cases hee : η = η₁
       · subst hee; simp
-      · rw [if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h)), if_neg hee]
-    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, if_pos rfl]
+      · rw [ite_eq_right (fun h => hee (hEinj_t η hη η₁ hη₁t h)), ite_eq_right hee]
+    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, ite_eq_left rfl]
     have hc : (hyp.Yset_finite.toFinset.erase η₁).card = hyp.Yset.ncard - 1 := by
       rw [Finset.card_erase_of_mem hη₁t, ← Set.ncard_eq_toFinset_card _ hyp.Yset_finite]
     have h1le : 1 ≤ hyp.Yset.ncard := by
       rw [Set.ncard_eq_toFinset_card _ hyp.Yset_finite]; exact Finset.one_le_card.mpr ⟨η₁, hη₁t⟩
-    rw [Finset.sum_congr rfl (fun η hη => if_neg (Finset.ne_of_mem_erase hη)),
+    rw [Finset.sum_congr rfl (fun η hη => ite_eq_right (Finset.ne_of_mem_erase hη)),
       Finset.sum_const, nsmul_eq_mul, hc, Nat.cast_sub h1le, Nat.cast_one]
   rw [hsum] at hbessel
   -- the integer inequality and `eq_zero_or_edge`.
@@ -668,11 +670,11 @@ theorem coeff_eq_neg_or_edge_c2_caseA
     have h0 : ClassFunction.inner (hyp.coherentYset.extension η)
         (hyp.coherentYset.extension η') = 0 := by
       rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
-        (Submodule.subset_span hη'), hYon η η' hη hη', if_neg hne]
+        (Submodule.subset_span hη'), hYon η η' hη hη', ite_eq_right hne]
     have h1 : ClassFunction.inner (hyp.coherentYset.extension η)
         (hyp.coherentYset.extension η') = 1 := by
       rw [heq, hyp.coherentYset.extension_inner_eq η' η' (Submodule.subset_span hη')
-        (Submodule.subset_span hη'), hYon η' η' hη' hη', if_pos rfl]
+        (Submodule.subset_span hη'), hYon η' η' hη' hη', ite_eq_left rfl]
     rw [h1] at h0; exact one_ne_zero h0
   -- coefficient values `⟨v, η^{τ₁}⟩`.
   have hcoeff : ∀ η ∈ hyp.Yset,
@@ -680,8 +682,8 @@ theorem coeff_eq_neg_or_edge_c2_caseA
         = ((if η = η₁ then bb else bb + a : ℤ) : ℂ) := by
     intro η hη
     by_cases hee : η = η₁
-    · subst hee; rw [if_pos rfl]; exact hbb
-    · rw [if_neg hee]
+    · subst hee; rw [ite_eq_left rfl]; exact hbb
+    · rw [ite_eq_right hee]
       have hsuppd : (η - η₁).support ⊆
           OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
         hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη₁)
@@ -712,7 +714,7 @@ theorem coeff_eq_neg_or_edge_c2_caseA
       (Submodule.subset_span (hmemt.mp hη')), hYon η η' (hmemt.mp hη) (hmemt.mp hη')]
     by_cases hee : η = η'
     · subst hee; simp
-    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η' hη' h))]
+    · rw [ite_eq_right hee, ite_eq_right (fun h => hee (hEinj_t η hη η' hη' h))]
   have hη₁t : η₁ ∈ hyp.Yset_finite.toFinset := hmemt.mpr hη₁
   have hβval : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
       ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) ψ
@@ -723,7 +725,7 @@ theorem coeff_eq_neg_or_edge_c2_caseA
     rw [hcoeff η (hmemt.mp hη)]
     by_cases hee : η = η₁
     · subst hee; simp
-    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
+    · rw [ite_eq_right hee, ite_eq_right (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
   -- Bessel + norm ⟹ the integer norm inequality.
   have hbessel := OddOrder.RepresentationTheory.sum_sq_le_inner_self_re horth
     (hyp.tau (χ₁ - a • η₁)) hβval
@@ -742,13 +744,13 @@ theorem coeff_eq_neg_or_edge_c2_caseA
       intro η hη
       by_cases hee : η = η₁
       · subst hee; simp
-      · rw [if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h)), if_neg hee]
-    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, if_pos rfl]
+      · rw [ite_eq_right (fun h => hee (hEinj_t η hη η₁ hη₁t h)), ite_eq_right hee]
+    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, ite_eq_left rfl]
     have hc : (hyp.Yset_finite.toFinset.erase η₁).card = hyp.Yset.ncard - 1 := by
       rw [Finset.card_erase_of_mem hη₁t, ← Set.ncard_eq_toFinset_card _ hyp.Yset_finite]
     have h1le : 1 ≤ hyp.Yset.ncard := by
       rw [Set.ncard_eq_toFinset_card _ hyp.Yset_finite]; exact Finset.one_le_card.mpr ⟨η₁, hη₁t⟩
-    rw [Finset.sum_congr rfl (fun η hη => if_neg (Finset.ne_of_mem_erase hη)),
+    rw [Finset.sum_congr rfl (fun η hη => ite_eq_right (Finset.ne_of_mem_erase hη)),
       Finset.sum_const, nsmul_eq_mul, hc, Nat.cast_sub h1le, Nat.cast_one]
   rw [hsum] at hbessel
   -- the integer inequality and `eq_zero_or_edge`.

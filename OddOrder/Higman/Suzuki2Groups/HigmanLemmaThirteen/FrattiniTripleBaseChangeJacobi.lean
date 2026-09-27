@@ -60,11 +60,9 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_comm
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro x y
-  induction x using TensorProduct.induction_on with
-  | zero => simp
+  induction x using TensorProduct.inductionOn with
   | tmul a x =>
-      induction y using TensorProduct.induction_on with
-      | zero => simp
+      induction y using TensorProduct.inductionOn with
       | tmul b y =>
           simp only [frattiniMiddleCommutatorBilinearBaseChange_tmul]
           rw [mul_comm, frattiniMiddleCommutatorBilinear_comm]
@@ -147,14 +145,11 @@ theorem frattiniTripleCommutatorBaseChange_jacobi
     simp only [map_add, LinearMap.add_apply]
     abel
   intro x y z
-  induction x using TensorProduct.induction_on with
-  | zero => simp [J]
+  induction x using TensorProduct.inductionOn with
   | tmul a x =>
-      induction y using TensorProduct.induction_on with
-      | zero => simp [J]
+      induction y using TensorProduct.inductionOn with
       | tmul b y =>
-          induction z using TensorProduct.induction_on with
-          | zero => simp [J]
+          induction z using TensorProduct.inductionOn with
           | tmul c z =>
               have hJ := frattiniTripleCommutatorTrilinear_jacobi
                 hP hxi hPhiComm hfour hexists x y z

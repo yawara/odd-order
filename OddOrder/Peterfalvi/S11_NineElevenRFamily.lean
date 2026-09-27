@@ -247,7 +247,7 @@ theorem sOf_memberRFamily_imageSet_of_irr [Finite G] {M : Subgroup G} {A : Set G
       (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M) hηIKF0,
     OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp hηIKF0, ?_⟩
   unfold sOf_memberRFamily
-  rw [dif_pos hirr]
+  rw [dite_eq_left hirr]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`sOf_memberRFamily` reduction, column case**: for a reducible member the dispatched family
@@ -275,7 +275,7 @@ theorem sOf_memberRFamily_imageSet_of_col [Finite G] {M : Subgroup G} {A : Set G
   have hex := sOf_columnSum_of_not_irreducible data h46 hKeq hη hcol
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold sOf_memberRFamily
-  rw [dif_neg hcol]
+  rw [dite_eq_right hcol]
   rfl
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -416,14 +416,14 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
     have hne1 : χ₂ ≠ χ₂' := by
       intro heq
       rw [hφcol, hξcol, heq, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h1
       exact hw1ne h1
     -- `χ₂ ≠ χ₂'⁻¹`: else `φ = ξ̄` and `⟨φ, ξ̄⟩ = w₁ ≠ 0` contradicts `h2`
     have hne2 : χ₂ ≠ χ₂'⁻¹ := by
       intro heq
       rw [hφcol, hξcol, OddOrder.Peterfalvi.S06.columnSum_conj_eq, heq,
         OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h2
       exact hw1ne h2
     exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46 hχ₂ hχ₂'
       (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
@@ -445,7 +445,7 @@ theorem sOf_member_inner_self_natCast [Finite G] {M : Subgroup G} {A : Set G}
   · obtain ⟨χ₂, -, hcol⟩ := sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr
     exact ⟨Nat.card h46.W1, by
       rw [hcol, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]⟩
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), case (9.7.b), at §9 level**: a uniform-degree `𝒮(Y)` is coherent on

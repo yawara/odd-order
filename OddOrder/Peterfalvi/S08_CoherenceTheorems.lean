@@ -185,8 +185,8 @@ theorem inner_chi_eq_ite
     ClassFunction.inner (data.χ t) (data.χ u) = if t = u then 1 else 0 := by
   by_cases htu : t = u
   · subst u
-    rw [if_pos rfl, data.norm_one]
-  · rw [if_neg htu, data.pairwise_inner_zero htu]
+    rw [ite_eq_left rfl, data.norm_one]
+  · rw [ite_eq_right htu, data.pairwise_inner_zero htu]
 
 /-- The weighted output sum `∑ d_t χ_t` used in Peterfalvi (7.10). -/
 noncomputable def weightedOutput
@@ -214,8 +214,8 @@ theorem inner_chi_weightedOutput
     rw [OddOrder.RepresentationTheory.inner_smul_right, data.inner_chi_eq_ite t u, star_intCast]
     by_cases hut : u = t
     · subst u
-      rw [if_pos rfl, if_pos rfl, mul_one]
-    · rw [if_neg (Ne.symm hut), if_neg hut, mul_zero]
+      rw [ite_eq_left rfl, ite_eq_left rfl, mul_one]
+    · rw [ite_eq_right (Ne.symm hut), ite_eq_right hut, mul_zero]
   rw [hsum, Finset.sum_ite_eq' (Finset.univ : Finset (Fin n)) t]
   simp
 

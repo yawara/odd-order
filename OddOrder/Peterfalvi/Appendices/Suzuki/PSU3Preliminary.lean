@@ -801,7 +801,7 @@ theorem ncard_le_card_V_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   set A' : G → ↥hyp.D := fun x => if h : A x ∈ hyp.D then ⟨A x, h⟩ else 1 with hA'def
   have hA'val : ∀ x ∈ S, (A' x : G) = A x := by
     intro x hx
-    simp only [hA'def, dif_pos (hAD x hx)]
+    simp only [hA'def, dite_eq_left (hAD x hx)]
   have hinj : Set.InjOn
       (fun x => (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) S := by
     intro x₁ hx₁ x₂ hx₂ hxy
@@ -884,7 +884,7 @@ theorem ncard_le_card_V_sub_one_of_f_eq_conj_self
   set A' : G → ↥hyp.D := fun x => if h : A x ∈ hyp.D then ⟨A x, h⟩ else 1 with hA'def
   have hA'val : ∀ x ∈ S, (A' x : G) = A x := by
     intro x hx
-    simp only [hA'def, dif_pos (hAD x hx)]
+    simp only [hA'def, dite_eq_left (hAD x hx)]
   have hinj : Set.InjOn
       (fun x => (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) S := by
     intro x₁ hx₁ x₂ hx₂ hxy

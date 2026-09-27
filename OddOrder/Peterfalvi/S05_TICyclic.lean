@@ -293,10 +293,10 @@ theorem finrank_supportedSubmodule_eq_card {H : Type*} [Group H] [Finite H] [IsM
       · intro w hw
         rw [ClassFunction.mem_support] at hw
         by_contra hwA
-        exact hw (dif_neg hwA)
+        exact hw (dite_eq_right hwA)
       · funext a
         change (if hw : (a : H) ∈ A then g ⟨(a : H), hw⟩ else 0) = g a
-        rw [dif_pos a.2]
+        rw [dite_eq_left a.2]
   rw [(LinearEquiv.ofBijective restr hbij).finrank_eq, Module.finrank_fintype_fun_eq_card,
     Nat.card_eq_fintype_card]
 
@@ -738,7 +738,7 @@ theorem omega_inner_self (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] (χ : hyp.W →* ℂˣ) :
     ClassFunction.inner (hyp.omega χ : ClassFunction hyp.W ℂ)
       (hyp.omega χ : ClassFunction hyp.W ℂ) = 1 := by
-  rw [irreducibleCharacter_inner, if_pos rfl]
+  rw [irreducibleCharacter_inner, ite_eq_left rfl]
 
 /-- The `ω`-family is orthonormal (off-diagonal): distinct linear characters give distinct
 irreducible characters (`omega_injective`), so `⟨ω(χ), ω(χ')⟩ = 0` for `χ ≠ χ'`. -/
@@ -746,7 +746,7 @@ theorem omega_inner_ne (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] {χ χ' : hyp.W →* ℂˣ} (h : χ ≠ χ') :
     ClassFunction.inner (hyp.omega χ : ClassFunction hyp.W ℂ)
       (hyp.omega χ' : ClassFunction hyp.W ℂ) = 0 := by
-  rw [irreducibleCharacter_inner, if_neg (fun hc => h (hyp.omega_injective hc))]
+  rw [irreducibleCharacter_inner, ite_eq_right (fun hc => h (hyp.omega_injective hc))]
 
 open scoped Classical in
 /-- The `ω`-family orthonormality in Kronecker form: `⟨ω(χ), ω(χ')⟩ = δ_{χχ'}`

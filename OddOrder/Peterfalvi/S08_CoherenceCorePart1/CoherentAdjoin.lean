@@ -117,8 +117,8 @@ theorem exists_indexed_intProjection_of_orthonormal_ZIrr
     obtain ⟨i, hi, rfl⟩ := hα; obtain ⟨j, hj, rfl⟩ := hβ
     rw [horth i hi j hj]
     by_cases hij : i = j
-    · rw [if_pos hij, if_pos (by rw [hij])]
-    · rw [if_neg hij, if_neg (fun h => hij (hvcinj i hi j hj h))]
+    · rw [ite_eq_left hij, ite_eq_left (by rw [hij])]
+    · rw [ite_eq_right hij, ite_eq_right (fun h => hij (hvcinj i hi j hj h))]
   obtain ⟨c, Y, hcoeff, hsum, hY⟩ :=
     ClassFunction.exists_intProjection_of_orthonormal_ZIrr hφ hZR horthR
   refine ⟨fun i => c (vc i), Y, fun i hi => hcoeff (vc i) (Finset.mem_image_of_mem vc hi), ?_,
@@ -189,7 +189,7 @@ theorem crux1_of_memberFamily
     intro i hi j hj hij
     by_contra hne
     have h0 := horth i hi j hj
-    rw [if_neg hne, hij, horth j hj j hj, if_pos rfl] at h0
+    rw [ite_eq_right hne, hij, horth j hj j hj, ite_eq_left rfl] at h0
     exact one_ne_zero h0
   obtain ⟨c, Z, hc_coeff, hYsum, hZortho⟩ :=
     exists_indexed_intProjection_of_orthonormal_ZIrr hDaY_ZIrr s
@@ -200,8 +200,8 @@ theorem crux1_of_memberFamily
     intro i hi
     rw [← hc_coeff i hi, hcoeffval i hi, hμeq]
     by_cases h : i = i₁
-    · simp only [if_pos h]; push_cast; ring
-    · simp only [if_neg h]; push_cast; ring
+    · simp only [ite_eq_left h]; push_cast; ring
+    · simp only [ite_eq_right h]; push_cast; ring
   -- The (5.6.1) λ-form and the (5.6.2) integer-forcing.
   have hY : Da.Y =
       (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ)
@@ -211,7 +211,7 @@ theorem crux1_of_memberFamily
   have hψ : (ClassFunction.inner (a • χmem i₁ : ClassFunction ↥L ℂ) (a • χmem i₁)).re
       = (a : ℝ) ^ 2 * 1 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), ClassFunction.inner_smul_left,
-      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl,
+      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, ite_eq_left rfl,
       star_natCast, mul_one,
       show (a : ℂ) * (a : ℂ) = (((a : ℝ) ^ 2 * 1 : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re]
   obtain ⟨hlam0, -⟩ := Da.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) ((a : ℤ) + μ) Z
@@ -676,7 +676,7 @@ noncomputable def xAdjoinStep
     rw [key]
     rcases eq_or_ne i i₁ with h | h
     · subst h; simp
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
+    · rw [ite_eq_right h, ite_eq_right (fun hc : i₁ = i => h hc.symm)]; ring
   -- crux1 via the λ-form collapse.
   have hcrux1 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)

@@ -50,14 +50,14 @@ theorem Sset_breakPair_fields [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
       ⟨ψ, Sset_isIrreducibleCharacter hyp hfrob hψS⟩
       ⟨x, Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hx)⟩
-    rwa [if_neg (fun he => hxne
+    rwa [ite_eq_right (fun he => hxne
       (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) he))] at hite
   · intro x hx
     have hxne : ψ.conj ≠ x := by rintro rfl; exact hψcnotS1 hx
     have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
       ⟨ψ.conj, Sset_isIrreducibleCharacter hyp hfrob hψconjS⟩
       ⟨x, Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hx)⟩
-    rwa [if_neg (fun he => hxne
+    rwa [ite_eq_right (fun he => hxne
       (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) he))] at hite
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

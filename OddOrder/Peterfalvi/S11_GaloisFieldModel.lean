@@ -26,7 +26,6 @@ open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (9.7.b), faithful-image field model.**  The irreducible action of
 `Ū = range(uActionHom)` on `H̄ = H/H₀` is multiplication on `GF(p^q)` through an injective
 homomorphism. -/

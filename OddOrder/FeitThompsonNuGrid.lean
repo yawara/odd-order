@@ -201,7 +201,7 @@ theorem omegaS_inner (i k : Fin tp.q) (j l : Fin tp.p) :
   rw [(mp.certainTypeS hG).sdiffTICyclicHypothesis.omega_inner]
   by_cases h : i = k ∧ j = l
   · obtain ⟨rfl, rfl⟩ := h
-    rw [if_pos rfl, if_pos ⟨rfl, rfl⟩]
+    rw [ite_eq_left rfl, ite_eq_left ⟨rfl, rfl⟩]
   · have hne : (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar
         ((mp.certainTypeS hG).w1CharEquiv (eqQ hG mp tp i)) (chi2enum hG mp tp j)
         ≠ (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar
@@ -212,7 +212,7 @@ theorem omegaS_inner (i k : Fin tp.q) (j l : Fin tp.p) :
       exact h ⟨(eqQ hG mp tp).injective
           ((mp.certainTypeS hG).w1CharEquiv_injective h1),
         (chi2enum hG mp tp).injective h2⟩
-    rw [if_neg hne, if_neg h]
+    rw [ite_eq_right hne, ite_eq_right h]
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- Distinct index pairs give distinct members of the shared `ω`-grid. -/
@@ -227,7 +227,7 @@ theorem omegaS_pair_injective :
   have h2 := omegaS_inner hG mp tp k k l l
   rw [h1] at h2
   have hcond : ¬ (i = k ∧ j = l) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
-  rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+  rw [ite_eq_right hcond, ite_eq_left (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
   exact zero_ne_one h2
 
 /-- The transported T-side row enumeration is injective. -/
@@ -331,13 +331,13 @@ theorem nuT_orthonormal (i k : Fin tp.q) (j l : Fin tp.p) :
   · subst k
     by_cases hjl : j = l
     · subst l
-      rw [if_pos rfl, if_pos ⟨rfl, rfl⟩]
-    · rw [if_neg (fun hc => hjl (rowT_injective hG mp tp
+      rw [ite_eq_left rfl, ite_eq_left ⟨rfl, rfl⟩]
+    · rw [ite_eq_right (fun hc => hjl (rowT_injective hG mp tp
           ((((mp.certainTypeT hG).columnFamily (colT hG mp tp i)).injective) hc))),
-        if_neg (by simp [hjl])]
-  · rw [if_neg ((mp.certainTypeT hG).columnFamily_mu_ne
+        ite_eq_right (by simp [hjl])]
+  · rw [ite_eq_right ((mp.certainTypeT hG).columnFamily_mu_ne
         (fun hc => hik (colT_injective hG mp tp hc)) _ _),
-      if_neg (by simp [hik])]
+      ite_eq_right (by simp [hik])]
 
 /-- **Peterfalvi (4.3.c), T-side** (Coq `prTIirr_id`, `PFsection4.v:403`): on
 `W ∖ W₁` the canonical `ν`-grid is the signed shared `ω`-grid,

@@ -121,23 +121,23 @@ theorem coeff_subgroupSum (N : Subgroup G) (g : G) :
     simp
   rw [hL]
   by_cases hg : g ∈ N
-  · rw [if_pos hg, Finset.sum_eq_single (⟨g, hg⟩ : ↥N)]
+  · rw [ite_eq_left hg, Finset.sum_eq_single (⟨g, hg⟩ : ↥N)]
     · simp
     · intro b _ hb
-      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, ite_eq_right]
       exact fun h => hb (Subtype.ext h)
     · intro h
       exact absurd (Finset.mem_univ _) h
-  · rw [if_neg hg, Finset.sum_eq_zero]
+  · rw [ite_eq_right hg, Finset.sum_eq_zero]
     intro b _
-    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, ite_eq_right]
     exact fun h => hg (h ▸ b.2)
 
 /-- **The coefficient of `N̂` at `1` is `1`.** -/
 theorem coeff_subgroupSum_one (N : Subgroup G) :
     (subgroupSum R N).coeff 1 = 1 := by
   classical
-  rw [coeff_subgroupSum, if_pos N.one_mem]
+  rw [coeff_subgroupSum, ite_eq_left N.one_mem]
 
 /-- **Left multiplication by `N̂` sums the coefficients over the coset.**
 `(N̂ · w)(g) = ∑_{x ∈ N} w(x⁻¹ g)`. -/

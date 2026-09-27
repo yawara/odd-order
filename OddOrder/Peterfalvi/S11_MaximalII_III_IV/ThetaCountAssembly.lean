@@ -508,7 +508,8 @@ theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
   have hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver
       (hInHu data ⊔ cuInHu caseA) ζ (hcuPsiPair caseA θ hinv lam) := by
     rw [← OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver]
-    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ,
+      ite_eq_left rfl]
     exact one_ne_zero
   intro hsub
   apply hθS0

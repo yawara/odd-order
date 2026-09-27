@@ -43,9 +43,9 @@ theorem irreducibleCharacter_inner_eq_ite (χ ψ : IrreducibleCharacter G) :
       if χ = ψ then 1 else 0 := by
   by_cases h : χ = ψ
   · subst h
-    rw [if_pos rfl, ← characterTableRowPairing_eq_inner]
+    rw [ite_eq_left rfl, ← characterTableRowPairing_eq_inner]
     exact characterTableRowOrthogonality.1 χ
-  · rw [if_neg h, ← characterTableRowPairing_eq_inner]
+  · rw [ite_eq_right h, ← characterTableRowPairing_eq_inner]
     exact characterTableRowOrthogonality.2 h
 
 /-- The Fourier coefficient `⟨φ, χ⟩` of a virtual character `φ ∈ ZIrr G` at an irreducible
@@ -58,8 +58,8 @@ theorem mem_ZIrr_inner_int (χ : IrreducibleCharacter G) {φ : ClassFunction G �
       have heq := irreducibleCharacter_inner_eq_ite (⟨x, hx⟩ : IrreducibleCharacter G) χ
       rw [show ((⟨x, hx⟩ : IrreducibleCharacter G) : ClassFunction G ℂ) = x from rfl] at heq
       by_cases h : (⟨x, hx⟩ : IrreducibleCharacter G) = χ
-      · refine ⟨1, ?_⟩; rw [heq, if_pos h]; norm_num
-      · refine ⟨0, ?_⟩; rw [heq, if_neg h]; norm_num
+      · refine ⟨1, ?_⟩; rw [heq, ite_eq_left h]; norm_num
+      · refine ⟨0, ?_⟩; rw [heq, ite_eq_right h]; norm_num
   | zero => exact ⟨0, by simp⟩
   | add x y _ _ ihx ihy =>
       obtain ⟨mx, hmx⟩ := ihx
@@ -97,8 +97,8 @@ theorem irr_cf_inner {a b : ClassFunction G ℂ}
   simp only [IrreducibleCharacter.coe_mk] at key
   rw [key]
   by_cases h : a = b
-  · rw [if_pos h, if_pos (Subtype.ext h)]
-  · rw [if_neg h, if_neg fun he => h (Subtype.ext_iff.mp he)]
+  · rw [ite_eq_left h, ite_eq_left (Subtype.ext h)]
+  · rw [ite_eq_right h, ite_eq_right fun he => h (Subtype.ext_iff.mp he)]
 
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- A virtual character `φ ∈ ZIrr G` is a finite `ℂ`-linear combination of irreducible
@@ -128,8 +128,8 @@ theorem inner_eq_coeff_of_repr (χ : IrreducibleCharacter G)
       mul_ite, mul_one, mul_zero]
   rw [step, Finset.sum_ite_eq' c.support (χ : ClassFunction G ℂ) (fun a => (c a : ℂ))]
   by_cases hmem : (χ : ClassFunction G ℂ) ∈ c.support
-  · rw [if_pos hmem]
-  · rw [if_neg hmem, Finsupp.notMem_support_iff.mp hmem, Int.cast_zero]
+  · rw [ite_eq_left hmem]
+  · rw [ite_eq_right hmem, Finsupp.notMem_support_iff.mp hmem, Int.cast_zero]
 
 omit [Finite G] in
 /-- Conjugate-linearity of `ClassFunction.inner` over a scalar in the right argument. -/
@@ -408,7 +408,7 @@ theorem inner_orthonormalSum_eq_coeff {s : Finset (ClassFunction G ℂ)} {c : Cl
       = ∑ a ∈ s, (if a = b then (c a : ℂ) else 0) := by
     refine Finset.sum_congr rfl fun a ha => ?_
     rw [ClassFunction.inner_smul_left, horth a ha b hb, mul_ite, mul_one, mul_zero]
-  rw [step, Finset.sum_ite_eq' s b (fun a => (c a : ℂ)), if_pos hb]
+  rw [step, Finset.sum_ite_eq' s b (fun a => (c a : ℂ)), ite_eq_left hb]
 
 open scoped Classical in
 omit [Finite G] in
@@ -451,8 +451,8 @@ theorem inner_self_sum_orthonormal_eq_card {s : Finset (ClassFunction G ℂ)}
   rw [inner_sum_left, Finset.sum_congr rfl (fun a ha => ?_)]
   · rw [Finset.sum_const, nsmul_eq_mul, mul_one]
   · rw [inner_sum_right, Finset.sum_eq_single a]
-    · rw [horth a ha a ha, if_pos rfl]
-    · intro b hb hba; rw [horth a ha b hb, if_neg (Ne.symm hba)]
+    · rw [horth a ha a ha, ite_eq_left rfl]
+    · intro b hb hba; rw [horth a ha b hb, ite_eq_right (Ne.symm hba)]
     · intro hna; exact absurd ha hna
 
 open scoped Classical in
@@ -470,7 +470,7 @@ theorem inner_sum_orthonormal_eq_zero_of_disjoint {s E F : Finset (ClassFunction
   rw [inner_sum_right]
   refine Finset.sum_eq_zero fun b hb => ?_
   have hab : a ≠ b := fun h => (Finset.disjoint_left.mp hdisj ha) (h ▸ hb)
-  rw [horth a (hE ha) b (hF hb), if_neg hab]
+  rw [horth a (hE ha) b (hF hb), ite_eq_right hab]
 
 open scoped Classical in
 omit [Finite G] in
@@ -509,12 +509,12 @@ theorem inner_self_orthogonalSum_add_re {ι : Type*} (s : Finset ι)
     refine Finset.sum_congr rfl fun i hi => ?_
     rw [inner_sum_right]
     rw [Finset.sum_eq_single i]
-    · rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi i hi, if_pos rfl,
+    · rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi i hi, ite_eq_left rfl,
         Complex.star_def, Complex.conj_ofReal]
       push_cast; ring
     · intro j hj hji
       rw [ClassFunction.inner_smul_left, inner_smul_right, horth i hi j hj,
-        if_neg (Ne.symm hji), mul_zero, mul_zero]
+        ite_eq_right (Ne.symm hji), mul_zero, mul_zero]
     · intro hni; exact absurd hi hni
   rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
     ClassFunction.inner_add_right, hXZ, hZX, add_zero, zero_add, hXX,
@@ -557,16 +557,15 @@ theorem exists_orthogonalProjection_of_orthogonal_family {ι : Type*} (s : Finse
   -- `⟨∑ cᵢ•vᵢ, vⱼ⟩ = ∑ cᵢ·⟨vᵢ,vⱼ⟩ = cⱼ·mⱼ` (diagonal survives by orthogonality).
   have hproj : ClassFunction.inner (∑ i ∈ s, c i • v i) (v j) = c j * (m j : ℂ) := by
     rw [inner_sum_left, Finset.sum_eq_single j]
-    · rw [ClassFunction.inner_smul_left, horth j hj j hj, if_pos rfl]
+    · rw [ClassFunction.inner_smul_left, horth j hj j hj, ite_eq_left rfl]
     · intro i hi hij
-      rw [ClassFunction.inner_smul_left, horth i hi j hj, if_neg hij, mul_zero]
+      rw [ClassFunction.inner_smul_left, horth i hi j hj, ite_eq_right hij, mul_zero]
     · intro hnj; exact absurd hj hnj
   rw [hproj, hc]
   -- `cⱼ·mⱼ = (⟨w,vⱼ⟩/mⱼ)·mⱼ = ⟨w,vⱼ⟩` since `mⱼ ≠ 0`.
   have hmj : (m j : ℂ) ≠ 0 := by exact_mod_cast hm j hj
   rw [div_mul_cancel₀ _ hmj, sub_self]
 
-set_option backward.isDefEq.respectTransparency false in
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- An irreducible representation has positive dimension. -/
 theorem finrank_pos_of_isIrreducible {V : Type} [AddCommGroup V] [Module ℂ V]
@@ -660,9 +659,9 @@ theorem sum_sq_inner_le_of_orthonormal {ι : Type*} [Fintype ι]
     intro l
     rw [hX, inner_sum_left]
     rw [Finset.sum_eq_single l]
-    · rw [ClassFunction.inner_smul_left, horth l l, if_pos rfl, mul_one]
+    · rw [ClassFunction.inner_smul_left, horth l l, ite_eq_left rfl, mul_one]
     · intro k _ hkl
-      rw [ClassFunction.inner_smul_left, horth k l, if_neg hkl, mul_zero]
+      rw [ClassFunction.inner_smul_left, horth k l, ite_eq_right hkl, mul_zero]
     · intro h; exact absurd (Finset.mem_univ _) h
   have hχvl : ∀ l, ClassFunction.inner χ (v l) = 0 := by
     intro l
@@ -674,9 +673,9 @@ theorem sum_sq_inner_le_of_orthonormal {ι : Type*} [Fintype ι]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [ClassFunction.inner_smul_left, inner_sum_right]
     rw [Finset.sum_eq_single i]
-    · rw [inner_smul_right, horth i i, if_pos rfl, mul_one, star_intCast]; ring
+    · rw [inner_smul_right, horth i i, ite_eq_left rfl, mul_one, star_intCast]; ring
     · intro k _ hki
-      rw [inner_smul_right, horth i k, if_neg (fun h => hki h.symm), mul_zero]
+      rw [inner_smul_right, horth i k, ite_eq_right (fun h => hki h.symm), mul_zero]
     · intro h; exact absurd (Finset.mem_univ _) h
   -- the cross terms vanish
   have hχX : ClassFunction.inner χ X = 0 := by

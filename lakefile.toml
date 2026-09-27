@@ -14,7 +14,7 @@ weak.linter.style.longFile = 1500 # mathlib 準拠の分割上限 (CLAUDE.md「�
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "db584cd6d46c92f209a44c0f1c829460d327499d" # mathlib tag v4.33.0 (= stable, 2026-08-10)
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612" # mathlib tag v4.34.1 (= stable, 2026-09-24)
 
 [[lean_lib]]
 name = "OddOrder"

@@ -724,7 +724,7 @@ theorem isMulCommutative_of_generalizedDihedral (hB : B.index = 2)
   obtain ⟨t, ht⟩ := exists_notMem_of_index_eq_two hB
   have h23 : (∀ t : G, t ∉ B → orderOf t = 2) →
       ∀ t : G, t ∉ B → orderOf t = 2 ∧ ∀ b ∈ B, t * b * t⁻¹ = b⁻¹ :=
-    ((generalizedDihedral_tfae hB).out 1 2).mp
+    ((generalizedDihedral_tfae hB).out 2 3).mp
   have hinv : ∀ b ∈ B, t * b * t⁻¹ = b⁻¹ := (h23 h t ht).2
   refine ⟨⟨fun b c => Subtype.ext ?_⟩⟩
   have hbc : t * ((b : G) * c) * t⁻¹ = ((b : G) * c)⁻¹ := hinv _ (B.mul_mem b.2 c.2)

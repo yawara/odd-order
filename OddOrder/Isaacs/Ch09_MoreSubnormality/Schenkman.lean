@@ -80,7 +80,7 @@ theorem isNilpotent_of_frattini_le_of_quotient_nilpotent [Finite G] {N : Subgrou
     Group.IsNilpotent G := by
   have := hquot
   have hnc : NormalizerCondition (G ⧸ N) := Group.normalizerCondition_of_isNilpotent
-  refine ((Group.isNilpotent_of_finite_tfae (G := G)).out 2 0).mp ?_
+  refine ((Group.isNilpotent_of_finite_tfae (G := G)).out 3 1).mp ?_
   intro M hM
   have hNM : N ≤ M := hle.trans (frattini_le_coatom hM)
   have hcoatom : IsCoatom (M.map (QuotientGroup.mk' N)) :=

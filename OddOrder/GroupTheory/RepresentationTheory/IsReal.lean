@@ -19,7 +19,7 @@ by `φ.conj g = star (φ g)`. A class function `φ` is **real** when `φ.conj = 
 Peterfalvi §3 (1.1) Odd-order theorem: `|G|` odd, `χ ∈ Irr(G), χ ≠ 1_G ⇒ χ̄ ≠ χ`.
 Statement-level handling of `χ̄ = χ` (`IsReal χ`) は本モジュールの目的.
 
-## mathlib v4.29.1 状況
+## mathlib 状況 (v4.34.1 で再確認)
 
 mathlib に「class function の複素共役」を直接扱う API は不在 (`StarRingEnd` は
 ringhom レベルのみ). 本モジュールで `ClassFunction.conj` と `IsReal` を提供.

@@ -70,9 +70,9 @@ theorem intCast_dvd_of_mem_adjoinPrimeIdeal (hω : IsIntegral ℤ ω) {k : ℤ}
       intro j
       by_cases hjj : j = j₀
       · subst hjj
-        rw [if_pos rfl, if_pos rfl, Int.cast_sub, Int.cast_mul, sub_mul, hj₀]
+        rw [ite_eq_left rfl, ite_eq_left rfl, Int.cast_sub, Int.cast_mul, sub_mul, hj₀]
         norm_num
-      · rw [if_neg hjj, if_neg hjj, Int.cast_mul, sub_zero]
+      · rw [ite_eq_right hjj, ite_eq_right hjj, Int.cast_mul, sub_zero]
     have hsum : ∑ j : Fin (minpoly ℤ ω).natDegree,
         ((p : ℤ) : K) * ((c j : ℤ) : K) * ω ^ (j : ℕ) = (k : K) := by
       rw [← haK, hc, Finset.sum_mul]
@@ -80,7 +80,7 @@ theorem intCast_dvd_of_mem_adjoinPrimeIdeal (hω : IsIntegral ℤ ω) {k : ℤ}
     rw [Finset.sum_congr rfl fun j (_ : j ∈ Finset.univ) => hexp j, Finset.sum_sub_distrib, hsum]
     simp
   have h0 := hzero j₀
-  rw [if_pos rfl, sub_eq_zero] at h0
+  rw [ite_eq_left rfl, sub_eq_zero] at h0
   exact h0.symm
 
 /-- **The residue ring `ℤ[ω] / p` has characteristic `p`.**  Hence (for `p` prime) it carries a

@@ -317,7 +317,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
       (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty :=
     ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
   have hbase : FT_signalizerBase x = N₀ := by
-    rw [show FT_signalizerBase x = hbr.2.choose from dif_pos hbr]
+    rw [show FT_signalizerBase x = hbr.2.choose from dite_eq_left hbr]
     exact huniq₀ _ hbr.2.choose_spec
   -- The signalizer structure at `x`; its unique maximal is `N₀`.
   obtain ⟨N, ⟨hNmax, hNC, hNRne, hNhall, hNt2, hNdichot, hNper⟩, -⟩ :=

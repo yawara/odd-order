@@ -525,12 +525,13 @@ theorem card_eq_pow_mul_pow_of_dvd {n p q : ℕ}
       Finsupp.single_apply, Finsupp.single_apply]
   by_cases hrp : r = p
   · subst hrp
-    rw [if_pos rfl, if_neg (fun h => hpq h.symm), mul_one, mul_zero, add_zero]
+    rw [ite_eq_left rfl, ite_eq_right (fun h => hpq h.symm), mul_one, mul_zero, add_zero]
   · by_cases hrq : r = q
     · subst hrq
-      rw [if_neg (fun h => hpq h), if_pos rfl, mul_one, mul_zero, zero_add]
+      rw [ite_eq_right (fun h => hpq h), ite_eq_left rfl, mul_one, mul_zero, zero_add]
     · -- r ∉ {p,q}: n.factorization r = 0 and both single-points miss r.
-      rw [if_neg (fun h => hrp h.symm), if_neg (fun h => hrq h.symm), mul_zero, mul_zero, add_zero]
+      rw [ite_eq_right (fun h => hrp h.symm), ite_eq_right (fun h => hrq h.symm), mul_zero,
+        mul_zero, add_zero]
       -- n.factorization r = 0: r is not a prime factor of n.
       by_cases hr_prime : r.Prime
       · exact Nat.factorization_eq_zero_of_not_dvd (fun hdvd_pr => by
@@ -1240,11 +1241,11 @@ theorem step1_unique_maximal_containing_nilpotent
     have hLq_le_M : Lq ≤ M :=
       le_trans hLq_le_centLp (le_trans
         (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hLp_extract))
-        (by rw [← hM_eq_NKp]; exact centralizer_le_normalizer Kp))
+        (by rw [← hM_eq_NKp]; exact Subgroup.centralizer_le_normalizer (Kp : Set H)))
     have hLp_le_M : Lp ≤ M :=
       le_trans hLp_le_centLq (le_trans
         (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hLq_extract))
-        (by rw [← hM_eq_NKq]; exact centralizer_le_normalizer Kq))
+        (by rw [← hM_eq_NKq]; exact Subgroup.centralizer_le_normalizer (Kq : Set H)))
     have hL_le_M : L ≤ M := sup_le hLp_le_M hLq_le_M
     -- Both cases (`K < L` and `K = L`) give `X = M`.
     rcases eq_or_lt_of_le hK_le_L with hKL_eq | hKL_lt

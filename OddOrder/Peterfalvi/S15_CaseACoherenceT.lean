@@ -338,7 +338,7 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
         (Submodule.subset_span hξ3)]
       have h := irreducibleCharacter_inner_eq_ite
         (⟨ξ, hξ.2.1⟩ : IrreducibleCharacter ↥hyp.T) ⟨ξ, hξ.2.1⟩
-      rwa [if_pos rfl] at h
+      rwa [ite_eq_left rfl] at h
     have hON2 : ∀ ξ ∈ hS4fin.toFinset, ∀ ξ' ∈ hS4fin.toFinset, ξ ≠ ξ' →
         ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ') = 0 := by
       intro ξ hξT ξ' hξ'T hne

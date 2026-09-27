@@ -85,7 +85,7 @@ theorem ne_of_columnSum_inner_eq_zero (h : Hypothesis46 A L) [NeZero (Nat.card h
     (h0 : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂') = 0) :
     χ₂ ≠ χ₂' := by
   rintro rfl
-  rw [columnSum_inner_columnSum, if_pos rfl] at h0
+  rw [columnSum_inner_columnSum, ite_eq_left rfl] at h0
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
 /-- **Certain-type column sums are injective in the `W₂`-dual**: `μ_j = μ_k → χ₂ = χ₂'`.  If two
@@ -102,8 +102,8 @@ theorem columnSum_injective (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   intro χ₂ χ₂' heq
   by_contra hne
   have h0 : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂') = 0 := by
-    rw [columnSum_inner_columnSum, if_neg hne]
-  rw [heq, columnSum_inner_columnSum, if_pos rfl] at h0
+    rw [columnSum_inner_columnSum, ite_eq_right hne]
+  rw [heq, columnSum_inner_columnSum, ite_eq_left rfl] at h0
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
 open scoped Classical in
@@ -146,7 +146,7 @@ theorem certainTypeExtension_mu (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     certainTypeExtensionFun]
   have hex : ∃ p : ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) × Fin (Nat.card h.W1),
       (h.columnFamily p.1).mu p.2 = (h.columnFamily χ₂).mu i := ⟨(χ₂, i), rfl⟩
-  rw [dif_pos hex]
+  rw [dite_eq_left hex]
   have hchoose : hex.choose = (χ₂, i) := h.columnFamily_mu_injective hex.choose_spec
   rw [hchoose]
 
@@ -242,9 +242,9 @@ theorem certainTypeExtension_columnSum_inner (h : Hypothesis46 A L) [NeZero (Nat
     certainType_omega_sum_isometry, columnSum_def, columnSum_def, columnFamily_mu_sum_inner]
   by_cases hχ : χ₂ = χ₂'
   · subst hχ
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> push_cast <;> ring
-  · rw [if_neg hχ, mul_zero, mul_zero]
+  · rw [ite_eq_right hχ, mul_zero, mul_zero]
 
 /-- **Peterfalvi (4.9)(b), isometry (`IsCoherent.extension_inner_eq`)**: `ν` preserves the inner
 product on `Z[𝒯]`.  By `span_induction₂` over both arguments: generators `μ_j, μ_l ∈ 𝒯` are handled
@@ -611,9 +611,9 @@ theorem certainTypeRImage_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   · -- (false,false): δ·(δ·[ip=iq]) = [ip=iq]
     rw [← mul_assoc, hδsq, one_mul]
   · -- (false,true): χ₂ ≠ χ₂' ⟹ 0
-    rw [if_neg (fun hcon => hne hcon.1)]; ring
+    rw [ite_eq_right (fun hcon => hne hcon.1)]; ring
   · -- (true,false): χ₂' ≠ χ₂ ⟹ 0
-    rw [if_neg (fun hcon => hne hcon.1.symm)]; ring
+    rw [ite_eq_right (fun hcon => hne hcon.1.symm)]; ring
   · -- (true,true): δ·(δ·[ip=iq]) = [ip=iq]
     rw [← mul_assoc, hδsq, one_mul]
 
@@ -627,7 +627,7 @@ theorem certainTypeRImage_injective (h : Hypothesis46 A L) [NeZero (Nat.card h.W
   intro p q hpq
   by_contra hpqne
   have h0 := certainTypeRImage_inner h hne p q
-  rw [if_neg hpqne, hpq, certainTypeRImage_inner h hne, if_pos rfl] at h0
+  rw [ite_eq_right hpqne, hpq, certainTypeRImage_inner h hne, ite_eq_left rfl] at h0
   exact one_ne_zero h0
 
 /-- The sum of the `R(μ_j)` family over `Bool × Fin w₁` is `δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`, the
@@ -715,7 +715,7 @@ noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     rw [certainTypeRImage_inner h (column_inv_ne_self h hχ₂).symm]
     by_cases hpq : p = q
     · subst hpq; simp
-    · rw [if_neg hpq, if_neg (fun he =>
+    · rw [ite_eq_right hpq, ite_eq_right (fun he =>
         hpq (certainTypeRImage_injective h (column_inv_ne_self h hχ₂).symm he))]
   image_eq := by
     rw [columnSum_conj_eq, Finset.sum_image
@@ -757,13 +757,13 @@ theorem certainTypeR_imageSet_orthogonal_certainTypeR (h : Hypothesis46 A L)
     simp only [certainTypeRImage, ClassFunction.inner_smul_left,
       RepresentationTheory.inner_smul_right, certainTypeOmegaSigma_inner, hδstar, star_neg,
       mul_neg, neg_mul, neg_neg]
-  · rw [if_neg (fun hcon => hne1 hcon.1)]; ring
-  · rw [if_neg (fun hcon => hne2 hcon.1)]; ring
-  · rw [if_neg (fun hcon => hne2 (by
+  · rw [ite_eq_right (fun hcon => hne1 hcon.1)]; ring
+  · rw [ite_eq_right (fun hcon => hne2 hcon.1)]; ring
+  · rw [ite_eq_right (fun hcon => hne2 (by
       rw [← hcon.1,
         (@inv_inv ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂)]))]
     ring
-  · rw [if_neg (fun hcon => hne1 (inv_injective hcon.1))]; ring
+  · rw [ite_eq_right (fun hcon => hne1 (inv_injective hcon.1))]; ring
 
 /-- **Per-constituent `CharacterPsiDecomposition` for a reducible certain-type member `μ_j`**
 (Peterfalvi (6.8.2.3), reducible case).  The analogue of `decompositionDaFromDadeOfDiff`
@@ -804,7 +804,7 @@ noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat
     · exact hμη₁supp
   have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
     rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
-      if_neg (column_inv_ne_self h hχ₂).symm]
+      ite_eq_right (column_inv_ne_self h hχ₂).symm]
   exact S07.CharacterPsiDecomposition.ofProjection (certainTypeR h hχ₂ hdeg)
     (S07.dadeIntegralCharacterMap h.dade0 h.tau)
     (fun φ ζ hφ hζ =>
@@ -862,7 +862,7 @@ noncomputable def certainTypeMemberDecomposition (h : Hypothesis46 A L) [NeZero 
     · rw [sub_zero]; exact hχmem
   have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
     rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
-      if_neg (column_inv_ne_self h hχ₂).symm]
+      ite_eq_right (column_inv_ne_self h hχ₂).symm]
   -- The reducible image family `R(μ_j) = certainTypeR`, transported from the certain-type Dade map
   -- to `τ'` by replacing only `image_eq` (`hagree`); the orthonormal `imageSet ⊆ ZIrr G` is shared.
   exact S07.CharacterPsiDecomposition.ofProjection
@@ -923,7 +923,7 @@ noncomputable def certainTypeSeedDecomposition (h : Hypothesis46 A L) [NeZero (N
     · rw [sub_zero]; exact Submodule.subset_span hμT
   have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
     rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
-      if_neg (column_inv_ne_self h hχ₂).symm]
+      ite_eq_right (column_inv_ne_self h hχ₂).symm]
   -- τ₁-agreement on the conjugate difference: `σ`-extension = Dade = `τ'` (via `hagree`)
   have hagree' : certainTypeExtension h (columnSum h χ₂ - (columnSum h χ₂).conj)
       = τ' (columnSum h χ₂ - (columnSum h χ₂).conj) := by

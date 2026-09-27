@@ -176,7 +176,7 @@ theorem exists_induce_eq_add_irreducible [Fintype G]
         (mem_irreducibleCharacters.mpr hα) (mem_irreducibleCharacters.mpr hα),
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr hβ) (mem_irreducibleCharacters.mpr hα),
-      if_pos rfl, if_neg (Ne.symm hαβ), mul_one, mul_zero, add_zero]
+      ite_eq_left rfl, ite_eq_right (Ne.symm hαβ), mul_one, mul_zero, add_zero]
   have hinnerβ : ClassFunction.inner Φ β = (εβ : ℂ) := by
     rw [hrepr, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       ClassFunction.inner_smul_left,
@@ -184,7 +184,7 @@ theorem exists_induce_eq_add_irreducible [Fintype G]
         (mem_irreducibleCharacters.mpr hα) (mem_irreducibleCharacters.mpr hβ),
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr hβ) (mem_irreducibleCharacters.mpr hβ),
-      if_neg hαβ, if_pos rfl, mul_one, mul_zero, zero_add]
+      ite_eq_right hαβ, ite_eq_left rfl, mul_one, mul_zero, zero_add]
   -- the signs are `+1`
   have hsign : ∀ (γ : ClassFunction G ℂ) (ε : ℤ), IsIrreducibleCharacter γ →
       ClassFunction.inner Φ γ = (ε : ℂ) → (ε = 1 ∨ ε = -1) → ε = 1 := by
@@ -206,7 +206,7 @@ theorem exists_induce_eq_add_irreducible [Fintype G]
     rw [hΦ, ClassFunction.induce_inner_trivial,
       OddOrder.RepresentationTheory.irr_cf_inner
         (mem_irreducibleCharacters.mpr hθ) trivialClassFunction_isIrreducible,
-      if_neg hne]
+      ite_eq_right hne]
   refine ⟨α, β, hα, hβ, hαβ, fun h => ?_, fun h => ?_, ?_⟩
   · rw [h, htriv] at hinnerα
     norm_num at hinnerα

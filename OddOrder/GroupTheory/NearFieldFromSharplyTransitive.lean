@@ -111,11 +111,11 @@ noncomputable def coord (y : A) : M := by
   classical exact if hy : y = 0 then 1 else (d.reg y hy).choose
 
 theorem coord_smul_e {y : A} (hy : y ≠ 0) : d.coord y • d.e = y := by
-  rw [coord, dif_neg hy]; exact (d.reg y hy).choose_spec.1
+  rw [coord, dite_eq_right hy]; exact (d.reg y hy).choose_spec.1
 
 /-- Uniqueness: any `m` with `m • e = y` equals `coord y` (for `y ≠ 0`). -/
 theorem coord_unique {y : A} (hy : y ≠ 0) {m : M} (hm : m • d.e = y) : m = d.coord y := by
-  rw [coord, dif_neg hy]; exact (d.reg y hy).choose_spec.2 m hm
+  rw [coord, dite_eq_right hy]; exact (d.reg y hy).choose_spec.2 m hm
 
 /-- `m • e ≠ 0` for any `m` (as `e ≠ 0` and `m` is invertible). -/
 theorem smul_e_ne_zero (m : M) : m • d.e ≠ 0 := by
@@ -126,9 +126,9 @@ theorem smul_e_ne_zero (m : M) : m • d.e ≠ 0 := by
 noncomputable def mul (x y : A) : A := by
   classical exact if _hy : y = 0 then 0 else d.coord y • x
 
-theorem mul_def {x y : A} (hy : y ≠ 0) : d.mul x y = d.coord y • x := dif_neg hy
+theorem mul_def {x y : A} (hy : y ≠ 0) : d.mul x y = d.coord y • x := dite_eq_right hy
 
-@[simp] theorem mul_zero (x : A) : d.mul x 0 = 0 := dif_pos rfl
+@[simp] theorem mul_zero (x : A) : d.mul x 0 = 0 := dite_eq_left rfl
 
 @[simp] theorem zero_mul (x : A) : d.mul 0 x = 0 := by
   by_cases hx : x = 0
@@ -203,9 +203,9 @@ theorem right_distrib' (a b c : A) : d.mul (a + b) c = d.mul a c + d.mul b c := 
 noncomputable def inv (y : A) : A := by
   classical exact if _hy : y = 0 then 0 else (d.coord y)⁻¹ • d.e
 
-theorem inv_def {y : A} (hy : y ≠ 0) : d.inv y = (d.coord y)⁻¹ • d.e := dif_neg hy
+theorem inv_def {y : A} (hy : y ≠ 0) : d.inv y = (d.coord y)⁻¹ • d.e := dite_eq_right hy
 
-@[simp] theorem inv_zero' : d.inv 0 = 0 := dif_pos rfl
+@[simp] theorem inv_zero' : d.inv 0 = 0 := dite_eq_left rfl
 
 theorem inv_ne_zero {y : A} (hy : y ≠ 0) : d.inv y ≠ 0 := by
   rw [d.inv_def hy]; exact d.smul_e_ne_zero _

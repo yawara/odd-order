@@ -10,7 +10,7 @@ import Mathlib.GroupTheory.Nilpotent
 /-!
 # Generic helpers for `SemidirectProduct`
 
-mathlib v4.29.1 `SemidirectProduct` モジュールに対する補足. 順次 upstream 視野.
+mathlib `SemidirectProduct` モジュールに対する補足 (v4.34.1 でも未収載を再確認). 順次 upstream 視野.
 
 ## 主結果
 

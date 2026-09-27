@@ -185,7 +185,7 @@ theorem inf_eq_centralizer_inf_of_isCarterSubgroup [Finite G] {p : ℕ} [Fact p.
     Subgroup.centralizer_le_normalizer _ hyX.1
   have hyCnorm : y ∈ Subgroup.normalizer (C : Set G) := by
     rw [← hCQ]
-    exact Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _ ⟨hyNorm, hyQnorm⟩
+    exact Subgroup.inf_normalizer_le_normalizer_sup _ _ ⟨hyNorm, hyQnorm⟩
   rw [hC.normalizer_eq] at hyCnorm
   exact hyNot ⟨hyCnorm, hXP hyX⟩
 

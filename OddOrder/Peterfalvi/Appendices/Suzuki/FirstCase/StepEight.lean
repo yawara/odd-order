@@ -50,14 +50,14 @@ theorem card_fixedSet_eq_card_fixedUnits_add_one {F : Type*} [Field F] [Finite F
       invFun := fun o => o.elim ⟨0, map_zero σ⟩ (fun u => ⟨(u : Fˣ), u.2⟩)
       left_inv := fun x => by
         by_cases hx : (x : F) = 0
-        · simp only [dif_pos hx, Option.elim]; exact Subtype.ext hx.symm
-        · simp only [dif_neg hx, Option.elim, Units.val_mk0]
+        · simp only [dite_eq_left hx, Option.elim]; exact Subtype.ext hx.symm
+        · simp only [dite_eq_right hx, Option.elim, Units.val_mk0]
       right_inv := fun o => by
         cases o with
-        | none => simp only [Option.elim, dif_pos]
+        | none => simp only [Option.elim, dite_eq_left]
         | some u =>
           have hu : ((u : Fˣ) : F) ≠ 0 := (u : Fˣ).ne_zero
-          simp only [Option.elim, dif_neg hu]
+          simp only [Option.elim, dite_eq_right hu]
           exact congrArg some (Subtype.ext (Units.ext (by simp))) }
   have : Fintype {u : Fˣ // σ (u : F) = (u : F)} := Fintype.ofFinite _
   rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_option,

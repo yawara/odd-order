@@ -183,7 +183,7 @@ theorem brauerProj_ne_zero_of_isDefectGroup (p : ℕ) [Fact p.Prime] [CharP k p]
     have : ∀ C ∈ T, (∑ g ∈ (if h : C ∈ T then ss C h else ∅),
         (if h : C ∈ T then cc C h g else 0)) = e * (e.coeff C.out • classSum k C.out) := by
       intro C hC
-      simp only [dif_pos hC]
+      simp only [dite_eq_left hC]
       exact (hccsum C hC).symm
     rw [Finset.sum_congr rfl this, ← Finset.mul_sum, ← hesum, he.eq]
   -- Rosenberg.
@@ -205,13 +205,13 @@ theorem brauerProj_ne_zero_of_isDefectGroup (p : ℕ) [Fact p.Prime] [CharP k p]
         · exact Or.inr ⟨u, hu, hub⟩)
       (fun x hx => by
         rw [hU, Finset.mem_sigma] at hx
-        simp only [dif_pos hx.1]
-        have hxs : x.2 ∈ ss x.1 hx.1 := by simpa only [dif_pos hx.1] using hx.2
+        simp only [dite_eq_left hx.1]
+        have hxs : x.2 ∈ ss x.1 hx.1 := by simpa only [dite_eq_left hx.1] using hx.2
         exact hcc x.1 hx.1 x.2 hxs)
       hUsum
   -- The surviving subgroup is strictly smaller than `D`, contradicting minimality.
   rw [hU, Finset.mem_sigma] at hxU
-  rw [dif_pos hxU.1] at hxmem
+  rw [dite_eq_left hxU.1] at hxmem
   refine hD.minimal _ (lt_of_le_of_ne inf_le_left fun heq => ?_) hxmem
   have hle : D ≤ MulAut.conj x.2 • S x.1.out := heq ▸ inf_le_right
   simp only [hT, Finset.mem_filter] at hxU

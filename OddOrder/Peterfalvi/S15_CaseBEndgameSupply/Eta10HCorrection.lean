@@ -178,13 +178,13 @@ theorem CharacterDegreeCore.exists_caseB_data_eta10_H_core [Finite G]
       ‖if h : x ∈ hyp.S then αS ⟨x, h⟩ else 0‖ ^ 2 = (s : ℝ) := by
     rw [← hglue, ← hFsum]
     refine Finset.sum_congr rfl (fun x hx => ?_)
-    rw [dif_pos x.2]
+    rw [dite_eq_left x.2]
   refine ⟨d, n, s, ?_, hGside, ?_, ?_, ?_, ?_⟩
   · intro x hx
     obtain ⟨hxH, hx1⟩ := (Set.Finite.mem_toFinset _).mp hx
     have hxS : x ∈ hyp.S := hHS hxH
     change hyp.eta10 x = if h : x ∈ hyp.S then αS ⟨x, h⟩ else 0
-    rw [dif_pos hxS]
+    rw [dite_eq_left hxS]
     have hxsharp : ((⟨x, hxS⟩ : ↥hyp.S) : G) ∈
         OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
       OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hxH, hx1⟩

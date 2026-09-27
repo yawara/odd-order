@@ -466,8 +466,8 @@ theorem betaDecompOfDade_a_eq_zero
           if i = j then ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) else 0 := by
     intro i _ j _
     by_cases hij : i = j
-    · rw [if_pos hij, hij]
-    · rw [if_neg hij]
+    · rw [ite_eq_left hij, hij]
+    · rw [ite_eq_right hij]
       exact induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj i j hij
   have hnorm_ne : ∀ i ∈ (Finset.univ.erase H78.ind1H),
       ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) ≠ 0 :=
@@ -825,7 +825,7 @@ theorem inner_constOne_eq_zero_of_orthonormal_pair {G : Type*} [Group G] [Fintyp
     rw [← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ),
       ← Int.cast_smul_eq_zsmul ℂ δ (ξ : ClassFunction G ℂ),
       ClassFunction.inner_smul_left, ClassFunction.inner_smul_right,
-      irreducibleCharacter_inner, if_pos rfl, mul_one] at hxy
+      irreducibleCharacter_inner, ite_eq_left rfl, mul_one] at hxy
     have hεne : (ε : ℂ) ≠ 0 := Int.cast_ne_zero.mpr (by rcases hε with h | h <;> simp [h])
     have hδne : star (δ : ℂ) ≠ 0 := by
       rw [star_ne_zero]; exact Int.cast_ne_zero.mpr (by rcases hδ with h | h <;> simp [h])
@@ -836,9 +836,9 @@ theorem inner_constOne_eq_zero_of_orthonormal_pair {G : Type*} [Group G] [Fintyp
   · -- `ξ` trivial ⟹ `ζ` nontrivial ⟹ `c = 0` from `y`, but `c = ±1` from `x`.
     exfalso
     have hζ : ζ ≠ trivialIrreducibleCharacter G := fun h => hξζ (hξ.trans h.symm)
-    rw [if_pos hξ, mul_one, if_neg hζ, mul_zero] at hc
+    rw [ite_eq_left hξ, mul_one, ite_eq_right hζ, mul_zero] at hc
     rcases hε with h | h <;> rw [h] at hc <;> norm_num at hc
-  · rw [if_neg hξ, mul_zero]
+  · rw [ite_eq_right hξ, mul_zero]
 
 /-- **The coherent image of a distinguished member is orthogonal to `1_G`** (Peterfalvi (7.8.a),
 the `⟨ζ_0^ν, 1_G⟩ = 0` fact — the certificate that the abstract `IsCoherent` structure does not

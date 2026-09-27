@@ -90,7 +90,7 @@ theorem xChiExtension_mu_zero
     ((h46.columnFamily χ₂).mu 0), xChiExtensionFun]
   have hex : ∃ p : ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) × Fin (Nat.card h46.W1),
       (h46.columnFamily p.1).mu p.2 = (h46.columnFamily χ₂).mu 0 ∧ p.2 = 0 := ⟨(χ₂, 0), rfl, rfl⟩
-  rw [dif_pos hex]
+  rw [dite_eq_left hex]
   have hchoose : hex.choose = (χ₂, 0) := h46.columnFamily_mu_injective hex.choose_spec.1
   rw [hchoose]
 
@@ -107,7 +107,7 @@ theorem xChiExtension_mu_ne_zero
   conv_lhs => rw [← OddOrder.Peterfalvi.S05.irreducibleCharacterBasis_apply (G := ↥L)
     ((h46.columnFamily χ₂).mu i)]
   rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
-    ((h46.columnFamily χ₂).mu i), xChiExtensionFun, dif_neg]
+    ((h46.columnFamily χ₂).mu i), xChiExtensionFun, dite_eq_right]
   rintro ⟨p, heq, hp2⟩
   have hpair : p = (χ₂, i) := h46.columnFamily_mu_injective heq
   rw [hpair] at hp2
@@ -190,7 +190,7 @@ theorem xchi_inner_eq_of_anchored
   have hηη : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hνν : ClassFunction.inner ν ν = 1 := by
     rw [hνdef, cY.extension_inner_eq η₁ η₁ (Submodule.subset_span hη₁)
       (Submodule.subset_span hη₁), hηη]
@@ -368,8 +368,8 @@ theorem exists_glue_nu_columnSum_Yset_via_map
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   set grid : Set (ClassFunction ↥L ℂ) :=
     Set.range (fun p : ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) × Fin (Nat.card h46.W1) =>
       ((h46.columnFamily p.1).mu p.2 : ClassFunction ↥L ℂ)) with hgrid

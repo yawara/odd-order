@@ -13,7 +13,7 @@ import Mathlib.GroupTheory.SemidirectProduct
 
 `OddOrder.GroupTheory` shared module: 'metacyclic group' の概念.
 
-mathlib v4.29.1 にはこの概念 (∃ cyclic normal `N ⊴ G` で `G ⧸ N` cyclic) が無いため,
+mathlib (v4.34.1 で再確認) にはこの概念 (∃ cyclic normal `N ⊴ G` で `G ⧸ N` cyclic) が無いため,
 **BG §4 (p-Groups of Small Rank)** Lem 4.10, Prop 4.11 (Huppert classification), Thm 4.12
 で必要となる shared concept として独立 module に切り出す.
 
@@ -124,7 +124,7 @@ the cyclic `G ⧸ N` via the lift of `mk' N ∘ H.subtype`, whose kernel is `N.s
 
 This is a genuine lemma — *not* a thin wrapper — and is needed in BG Theorem 4.12(b)(c)
 where part (a) is applied to the subgroup `T = [R, A]`. (The textbook leaves this implicit;
-mathlib v4.29.1 has no `IsMetacyclic`.)
+mathlib (v4.34.1) has no `IsMetacyclic`.)
 
 **BG §4** Thm 4.12(b)(c) の補題段 (Huppert). -/
 theorem subgroup {H : Subgroup G} (h : IsMetacyclic G) : IsMetacyclic ↥H := by

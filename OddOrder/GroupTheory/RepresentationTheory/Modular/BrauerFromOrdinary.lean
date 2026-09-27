@@ -92,12 +92,12 @@ theorem pairingZero_irreducibleBrauerCharacter_eq_zero_of_centralCharacterAlg_ne
     · rw [← hCP, Matrix.mul_apply, Matrix.mul_apply]
       refine Finset.sum_congr rfl fun μ _ => ?_
       by_cases hμθ : cc μ = cc θ
-      · simp only [hP', if_pos (hμθ.trans hθφ)]
+      · simp only [hP', ite_eq_left (hμθ.trans hθφ)]
       · rw [Matrix.transpose_apply, hCzero μ θ hμθ, zero_mul, zero_mul]
-    · rw [Matrix.mul_apply, Matrix.one_apply, if_neg (fun h => hθφ (by rw [h]))]
+    · rw [Matrix.mul_apply, Matrix.one_apply, ite_eq_right (fun h => hθφ (by rw [h]))]
       refine Finset.sum_eq_zero fun μ _ => ?_
       by_cases hμθ : cc μ = cc θ
-      · simp only [hP', if_neg (fun hc => hθφ (hμθ.symm.trans hc)), mul_zero]
+      · simp only [hP', ite_eq_right (fun hc => hθφ (hμθ.symm.trans hc)), mul_zero]
       · rw [Matrix.transpose_apply, hCzero μ θ hμθ, zero_mul]
   have hPP' : P' = P := by
     have hPC : P * Cᵀ = 1 := mul_eq_one_comm.mp hCP
@@ -107,7 +107,7 @@ theorem pairingZero_irreducibleBrauerCharacter_eq_zero_of_centralCharacterAlg_ne
       _ = P := by rw [hCP', Matrix.mul_one]
   have hzero : P' τ μ₀ = 0 := by
     simp only [hP']
-    exact if_neg hne
+    exact ite_eq_right hne
   have hval := congrFun (congrFun hPP' τ) μ₀
   rw [hzero] at hval
   exact hval.symm

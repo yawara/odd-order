@@ -369,7 +369,7 @@ noncomputable def columnDecompositionTau
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj = 0 := by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
-      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm]
+      ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm]
   exact OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
     (columnRFamilyTau hyp h46 hχ₂ hdeg hmapagree) hyp.tau
     (fun _φ _ζ hφ hζ =>
@@ -450,7 +450,7 @@ theorem per_phi_anchored_image
   have hηnorm : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L) (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hYY : ClassFunction.inner (cY.extension η₁)
       (cY.extension η₁) = 1 := by
     rw [cY.extension_inner_eq η₁ η₁
@@ -562,9 +562,9 @@ theorem SibleyDadeHypothesis.columnSum_notMem_SsubFiltration
   have hθeqψ : θ = ψirr := by
     by_contra hc
     have e0 : ClassFunction.inner (θ : ClassFunction ↥H ℂ) (ψirr : ClassFunction ↥H ℂ) = 0 := by
-      rw [irreducibleCharacter_inner_eq_ite, if_neg hc]
+      rw [irreducibleCharacter_inner_eq_ite, ite_eq_right hc]
     have e1 : ClassFunction.inner (ψirr : ClassFunction ↥H ℂ) (ψirr : ClassFunction ↥H ℂ) = 1 := by
-      rw [irreducibleCharacter_inner_eq_ite, if_pos rfl]
+      rw [irreducibleCharacter_inner_eq_ite, ite_eq_left rfl]
     rw [show (ψirr : ClassFunction ↥H ℂ) = ψ from rfl] at e0 e1
     rw [hinner] at e0
     exact zero_ne_one (e0.symm.trans e1)
@@ -716,7 +716,7 @@ theorem inner_central_restrict_eq_apply_one [Finite ↥H]
     have h := irreducibleCharacter_inner_eq_ite
       (⟨φ, hφ⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
       (⟨φ, hφ⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   rw [hres, OddOrder.RepresentationTheory.inner_smul_right, hφφ, mul_one, hd, star_natCast]
 

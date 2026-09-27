@@ -744,7 +744,7 @@ theorem brauerTrunc_eq_of_coeff_eq (x : MonoidAlgebra k G)
     (h : ∀ g : ↥(Subgroup.centralizer (Q : Set G)), x.coeff (g : G) = y.coeff g) :
     brauerTrunc Q (Subgroup.centralizer (Q : Set G)) x = y := by
   refine MonoidAlgebra.coeff_injective (Finsupp.ext fun g => ?_)
-  rw [coeff_brauerTrunc, if_pos g.2]
+  rw [coeff_brauerTrunc, ite_eq_left g.2]
   exact h g
 
 variable {ιC : Type*} [Finite ιC] {nnC : ιC → Type*} [∀ i, Fintype (nnC i)]
@@ -826,7 +826,7 @@ theorem eq_principalBlock_of_blockOfCentralCharacter_eq (hQ : IsPGroup p ↥Q)
     rw [hbr, ← MatrixModule.blockCharacterPi_apply, hBC, Pi.single_apply]
   rw [hL, hR] at heval
   by_contra hne
-  rw [if_neg hne] at heval
+  rw [ite_eq_right hne] at heval
   exact one_ne_zero heval
 
 -- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14)
@@ -935,12 +935,12 @@ theorem eq_principalBlock_of_blockOfCentralCharacter_eq_intermediate
     rw [blockCharacter_eq_of_coeff_eq_on_centralizer (P := Q) hπH hlinH hQ hQH hHN b
         (w := F'H (principalBlock πH hπH hlinH hnilH))
         (fun h hh => by
-          rw [coe_brauerCenterHom_apply, coeff_brauerTrunc, if_pos hh]
+          rw [coe_brauerCenterHom_apply, coeff_brauerTrunc, ite_eq_left hh]
           exact hcoeff h hh),
       ← MatrixModule.blockCharacterPi_apply, hBH, Pi.single_apply]
   rw [hL, hR] at heval
   by_contra hne
-  rw [if_neg hne] at heval
+  rw [ite_eq_right hne] at heval
   exact one_ne_zero heval
 
 -- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14)

@@ -190,9 +190,9 @@ private theorem collectedWord_mul_generator
       let d' : Fin n → W := fun i => d i.castSucc
       have ih' := ih x' a' y d' (fun i => hrel i.castSucc)
       rcases zmodTwo_eq_zero_or_one (a (Fin.last n)) with ha | ha
-      · simp only [collectedWord, bitFactor, ha, if_pos, one_mul, bitSum]
+      · simp only [collectedWord, bitFactor, ha, ite_eq_left, one_mul, bitSum]
         simpa [a', d'] using ih'
-      · simp only [collectedWord, bitFactor, ha, one_ne_zero, if_false, bitSum]
+      · simp only [collectedWord, bitFactor, ha, one_ne_zero, ite_false, bitSum]
         have hc := kernelValue_commute k hcentral (bitSum n a' d') (x (Fin.last n))
         have hrelLast := hrel (Fin.last n)
         calc
@@ -251,16 +251,16 @@ private theorem collectedWord_mul
         funext i
         rfl
       rcases zmodTwo_eq_zero_or_one (b (Fin.last n)) with hb | hb
-      · simp only [collectedWord, bitFactor, hb, if_pos, one_mul, collectedDefect]
+      · simp only [collectedWord, bitFactor, hb, ite_eq_left, one_mul, collectedDefect]
         rw [mul_assoc, ih']
         rcases zmodTwo_eq_zero_or_one (a (Fin.last n)) with ha | ha
-        · simp only [ha, if_pos, Pi.add_apply, hb, add_zero, one_mul]
+        · simp only [ha, ite_eq_left, Pi.add_apply, hb, add_zero, one_mul]
           simpa [a', b', diag', cross'] using congrArg
             (fun z => kernelValue k (collectedDefect n diag' cross' a' b') *
               collectedWord n x' z) hab'
         · have hc := kernelValue_commute k hcentral
             (collectedDefect n diag' cross' a' b') (x (Fin.last n))
-          simp only [ha, one_ne_zero, if_false, Pi.add_apply, hb, add_zero]
+          simp only [ha, one_ne_zero, ite_false, Pi.add_apply, hb, add_zero]
           calc
             x (Fin.last n) *
                 (kernelValue k (collectedDefect n diag' cross' a' b') *
@@ -276,7 +276,7 @@ private theorem collectedWord_mul
                   collectedWord n x' (fun i => (a + b) i.castSucc)) := by
                     rw [hab']
                     group
-      · simp only [collectedWord, bitFactor, hb, one_ne_zero, if_false,
+      · simp only [collectedWord, bitFactor, hb, one_ne_zero, ite_false,
           collectedDefect]
         have hmove := collectedWord_mul_generator k hcentral n x' a'
           (x (Fin.last n)) (fun i => cross i.castSucc (Fin.last n))
@@ -290,7 +290,7 @@ private theorem collectedWord_mul
                 group,
           hmove]
         rcases zmodTwo_eq_zero_or_one (a (Fin.last n)) with ha | ha
-        · simp only [ha, if_pos, one_mul, zero_add, Pi.add_apply, hb]
+        · simp only [ha, ite_eq_left, one_mul, zero_add, Pi.add_apply, hb]
           have hc := kernelValue_commute k hcentral
             (collectedDefect n diag' cross' a' b')
             (x (Fin.last n))
@@ -354,8 +354,8 @@ private theorem collectedWord_mul
                     (fun i => (a + b) i.castSucc)) := by
                       simp only [a', b', diag', cross', add_zero]
                       rfl
-        · simp only [ha, one_ne_zero, if_false, Pi.add_apply, hb,
-            show (1 + 1 : ZMod 2) = 0 by decide, if_pos, one_mul]
+        · simp only [ha, one_ne_zero, ite_false, Pi.add_apply, hb,
+            show (1 + 1 : ZMod 2) = 0 by decide, ite_eq_left, one_mul]
           have hc := kernelValue_commute k hcentral
             (bitSum n a' (fun i => cross i.castSucc (Fin.last n)))
             (x (Fin.last n))
@@ -458,7 +458,7 @@ private theorem map_collectedWord {V : Type uV} [AddCommGroup V]
       rfl
   | succ n ih =>
       intro x
-      simp only [collectedWord, Pi.zero_apply, bitFactor, if_pos, one_mul]
+      simp only [collectedWord, Pi.zero_apply, bitFactor, ite_eq_left, one_mul]
       change collectedWord n (fun i ↦ x i.castSucc) 0 = 1
       exact ih (fun i ↦ x i.castSucc)
 

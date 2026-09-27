@@ -365,7 +365,7 @@ theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A :
       rw [c₃.extension_inner_eq ξ ξ (Submodule.subset_span hξ3) (Submodule.subset_span hξ3)]
       have h := irreducibleCharacter_inner_eq_ite
         (⟨ξ, hξ.2.1⟩ : IrreducibleCharacter ↥M) ⟨ξ, hξ.2.1⟩
-      rwa [if_pos rfl] at h
+      rwa [ite_eq_left rfl] at h
     have hON2 : ∀ ξ ∈ hS4fin.toFinset, ∀ ξ' ∈ hS4fin.toFinset, ξ ≠ ξ' →
         ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ') = 0 := by
       intro ξ hξT ξ' hξ'T hne
@@ -473,7 +473,7 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
     intro χ hχ
     have h := irreducibleCharacter_inner_eq_ite
       (⟨χ, hχ⟩ : IrreducibleCharacter ↥M) ⟨χ, hχ⟩
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   -- ── the two `τ`-facts on the supported lattice, from `htau`
   have htauiso : ∀ {φ ψ : ClassFunction ↥M ℂ}, φ.support ⊆ A0 → ψ.support ⊆ A0 →
       ClassFunction.inner (tau φ) (tau ψ) = ClassFunction.inner φ ψ := by
@@ -734,8 +734,8 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
         have hξ := hS₂fin.mem_toFinset.mp hξF
         rw [c₁.extension_inner_eq φ ξ (Submodule.subset_span hφ) (Submodule.subset_span hξ)]
         by_cases h : φ = ξ
-        · subst h; rw [if_pos rfl]; exact hON1 φ hφ
-        · rw [if_neg h]; exact hON2 φ hφ ξ hξ h)
+        · subst h; rw [ite_eq_left rfl]; exact hON1 φ hφ
+        · rw [ite_eq_right h]; exact hON2 φ hφ ξ hξ h)
       (by
         intro ξ hξF ξ' hξ'F
         have hξ := hS4sub (hS4fin.mem_toFinset.mp hξF)
@@ -743,9 +743,9 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
         rw [c₃.extension_inner_eq ξ ξ' (Submodule.subset_span hξ) (Submodule.subset_span hξ')]
         by_cases h : ξ = ξ'
         · subst h
-          rw [if_pos rfl]
+          rw [ite_eq_left rfl]
           exact hselfone (hS4fin.mem_toFinset.mp hξF).2.1
-        · rw [if_neg h]
+        · rw [ite_eq_right h]
           exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
             (hIKF hξ.1) (hIKF hξ'.1) h)
       (fun φ hφF ξ hξF => hcross φ (hS₂fin.mem_toFinset.mp hφF)

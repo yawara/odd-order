@@ -564,28 +564,6 @@ theorem commute_of_normal_isPGroup_of_normal_isPiCompl
   intro x y hx hy
   exact Subgroup.commute_of_normal_of_disjoint P Q inferInstance inferInstance hdis x y hx hy
 
-/-- centralizer ⊆ normalizer (mathlib v4.29.1 に直接の lemma 無し). -/
-theorem centralizer_le_normalizer_subgroup {G : Type*} [Group G] (H : Subgroup G) :
-    Subgroup.centralizer (H : Set G) ≤ Subgroup.normalizer H := by
-  intro x hx
-  rw [Subgroup.mem_normalizer_iff]
-  intro y
-  have hcomm : ∀ z ∈ H, z * x = x * z := Subgroup.mem_centralizer_iff.mp hx
-  have hx_inv_mem : x⁻¹ ∈ Subgroup.centralizer (H : Set G) :=
-    Subgroup.inv_mem _ hx
-  have hcomm_inv : ∀ z ∈ H, z * x⁻¹ = x⁻¹ * z :=
-    Subgroup.mem_centralizer_iff.mp hx_inv_mem
-  refine ⟨fun hy => ?_, fun hxyx => ?_⟩
-  · have hxy : x * y = y * x := (hcomm y hy).symm
-    have : x * y * x⁻¹ = y := by rw [hxy]; group
-    rw [this]; exact hy
-  · have hcomm_z : (x * y * x⁻¹) * x⁻¹ = x⁻¹ * (x * y * x⁻¹) :=
-      hcomm_inv (x * y * x⁻¹) hxyx
-    have h_eq : y * x⁻¹ = (x * y * x⁻¹) * x⁻¹ := by
-      rw [hcomm_z]; group
-    have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
-    rw [hy_eq]; exact hxyx
-
 /-- **作用交換子部分群** `[G, A]_φ` := 集合 `{g * (φ a) g⁻¹ : g ∈ G, a ∈ A}` の生成部分群.
 
 これは Γ = G ⋊[φ] A 内で `⁅inl(G), inr(A)⁆` を `inl : G →* Γ` 経由で pull back した

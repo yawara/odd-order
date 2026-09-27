@@ -127,7 +127,7 @@ theorem hallCollection_of_class_le_two
       rw [Subgroup.top_lowerCentralSeries_one]
       exact Subgroup.inv_mem _
         (Subgroup.commutator_mem_commutator (Subgroup.mem_top y) (Subgroup.mem_top x))
-    · simp only [if_neg h]
+    · simp only [ite_eq_right h]
       exact Subgroup.one_mem _
   · have hz : ⁅y, x⁆ ∈ Subgroup.center G :=
       hcl (Subgroup.commutator_mem_commutator (Subgroup.mem_top y) (Subgroup.mem_top x))
@@ -136,8 +136,8 @@ theorem hallCollection_of_class_le_two
     rcases Nat.lt_or_ge n 2 with hn | hn
     · interval_cases n <;> simp
     · rw [collectionTail, hallTail_eq_of_eq_one_of_three_le _ hn
-        (fun r hr => if_neg (by omega : ¬ r = 2))]
-      rw [if_pos (rfl : (2 : ℕ) = 2), Nat.choose_two_right]
+        (fun r hr => ite_eq_right (by omega : ¬ r = 2))]
+      rw [ite_eq_left (rfl : (2 : ℕ) = 2), Nat.choose_two_right]
       -- `(x*y)^n = ⁅y,x⁆^{n(n-1)/2} * x^n * y^n` with `⁅y,x⁆` central.
       have hw : Commute (⁅y, x⁆ ^ (n * (n - 1) / 2)) (x ^ n * y ^ n) :=
         Commute.pow_left (hzc (x ^ n * y ^ n)) _
@@ -231,15 +231,15 @@ theorem hallCollection_of_class_le_three
     · by_cases h3 : r = 3
       · subst h3
         exact he_mem
-      · simp only [if_neg h2, if_neg h3]
+      · simp only [ite_eq_right h2, ite_eq_right h3]
         exact Subgroup.one_mem _
   · rcases Nat.lt_or_ge n 2 with hn | hn
     · interval_cases n <;> simp
     · -- Collapse the tail to its weight-`2` and weight-`3` factors.
       rw [collectionTail, hallTail_eq_of_eq_one_of_four_le _ hn
-        (fun r hr => by rw [if_neg (by omega : ¬ r = 2), if_neg (by omega : ¬ r = 3)])]
-      rw [if_pos (rfl : (2 : ℕ) = 2), if_neg (by norm_num : ¬ (3 : ℕ) = 2),
-        if_pos (rfl : (3 : ℕ) = 3)]
+        (fun r hr => by rw [ite_eq_right (by omega : ¬ r = 2), ite_eq_right (by omega : ¬ r = 3)])]
+      rw [ite_eq_left (rfl : (2 : ℕ) = 2), ite_eq_right (by norm_num : ¬ (3 : ℕ) = 2),
+        ite_eq_left (rfl : (3 : ℕ) = 3)]
       -- Run BG (4.4) and match exponents by Pascal `C(n+1,3) = C(n,2) + C(n,3)`.
       rw [OddOrder.BG.Ch1.S04.mul_pow_eq_collect_of_triple_central hc3 hc4 x y n,
         Nat.choose_succ_succ n 2]

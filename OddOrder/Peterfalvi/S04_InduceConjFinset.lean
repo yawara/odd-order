@@ -424,7 +424,7 @@ theorem induce_alphaB_apply_eq_sum_nLStabilizerIn (hyp : Hypothesis G A L)
         ((φ x : nLStabilizerIn hyp B) : G)
           = ((hyp.dadeQuotientHom hB ⟨x⁻¹ * g * x, hxM⟩ : L) : G) := by
       intro hxM
-      simp only [hφ, dif_pos hxM]
+      simp only [hφ, dite_eq_left hxM]
     constructor
     · rintro ⟨hxM, hφx⟩
       have hφx' : ((hyp.dadeQuotientHom hB ⟨x⁻¹ * g * x, hxM⟩ : L) : G) = (b : G) := by
@@ -1162,7 +1162,7 @@ theorem mobiusSummand_of_nonempty (a : {a : G // a ∈ A}) (g : G)
     hyp.mobiusSummand a g B
       = ((-1 : ℂ) ^ B.card / (Nat.card (hIntersection hyp B hB) : ℂ)) *
         ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ) := by
-  rw [mobiusSummand, dif_pos hB]
+  rw [mobiusSummand, dite_eq_left hB]
 
 open scoped Classical in
 /-- Membership of `a` in `N_L(B)` is insensitive to inserting `a` into `B` (for `a ∉ B`): since
@@ -1281,14 +1281,14 @@ omit [Fintype G] in
 open scoped Classical in
 theorem toggleA_of_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
     (haB : a ∈ B) : toggleA a B = B.erase a := by
-  classical rw [toggleA]; simp only [if_pos haB]
+  classical rw [toggleA]; simp only [ite_eq_left haB]
 
 omit [Group G] in
 omit [Fintype G] in
 open scoped Classical in
 theorem toggleA_of_not_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
     (haB : a ∉ B) : toggleA a B = insert a B := by
-  classical rw [toggleA]; simp only [if_neg haB]
+  classical rw [toggleA]; simp only [ite_eq_right haB]
 
 open scoped Classical in
 /-- **Peterfalvi (2.10), the toggle-`a` involution collapses `𝒫(a)` to its `B = {a}` survivor.**

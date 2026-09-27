@@ -128,7 +128,7 @@ theorem repr_sum_fourier_orbit_zero
   rw [ha]
   simp only [map_smul, Finsupp.coe_smul, Pi.smul_apply, Basis.repr_self, Finsupp.single_apply,
     smul_eq_mul]
-  rw [if_neg (hcc' k), mul_zero, mul_zero]
+  rw [ite_eq_right (hcc' k), mul_zero, mul_zero]
 
 /-- **Diagonal coordinate is `1` on a free orbit.** If the `σ`-orbit of `c` is free
 (`σ^{k} c = c ⟹ k = 0`), the Fourier projection of `b c` has `c`-coordinate `1` (only the `k = 0`
@@ -148,7 +148,7 @@ theorem repr_sum_fourier_self_free
     rw [ha]
     simp only [map_smul, Finsupp.coe_smul, Pi.smul_apply, Basis.repr_self, Finsupp.single_apply,
       smul_eq_mul]
-    rw [if_neg (fun heq => hk (hfree k heq)), mul_zero, mul_zero]
+    rw [ite_eq_right (fun heq => hk (hfree k heq)), mul_zero, mul_zero]
   · intro hc0; exact absurd (Finset.mem_univ _) hc0
 
 /-- **Plain permutation operators are monomial with weight `1`** (issue 0106, the `a = 1`

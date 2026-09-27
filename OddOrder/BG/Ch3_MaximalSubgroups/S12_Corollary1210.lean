@@ -69,7 +69,7 @@ theorem isMulCommutative_of_isNilpotent_of_forall_sylow {H : Type*} [Group H] [F
     (hab : ∀ (q : ℕ), q.Prime → ∀ S : Sylow q H, IsMulCommutative ↥(S : Subgroup H)) :
     IsMulCommutative H := by
   classical
-  obtain ⟨e⟩ := ((Group.isNilpotent_of_finite_tfae (G := H)).out 0 4).mp hnil
+  obtain ⟨e⟩ := ((Group.isNilpotent_of_finite_tfae (G := H)).out 1 5).mp hnil
   refine S11.isMulCommutative_of_mulEquiv e ⟨⟨fun x y => ?_⟩⟩
   funext q P
   exact (hab q (Nat.prime_of_mem_primeFactors q.2) P).is_comm.comm (x q P) (y q P)

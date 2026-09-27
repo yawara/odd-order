@@ -56,9 +56,9 @@ theorem eq_zero_on_iff_forall_inner_eq_zero_of_span
         change (if h * g * h⁻¹ ∈ A then D (h * g * h⁻¹) else 0)
           = (if g ∈ A then D g else 0)
         by_cases hg : g ∈ A
-        · rw [if_pos hg, if_pos (hAconj h hg)]
+        · rw [ite_eq_left hg, ite_eq_left (hAconj h hg)]
           exact D.conj_eq g h
-        · rw [if_neg hg, if_neg (fun hc : h * g * h⁻¹ ∈ A => hg (by
+        · rw [ite_eq_right hg, ite_eq_right (fun hc : h * g * h⁻¹ ∈ A => hg (by
             have hback := hAconj h⁻¹ hc
             have hgid : h⁻¹ * (h * g * h⁻¹) * h⁻¹⁻¹ = g := by group
             rwa [hgid] at hback))]⟩ with hDA_def
@@ -68,7 +68,7 @@ theorem eq_zero_on_iff_forall_inner_eq_zero_of_span
       intro x hx
       rw [ClassFunction.mem_support] at hx
       by_contra hxA
-      exact hx (by rw [hDA_apply, if_neg hxA])
+      exact hx (by rw [hDA_apply, ite_eq_right hxA])
     -- `⟨Φ i, D − DA⟩ = 0`: the difference is supported off `A`.
     have hDc : ∀ i, ClassFunction.inner (Φ i) (D - DA) = 0 := by
       intro i
@@ -79,7 +79,7 @@ theorem eq_zero_on_iff_forall_inner_eq_zero_of_span
       have hxA : x ∈ A := ClassFunction.mem_supportedSubmodule.mp (hΦA i) hxΦ
       refine hxDc ?_
       change D x - DA x = 0
-      rw [hDA_apply, if_pos hxA, sub_self]
+      rw [hDA_apply, ite_eq_left hxA, sub_self]
     -- Hence `⟨Φ i, DA⟩ = ⟨Φ i, D⟩ = 0` for every `i`.
     have hΦDA : ∀ i, ClassFunction.inner (Φ i) DA = 0 := by
       intro i
@@ -108,7 +108,7 @@ theorem eq_zero_on_iff_forall_inner_eq_zero_of_span
       simp
     intro a ha
     have h0 : DA a = 0 := by rw [hDA0]; rfl
-    rwa [hDA_apply, if_pos ha] at h0
+    rwa [hDA_apply, ite_eq_left ha] at h0
 
 open scoped Classical in
 /-- **Peterfalvi (1.3.b), value-identification half**: if `η` is an orthonormal-image family
@@ -165,9 +165,9 @@ theorem restrict_apply_eq_on_of_induce_eq_sum
     (ClassFunction.inner_induce_eq_inner_restrict H (Φ j) (mu i)).symm
   rw [hrecip, hInd j, inner_sum_left]
   rw [Finset.sum_eq_single i]
-  · rw [ClassFunction.inner_smul_left, hmu_orth, if_pos rfl, mul_one]
+  · rw [ClassFunction.inner_smul_left, hmu_orth, ite_eq_left rfl, mul_one]
   · intro k _ hki
-    rw [ClassFunction.inner_smul_left, hmu_orth, if_neg hki, mul_zero]
+    rw [ClassFunction.inner_smul_left, hmu_orth, ite_eq_right hki, mul_zero]
   · intro h
     exact absurd (Finset.mem_univ i) h
 
@@ -197,9 +197,9 @@ theorem eq_sum_inner_smul_of_orthonormal_of_span_top
     have hsum : ∑ i, ClassFunction.inner (Φ j) (ClassFunction.inner f (Φ i) • Φ i)
         = star (ClassFunction.inner f (Φ j)) := by
       rw [Finset.sum_eq_single j]
-      · rw [inner_smul_right, horth, if_pos rfl, mul_one]
+      · rw [inner_smul_right, horth, ite_eq_left rfl, mul_one]
       · intro i _ hij
-        rw [inner_smul_right, horth, if_neg (Ne.symm hij), mul_zero]
+        rw [inner_smul_right, horth, ite_eq_right (Ne.symm hij), mul_zero]
       · intro h; exact absurd (Finset.mem_univ j) h
     rw [hsum, ← inner_conj_symm, sub_self]
   ext a

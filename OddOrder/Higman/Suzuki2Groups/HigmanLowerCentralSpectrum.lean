@@ -880,8 +880,7 @@ theorem baseChange_eigenvector_equation_of_equivariant_linearEquiv
       e.baseChange F K V W ((rhoV c).baseChange K y) =
         (rhoW c).baseChange K (e.baseChange F K V W y) := by
     intro y
-    induction y using TensorProduct.induction_on with
-    | zero => simp
+    induction y using TensorProduct.inductionOn with
     | tmul a v => simp [he]
     | add y z hy hz => simp [hy, hz]
   rw [← hinter x, hx, map_smul]

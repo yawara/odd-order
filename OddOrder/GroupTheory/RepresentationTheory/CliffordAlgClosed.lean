@@ -7,6 +7,7 @@ import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.Algebra.MonoidAlgebra.MapDomain
 import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.SimpleModule.Isotypic
+import Mathlib.RingTheory.Artinian.Module
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Module.Submodule.RestrictScalars
 
@@ -133,7 +134,6 @@ theorem conjSemilinearEnd_bijective (g : G) :
     Function.Bijective (conjSemilinearEnd (H := H) ρ g) :=
   ρ.apply_bijective g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Membership in the image submodule `N.map (conjSemilinearEnd ρ g)` is exactly being of the form
 `ρ g v` for `v ∈ N`: the image is, as a set, the `ρ g`-translate of `N`, carrying the standard
 `k[H]`-action `h • w = ρ (h : G) w`. -/
@@ -143,7 +143,6 @@ theorem mem_map_conjSemilinearEnd (g : G)
       ∃ v ∈ N, (show (resRep ρ H).asModule from ρ g v) = w := by
   simp only [Submodule.mem_map, conjSemilinearEnd_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Conjugation permutes simple constituents** (module core of Clifford's theorem; the first
 ingredient of BG Prop 2.2(a)).  For `ρ : Representation k G V` over any field `k`, `H ⊴ G`, a simple
 `k[H]`-submodule `N` of the restriction `(resRep ρ H).asModule`, and any `g : G`, the image of
@@ -245,7 +244,6 @@ theorem iSup_map_conjSemilinearEnd_eq_top [ρ.IsIrreducible]
     rw [map_map_conjSemilinearEnd]
     exact le_iSup (fun g => W.map (conjSemilinearEnd (H := H) ρ g)) (g' * g)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **The restriction is `W`-isotypic** (the Clifford structure of BG Prop 2.2(a)).  If `ρ` is
 irreducible, `W` is a nonzero simple `k[H]`-submodule of the restriction, and every `G`-conjugate
 of `W` is isomorphic to `W` (the hypothesis `M ≅ M^g`), then *every* simple `k[H]`-submodule of the
@@ -266,7 +264,6 @@ theorem isIsotypicOfType_of_conjugates [ρ.IsIrreducible]
   obtain ⟨g, rfl⟩ := hS
   exact ⟨e.trans (hconj g).some.symm⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford semisimplicity** (characteristic-free): the restriction of a nontrivial
 finite-dimensional irreducible representation to a normal subgroup is a *semisimple*
 `k[H]`-module — with **no** condition relating `char k` and `|H|` (in contrast to Maschke's

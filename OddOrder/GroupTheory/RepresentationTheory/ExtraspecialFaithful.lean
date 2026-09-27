@@ -135,7 +135,7 @@ theorem sq_finrank_mul_card_center [FiniteDimensional F V] [Finite P]
   have hne : (Nat.card P : F) ≠ 0 := (isUnit_of_invertible _).ne_zero
   -- orthonormality `⟹ ∑ χ(g) χ(g⁻¹) = |P|`
   have hortho := Representation.char_orthonormal ρ ρ
-  rw [if_pos ⟨Representation.Equiv.refl ρ⟩] at hortho
+  rw [ite_eq_left ⟨Representation.Equiv.refl ρ⟩] at hortho
   have hsum : ∑ g : P, ρ.character g * ρ.character g⁻¹ = (Nat.card P : F) := by
     have h := congrArg (fun x => (Nat.card P : F) * x) hortho
     simp only [← mul_assoc, mul_inv_cancel₀ hne, one_mul, mul_one] at h
@@ -145,8 +145,8 @@ theorem sq_finrank_mul_card_center [FiniteDimensional F V] [Finite P]
       = if g ∈ Subgroup.center P then (Module.finrank F V : F) ^ 2 else 0 := by
     intro g
     by_cases hg : g ∈ Subgroup.center P
-    · rw [if_pos hg, char_mul_char_inv_of_mem_center ρ hg]
-    · rw [if_neg hg, character_eq_zero_of_notMem_center ρ hf hcl hg, zero_mul]
+    · rw [ite_eq_left hg, char_mul_char_inv_of_mem_center ρ hg]
+    · rw [ite_eq_right hg, character_eq_zero_of_notMem_center ρ hf hcl hg, zero_mul]
   -- count: `|{g : g ∈ Z}| = |Z|`
   have hcard : (Finset.univ.filter (· ∈ Subgroup.center P)).card
       = Nat.card (Subgroup.center P) := by
@@ -206,8 +206,8 @@ theorem card_quotient_center_le_sq_finrank [FiniteDimensional F V] [Finite P]
     rw [← map_mul]
     change ρ.character _ = _
     by_cases h : c = c'
-    · subst h; rw [if_pos rfl, mul_inv_cancel, char_one]
-    · rw [if_neg h]
+    · subst h; rw [ite_eq_left rfl, mul_inv_cancel, char_one]
+    · rw [ite_eq_right h]
       exact character_eq_zero_of_notMem_center ρ hf hcl ((hmem c c').not.mpr h)
   -- the family of coset-rep images is linearly independent
   have hindep : LinearIndependent F (fun c : P ⧸ Subgroup.center P => ρ (Quotient.out c)) := by
@@ -221,7 +221,7 @@ theorem card_quotient_center_le_sq_finrank [FiniteDimensional F V] [Finite P]
     rw [hcoef, zero_mul, map_zero] at happ
     simp only [hTval, smul_ite, smul_zero] at happ
     rw [Finset.sum_ite_eq' Finset.univ j] at happ
-    simp only [Finset.mem_univ, if_true, smul_eq_mul] at happ
+    simp only [Finset.mem_univ, ite_true, smul_eq_mul] at happ
     exact (mul_eq_zero.mp happ.symm).resolve_right (finrank_cast_ne_zero ρ hf hcl)
   -- independence ⟹ card ≤ finrank End = (dim V)²
   have h1 := hindep.fintype_card_le_finrank

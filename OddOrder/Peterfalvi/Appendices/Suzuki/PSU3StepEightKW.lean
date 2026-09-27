@@ -223,7 +223,7 @@ theorem ncard_le_card_W_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   set V' : G → ↥hyp.W := fun x => if hx : Vf x ∈ hyp.W then ⟨Vf x, hx⟩ else 1 with hV'def
   have hV'val : ∀ x ∈ S, (V' x : G) = Vf x := by
     intro x hx
-    simp only [hV'def, dif_pos (hVfW x hx)]
+    simp only [hV'def, dite_eq_left (hVfW x hx)]
   have hinj : Set.InjOn V' S := by
     intro x₁ hx₁ x₂ hx₂ hxy
     have hveq : Vf x₁ = Vf x₂ := by
@@ -275,7 +275,7 @@ theorem ncard_le_card_W_sub_one_of_f_eq_conj_self
   set V' : G → ↥hyp.W := fun x => if hx : Vf x ∈ hyp.W then ⟨Vf x, hx⟩ else 1 with hV'def
   have hV'val : ∀ x ∈ S, (V' x : G) = Vf x := by
     intro x hx
-    simp only [hV'def, dif_pos (hVfW x hx)]
+    simp only [hV'def, dite_eq_left (hVfW x hx)]
   have hinj : Set.InjOn V' S := by
     intro x₁ hx₁ x₂ hx₂ hxy
     have hveq : Vf x₁ = Vf x₂ := by
@@ -524,7 +524,7 @@ theorem exists_witness_mem_W_of_KW {m : ℕ} (M : hyp.QuotientFieldModel m)
   set V' : G → ↥hyp.W := fun x => if hx : Vf x ∈ hyp.W then ⟨Vf x, hx⟩ else 1 with hV'def
   have hV'val : ∀ x ∈ S, (V' x : G) = Vf x := by
     intro x hx
-    simp only [hV'def, dif_pos (hVfW x hx)]
+    simp only [hV'def, dite_eq_left (hVfW x hx)]
   have hinjOn : Set.InjOn V' S := by
     intro x₁ hx₁ x₂ hx₂ hxy
     have hveq : Vf x₁ = Vf x₂ := by

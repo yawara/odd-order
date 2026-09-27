@@ -416,24 +416,6 @@ theorem higmanLemmaNine_pow_four_eq_one
       (actor_card_odd_of_regular_on_involutions hP X hreg hinv)
       hmulti hncomm A hAmax
 
-/-- The join of two abelian subgroups is abelian when the left subgroup
-centralizes the right one. This local form avoids importing the later BG
-copy of the same elementary fact into the Higman development. -/
-private theorem isMulCommutative_sup_of_central_left
-    {G : Type*} [Group G] {A B : Subgroup G}
-    (hA : IsMulCommutative A) (hB : IsMulCommutative B)
-    (hAB : A ≤ Subgroup.centralizer (B : Set G)) :
-    IsMulCommutative ↥(A ⊔ B) := by
-  rw [Subgroup.sup_eq_closure]
-  refine Subgroup.isMulCommutative_closure fun x hx y hy => ?_
-  rcases hx with hx | hx <;> rcases hy with hy | hy
-  · simpa using congrArg Subtype.val
-      (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
-  · exact (Subgroup.mem_centralizer_iff.mp (hAB hx) y hy).symm
-  · exact Subgroup.mem_centralizer_iff.mp (hAB hy) x hx
-  · simpa using congrArg Subtype.val
-      (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
-
 /-- Endgame of Higman Lemma 9. If the maximal normal invariant abelian
 subgroup has exponent two, every one of its nonidentity elements is a
 central involution, so maximality identifies it with the center. A lower
@@ -506,7 +488,7 @@ private theorem IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
     have hsupNI : IsNormalInvariant X.subtype (A ⊔ L) :=
       ⟨inferInstance, hAmax.isNormalInvariant.2.sup hLinv⟩
     have hsupComm : IsMulCommutative ↥(A ⊔ L) :=
-      isMulCommutative_sup_of_central_left
+      Subgroup.isMulCommutative_sup_of_le_centralizer
         hAmax.isMulCommutative hLcomm
         (hAcenter.trans (Subgroup.center_le_centralizer _))
     have hsupEq : A ⊔ L = A :=

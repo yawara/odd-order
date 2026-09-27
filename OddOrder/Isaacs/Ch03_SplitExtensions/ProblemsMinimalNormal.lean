@@ -194,7 +194,7 @@ private theorem exists_sylow_frattini_setup [Group.IsSolvable G]
       Subgroup.normal_mul _ _
     rw [show Nat.card ↥(M.subgroupOf L ⊔ (Q : Subgroup ↥L)) =
         Nat.card ↥((M.subgroupOf L : Set ↥L) * ((Q : Subgroup ↥L) : Set ↥L)) from
-      Nat.card_congr (Equiv.setCongr hcoe), hprod, hMsub_card, hQ_card,
+      Nat.card_congr (Set.equivOfEq hcoe), hprod, hMsub_card, hQ_card,
       hfactL, hL_card, hLbar_card, mul_comm]
   have hsup_top : M.subgroupOf L ⊔ (Q : Subgroup ↥L) = ⊤ :=
     Subgroup.eq_top_of_card_eq _ hsup_card

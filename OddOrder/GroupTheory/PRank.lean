@@ -17,7 +17,7 @@ import Mathlib.LinearAlgebra.Dimension.Free
 
 `OddOrder.GroupTheory` shared module: BG / Isaacs FGT の `r_p(G)` (`p`-rank) の概念.
 
-mathlib v4.30.0-rc2 の `Group.rank G` は **minimum generators 数** (`Mathlib/GroupTheory/Rank.lean`)
+mathlib (v4.34.1) の `Group.rank G` は **minimum generators 数** (`Mathlib/GroupTheory/Rank.lean`)
 で BG の `r_p(G)` (= max log_p of elementary abelian p-subgroup) とは別概念. 命名衝突を
 避けるため `pRank G p` を採用.
 
@@ -418,7 +418,7 @@ variable (G : Type*) [Group G]
 
 For `G = ⊥` or no elementary abelian `p`-subgroup besides `⊥`, this is `0`.
 
-**注**: mathlib v4.30.0-rc2 の `Group.rank G` は **minimum generators 数** で別概念.
+**注**: mathlib (v4.34.1) の `Group.rank G` は **minimum generators 数** で別概念.
 本 def の命名 `pRank` で衝突回避. -/
 noncomputable def pRank (p : ℕ) : ℕ :=
   ⨆ A : {A : Subgroup G // A.IsElementaryAbelian p}, Nat.log p (Nat.card (A.val : Subgroup G))

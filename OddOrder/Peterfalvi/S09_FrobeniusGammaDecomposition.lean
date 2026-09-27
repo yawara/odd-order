@@ -536,8 +536,8 @@ theorem exists_orthogonal_projection_residual
       rw [OddOrder.RepresentationTheory.inner_sum_left,
         Finset.sum_eq_single_of_mem j hj (fun l hl hlj => by
           rw [ClassFunction.inner_smul_left, horth l hl j hj,
-            if_neg hlj, mul_zero]),
-        ClassFunction.inner_smul_left, horth j hj j hj, if_pos rfl]
+            ite_eq_right hlj, mul_zero]),
+        ClassFunction.inner_smul_left, horth j hj j hj, ite_eq_left rfl]
     rw [ClassFunction.inner_sub_left, hsum, hproj j hj, sub_self]
 
 end ProjectionResidual
@@ -695,7 +695,7 @@ theorem exists_weightedGammaDecomposition
     intro j _hj l _hl
     by_cases hjl : j = l
     · subst l
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       let : Fintype ↥(F.L j) := Fintype.ofFinite _
       let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
         invertibleOfNonzero
@@ -708,7 +708,7 @@ theorem exists_weightedGammaDecomposition
       simpa [weightedNuSumAt] using
         (F.hypothesis78_weightedNuSum_inner_self_eq_BsumWeight
           j hodd (hnilp j) (C j) (hFrob j))
-    · rw [if_neg hjl]
+    · rw [ite_eq_right hjl]
       let : Fintype ↥(F.L j) := Fintype.ofFinite _
       let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
         invertibleOfNonzero

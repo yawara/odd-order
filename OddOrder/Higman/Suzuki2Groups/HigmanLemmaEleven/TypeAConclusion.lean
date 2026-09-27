@@ -395,7 +395,7 @@ private theorem frobeniusPower_ne_one_and_orderOf_odd_of_primitive_shift
     have hgcd := higmanPowerMapGcd r.val n hnpos
     rw [hcop.gcd_eq_one] at hgcd
     by_contra hnotOdd
-    rw [if_neg hnotOdd] at hgcd
+    rw [ite_eq_right hnotOdd] at hgcd
     have : 0 < 2 ^ Nat.gcd r.val n := by positivity
     omega
   let : Finite (RingAut F) :=

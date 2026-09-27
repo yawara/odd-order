@@ -369,7 +369,7 @@ private theorem inf_centralizer_ne_bot_of_not_le_centralizer [Finite G]
   refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
     (N := Q ⊔ R₁) (R := P) ?_ ?_ ?_ hPne ⟨p, Fact.out, hPcard⟩ ?_
   · exact (le_inf hQinv hPnormR₁).trans
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup Q R₁)
+      (Subgroup.inf_normalizer_le_normalizer_sup Q R₁)
   · rw [disjoint_iff, inf_comm]
     exact OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hPp hQR₁cop
   · exact fun h => hQne (le_bot_iff.mp (le_sup_left.trans h.le))
@@ -663,7 +663,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   set Y : Subgroup G := Q ⊔ N with hY_def
   have hYM : Y ≤ M := sup_le hQM hNM
   have hPnormY : P ≤ Subgroup.normalizer (Y : Set G) :=
-    (le_inf hQinv hPnormN).trans (Subgroup.normalizer_inf_normalizer_le_normalizer_sup Q N)
+    (le_inf hQinv hPnormN).trans (Subgroup.inf_normalizer_le_normalizer_sup Q N)
   have hYnormR₀ : Y ≤ Subgroup.normalizer (R₀ : Set G) := sup_le hQnormR₀ inf_le_right
   have hYcard : Nat.card ↥Y = Nat.card ↥Q * Nat.card ↥N :=
     card_sup_eq_mul_of_le_normalizer_of_disjoint hQnormN hQNdisj
@@ -1126,7 +1126,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
       apply Subgroup.map_injective (derivedInG M).subtype_injective
       rw [Subgroup.map_subgroupOf_eq_of_le hQM', ← hTeq]
     let S : Sylow q ↥(derivedInG M) := ⟨Q.subgroupOf (derivedInG M), hQ₀pgrp, hmax⟩
-    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(derivedInG M))).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(derivedInG M))).out 1 4
     have hnormal : (Q.subgroupOf (derivedInG M)).Normal := htfae.mp hnil q ⟨Fact.out⟩ S
     have hchar : (Q.subgroupOf (derivedInG M)).Characteristic :=
       Sylow.characteristic_of_normal S hnormal

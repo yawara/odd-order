@@ -167,13 +167,13 @@ theorem muS_orthonormal (i k : Fin tp.q) (j l : Fin tp.p) :
   · subst hjl
     by_cases hik : i = k
     · subst hik
-      rw [if_pos rfl, if_pos ⟨rfl, rfl⟩]
-    · rw [if_neg (fun hc => hik ((eqQ hG mp tp).injective
+      rw [ite_eq_left rfl, ite_eq_left ⟨rfl, rfl⟩]
+    · rw [ite_eq_right (fun hc => hik ((eqQ hG mp tp).injective
           ((((mp.certainTypeS hG).columnFamily (chi2enum hG mp tp j)).injective) hc))),
-        if_neg (by simp [hik])]
-  · rw [if_neg ((mp.certainTypeS hG).columnFamily_mu_ne
+        ite_eq_right (by simp [hik])]
+  · rw [ite_eq_right ((mp.certainTypeS hG).columnFamily_mu_ne
         (fun hc => hjl ((chi2enum hG mp tp).injective hc)) _ _),
-      if_neg (by simp [hjl])]
+      ite_eq_right (by simp [hjl])]
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **The type-`P₂` `Hypothesis46` on the `muS` producer instance** (issue 2038, the shortcut
@@ -563,7 +563,7 @@ theorem omegaSChar_injective :
   have h2 := omegaS_inner hG mp tp k k l l
   rw [h1] at h2
   have hcond : ¬ (i = k ∧ j = l) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
-  rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+  rw [ite_eq_right hcond, ite_eq_left (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
   exact zero_ne_one h2
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
@@ -1009,7 +1009,7 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
     have h2 := omegaS_inner hG mp tp i i j j
     rw [h1] at h2
     have hcond : ¬ (k = i ∧ l = j) := fun ⟨h1', h2'⟩ => hne (by rw [h1', h2'])
-    rw [if_neg hcond, if_pos ⟨rfl, rfl⟩] at h2
+    rw [ite_eq_right hcond, ite_eq_left ⟨rfl, rfl⟩] at h2
     exact zero_ne_one h2
   have hA1 : A ≠ 1 := by
     intro h1

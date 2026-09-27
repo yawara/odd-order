@@ -1023,7 +1023,6 @@ theorem elabRepresentation_isIrreducible {A K : Type*} [Group A] [CommGroup K] {
   · refine Subrepresentation.toSubmodule_injective (show S.toSubmodule = ⊤ from ?_)
     rw [← Φ.symm_apply_apply S.toSubmodule, hJtop]; exact Φ.symm.map_top
 
-set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
 /-- **Thin subgroup→module Singer adapter** (issue 9000 dedup): a `φ`-irreducible, faithful
 action of `A` on the elementary abelian `p`-group `K` makes `(elabRepresentation p φ).asModule`
@@ -1225,7 +1224,6 @@ theorem exists_addEquiv_asModule_fpf
   rw [hτ, hτ, elabRepresentation_apply] at h
   exact Additive.ofMul.injective h
 
-set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
 /-- **Thin subgroup-level entry to the canonical Singer cyclicity+divisibility** (issue 9000
 dedup): the subgroup→module conversion `elabRepresentation_isSimpleModule_and_faithful` followed
@@ -1249,7 +1247,6 @@ theorem singerAdapter_isCyclic_card_dvd
   exact ⟨hcyc, by
     rwa [show Nat.card (elabRepresentation p φ).asModule = Nat.card K from rfl] at hdvd⟩
 
-set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
 /-- **Thin subgroup-level entry to the canonical Singer FPF-coprimality** (issue 9000 dedup):
 the subgroup→module conversions (`elabRepresentation_isSimpleModule_and_faithful` +

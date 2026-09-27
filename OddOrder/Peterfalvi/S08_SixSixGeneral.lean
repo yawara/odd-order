@@ -351,10 +351,10 @@ theorem xMember_characterFacts (hodd : Odd (Nat.card ↥L)) {Z : Subgroup ↥L}
   refine ⟨hreal, hχirr.inner_self_eq_one, hconjirr.inner_self_eq_one, ?_, ?_⟩
   · simpa using
       (irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
-        ⟨χ, hχirr⟩).trans (if_neg hne)
+        ⟨χ, hχirr⟩).trans (ite_eq_right hne)
   · simpa using
       (irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
-        ⟨χ.conj, hconjirr⟩).trans (if_neg (Ne.symm hne))
+        ⟨χ.conj, hconjirr⟩).trans (ite_eq_right (Ne.symm hne))
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **A break `χ ∈ 𝒳` outside an accumulator `S₁ ⊆ 𝒳` is orthogonal to it, as is `χ̄`** — the
@@ -717,7 +717,7 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
     by_cases hjl : j = l
     · subst hjl
       simpa using (hirr _ (hmemX j hj)).inner_self_eq_one
-    · rw [if_neg hjl]
+    · rw [ite_eq_right hjl]
       exact xSet_pairwise_orthogonal (K := K) Z (hmemX j hj) (hmemX l hl)
         (fun h => hjl (hmeminj j hj l hl h))
   -- supported differences from the degree ratios
