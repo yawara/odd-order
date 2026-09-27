@@ -15,7 +15,7 @@ created: 2026-09-27
 
 - 最新 stable = **Lean v4.34.1 / mathlib tag `v4.34.1`** (`d13f23b723b8`, 2026-09-24)。
   v4.35.0 は rc3 止まりなので対象外 (CLAUDE.md「rc には当てない」)。
-- 現 pin = `v4.33.0` / `db584cd6d46c` (2026-08-20, [issue 0183](closed/0183-mathlib-v433-bump.md))。
+- 現 pin = `v4.33.0` / `db584cd6d46c` (2026-08-20, [issue 0183](0183-mathlib-v433-bump.md))。
 
 ### 事前実測 (2026-09-27, 両 tag を展開して機械照合)
 
@@ -60,10 +60,27 @@ created: 2026-09-27
 
 ### 同時リファクタ (ユーザー指示: 影響ファイルのリファクタ / モジュール分割 / stale doc)
 
-- [ ] **R1** 影響を受けたファイルのリファクタ (改名に伴う自前命名の追随など)
-- [ ] **R2** `OddOrder/Mathlib/` shim の棚卸し (v4.34.1 で upstream 化されたものを削除・置換)
-- [ ] **R3** 関連ファイルのモジュール分割の是正
-- [ ] **R4** stale docstring / ドキュメント (改名された補題名への言及、CLAUDE.md ツールチェイン節 等)
+- [x] **R1** 影響を受けたファイルのリファクタ
+  - [x] v4.33 で入れた互換フラグ `backward.isDefEq.respectTransparency` を 1 本ずつ要否判定:
+        **269 → 231** (20 file / 38 箇所が不要、commit `2f507e069`)
+  - [x] v4.34 の新 mathlib 宣言で重複になった自前補題を削除: `Subgroup.normal_of_le_center` の同一補題 **8 本**、
+        `IsCyclic.subgroup_eq_iff_card_eq` が包含する `subgroup_eq_of_card_eq_prime_of_isCyclic`、
+        `isMulCommutative_closure_of_forall_commute`、薄いラッパー `commutator_bot_left_eq`
+  - [x] v4.30 から mathlib にある `Subgroup.centralizer_le_normalizer` の自前コピー 2 本を削除
+  - [x] repo 内の重複: `isMulCommutative_sup_of_le_centralizer` の逐語コピー 3 本を
+        `Subgroup.isMulCommutative_sup_of_le_centralizer` (`OddOrder/Mathlib/Subgroup.lean`) に一本化、
+        有理代数的整数の独立 2 証明の片方を導出に置換
+  - [x] ビルドログの "Try this" 提案 14 件を解消 (commit `5a48263c6`)
+- [x] **R2** `OddOrder/Mathlib/` shim の棚卸し: 93 宣言を v4.34.1 と名前照合 → **upstream 化されたものは無し**
+      (上記 `isMulCommutative_sup_of_le_centralizer` は逆に shim へ集約)
+- [x] **R3** モジュール分割: 改名の折返しで 1486 → 1490 行になった `S08_XBlockCounting` を、依存の閉じた
+      「中心交換子への制限・直交性」群で新 leaf `S08_CentralCommutatorRestriction` (772 行) に分割
+      (残り 761 行、module 名不変・`OddOrder.lean` 配線済)。他の上限近傍 file はむしろ縮小
+- [x] **R4** stale docstring / ドキュメント
+  - [x] 改名された補題名への言及 (`if_pos` 等は Lean file 内では機械リネームで一括更新)
+  - [x] 「mathlib v4.29.1 / v4.30.0-rc2 に不在」系の主張 56 行を v4.34.1 で全件再確認、**事実誤り 5 件**を訂正
+        (commit `481a23dbe`)
+  - [x] CLAUDE.md ツールチェイン節、`notes/meta/mathlib_v434_migration.md` 新設
 
 ## 完了条件
 
@@ -76,6 +93,31 @@ created: 2026-09-27
 
 ## 参照
 
-- 前回 bump: [`notes/meta/mathlib_v433_migration.md`](../notes/meta/mathlib_v433_migration.md) (issue 0183)
+- 前回 bump: [`notes/meta/mathlib_v433_migration.md`](../../notes/meta/mathlib_v433_migration.md) (issue 0183)
+- 今回の記録: [`notes/meta/mathlib_v434_migration.md`](../../notes/meta/mathlib_v434_migration.md)
 - mathlib tag `v4.34.1` = `d13f23b723b8a846827a245b89c10fc7d3f11612`
 - Lean v4.34.0 release notes: https://lean-lang.org/doc/reference/latest/releases/v4.34.0/
+
+## 結果 (2026-09-27 完了)
+
+| gate | 結果 |
+|---|---|
+| `lake build OddOrder` | **green** (5,566 jobs) |
+| `bin/check-warnings --strict` | **非 sorry 警告ゼロ / PANIC ゼロ** |
+| AxiomsCheck | **OK** (6,030 件) |
+| `bin/count-sorry` | **0** (非退行) |
+| `bin/check-links` / `bin/check-doc-names` | 0 / 0 |
+| 変更規模 | 434 Lean file / +3,033 −3,221 |
+
+詳細 (API 変更一覧・手順・commit 構成) は
+[`notes/meta/mathlib_v434_migration.md`](../../notes/meta/mathlib_v434_migration.md)。
+
+### 事前調査で見えていなかったもの
+
+1. **deprecated 属性の付かない意味の変更**: `List.TFAE.out` の 1-indexed 化 (0 始まりは即エラーだが
+   1 以上は黙って別命題になる)、`Finsupp.mapDomain_apply` / `Equiv.setCongr` の**名前の再利用**。
+   両 tag の同名宣言の文を比較する照合でしか事前に拾えない。
+2. **ビルド中の `lake env lean` 並列が `lake build` を数倍遅くする** (Lake の起動処理の競合)。
+   `lean` 直接起動に切り替えて解消。
+3. **v4.34 で mathlib に入った補題と repo 内の同一補題** (`Subgroup.normal_of_le_center` の 8 重複など)。
+   新宣言名と repo 宣言名の機械照合で発見。

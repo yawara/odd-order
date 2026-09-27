@@ -4,7 +4,12 @@
 > 実装済 (Frobenius 群 = Isaacs Ch06、J(P)/ZJ = `GroupTheory/ThompsonSubgroup`+Ch07、TI = `GroupTheory/TISubset`、
 > Dade = Pf S04/S06、coherence = S07/S08 sorry-free 等)。**本 doc は mathlib coverage の記録であり残作業リストではない**。
 
-mathlib (調査時 `v4.29.1`; **2026-05-27 に `v4.30.0-rc2` へ bump 済** — 本調査自体は v4.29.1 時点のスナップショット, ローカルパス `.lake/packages/mathlib/Mathlib/`) における Feit-Thompson 関連項目の網羅調査結果。**2026-05-21** 実施。mathlib は更新が速いので 3 ヶ月以上経ったら再監査推奨。
+mathlib (調査時 `v4.29.1`、ローカルパス `.lake/packages/mathlib/Mathlib/`) における Feit-Thompson 関連項目の網羅調査結果。**2026-05-21** 実施。mathlib は更新が速いので 3 ヶ月以上経ったら再監査推奨。
+
+> **現行 pin は `v4.34.1`** (2026-09-27 bump、[`mathlib_v434_migration.md`](mathlib_v434_migration.md))。本表の全面再監査はしていないが、
+> 同日に Lean docstring 側の「mathlib に不在」主張 56 行を v4.34.1 で全件再確認した: **新たに mathlib 入りしたのは
+> `Subgroup.normal_of_le_center` と `IsCyclic.subgroup_eq_iff_card_eq` のみ** (repo 側の重複は削除済)。
+> O_π・Fitting・J(P)・Ω/℧・SCN・TI・extraspecial・metacyclic・中心積・類関数・`ℤ[Irr]`・慣性群・Dade・coherence は依然 mathlib に無い。
 
 ## ✓ 完全に揃っているもの (そのまま使える)
 
