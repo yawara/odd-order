@@ -783,6 +783,7 @@ import OddOrder.Peterfalvi.S07_UnionPairBridge
 import OddOrder.Peterfalvi.S07_RetargetScaled
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S08_CoherenceCore
+import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S08_CaseBCoherence2
