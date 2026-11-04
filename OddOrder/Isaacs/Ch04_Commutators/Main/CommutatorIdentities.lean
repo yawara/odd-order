@@ -437,48 +437,6 @@ theorem isElementaryAbelian_quotient_of_frattini_le_of_pgroup
     rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
     exact hΦ (pow_p_mem_frattini_of_pgroup hP x)
 
-/-- **Helper**: For any group `G` and subgroup `M ≤ G` with prime index, `M` is a coatom
-(maximal proper subgroup) in the subgroup lattice.
-
-**証明**: M.index = p ≥ 2 ⇒ M ≠ ⊤. For M < K, by `relIndex_mul_index`,
-`M.relIndex K * K.index = M.index = p`, so K.index = 1 or p. If K.index = p, then
-`M.relIndex K = 1` so K = M, contradicting M < K. Hence K.index = 1, K = ⊤. -/
-private lemma isCoatom_of_index_prime {G : Type*} [Group G] {M : Subgroup G}
-    {p : ℕ} (hp : p.Prime) (h_idx : M.index = p) : IsCoatom M := by
-  refine ⟨?_, ?_⟩
-  · -- M ≠ ⊤
-    intro h_top
-    rw [h_top, Subgroup.index_top] at h_idx
-    exact hp.one_lt.ne' h_idx.symm
-  · -- ∀ K, M < K → K = ⊤
-    intro K hMK
-    by_contra h_K_ne_top
-    -- M ≤ K, use relIndex_mul_index
-    have hMK_le : M ≤ K := hMK.le
-    have h_eq : M.relIndex K * K.index = M.index :=
-      Subgroup.relIndex_mul_index hMK_le
-    rw [h_idx] at h_eq
-    -- K.index ∣ p, so K.index = 1 or p
-    have h_dvd : K.index ∣ p := by
-      refine ⟨M.relIndex K, ?_⟩
-      linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]
-    rcases hp.eq_one_or_self_of_dvd _ h_dvd with h1 | hp_eq
-    · -- K.index = 1 ⇒ K = ⊤
-      have hK_top : K = ⊤ := Subgroup.index_eq_one.mp h1
-      exact h_K_ne_top hK_top
-    · -- K.index = p ⇒ M.relIndex K = 1 ⇒ M = K, contradicting M < K
-      rw [hp_eq] at h_eq
-      have h_rel_one : M.relIndex K = 1 := by
-        have hp_pos : 0 < p := hp.pos
-        have : M.relIndex K * p = 1 * p := by rw [h_eq, one_mul]
-        exact Nat.eq_of_mul_eq_mul_right hp_pos this
-      have hM_eq_K : M = K := by
-        -- M.relIndex K = 1 ⇒ M.subgroupOf K = ⊤
-        have := Subgroup.relIndex_eq_one.mp h_rel_one
-        -- this : K ≤ M (since M.subgroupOf K = ⊤ means everything in K is in M)
-        exact le_antisymm hMK_le this
-      exact absurd hM_eq_K (ne_of_lt hMK)
-
 -- rc2: scoped `IsMulCommutative → CommGroup` (consistent with the ambient `Group`,
 -- unlike an explicit `{ … with mul_comm }` which makes a diamond).
 open scoped IsMulCommutative in
@@ -583,7 +541,7 @@ theorem frattini_le_of_isElementaryAbelian_quotient_of_pgroup
     rw [Subgroup.index_comap_of_surjective _ QuotientGroup.mk_surjective]
     exact h_M_quot_index
   -- M is a coatom (maximal proper subgroup)
-  have h_M_coatom : IsCoatom M := isCoatom_of_index_prime hp.out h_M_index
+  have h_M_coatom : IsCoatom M := Subgroup.isCoatom_of_index_prime (h_M_index ▸ hp.out)
   -- Φ(P) ⊆ M
   have hfrat_le_M : frattini P ≤ M := frattini_le_coatom h_M_coatom
   -- Contradiction: x ∈ Φ(P) ⊆ M but x ∉ M

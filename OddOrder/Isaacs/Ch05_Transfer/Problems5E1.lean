@@ -132,7 +132,7 @@ theorem exists_normal_index_eq_prime_of_index_eq_pow [Finite G] {p : ℕ} [Fact 
   have : Mbar.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom Mbar
       (Group.normalizerCondition_of_isNilpotent (G := G ⧸ K)) hMco
-  have hMprime : Mbar.index.Prime := (Ch01.isCoatom_iff_index_prime Mbar).mp hMco
+  have hMprime : Mbar.index.Prime := (Subgroup.isCoatom_iff_index_prime Mbar).mp hMco
   have hMdvd : Mbar.index ∣ p ^ a := hcard ▸ Subgroup.index_dvd_card Mbar
   have hMp : Mbar.index = p :=
     (Nat.prime_dvd_prime_iff_eq hMprime Fact.out).mp (hMprime.dvd_of_dvd_pow hMdvd)

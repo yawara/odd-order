@@ -185,7 +185,7 @@ theorem card_commutator_le_pow_choose_two {p : ℕ} [Fact p.Prime] :
       Subgroup.NormalizerCondition.normal_of_coatom Q
         (Group.normalizerCondition_of_isNilpotent (G := G)) hQco
     have hQprime : (Q.index).Prime :=
-      (OddOrder.Isaacs.Ch01.isCoatom_iff_index_prime Q).mp hQco
+      (Subgroup.isCoatom_iff_index_prime Q).mp hQco
     have hQp : Q.index = p := by
       obtain ⟨k, hk⟩ := hP.exists_card_eq
       have hdvd : Q.index ∣ p ^ k := hk ▸ Subgroup.index_dvd_card Q

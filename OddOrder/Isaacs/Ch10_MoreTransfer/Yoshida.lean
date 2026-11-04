@@ -212,26 +212,6 @@ lemma mem_normalizer_of_sylow_le_conj (P : Sylow p G) {x : G}
   rw [mem_conjSubgroup, inv_inv] at h6
   exact h6.symm
 
-/-- A subgroup of prime index is a coatom of the subgroup lattice. -/
-private lemma isCoatom_of_index_prime'' {H₀ : Type*} [Group H₀] {Q : Subgroup H₀}
-    (hidx : Q.index = p) : IsCoatom Q := by
-  have hp_prime : p.Prime := hp.out
-  constructor
-  · intro htop
-    rw [htop, Subgroup.index_top] at hidx
-    exact hp_prime.one_lt.ne' hidx.symm
-  · intro X hQX
-    have hmul := Subgroup.relIndex_mul_index hQX.le
-    rw [hidx] at hmul
-    rcases hp_prime.eq_one_or_self_of_dvd X.index (Dvd.intro_left _ hmul) with h1 | hXp
-    · exact Subgroup.index_eq_one.mp h1
-    · exfalso
-      have hrel : Q.relIndex X = 1 := by
-        rw [hXp] at hmul
-        exact Nat.eq_of_mul_eq_mul_right hp_prime.pos
-          (by rw [one_mul]; exact hmul)
-      exact hQX.not_ge (Subgroup.relIndex_eq_one.mp hrel)
-
 /-- **Yoshida, main reduction step**: if the Mackey factor at a representative
 `x ∉ N = N_G(P)` lies outside the image of `M` (where `M ⊴ N` has index `p` and
 `n ∈ P ∖ M` has minimal order), then the `S₀ = (xNx⁻¹ ⊓ P)`-transfer of `n`
@@ -361,7 +341,7 @@ private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
         rcases (Nat.Prime.eq_one_or_self_of_dvd hp.out _ hker_idx) with h11 | h11
         · rw [Subgroup.index_eq_one.mp h11]
           exact le_top
-        · exact frattini_le_coatom (isCoatom_of_index_prime'' h11)
+        · exact frattini_le_coatom (Subgroup.isCoatom_of_index_prime (h11 ▸ hp.out))
       -- membership in the kernel means the conjugate lies in M
       rw [Subgroup.map_le_iff_le_comap]
       intro s hsΦ
