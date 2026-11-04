@@ -373,7 +373,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
         have h_lcs_km1_le_A : (⊤ : Subgroup P).lowerCentralSeries (k - 1) ≤ A :=
           h_lcs_km1_le_G'.trans hG'_le_A
         -- ∃ x ∈ lcs P (k-1), x ∉ Z
-        rw [SetLike.not_le_iff_exists] at h_lcs_km1_nle_Z
+        rw [IsConcreteLE.not_le_iff_exists] at h_lcs_km1_nle_Z
         obtain ⟨x, hx_in, hx_notZ⟩ := h_lcs_km1_nle_Z
         -- x ∈ A but x ∉ Z = A ⊓ Z(P), so x ∉ Z(P) (since x ∈ A)
         have hx_in_A : x ∈ A := h_lcs_km1_le_A hx_in

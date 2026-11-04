@@ -105,7 +105,7 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
         -- Pick `x ∉ H`; then `G = ⟨H, x⟩` because `[G:H]` is prime.
         have hHtop : H ≠ ⊤ := by
           intro h; rw [h, Subgroup.index_top] at hHprime; exact Nat.not_prime_one hHprime
-        obtain ⟨x, -, hxH⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hHtop)
+        obtain ⟨x, -, hxH⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hHtop)
         have hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤ := by
           have hHleK : H ≤ Subgroup.closure ((H : Set G) ∪ {x}) := by
             intro h hh; exact Subgroup.subset_closure (Set.mem_union_left _ hh)

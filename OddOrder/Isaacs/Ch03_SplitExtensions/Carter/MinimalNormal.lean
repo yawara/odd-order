@@ -99,7 +99,7 @@ theorem exists_mem_normalizer_notMem_of_isNilpotent {X Y : Subgroup G}
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hne (le_antisymm hYX htop)
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt
     (Group.normalizerCondition_of_isNilpotent (G := ↥X) _ hlt)
   rw [← Subgroup.subgroupOf_normalizer_eq hYX, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not

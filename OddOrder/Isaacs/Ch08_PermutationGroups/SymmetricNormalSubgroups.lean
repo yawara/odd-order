@@ -89,7 +89,7 @@ theorem normal_perm_eq_bot_or_alternating_or_top (hα : 5 ≤ Fintype.card α)
   have hsimple : IsSimpleGroup (alternatingGroup α) :=
     alternatingGroup.isSimpleGroup (by rwa [Nat.card_eq_fintype_card])
   have : (N.subgroupOf (alternatingGroup α)).Normal := Subgroup.Normal.subgroupOf ‹N.Normal› _
-  rcases hsimple.eq_bot_or_eq_top_of_normal (N.subgroupOf (alternatingGroup α)) inferInstance with
+  rcases hsimple.eq_bot_or_eq_top_of_normal (N.subgroupOf (alternatingGroup α)) with
     hbot | htop
   · -- `N ⊓ A = 1`: `sign` separates the elements of `N`, so `N ≤ Z(Sym Ω) = 1`.
     left

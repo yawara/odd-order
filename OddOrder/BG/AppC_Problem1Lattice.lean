@@ -819,7 +819,7 @@ theorem false_of_normalizes_layerOne (data : FieldNormalizerData p q G) (hp : p 
     ⟨⟨fun a b => Subtype.ext (Subtype.ext (P_mul_comm data a.2 b.2))⟩⟩
   have hsup : (layerOne data).subgroupOf N ⊔ data.P.subgroupOf N = ⊤ := by
     rw [← Subgroup.subgroupOf_sup hBN hPN, sup_comm, ← hNsup, Subgroup.subgroupOf_self]
-  have hle := Subgroup.Normal.commutator_le_of_self_sup_commutative_eq_top hsup hPcomm
+  have hle := Subgroup.Normal.commutator_le_of_self_sup_commutative_eq_top hsup
   rw [commutator_layerClosure_eq_top_of_exp data hp hexp hnotfrob, top_le_iff,
     Subgroup.subgroupOf_eq_top] at hle
   -- so `N` lies in the abelian second layer, hence is abelian, hence trivial

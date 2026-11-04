@@ -84,7 +84,7 @@ primitive root stays primitive; cyclicity is automatic in a field). -/
 theorem hasEnoughRootsOfUnity_of_ringHom {F E : Type*} [Field F] [Field E] {n : ℕ} [NeZero n]
     [HasEnoughRootsOfUnity F n] (f : F →+* E) : HasEnoughRootsOfUnity E n where
   prim := by
-    obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot F n
+    obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot F n
     exact ⟨f ζ, hζ.map_of_injective f.injective⟩
   cyc := rootsOfUnity.isCyclic E n
 
@@ -150,7 +150,7 @@ theorem exists_isPrimitiveRoot_splittingSystem (hp : ¬ p ∣ n) (hn : n ≠ 0) 
     ∃ ζ : SplittingSystem p n, IsPrimitiveRoot ζ n := by
   have : NeZero n := ⟨hn⟩
   have := hasEnoughRootsOfUnity_splittingSystem p n hp hn
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
+  exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot _ n
 
 /-! ### Algebraically closed residue fields
 

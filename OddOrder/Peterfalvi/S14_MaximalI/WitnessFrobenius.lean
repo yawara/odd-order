@@ -343,7 +343,7 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
   obtain ⟨n, hnK, hn1, hnA⟩ := exists_ne_one_centralized_by_complement_of_kernel_not_centralizes
     hHL hFrobL hP_le_H hPne hAL hAH hAne hAP hPAK hKsolv hcop hPnc
   -- **`C_K(x) ≠ 1`** (Peterfalvi (12.9)).
-  obtain ⟨n', hn'mem, hn'K'⟩ := SetLike.not_le_iff_exists.mp data.CKx_not_le_Kprime
+  obtain ⟨n', hn'mem, hn'K'⟩ := IsConcreteLE.not_le_iff_exists.mp data.CKx_not_le_Kprime
   obtain ⟨hn'C, hn'K⟩ := Subgroup.mem_inf.mp hn'mem
   have hn'1 : n' ≠ 1 := fun h => hn'K' (by rw [h]; exact Subgroup.one_mem _)
   -- **`A` and `x` in a common abelian `W ≤ M ∩ L`** (step (8.1.b), `V = M ∩ L`).

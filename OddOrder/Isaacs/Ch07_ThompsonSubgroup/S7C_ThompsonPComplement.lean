@@ -361,7 +361,7 @@ theorem lt_normalizer_inf_sylow_of_lt
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact (ne_of_lt hD_lt) (le_antisymm hD_le htop)
   have hlt := hNC (D.subgroupOf (S : Subgroup H)) hsub_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   rw [← Subgroup.subgroupOf_normalizer_eq hD_le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hD_le) ?_

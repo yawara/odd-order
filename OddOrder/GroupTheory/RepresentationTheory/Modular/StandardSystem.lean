@@ -53,7 +53,7 @@ theorem exists_isPrimitiveRoot_pRegularExponent_standardSystem
   have : NeZero (pRegularExponent p G) := ⟨hpos.ne'⟩
   have := hasEnoughRootsOfUnity_residueField_standardSystem p
     (not_dvd_pRegularExponent (G := G) Fact.out) hpos.ne'
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot _ _
+  exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot _ _
 
 /-- **Brauer's theorem over the standard system.**  Nothing is assumed beyond `G` being a finite
 group: the splitting datum, the identification of its blocks with the simple modules, and the

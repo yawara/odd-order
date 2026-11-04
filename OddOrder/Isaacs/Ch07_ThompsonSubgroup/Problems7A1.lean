@@ -53,7 +53,7 @@ theorem exists_sylow_eq_of_maximal_pSubgroup_in_normalizer {G : Type*} [Group G]
   have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   have hlt := Group.normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup G))
     (P.subgroupOf (S : Subgroup G)) (lt_top_iff_ne_top.mpr hHne)
-  obtain ⟨x, hxnorm, hxnot⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨x, hxnorm, hxnot⟩ := IsConcreteLE.exists_of_lt hlt
   -- `x` は `P` を (G の中で) 正規化する
   have hxN : ((x : ↥(S : Subgroup G)) : G) ∈ Subgroup.normalizer P := by
     refine Subgroup.mem_normalizer_iff.mpr fun y => ?_
@@ -182,7 +182,7 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
     have hne : Subgroup.normalizer (Y : Set G) ≠ ⊤ := by
       intro htop
       have hYnormal : Y.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal Y hYnormal with hb | ht
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal Y with hb | ht
       · exact hYne hb
       · exact hM.1 (top_le_iff.mp ((ht ▸ hYP).trans hPM))
     have hnlt : ¬ M < Subgroup.normalizer (Y : Set G) := fun hlt => hne (hM.2 _ hlt)
@@ -234,7 +234,7 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
   obtain ⟨N, hNnormal, hNcompl⟩ :=
     OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer S hp2 hchar
   -- (9) 単純性からどちらの分岐でも矛盾
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N hNnormal with hb | ht
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N with hb | ht
   · have hStop : (S : Subgroup G) = ⊤ := by
       have h := hNcompl S
       rw [hb] at h

@@ -426,7 +426,7 @@ theorem xsetOf_S_coherent_step [Finite G]
       (fun δ hδ z hz => hZH δ (hyp.D_le_H hδ) z hz) hZne hZodd
   -- `h5`: `|S⧸S₁| ≥ 2`
   have h5 : 2 ≤ Nat.card (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := by
-    obtain ⟨s, hsS, hsS₁⟩ := SetLike.not_le_iff_exists.mp hSnotle
+    obtain ⟨s, hsS, hsS₁⟩ := IsConcreteLE.not_le_iff_exists.mp hSnotle
     have hne : (Quotient.mk'' (⟨s, hsS⟩ : ↥hyp.S) : ↥hyp.S ⧸ S₁.subgroupOf hyp.S)
         ≠ Quotient.mk'' (1 : ↥hyp.S) := by
       intro h

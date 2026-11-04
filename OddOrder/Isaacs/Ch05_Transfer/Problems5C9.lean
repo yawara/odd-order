@@ -98,7 +98,7 @@ theorem three_dvd_card_of_isSimpleGroup_of_not_dvd_eight [Finite G] [IsSimpleGro
   obtain ⟨K, hKnormal, hKcompl⟩ :=
     hasNormalPComplement_of_sylow_normalizer_le_centralizer P hNC
   have hcard := (hKcompl P).card_mul_card
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal K hKnormal with hbot | htop
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal K with hbot | htop
   · -- `K = ⊥` ⇒ `P = ⊤` ⇒ `G` 可換 (非可換性に矛盾)
     rw [hbot, Subgroup.card_bot, one_mul] at hcard
     have hPtop : (P : Subgroup G) = ⊤ := Subgroup.eq_top_of_card_eq _ hcard

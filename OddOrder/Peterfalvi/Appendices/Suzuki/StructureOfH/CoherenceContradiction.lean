@@ -344,7 +344,8 @@ theorem Q1_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   -- `G` is not simple, so `Q₁ = 1` — contradiction
   have hG : ¬ IsSimpleGroup G := by
     intro hs
-    rcases hs.eq_bot_or_eq_top_of_normal _ hN_normal with h | h
+    rcases hs.eq_bot_or_eq_top_of_normal
+      (OddOrder.Peterfalvi.S03.characterKernelSubgroup hf.isCharacter) with h | h
     · exact hN_ne_bot h
     · exact hN_ne_top h
   exact hQ1 (sc.Q1_eq_bot_of_not_isSimpleGroup ind hG)

@@ -628,7 +628,7 @@ theorem nineElevenOne_squeeze_arithmetic
   -- The circle: `r₀ ≤ r₁ ≤ s₂ ≤ r₂ ≤ r₃ ≤ r₄ ≤ r₀`.
   have h01 : r₀ ≤ r₁ := by
     have hc : ((p1 : ℝ) * iUU') ≤ (n₁ : ℝ) * (a * a) := by exact_mod_cast hcount
-    calc r₀ = ((p1 : ℝ) * iUU') * (q : ℝ) ^ 2 := by rw [hr₀]; try ring
+    calc r₀ = ((p1 : ℝ) * iUU') * (q : ℝ) ^ 2 := by rw [hr₀]
       _ ≤ ((n₁ : ℝ) * (a * a)) * (q : ℝ) ^ 2 :=
           mul_le_mul_of_nonneg_right hc (by positivity)
       _ = r₁ := by rw [hr₁]; push_cast; try ring
@@ -644,7 +644,7 @@ theorem nineElevenOne_squeeze_arithmetic
       _ = r₄ := by rw [hr₄]; try ring
   have h40 : r₄ ≤ r₀ := by
     have hule' : (u : ℝ) ≤ (iUU' : ℝ) := by exact_mod_cast hule
-    calc r₄ = ((p1 : ℝ) * (q : ℝ) ^ 2) * u := by rw [hr₄]; try ring
+    calc r₄ = ((p1 : ℝ) * (q : ℝ) ^ 2) * u := by rw [hr₄]
       _ ≤ ((p1 : ℝ) * (q : ℝ) ^ 2) * iUU' :=
           mul_le_mul_of_nonneg_left hule' (by positivity)
       _ = r₀ := by rw [hr₀]; try ring

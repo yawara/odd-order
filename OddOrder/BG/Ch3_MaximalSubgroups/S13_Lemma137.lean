@@ -488,7 +488,7 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNRne : Subgroup.normalizer (R : Set G) ≠ ⊤ := by
     intro htop
     have : R.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal R with hb | ht
     · exact hRne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hRM))
   obtain ⟨Mstar, hMstarCo, hNRM⟩ :=

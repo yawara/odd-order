@@ -684,7 +684,7 @@ theorem exists_orderOf_pow_three_mem_normalizerRSigma_notMem_sup
     norm_num at hcon
   have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
     (p := 3) X.isPGroup' hRltX
-  obtain ⟨x, hxY, hxR⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨x, hxY, hxR⟩ := IsConcreteLE.exists_of_lt hgrow
   refine ⟨x, hxY.2, hxR, ?_⟩
   obtain ⟨j, hj⟩ := (IsPGroup.iff_orderOf).mp X.isPGroup' ⟨x, hxY.1⟩
   exact ⟨j, by rwa [Subgroup.orderOf_mk] at hj⟩

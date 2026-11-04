@@ -1147,7 +1147,7 @@ private lemma image_subgroupOf_le_oPiCore (π : Set ℕ) {G : Type*} [Group G] [
   have h_quot_dvd : Nat.card (↥S ⧸ F'.subgroupOf S) ∣
       Nat.card (↥S ⧸ (F.subgroupOf N).subgroupOf S) := by
     apply Subgroup.card_dvd_of_surjective
-      (QuotientGroup.map ((F.subgroupOf N).subgroupOf S) (F'.subgroupOf S) (MonoidHom.id ↥S)
+      (f := QuotientGroup.map ((F.subgroupOf N).subgroupOf S) (F'.subgroupOf S) (MonoidHom.id ↥S)
         (fun x hx => by simpa using hKK' hx))
     apply QuotientGroup.map_surjective_of_surjective
     exact QuotientGroup.mk_surjective

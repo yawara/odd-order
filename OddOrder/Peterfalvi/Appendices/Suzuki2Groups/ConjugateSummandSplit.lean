@@ -137,7 +137,7 @@ theorem map_quotientCongr_ne_of_fixedPoints_le
   intro hstab
   classical
   -- a nonidentity central involution `s`
-  obtain ⟨s, hsZ, hsbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hZbot)
+  obtain ⟨s, hsZ, hsbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hZbot)
   have hs1 : s ≠ 1 := by
     intro h1
     exact hsbot (by rw [h1]; exact Subgroup.one_mem ⊥)

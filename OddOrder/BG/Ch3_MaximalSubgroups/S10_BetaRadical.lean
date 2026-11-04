@@ -1263,7 +1263,7 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
       intro htop
       have hQnorm : Q.Normal := by
         rw [← Subgroup.normalizer_eq_top_iff]; exact htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal Q hQnorm with h | h
+      rcases hG.simple.eq_bot_or_eq_top_of_normal Q with h | h
       · exact hQne h
       · have hGpg : IsPGroup q G := (h ▸ hQpg : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
           (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective

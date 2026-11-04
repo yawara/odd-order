@@ -1259,7 +1259,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         exact Subtype.ext
           ((huniq _ ⟨(e.symm j.down).2, OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl _⟩).trans
             (huniq _ ⟨(e.symm k.down).2, hconj⟩).symm)
-      exact ULift.ext _ _ (e.symm.injective hsub)
+      exact ULift.ext (e.symm.injective hsub)
     primeFactors_cover := fun p _ => by
       rw [OddOrder.BG.Ch4.S16.sigma_reps_prime_cover hG hrepsMax hreps p]
       constructor
@@ -1274,7 +1274,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [Finset.disjoint_left]
       intro p hpj hpk
       have hne : (e.symm j.down).1 ≠ (e.symm k.down).1 := fun h =>
-        hjk (ULift.ext _ _ (e.symm.injective (Subtype.ext h)))
+        hjk (ULift.ext (e.symm.injective (Subtype.ext h)))
       have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (e.symm j.down).1 ∩
           OddOrder.BG.Ch3.S10.sigma (e.symm k.down).1 :=
         ⟨(hbridge (e.symm j.down) _ (htyped (e.symm j.down)) p).mp hpj,
@@ -1339,7 +1339,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         intro hconj
         apply hjk
         obtain ⟨_, _, huniq⟩ := hreps (e.symm j.down).1 (hrepsMax _ (e.symm j.down).2)
-        exact ULift.ext _ _ (e.symm.injective (Subtype.ext
+        exact ULift.ext (e.symm.injective (Subtype.ext
           ((huniq _ ⟨(e.symm j.down).2, OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl _⟩).trans
             (huniq _ ⟨(e.symm k.down).2, hconj⟩).symm)))
       exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D

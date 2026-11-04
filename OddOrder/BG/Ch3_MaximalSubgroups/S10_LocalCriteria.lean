@@ -402,7 +402,7 @@ theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [lt_top_iff_ne_top]
         intro htop
         have hPGnormal : (PG : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-        rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPGnormal with hbot | htop'
+        rcases hG.simple.eq_bot_or_eq_top_of_normal (PG : Subgroup G) with hbot | htop'
         · exact hPGne hbot
         · have hsolv : Group.IsSolvable ↥(PG : Subgroup G) := by
             have := (PG.isPGroup').isNilpotent; infer_instance
@@ -561,7 +561,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
   have hNP_not_le : ¬ Subgroup.normalizer (PG : Set G) ≤ M := by
     intro hle
     exact hpσ ⟨hpM, P, by rw [← hPGdef]; exact hle⟩
-  obtain ⟨u, huN, huM⟩ := SetLike.not_le_iff_exists.mp hNP_not_le
+  obtain ⟨u, huN, huM⟩ := IsConcreteLE.not_le_iff_exists.mp hNP_not_le
   -- Step 3: `Ω₁(Z(P))^#` is nonempty (the `p`-group `P` is nontrivial since `p ∈ π(M)`).
   have hp_dvd_P : p ∣ Nat.card ↥(P : Subgroup ↥M) := by
     have hdvd : p ∣ Nat.card ↥(P : Subgroup ↥M) * (P : Subgroup ↥M).index := by
@@ -595,7 +595,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
     exact mul_left_cancel (mul_right_cancel h2)
   -- The centralizer of `⟨y'⟩` is proper (the center of the simple nonabelian `G` is trivial).
   have hcenter : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exfalso
       refine hG.notSolvable (Group.isSolvable_of_comm fun a b => ?_)
@@ -658,7 +658,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
     exact huM huNM
   · have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp
       ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop
     · exact hMα (le_bot_iff.mp (hbot ▸ Malpha_le M))
     · exact (mem_maximalSubgroups.mp hM).1 htop
 

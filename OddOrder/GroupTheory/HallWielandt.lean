@@ -412,7 +412,7 @@ theorem sylow_le_commutator_normalizer [Finite G] (hp2 : p ≠ 2) (P : Sylow p G
   obtain ⟨x, ⟨hxP, hxNc⟩, hmin⟩ :=
     exists_min_orderOf (S := {y : G | y ∈ (P : Subgroup G) ∧ y ∉ Nc})
       (by
-        obtain ⟨y, hyP, hyNc⟩ := SetLike.not_le_iff_exists.mp hcon
+        obtain ⟨y, hyP, hyNc⟩ := IsConcreteLE.not_le_iff_exists.mp hcon
         exact ⟨y, hyP, hyNc⟩)
   have hmin' : ∀ y ∈ (P : Subgroup G), orderOf y < orderOf x → y ∈ Nc := by
     intro y hyP hlt

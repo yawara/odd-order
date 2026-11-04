@@ -1122,7 +1122,7 @@ commuting with `x` used throughout the (12.16) argument.  (Pure `SetLike` extrac
 theorem exists_witness_g {ctr : CounterexampleHypothesis (G := G)}
     (witness : RankTwoWitnessData ctr) :
     ∃ g : G, Commute witness.x g ∧ g ∈ ctr.K ∧ g ∉ ctr.Kprime := by
-  obtain ⟨g, hgA, hgB⟩ := SetLike.not_le_iff_exists.mp witness.CKx_not_le_Kprime
+  obtain ⟨g, hgA, hgB⟩ := IsConcreteLE.not_le_iff_exists.mp witness.CKx_not_le_Kprime
   rw [Subgroup.mem_inf] at hgA
   exact ⟨g, Subgroup.mem_centralizer_iff.mp hgA.1 witness.x (Set.mem_singleton _), hgA.2, hgB⟩
 

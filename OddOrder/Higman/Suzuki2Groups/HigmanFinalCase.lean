@@ -787,7 +787,7 @@ theorem NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq
       exact Subgroup.map_subtype_le (Agemo A 2 1)
         (square_mem_agemo_one_of_frattini_map_eq
           hP hcover.le hAcomm hΦ v.2)
-    obtain ⟨uP, huC, huA⟩ := SetLike.exists_of_lt hcover.lt
+    obtain ⟨uP, huC, huA⟩ := IsConcreteLE.exists_of_lt hcover.lt
     let u : C := ⟨uP, huC⟩
     have hu : (u : P) ∉ A := by simpa [u] using huA
     let z : A := ⟨(u : P) ^ 2, hsq u hu⟩

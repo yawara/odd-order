@@ -95,7 +95,7 @@ theorem colT_finNeg (i : Fin tp.q) :
     (mp.certainTypeS hG).w1CharEquiv_finNeg (eqQ hG mp tp i)]
   ext w
   simp only [Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.one_comp,
-    MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_comp, MonoidHom.coe_coe, Subgroup.coe_subtype,
+    MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_comp, MonoidHom.coe_ofClass, Subgroup.coe_subtype,
     Function.comp_apply, MonoidHom.mul_apply,
     MonoidHom.one_apply, mul_one, MonoidHom.inv_apply, Units.val_inv_eq_inv_val]
   exact Units.val_inv_eq_inv_val _

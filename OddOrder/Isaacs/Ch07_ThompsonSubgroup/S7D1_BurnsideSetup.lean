@@ -187,8 +187,7 @@ theorem opCore_eq_bot_of_simple_nonsolvable
     (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H) :
     OddOrder.Isaacs.Ch01.opCore r H = ⊥ := by
   have := OddOrder.Isaacs.Ch01.opCore.normal r H
-  rcases Subgroup.Normal.eq_bot_or_eq_top
-    (OddOrder.Isaacs.Ch01.opCore.normal r H) with h | h
+  rcases Subgroup.Normal.eq_bot_or_eq_top (OddOrder.Isaacs.Ch01.opCore r H) with h | h
   · exact h
   · exfalso
     -- opCore r H = ⊤ ⇒ H is an r-group ⇒ solvable, contradiction.
@@ -277,8 +276,7 @@ theorem normalClosure_eq_top_of_simple_of_ne_bot
     {V : Subgroup G} (hV_ne_bot : V ≠ ⊥) :
     Subgroup.normalClosure (V : Set G) = ⊤ := by
   have := Subgroup.normalClosure_normal (s := (V : Set G))
-  rcases Subgroup.Normal.eq_bot_or_eq_top
-    (Subgroup.normalClosure_normal (s := (V : Set G))) with h | h
+  rcases Subgroup.Normal.eq_bot_or_eq_top (Subgroup.normalClosure (V : Set G)) with h | h
   · -- V ≤ normalClosure V = ⊥ ⇒ V = ⊥, contradiction.
     exfalso
     apply hV_ne_bot

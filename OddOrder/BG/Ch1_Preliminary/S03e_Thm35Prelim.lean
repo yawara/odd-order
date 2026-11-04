@@ -629,7 +629,7 @@ theorem finrank_eq_one_of_not_iso_generator
     exact Submodule.coe_eq_zero.mp hbot
   -- range `T` lands in `C_W(R)`.
   have hTinv : LinearMap.range T ≤ Representation.invariants (ρ.comp R.subtype) := by
-    rw [SetLike.le_def]
+    rw [IsConcreteLE.le_iff]
     rintro v ⟨m, rfl⟩
     rw [Representation.mem_invariants]
     have hxfix : ρ x (T m) = T m := by

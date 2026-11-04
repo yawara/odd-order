@@ -600,7 +600,7 @@ theorem not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt [Finite G]
   have : M.Normal := inferInstance
   -- G simple ⟹ M = ⊥ or M = ⊤. M ≠ ⊥ ⟹ M = ⊤
   have h_M_top : M = ⊤ :=
-    (h_simple.eq_bot_or_eq_top_of_normal M ‹M.Normal›).resolve_left h_M_ne_bot
+    (h_simple.eq_bot_or_eq_top_of_normal M).resolve_left h_M_ne_bot
   -- M abelian
   have hM_comm : IsMulCommutative M := inferInstance
   -- IsMulCommutative G derivation

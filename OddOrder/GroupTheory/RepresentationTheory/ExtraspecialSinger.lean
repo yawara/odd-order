@@ -69,7 +69,7 @@ theorem det_eq_one_of_compLinearMap_alternating [Finite ι]
     rwa [AlternatingMap.compLinearMap_apply] at hfe
   have h3 : ω (⇑f ∘ ⇑e) = ω ⇑e * LinearMap.det f := by
     nth_rewrite 1 [ω.eq_smul_basis_det e]
-    rw [AlternatingMap.smul_apply, e.det_comp, e.det_self, mul_one, smul_eq_mul]
+    rw [smul_apply, e.det_comp, e.det_self, mul_one, smul_eq_mul]
   rw [h2] at h3
   have h4 : ω ⇑e * 1 = ω ⇑e * LinearMap.det f := by rw [mul_one]; exact h3
   exact (mul_left_cancel₀ hbasis h4).symm

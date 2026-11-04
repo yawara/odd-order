@@ -140,7 +140,6 @@ instance : Group (SemiDihedralGroup n) where
       (change mul (mul _ _) _ = mul _ (mul _ _)) <;>
       simp only [mul] <;>
       first
-        | rfl
         | (refine congr_arg c ?_; linear_combination i * hr)
         | (refine congr_arg ca ?_; linear_combination i * hr)
         | (refine congr_arg c ?_; ring)

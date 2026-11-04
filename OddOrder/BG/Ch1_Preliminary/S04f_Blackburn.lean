@@ -412,8 +412,8 @@ private theorem blackburn_noncentral_commutator_witnesses
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  obtain ⟨y, hyS, hyT⟩ := SetLike.exists_of_lt hT_facts.2.1
-  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  obtain ⟨y, hyS, hyT⟩ := IsConcreteLE.exists_of_lt hT_facts.2.1
+  obtain ⟨z, hzT, hzZ⟩ := IsConcreteLE.exists_of_lt hT_facts.1
   exact ⟨y, hyS, hyT, z, hzT, hzZ⟩
 
 

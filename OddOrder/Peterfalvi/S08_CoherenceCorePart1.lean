@@ -256,7 +256,7 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
     fun y => QuotientGroup.induction_on y fun a => ⟨a, rfl⟩
   have hQab_triv : Subsingleton (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
     subsingleton_of_isPGroup_of_not_dvd hQab_p
-      (fun hp => P.not_dvd_index (hp.trans (Subgroup.card_dvd_of_surjective _ hofsurj)))
+      (fun hp => P.not_dvd_index (hp.trans (Subgroup.card_dvd_of_surjective hofsurj)))
   -- `Abelianization Q` trivial ⟹ `commutator Q = ⊤` ⟹ (nilpotent ⟹ solvable) `Q` trivial.
   have hQ_triv : Subsingleton (Γ ⧸ (↑P : Subgroup Γ)) := by
     rcases subsingleton_or_nontrivial (Γ ⧸ (↑P : Subgroup Γ)) with hs | hns

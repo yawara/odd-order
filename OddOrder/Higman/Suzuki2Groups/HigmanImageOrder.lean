@@ -36,7 +36,7 @@ theorem natCard_range_eq_two_of_forall_eq_one_or_eq
     (hvalues : ∀ u : C, f u = 1 ∨ f u = t)
     (hker : f.ker < ⊤) :
     Nat.card ↥f.range = 2 := by
-  obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt hker
+  obtain ⟨u, -, hu⟩ := IsConcreteLE.exists_of_lt hker
   have hfu_ne : f u ≠ 1 := by
     simpa only [MonoidHom.mem_ker] using hu
   have hfut : f u = t := (hvalues u).resolve_left hfu_ne

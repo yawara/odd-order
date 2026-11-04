@@ -101,10 +101,10 @@ theorem span_range_mkQ_out_eq_top :
   obtain ⟨x, rfl⟩ := (commutatorSubmodule k G).mkQ_surjective q
   exact mkQ_mem_span_range_out x
 
-omit [DecidableEq (ConjClasses G)] in
 -- `[Fintype G]` does not appear in the statement but the proof needs it: the class-coefficient
 -- functionals that give the lower bound are sums over `G`.
 set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] in
 /-- **`kG ⧸ [kG, kG]` has dimension the number of conjugacy classes of `G`.** -/
 theorem finrank_quotient_commutatorSubmodule :
     Module.finrank k (MonoidAlgebra k G ⧸ commutatorSubmodule k G)
@@ -125,9 +125,9 @@ theorem finrank_quotient_commutatorSubmodule :
     have := LinearMap.finrank_le_finrank_of_surjective hsurj
     simpa [Nat.card_eq_fintype_card, Module.finrank_pi] using this
 
-omit [DecidableEq (ConjClasses G)] in
 -- `[Fintype G]` is used through `finrank_quotient_commutatorSubmodule`.
 set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] in
 /-- **The class representatives are a basis of `kG ⧸ [kG, kG]`.**  They span
 (`span_range_mkQ_out_eq_top`) and there are `dim` of them
 (`finrank_quotient_commutatorSubmodule`), so they are independent. -/

@@ -43,7 +43,7 @@ variable {G : Type*} [Group G]
 theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x : G}
     (hx : x ≠ (1 : G)) : Subgroup.centralizer ({x} : Set G) < ⊤ := by
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
@@ -231,8 +231,7 @@ theorem normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot [Finite G]
     intro hNtop
     have hOq_normal : (opiCoreInG ({q} : Set ℕ) M).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M)
-        inferInstance with hOqbot | hOqtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M) with hOqbot | hOqtop
     · exact hOqne hOqbot
     · have htop_le_M : ⊤ ≤ M := by
         rw [← hOqtop]
@@ -255,8 +254,7 @@ private theorem normalizer_opiCoreInG_le_maximal_of_ne_bot [Finite G]
     intro hNtop
     have hO_normal : (opiCoreInG π M).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG π M)
-        inferInstance with hObot | hOtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG π M) with hObot | hOtop
     · exact hOne hObot
     · have htop_le_M : ⊤ ≤ M := by
         rw [← hOtop]

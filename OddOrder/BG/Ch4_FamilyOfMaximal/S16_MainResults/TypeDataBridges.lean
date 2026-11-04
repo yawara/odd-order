@@ -110,7 +110,7 @@ theorem normalizer_eq_self_of_subgroupOf_normal_of_ne_bot [Finite G]
   · exact le_of_eq heq.symm
   · have hnorm : H.Normal :=
       Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal H with hbot | htop
     · exact absurd hbot hHne
     · exact absurd (top_le_iff.mp (htop ▸ hHle)) (mem_maximalSubgroups.mp hM).1
 

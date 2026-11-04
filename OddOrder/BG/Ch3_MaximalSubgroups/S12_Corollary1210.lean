@@ -503,8 +503,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
             rw [htop]; exact Subgroup.mem_top g
           exact (Subgroup.mem_centralizer_iff.mp hg y rfl).symm
         have hZbot : Subgroup.center G = ⊥ := by
-          rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G)
-            inferInstance with hb | ht
+          rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with hb | ht
           · exact hb
           · exfalso
             apply hG.notSolvable

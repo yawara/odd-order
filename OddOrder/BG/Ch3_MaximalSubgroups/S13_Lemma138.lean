@@ -252,7 +252,7 @@ theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   apply hG.isSolvable_of_lt_top
   rw [lt_top_iff_ne_top]
   intro htop
-  rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with hc | hc
+  rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with hc | hc
   · apply hP
     rw [eq_bot_iff, ← hc]
     intro x hx

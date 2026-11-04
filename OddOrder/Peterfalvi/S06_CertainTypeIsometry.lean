@@ -197,13 +197,12 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
             = ((h.columnFamily χ₂').sign : ℂ) + (Nat.card h.W1 : ℂ) * (b : ℂ) := by
       rw [← ha, ← hb]; exact hdeg
     exact_mod_cast hC
-  -- Case split on the two signs.  Diagonal cases are reflexive; off-diagonal cases give
-  -- `w₁ ∣ 2`, contradicting `w₁ ≥ 3`.
+  -- Case split on the two signs.  Diagonal cases are closed by the `rw` (it tries `rfl`);
+  -- off-diagonal cases give `w₁ ∣ 2`, contradicting `w₁ ≥ 3`.
   rcases (h.columnFamily χ₂).sign_eq with hd | hd <;>
     rcases (h.columnFamily χ₂').sign_eq with hd' | hd' <;>
     rw [hd, hd'] at hZ ⊢ <;>
     first
-    | rfl
     | (exfalso
        have hdvd : (Nat.card h.W1 : ℤ) ∣ 2 := ⟨b - a, by linear_combination hZ⟩
        have hle := Int.le_of_dvd (by norm_num) hdvd

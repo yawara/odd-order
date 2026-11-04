@@ -741,7 +741,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [disjoint_iff, inf_comm]
     exact OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hR'p hN'cop_p
   -- nontriviality witnesses.
-  obtain ⟨n₀, hn₀N, hn₀R₀⟩ := SetLike.exists_of_lt hR₀ltN
+  obtain ⟨n₀, hn₀N, hn₀R₀⟩ := IsConcreteLE.exists_of_lt hR₀ltN
   have hn₀Y : n₀ ∈ Y := Subgroup.mem_sup_right hn₀N
   have hn₀H : n₀ ∈ Hgrp := Subgroup.mem_sup_left hn₀Y
   have hN'ne : N' ≠ ⊥ := by
@@ -1055,7 +1055,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNQne_top : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
     intro htop
     have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q with h | h
     · exact hQne h
     · exact hMcoatom.1 (top_le_iff.mp (h ▸ hQM))
   have hnotMleNQ : ¬ M ≤ Subgroup.normalizer (Q : Set G) := by

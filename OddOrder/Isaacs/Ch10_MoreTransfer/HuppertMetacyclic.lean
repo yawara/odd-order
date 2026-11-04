@@ -79,7 +79,7 @@ theorem index_commutator_dvd_of_surjective {G H : Type*} [Group G] [Group H]
       QuotientGroup.eq_one_iff]
     exact hfx
   refine Subgroup.card_dvd_of_surjective
-    (QuotientGroup.lift (commutator G) _ hker) ?_
+    (f := QuotientGroup.lift (commutator G) _ hker) ?_
   intro y
   obtain ⟨h, rfl⟩ := QuotientGroup.mk'_surjective (commutator H) y
   obtain ⟨g, rfl⟩ := hf h

@@ -122,7 +122,7 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
     apply hfixne
     rw [← hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
     exact hle
-  obtain ⟨c, hcCfix, hcN⟩ := SetLike.not_le_iff_exists.mp hCfixN
+  obtain ⟨c, hcCfix, hcN⟩ := IsConcreteLE.not_le_iff_exists.mp hCfixN
   intro hW2H0
   have hcG_W2 : (data.typeP.H.subtype c) ∈ data.typeP.W2 := by
     rw [← hCHW1]; exact Subgroup.mem_map_of_mem _ hcCfix

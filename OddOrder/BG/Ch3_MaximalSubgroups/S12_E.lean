@@ -476,7 +476,7 @@ theorem rank_centralizer_Malpha_le_one_of_not_uniqueMaximal [Finite G]
     rw [lt_top_iff_ne_top]
     intro hNtop
     have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal X with hXbot | hXtop
     · exact hXne hXbot
     · exact hMcoatom.1 (top_le_iff.mp (hXtop ▸ hXM))
   have hUNX : IsUniquelyMaximal (Subgroup.normalizer (X : Set G)) := hU.of_le_of_lt_top hCN hNXlt

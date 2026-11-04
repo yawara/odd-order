@@ -721,7 +721,7 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
     have := hyp.sup_S_Qder_conj_mem_of_mem_Q hgQ hn
     simpa using this
   -- the quotient is nontrivial
-  obtain ⟨q0, hq0Q, hq0N⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨q0, hq0Q, hq0N⟩ := IsConcreteLE.exists_of_lt hlt
   set k0 : ↥(hyp.Q.subgroupOf hyp.H) :=
     ⟨⟨q0, hyp.Q_le_H hq0Q⟩, Subgroup.mem_subgroupOf.mpr hq0Q⟩ with hk0
   have : Nontrivial (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := by

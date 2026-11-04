@@ -232,7 +232,7 @@ theorem mem_of_conj_smul_eq_of_ne
       rw [hT₁card, hTcard] at h2
       have h3 := fc.p_prime.one_lt
       nlinarith
-    obtain ⟨t₁, h1, h2⟩ := SetLike.not_le_iff_exists.mp h1
+    obtain ⟨t₁, h1, h2⟩ := IsConcreteLE.not_le_iff_exists.mp h1
     exact ⟨t₁, h1, h2⟩
   have ht₁R₁ : t₁ ∈ ((fc.invImageF model ⊔ X : Subgroup G) : Set G) := by
     rw [hsup]
@@ -576,7 +576,7 @@ theorem normalizer_overgroup_eq_normalizer_invImageF
       simpa [mul_assoc] using h1
   apply le_antisymm ?_ hNRle
   by_contra hnle
-  obtain ⟨n, hnN, hnNR⟩ := SetLike.not_le_iff_exists.mp hnle
+  obtain ⟨n, hnN, hnNR⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
   -- every `m ∈ N` fixes `T` setwise and sends `R` to a line.
   have hmT : ∀ m ∈ N, MulAut.conj m • fc.sInvertedT model = fc.sInvertedT model := by
     intro m hm

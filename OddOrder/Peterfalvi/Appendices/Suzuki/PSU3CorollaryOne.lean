@@ -125,11 +125,9 @@ theorem closure_conj_standardRootSubgroup_eq_top {m : ℕ} (hn : 1 < m) :
       = ⊤ := by
   have := standardPermGroup_isSimpleGroup hn
   rw [closure_iUnion_conj_eq_normalClosure]
-  have hnorm : (Subgroup.normalClosure
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.normalClosure
       ((standardRootSubgroup m : Subgroup ↥(standardPermGroup m)) :
-        Set ↥(standardPermGroup m))).Normal :=
-    Subgroup.normalClosure_normal
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+        Set ↥(standardPermGroup m))) with hbot | htop
   · exfalso
     have hle : (standardRootSubgroup m : Subgroup ↥(standardPermGroup m))
         ≤ Subgroup.normalClosure _ := Subgroup.le_normalClosure

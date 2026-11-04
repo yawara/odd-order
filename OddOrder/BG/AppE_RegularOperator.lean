@@ -887,7 +887,7 @@ theorem RegularOperatorSetup.card_le_pow_card_A {R B : Type*} [Group R] [Group B
     push_cast
     exact hrall _ hvR₀
   -- BG's `w ∈ H₀ − H₁`
-  obtain ⟨w, hwmem, hw1⟩ := SetLike.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS h0live)
+  obtain ⟨w, hwmem, hw1⟩ := IsConcreteLE.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS h0live)
   rw [OddOrder.Isaacs.Ch04.iterCommutator_zero] at hwmem
   -- `r₀`, the eigenvalue on the top section
   obtain ⟨r₀, hr₀q, hr₀⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS hSinv h0live ha

@@ -519,7 +519,7 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
   have hNUtop : Subgroup.normalizer (hyp.U : Set G) ≠ ⊤ := by
     intro hNtop
     have hUnormal : (hyp.U).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.U hUnormal with h | h
+    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.U with h | h
     · exact hUne h
     · exact hUneTop h
   -- a maximal subgroup `L ⊇ N_G(U)`.
@@ -730,7 +730,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
   have hNVtop : Subgroup.normalizer (hyp.V : Set G) ≠ ⊤ := by
     intro hNtop
     have hVnormal : (hyp.V).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.V hVnormal with h | h
+    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.V with h | h
     · exact hVne h
     · exact hVneTop h
   obtain ⟨L, hNVL, hLmaximal⟩ :=

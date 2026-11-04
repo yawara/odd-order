@@ -141,7 +141,7 @@ theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
     exact Subgroup.map_mono hXPM
   -- **`C_G(X) < ⊤`**: else `X ≤ Z(G) = ⊥`, contradicting `X ≠ ⊥`.
   have hcenter_bot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exfalso
       refine hG.notSolvable (Group.isSolvable_of_comm fun a b => ?_)

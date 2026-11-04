@@ -474,7 +474,7 @@ theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
   · exact heq.ge
   · exfalso
     have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop'
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop'
     · -- `M = ⊥`: every nontrivial subgroup is `⊤`, so `G` is cyclic, hence solvable.
       have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hbot]; exact hco.2
       have : Nontrivial G := hG.simple.toNontrivial
@@ -524,7 +524,7 @@ private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hXS.ne (le_antisymm hXS.le htop)
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hsub_lt)
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt (hNC _ hsub_lt)
   rw [← Subgroup.subgroupOf_normalizer_eq hXS.le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hXS.le) (fun heq => ht_not ?_)
@@ -690,7 +690,7 @@ private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
       intro htop
       rw [hLdef] at htop
       have hXnorm : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal X hXnorm with hbot | htopX
+      rcases hG.simple.eq_bot_or_eq_top_of_normal X with hbot | htopX
       · exact hXne hbot
       · have hGpg : IsPGroup p G := hXp.of_equiv (htopX ▸ Subgroup.topEquiv)
         have : Group.IsNilpotent G := hGpg.isNilpotent
@@ -996,8 +996,8 @@ theorem alpha_subset_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
   have hN_lt : Subgroup.normalizer (Pbar : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Pbar
-      (Subgroup.normalizer_eq_top_iff.mp htop) with hbot | htopP
+    have := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Pbar with hbot | htopP
     · exact hPbar_ne hbot
     · exact hMc.1 (top_le_iff.mp (htopP ▸ hPbar_le_M))
   obtain ⟨N, hNc, hNleN⟩ := (IsCoatomic.eq_top_or_exists_le_coatom _).resolve_left hN_lt.ne

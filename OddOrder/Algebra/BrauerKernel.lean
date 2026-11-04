@@ -166,7 +166,7 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
       have hdmem := ih (c - t) hdcard hdfix hdbr
       have hct : c = (c - t) + t := by abel
       rw [hct]
-      exact add_mem hdmem (SetLike.le_def.mp
+      exact add_mem hdmem (IsConcreteLE.le_iff.mp
         (le_iSup _ (⟨Q, hQlt⟩ : {Q : Subgroup G // Q < P})) htmem)
   · -- Conversely every such trace is killed.
     intro hmem
@@ -176,7 +176,7 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
       rintro x ⟨a, -, rfl⟩
       exact AddMonoidHom.mem_ker.mpr
         (brauerProj_relTrace_eq_zero hchar (dvd_relIndex_of_lt_of_isPGroup hP Q.2) a)
-    exact AddMonoidHom.mem_ker.mp (SetLike.le_def.mp hle hmem)
+    exact AddMonoidHom.mem_ker.mp (IsConcreteLE.le_iff.mp hle hmem)
 
 /-- **The Brauer quotient.**  Two `P`-fixed elements have the same image under `Br_P` exactly
 when they differ by a sum of relative traces from proper subgroups of `P`.  Together with the

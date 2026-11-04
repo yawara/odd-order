@@ -701,7 +701,7 @@ theorem lt_inf_normalizer_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] 
     rw [Subgroup.subgroupOf_eq_top] at h
     exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl S)
   obtain ⟨x, hxN, hxS⟩ :=
-    SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
+    IsConcreteLE.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
   refine lt_of_le_of_ne (le_inf hlt.le Subgroup.le_normalizer) fun heq => hxS ?_
   have hxmem : (x : G) ∈ P ⊓ Subgroup.normalizer S :=
     ⟨x.2, mem_normalizer_of_mem_normalizer_subgroupOf hlt.le hxN⟩
@@ -722,7 +722,7 @@ theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
     by_contra hne
     have hlt : P < (Q : Subgroup G) := lt_of_le_of_ne hPQ hne
     obtain ⟨x, ⟨hxQ, hxN⟩, hxP⟩ :=
-      SetLike.exists_of_lt (lt_inf_normalizer_of_lt_of_isPGroup Q.isPGroup' hlt)
+      IsConcreteLE.exists_of_lt (lt_inf_normalizer_of_lt_of_isPGroup Q.isPGroup' hlt)
     -- `R = P ⊔ ⟨x⟩` は `M` の中の `P` より真に大きい `p`-部分群.
     have hxM : x ∈ M := hN hxN
     set R : Subgroup G := P ⊔ Subgroup.zpowers x with hRdef
@@ -938,7 +938,7 @@ section /- 9D: Bartels Step 6 と Theorem 9.28 本体 (pp. 290-293) -/
 @[simp] theorem strongClosure_bot : strongClosure (⊥ : Subgroup G) = ⊥ := by
   refine le_antisymm (strongClosure_le ?_) bot_le
   rintro Y ⟨g, -, rfl⟩
-  simp [Subgroup.smul_bot]
+  simp
 
 /-- 反例の `X^{(G)}` は真部分群 (`⊤` は subnormal ゆえ)。 -/
 theorem strongClosure_ne_top_of_not_isSubnormal {X : Subgroup G}

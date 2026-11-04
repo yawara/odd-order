@@ -298,7 +298,7 @@ theorem minimal_le_centralLiftIn [Finite G] (W : Subgroup G)
     Subgroup.Normal.map ‹(Q₂.subgroupOf W).Normal› π
       (QuotientGroup.mk'_surjective _)
   have hQbar_ne : Qbar ≠ ⊥ := by
-    obtain ⟨x, hxQ₂, hxQ₃⟩ := SetLike.exists_of_lt hQ₃Q₂
+    obtain ⟨x, hxQ₂, hxQ₃⟩ := IsConcreteLE.exists_of_lt hQ₃Q₂
     intro hbot
     have hxmem : π (⟨x, hQ₂W hxQ₂⟩ : ↥W) ∈ Qbar :=
       Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr hxQ₂)

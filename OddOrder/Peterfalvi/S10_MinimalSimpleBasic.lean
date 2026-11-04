@@ -236,7 +236,7 @@ theorem normalizer_support_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           rw [hxi]; exact inv_mem hx
     obtain ⟨x0, hx0⟩ := hXne
     have hle : Subgroup.closure X ≤ M := (Subgroup.closure_le M).mpr hXM
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnormal with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.closure X) with hb | ht
     · exact hX1 x0 hx0 (Subgroup.mem_bot.mp (hb ▸ Subgroup.subset_closure hx0))
     · exact hcoatom.1 (top_le_iff.mp (ht ▸ hle))
 

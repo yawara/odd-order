@@ -831,7 +831,7 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
         h_t_in ht_inP ht_central)
   -- G simple ⇒ commutator G ∈ {⊥, ⊤}. ≠ ⊤ (else t ∈ ⊤). So = ⊥ ⇒ G abelian, 矛盾
   have h_comm_normal : (commutator G).Normal := inferInstance
-  rcases hSimp.eq_bot_or_eq_top_of_normal _ h_comm_normal with h_bot | h_top
+  rcases hSimp.eq_bot_or_eq_top_of_normal (commutator G) with h_bot | h_top
   · -- commutator G = ⊥ ⇒ G abelian (直接 commutator element 経由)
     apply hG_nonab
     refine ⟨⟨fun a b => ?_⟩⟩

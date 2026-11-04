@@ -633,7 +633,7 @@ theorem exists_chiefFactorHom_ne_one [Finite G] {M : Subgroup G}
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.1 }
   have : Nontrivial (↥data.H ⧸ chief.N) := by
-    obtain ⟨x, hxH, hxnot⟩ := SetLike.exists_of_lt chief.H0_lt_H
+    obtain ⟨x, hxH, hxnot⟩ := IsConcreteLE.exists_of_lt chief.H0_lt_H
     refine ⟨⟨QuotientGroup.mk ⟨x, hxH⟩, 1, ?_⟩⟩
     rw [ne_eq, QuotientGroup.eq_one_iff]
     intro hmem
@@ -689,7 +689,7 @@ theorem exists_cInHuHom_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hlt : commutator ↥(cInHu data chief) < ⊤ :=
     Group.IsSolvable.commutator_lt_top_of_nontrivial ↥(cInHu data chief)
   have : Nontrivial (Abelianization ↥(cInHu data chief)) := by
-    obtain ⟨x, -, hxnot⟩ := SetLike.exists_of_lt hlt
+    obtain ⟨x, -, hxnot⟩ := IsConcreteLE.exists_of_lt hlt
     exact ⟨⟨Abelianization.of x, 1, fun h => hxnot ((QuotientGroup.eq_one_iff x).mp h)⟩⟩
   have : NeZero (Monoid.exponent (Abelianization ↥(cInHu data chief))) :=
     ⟨Monoid.exponent_ne_zero_of_finite⟩

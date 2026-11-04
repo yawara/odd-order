@@ -63,7 +63,7 @@ lemma exists_minimal_orderOf_notMem {N₀ : Type*} [Group N₀] [Finite N₀]
   classical
   let : Fintype N₀ := Fintype.ofFinite N₀
   have hne : (Finset.univ.filter (fun n : N₀ => n ∉ M)).Nonempty := by
-    obtain ⟨n, -, hn⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hM)
+    obtain ⟨n, -, hn⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hM)
     exact ⟨n, by simp [hn]⟩
   obtain ⟨n, hn_mem, hn_min⟩ :=
     Finset.exists_min_image _ orderOf hne

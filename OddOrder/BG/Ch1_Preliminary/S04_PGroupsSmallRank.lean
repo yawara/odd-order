@@ -300,7 +300,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
       have hQclass : Group.nilpotencyClass (R' ⧸ Subgroup.center R') ≤ j - 1 :=
         ih (Nat.card (R' ⧸ Subgroup.center R')) hquot_lt (j - 1) (by omega) hQpg rfl hquot_le
       -- `cl(R') = cl(R'/Z) + 1 ≤ (j-1) + 1 = j`.
-      rw [Group.nilpotencyClass_eq_quotient_center_plus_one]
+      rw [Group.nilpotencyClass_eq_quotient_center_add_one]
       omega
 
 /-- From `cl(G) ≤ 3` one gets that every weight-`3` commutator `⁅⁅a, b⁆, c⁆` is central.

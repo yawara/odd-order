@@ -195,7 +195,7 @@ theorem actsPrimeOn_Msigma_of_mem_tau13 [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNZne : Subgroup.normalizer (Subgroup.zpowers g : Set G) ≠ ⊤ := by
     intro htop
     have : (Subgroup.zpowers g).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers g) inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers g) with hb | ht
     · exact hZne hb
     · exact hMcoatom.1 (top_le_iff.mp (ht ▸ hZM))
   obtain ⟨Mstar, hMstarCo, hNZM⟩ :=
@@ -352,7 +352,7 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     have hNxne : Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≠ ⊤ := by
       intro htop
       have : (Subgroup.zpowers x).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) with hb | ht
       · exact hxne hb
       · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hxM))
     obtain ⟨Mstar, hMstarCo, hNxM⟩ :=

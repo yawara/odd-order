@@ -191,7 +191,7 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
     have hlt : p ^ 1 < p ^ 4 := Nat.pow_lt_pow_right hyp.p_prime.one_lt (by omega)
     rw [pow_one] at hlt
     omega
-  obtain ⟨w, hwmem, hw1⟩ := SetLike.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS3 h0live)
+  obtain ⟨w, hwmem, hw1⟩ := IsConcreteLE.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS3 h0live)
   rw [OddOrder.Isaacs.Ch04.iterCommutator_zero] at hwmem
   -- `r₀`, the eigenvalue of `α` on the top section `H₀/H₁`.
   obtain ⟨r₀, hr₀q, hr₀⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS3 hSinvA h0live ha

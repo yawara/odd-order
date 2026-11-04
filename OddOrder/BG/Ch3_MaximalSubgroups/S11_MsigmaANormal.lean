@@ -915,7 +915,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
       have hlt : M < Subgroup.normalizer (Q₀ : Set G) :=
         lt_of_le_of_ne hM_norm_Q₀ (Ne.symm hne')
       have hnormal : Q₀.Normal := Subgroup.normalizer_eq_top_iff.mp (hM.2 _ hlt)
-      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnormal with hbot | htop'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal Q₀ with hbot | htop'
       · exact hQ₀_ne_bot hbot
       · exact hM.1 (top_le_iff.mp (htop' ▸ hQ₀_le_M))
     have hNQ_le_M : Subgroup.normalizer (Q : Set G) ≤ M := hNQ₀_eq_M ▸ hN_le

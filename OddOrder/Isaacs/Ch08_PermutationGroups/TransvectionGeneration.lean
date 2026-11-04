@@ -350,8 +350,8 @@ private lemma diagonal_pair_mul_transvection (hij : i ≠ j) {β : 𝕜}
     by_cases hsi : s = i <;> by_cases hsj : s = j <;>
     simp_all [transvection, Matrix.single_apply, Matrix.one_apply,
       Matrix.add_apply, Function.update_apply, mul_ite, ite_mul, mul_comm,
-      mul_assoc, eq_comm] <;>
-    field_simp
+      mul_assoc, eq_comm]
+  field_simp
 
 /-- The inverse of a transvection is the opposite transvection. -/
 private lemma transvectionSL_inv (hij : i ≠ j) (c : 𝕜) :

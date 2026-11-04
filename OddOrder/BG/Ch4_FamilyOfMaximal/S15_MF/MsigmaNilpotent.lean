@@ -524,7 +524,7 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
       rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
       rw [← hc, show c = 1 from Subtype.ext hmem, map_one]
     · -- `ψ.range ≠ ⊥`: the image of an `x ∈ (D ⊔ Q₁) ∖ Q₀` is nontrivial.
-      obtain ⟨x, hxDQ1, hxQ0⟩ := SetLike.exists_of_lt hQ0lt
+      obtain ⟨x, hxDQ1, hxQ0⟩ := IsConcreteLE.exists_of_lt hQ0lt
       intro hbot
       refine hxQ0 ((hψ1 ⟨x, hxDQ1⟩).mp ?_)
       have hmem : ψ ⟨x, hxDQ1⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
@@ -639,7 +639,7 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
       have hmem : (c : G) ∈ N ⊓ K1 := ⟨hcN, c.2⟩
       rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
       rw [← hc, show c = 1 from Subtype.ext hmem, map_one]
-    · obtain ⟨x, hxN, hxQ0⟩ := SetLike.exists_of_lt hQ0lt
+    · obtain ⟨x, hxN, hxQ0⟩ := IsConcreteLE.exists_of_lt hQ0lt
       intro hbot
       refine hxQ0 ((hψ1 ⟨x, hxN⟩).mp ?_)
       have hmem : ψ ⟨x, hxN⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
@@ -1291,7 +1291,7 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
   have hQnM : (Q.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
   -- `Nontrivial Q̄` (`Q₀ < Q`).
-  obtain ⟨x0, hx0Q, hx0Q0⟩ := (SetLike.lt_iff_le_and_exists.mp hQ0Q).2
+  obtain ⟨x0, hx0Q, hx0Q0⟩ := (IsConcreteLE.lt_iff_le_and_exists.mp hQ0Q).2
   have hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
     refine ⟨QuotientGroup.mk ⟨x0, hx0Q⟩, 1, ?_⟩
     rw [Ne, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]

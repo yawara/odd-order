@@ -283,7 +283,7 @@ theorem step3_main
   -- L3. `Z(H) = ⊥` (else `H` abelian ⇒ `M` proper nontrivial normal, contra simplicity),
   -- hence `1 ≠ z ∈ Z ⇒ C_H(z) < H`, contained in a maximal ⊇ Z, which is `M`.
   have hcenter_bot : Subgroup.center H = ⊥ := by
-    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.center H) inferInstance
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.center H)
       with h | h
     · exact h
     · exfalso
@@ -291,7 +291,7 @@ theorem step3_main
         refine ⟨fun n hn g => ?_⟩
         have hg : g * n = n * g := (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top g) n).symm
         rw [hg, mul_inv_cancel_right]; exact hn
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hM | hM
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M with hM | hM
       · exact absurd hM (M.nontrivial_iff_ne_bot.mp inferInstance)
       · exact hM_max.1 hM
   have hL3 : ∀ z ∈ Z, z ≠ 1 → Subgroup.centralizer ({z} : Set H) ≤ M := by
@@ -349,7 +349,7 @@ theorem step3_main
       rw [hK_eq] at h1
       exact (hSH_def.trans h1).symm
     exact (ne_of_lt hNPS_gt) hNPS_eq_SH.symm
-  obtain ⟨g, hg_NPS, hg_notM⟩ := SetLike.not_le_iff_exists.mp hNPS_not_le_M
+  obtain ⟨g, hg_NPS, hg_notM⟩ := IsConcreteLE.not_le_iff_exists.mp hNPS_not_le_M
   rw [hNPS_def, Subgroup.mem_inf] at hg_NPS
   have hg_normSH : g ∈ Subgroup.normalizer SH := hg_NPS.1
   -- L5. `A := Z_p^g ⊆ S^g = S ⊆ M`, normalizing `Z_q`.
@@ -380,7 +380,7 @@ theorem step3_main
     · exfalso
       have hNtop : Subgroup.normalizer M = ⊤ := hM_max.2 _ h
       have hMnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hb | ht
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M with hb | ht
       · exact (M.nontrivial_iff_ne_bot.mp inferInstance) hb
       · exact hM_max.1 ht
   set Mg : Subgroup H := M.map (MulAut.conj g) with hMg_def
@@ -849,7 +849,7 @@ theorem step4_qCentral_normalizes_no_pCentral
     rw [this] at hSH_lt_norm
     exact (lt_irrefl _ hSH_lt_norm)
   -- Choose g ∈ (N_H(SH) ⊓ PH) \ N.
-  obtain ⟨g, hg_mem, hg_not_N⟩ := SetLike.not_le_iff_exists.mp hNormPH_not_le_N
+  obtain ⟨g, hg_mem, hg_not_N⟩ := IsConcreteLE.not_le_iff_exists.mp hNormPH_not_le_N
   have hg_norm_SH : g ∈ Subgroup.normalizer (SH : Set H) := hg_mem.1
   -- (b) W^g ≠ W (else g ∈ N_H(W) = N); W^g ≤ SH.
   set Wg : Subgroup H := W.map (MulAut.conj g).toMonoidHom with hWg_def

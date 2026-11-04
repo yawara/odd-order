@@ -1109,7 +1109,7 @@ theorem normalizer_fittingInG_le_self [Finite G]
       rw [OddOrder.BG.Ch2.S08.fittingInG]
       exact fun h => hFMne ((Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp h)
     -- `F(M) ⊴ G`, `F(M) ≠ ⊥`, `G` simple ⟹ `F(M) = ⊤` ⟹ `G` nilpotent ⟹ solvable, contradiction.
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (fittingInAmbient M) hFnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (fittingInAmbient M) with hbot | htop
     · exact hFne hbot
     · -- `F(M) = ⊤`: `G ≃ ↥F(M)` is nilpotent, hence solvable.
       have : Group.IsNilpotent ↥(fittingInAmbient M) := by

@@ -70,7 +70,7 @@ theorem not_isSimpleGroup_of_card_eq_twentytwo {H : Type*} [Group H] (h : Nat.ca
       omega
   have : Subsingleton (Sylow 11 H) := (Nat.card_eq_one_iff_unique.mp hn).1
   have : (P : Subgroup H).Normal := Sylow.normal_of_subsingleton P
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (P : Subgroup H) inferInstance with hb | ht
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (P : Subgroup H) with hb | ht
   · rw [hb] at hPcard
     simp at hPcard
   · rw [ht, Subgroup.card_top, h] at hPcard

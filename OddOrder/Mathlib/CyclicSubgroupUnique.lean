@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 
 /-!
 # Subgroups of a finite cyclic group are determined by their order
@@ -51,7 +51,6 @@ theorem eq_powMonoidHom_ker_card [Finite A] [IsCyclic A] (B : Subgroup A) :
       #{a : A | a ^ Nat.card B = 1} := by
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     congr 1
-    exact Finset.filter_congr fun x _ => by simp
   omega
 
 /-- **Subgroups of a finite cyclic group are determined by their order.**  Two subgroups of the

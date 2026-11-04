@@ -31,7 +31,7 @@ theorem normalizer_eq_self_of_mem_maximalSubgroups [Finite G]
   · exact h.symm
   · exfalso
     have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hcoatom.2 _ h)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
     · exact hG.ne_bot_of_isCoatom hcoatom hb
     · exact hcoatom.1 ht
 

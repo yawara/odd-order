@@ -254,7 +254,7 @@ theorem centerLiftQ1_ne_bot [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
   have := hnil
   have : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
   have hcne := Group.IsNilpotent.center_ne_bot (G := ↥hyp.Q1)
-  obtain ⟨x, hxC, hxb⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hcne)
+  obtain ⟨x, hxC, hxb⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hcne)
   intro hbot
   have hmem : (x : G) ∈ hyp.centerLiftQ1 := by
     refine ⟨x.2, fun y hy => ?_⟩
@@ -494,7 +494,7 @@ theorem ssetOf_S_coherent_step
     exact Subgroup.card_eq_card_quotient_mul_card_subgroup _
   -- `|S⧸S₁| ≥ 2`
   have h25 : 2 ≤ Nat.card (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := by
-    obtain ⟨s, hsS, hsS₁⟩ := SetLike.not_le_iff_exists.mp hSnotle
+    obtain ⟨s, hsS, hsS₁⟩ := IsConcreteLE.not_le_iff_exists.mp hSnotle
     have hne : (Quotient.mk'' (⟨s, hsS⟩ : ↥hyp.S) : ↥hyp.S ⧸ S₁.subgroupOf hyp.S)
         ≠ Quotient.mk'' (1 : ↥hyp.S) := by
       intro h

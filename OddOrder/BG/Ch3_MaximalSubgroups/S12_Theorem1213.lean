@@ -46,7 +46,7 @@ private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hXS.ne (le_antisymm hXS.le htop)
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hsub_lt)
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt (hNC _ hsub_lt)
   rw [← Subgroup.subgroupOf_normalizer_eq hXS.le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hXS.le) (fun heq => ht_not ?_)

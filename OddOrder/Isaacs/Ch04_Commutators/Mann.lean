@@ -93,11 +93,11 @@ theorem centralizer_singleton_conj (g x : G) :
         _ = g⁻¹ * (g * x * g⁻¹ * t) * g := by rw [h]
         _ = x * (g⁻¹ * t * g) := by group
     · show (MulAut.conj g : G →* G) (g⁻¹ * t * g) = t
-      simp only [MonoidHom.coe_coe, MulAut.conj_apply]
+      simp only [MonoidHom.coe_ofClass, MulAut.conj_apply]
       group
   · rintro ⟨s, hs, rfl⟩
     rw [Subgroup.mem_centralizer_singleton_iff] at hs
-    simp only [MonoidHom.coe_coe, MulAut.conj_apply]
+    simp only [MonoidHom.coe_ofClass, MulAut.conj_apply]
     calc g * s * g⁻¹ * (g * x * g⁻¹) = g * (s * x) * g⁻¹ := by group
       _ = g * (x * s) * g⁻¹ := by rw [hs]
       _ = g * x * g⁻¹ * (g * s * g⁻¹) := by group
@@ -159,16 +159,16 @@ instance mannSubgroup_normal : (mannSubgroup G).Normal := by
     apply Set.Subset.antisymm
     · rintro _ ⟨x, hx, rfl⟩
       show (MulAut.conj g : G →* G) x ∈ mannGenerators G
-      simp only [MonoidHom.coe_coe, MulAut.conj_apply]
+      simp only [MonoidHom.coe_ofClass, MulAut.conj_apply]
       exact mannGenerators_conj_mem hx g
     · intro x hx
       refine ⟨g⁻¹ * x * g, by simpa using mannGenerators_conj_mem hx g⁻¹, ?_⟩
       show (MulAut.conj g : G →* G) (g⁻¹ * x * g) = x
-      simp only [MonoidHom.coe_coe, MulAut.conj_apply]
+      simp only [MonoidHom.coe_ofClass, MulAut.conj_apply]
       group
   rw [← hmap]
   exact Subgroup.mem_map.mpr
-    ⟨n, hn, by simp only [MonoidHom.coe_coe, MulAut.conj_apply]⟩
+    ⟨n, hn, by simp only [MonoidHom.coe_ofClass, MulAut.conj_apply]⟩
 
 end
 
@@ -653,7 +653,7 @@ theorem centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent
   have : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective A)
   -- `H̄ ≠ ⊥`: pick `h ∈ H \ A`
   have hHbar_ne : Hbar ≠ ⊥ := by
-    obtain ⟨h, hhH, hhA⟩ := SetLike.exists_of_lt hAH
+    obtain ⟨h, hhH, hhA⟩ := IsConcreteLE.exists_of_lt hAH
     intro hbot
     apply hhA
     have hmem : q h ∈ Hbar := Subgroup.mem_map_of_mem q hhH

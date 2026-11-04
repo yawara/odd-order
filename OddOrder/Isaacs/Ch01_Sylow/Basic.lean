@@ -99,7 +99,7 @@ theorem card_dvd_factorial_of_simple_subgroup_index [IsSimpleGroup G] [Finite G]
   have hn : H.index ≠ 0 := by omega
   have : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp hn
   obtain ⟨_, hNH, hdvd⟩ := normalCore_index_dvd_factorial H
-  rcases Subgroup.Normal.eq_bot_or_eq_top (inferInstance : H.normalCore.Normal)
+  rcases Subgroup.Normal.eq_bot_or_eq_top H.normalCore
       with hN | hN
   · rw [hN, Subgroup.index_bot] at hdvd
     exact hdvd
@@ -491,7 +491,7 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
   have hM'_nontriv : Nontrivial M' := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro hbot
-    obtain ⟨m, hmM, hmN⟩ := SetLike.exists_of_lt hNM
+    obtain ⟨m, hmM, hmN⟩ := IsConcreteLE.exists_of_lt hNM
     apply hmN
     have hm_in : QuotientGroup.mk' N m ∈ M' := Subgroup.mem_map.mpr ⟨m, hmM, rfl⟩
     rw [hbot, Subgroup.mem_bot] at hm_in

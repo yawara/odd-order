@@ -584,7 +584,7 @@ theorem mem_of_forall_conj_mul_inv_mem_sInvertedT
     have h6 : fc.p ≤ 1 :=
       Nat.le_of_mul_le_mul_left h5 (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
     omega
-  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := SetLike.not_le_iff_exists.mp hnle
+  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
   -- its class has order `p` and generates the normal Sylow of `N/R`.
   have hx₁NR : x₁ ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
     hR₁le hx₁R₁
@@ -783,7 +783,7 @@ private theorem exists_quotient_generator
     have h6 : fc.p ≤ 1 :=
       Nat.le_of_mul_le_mul_left h5 (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
     omega
-  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := SetLike.not_le_iff_exists.mp hnle
+  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
   have hx₁NR : x₁ ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
     hR₁le hx₁R₁
   have hξ1 : QuotientGroup.mk' ((fc.invImageF model).subgroupOf

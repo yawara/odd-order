@@ -937,7 +937,7 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
   have hDbar_normal : Dbar.Normal :=
     Subgroup.Normal.map hD_normal q (QuotientGroup.mk'_surjective H)
   have hDbar_ne : Dbar ≠ ⊥ := by
-    obtain ⟨d, hdD, hdH⟩ := SetLike.exists_of_lt hHD_lt
+    obtain ⟨d, hdD, hdH⟩ := IsConcreteLE.exists_of_lt hHD_lt
     intro hbot
     apply hdH
     have : q d ∈ Dbar := Subgroup.mem_map_of_mem q hdD

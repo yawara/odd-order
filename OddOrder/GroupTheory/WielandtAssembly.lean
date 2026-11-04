@@ -97,7 +97,7 @@ theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E 
       have : N.Normal := hN_normal
       -- Coprimality and the quotient action descend to `H / N`.
       have hcopN : Nat.Coprime (Nat.card L) (Nat.card (H ⧸ N)) :=
-        hcop.coprime_dvd_right (Subgroup.card_dvd_of_surjective _ (QuotientGroup.mk'_surjective N))
+        hcop.coprime_dvd_right (Subgroup.card_dvd_of_surjective (QuotientGroup.mk'_surjective N))
       have hlt : Nat.card (H ⧸ N) < n := by
         rw [← hcard]; exact Subgroup.card_quotient_lt_of_ne_bot hN_ne
       -- Induction hypothesis on the quotient.

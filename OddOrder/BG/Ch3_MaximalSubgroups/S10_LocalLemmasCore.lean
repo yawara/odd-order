@@ -209,7 +209,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
     · exact h
     · exfalso
       have : R.Normal := Subgroup.normalizer_eq_top_iff.mp h
-      rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with h' | h'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal R with h' | h'
       · exact hRne h'
       · exact (mem_maximalSubgroups.mp hM).1
           (top_le_iff.mp (h' ▸ hRE.trans hEM : (⊤ : Subgroup G) ≤ M))
@@ -430,7 +430,7 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
     · exact h
     · exfalso
       have : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp h
-      rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) inferInstance with h' | h'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) with h' | h'
       · exact hPne h'
       · exact (mem_maximalSubgroups.mp hM).1
           (top_le_iff.mp (h' ▸ hP_le_M : (⊤ : Subgroup G) ≤ M))

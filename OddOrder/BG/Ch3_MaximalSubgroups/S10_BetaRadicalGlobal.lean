@@ -251,7 +251,7 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
         intro htop
         rw [Subgroup.subgroupOf_eq_top] at htop
         exact hQne (le_antisymm hQP htop)
-      obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hQsub_lt)
+      obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt (hNC _ hQsub_lt)
       rw [← Subgroup.subgroupOf_normalizer_eq hQP, Subgroup.mem_subgroupOf] at ht_norm
       rw [Subgroup.mem_subgroupOf] at ht_not
       -- `↑t ∈ N_G(Q) ⊓ P ≤ Q`, so `↑t ∈ Q`, contradicting `t ∉ Q.subgroupOf P`.
@@ -342,7 +342,7 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
     rw [lt_top_iff_ne_top]
     intro htop
     have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases (hG.simple).eq_bot_or_eq_top_of_normal X hXnormal with hb | ht
+    rcases (hG.simple).eq_bot_or_eq_top_of_normal X with hb | ht
     · exact hXne hb
     · exact hM_co.1 (top_le_iff.mp (ht ▸ hXM))
   -- A coatom `C ⊇ N_G(X)` exists; it contains `N_G(X) ⊓ S`, so `C = M' = M`.

@@ -212,7 +212,7 @@ lemma inf_stabilizer_eq_bot_of_card_stabilizer_eq_two [Finite G] [FaithfulSMul G
       fun h hh => mem_stabilizer_iff.mp (hle hh)).1
     rw [hbot] at hcard
     simp at hcard
-  obtain ⟨t, htα, htβ⟩ := SetLike.not_le_iff_exists.mp hnotle
+  obtain ⟨t, htα, htβ⟩ := IsConcreteLE.not_le_iff_exists.mp hnotle
   have ht1 : t ≠ 1 := fun hc => htβ (hc ▸ Subgroup.one_mem _)
   refine le_antisymm (fun s hs => Subgroup.mem_bot.mpr ?_) bot_le
   obtain ⟨hsα, hsβ⟩ := Subgroup.mem_inf.mp hs

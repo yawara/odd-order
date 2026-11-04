@@ -200,9 +200,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     have hNMle : Subgroup.normalizer M ≤ M := by
       rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
       · exact heq.ge
-      · rcases hG.simple.eq_bot_or_eq_top_of_normal M
-            (Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hMmax).2 _ hlt)) with hb |
-                ht
+      · have := Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hMmax).2 _ hlt)
+        rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
         · exact absurd hb hMne
         · exact absurd ht (mem_maximalSubgroups.mp hMmax).1
     -- Decompose `c = v * a` with `v ∈ N_σ`, `a ∈ M ⊓ N` (in `↥N`, since `N_σ ⊴ N`).
@@ -547,9 +546,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
       have hN_M₂_le : Subgroup.normalizer M₂ ≤ M₂ := by
         rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M₂)) with heq | hlt
         · exact heq.ge
-        · rcases hG.simple.eq_bot_or_eq_top_of_normal M₂
-              (Subgroup.normalizer_eq_top_iff.mp
-                ((mem_maximalSubgroups.mp hM₂max).2 _ hlt)) with hb | ht
+        · have := Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM₂max).2 _ hlt)
+          rcases hG.simple.eq_bot_or_eq_top_of_normal M₂ with hb | ht
           · exact absurd hb hM₂ne
           · exact absurd ht (mem_maximalSubgroups.mp hM₂max).1
       -- `L` conjugate to `M₂` (else Thm 13.9 σ-disjoint, but `q ∈ σ(M₂) ∩ σ(L)`).

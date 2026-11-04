@@ -150,7 +150,7 @@ private theorem exists_sigma_maximal_of_sylow [Finite G] (hG : IsMinimalSimpleOd
     rw [lt_top_iff_ne_top]
     intro htop
     have hPnormal : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPnormal with hbot | htop'
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) with hbot | htop'
     · exact hPne hbot
     · have hsolv : Group.IsSolvable ↥(P : Subgroup G) := by
         have := (P.isPGroup').isNilpotent; infer_instance

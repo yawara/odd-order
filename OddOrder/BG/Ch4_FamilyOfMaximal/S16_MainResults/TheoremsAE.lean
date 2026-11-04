@@ -889,7 +889,7 @@ theorem centralizer_le_of_maximalSigma_le_one [Finite G] (hG : OddOrder.BG.IsMin
     · exact le_of_eq heq.symm
     · have hnorm : M.Normal :=
         Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
-      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+      rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop
       · exact absurd hbot hMne
       · exact absurd htop (mem_maximalSubgroups.mp hM).1
   -- `conj c • M = M → c ∈ N_G(M)`.

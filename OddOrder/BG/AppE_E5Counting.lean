@@ -221,7 +221,7 @@ theorem normalizer_zpowers_le_of_centralizer_singleton [Finite G]
   have hne : Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≠ ⊤ := by
     intro htop
     have hnorm : (Subgroup.zpowers x).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop2
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) with hbot | htop2
     · exact hx1 (Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_zpowers x))
     · refine hG.notSolvable ?_
       have : IsCyclic G := ⟨⟨x, fun g =>

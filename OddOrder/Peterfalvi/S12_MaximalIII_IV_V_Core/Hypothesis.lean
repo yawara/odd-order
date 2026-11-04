@@ -528,7 +528,7 @@ theorem normalizer_typePA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have htop : Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) = ⊤ :=
         hyp.maximal.2 _ (hMle.lt_of_ne (Ne.symm hN))
       have hnormal : (derivedInG M).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnormal with hbot | htop'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (derivedInG M) with hbot | htop'
       · -- `M' = ⊥` contradicts `⊥ ≠ W₂ ≤ H ≤ M'`.
         have hW2le : hyp.typeP.W2 ≤ derivedInG M :=
           hyp.typeP.W2_le.trans (inf_le_left.trans hyp.typeP.H_le)

@@ -77,11 +77,11 @@ theorem pi_classSum_subgroup_eq_zero_of_notMem_centralizer {p : ℕ} [Fact p.Pri
   have hzQ : (⟨z, hzH⟩ : ↥H) ∈ Q := hz
   exact congrArg Subtype.val ((Subgroup.mem_centralizer_iff.mp hmem) (⟨z, hzH⟩ : ↥H) hzQ)
 
-omit [Fintype G] [Finite ι] in
 -- The class-sum expansion of the centre needs the finiteness and decidability of `cl(H)`, which
 -- the statement itself does not mention.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [Fintype G] [Finite ι] in
 open scoped Classical in
 set_option backward.isDefEq.respectTransparency false in
 /-- **A block character of `H` is determined by the coefficients on `C_G(P)`.**

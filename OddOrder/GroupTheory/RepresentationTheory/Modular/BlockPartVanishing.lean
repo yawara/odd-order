@@ -62,9 +62,9 @@ variable {ιH : Type*} {mH : ιH → Type*} [∀ i, Fintype (mH i)] [∀ i, Deci
 variable {ιG : Type*} {nnG : ιG → Type*} [∀ i, Fintype (nnG i)] [∀ i, DecidableEq (nnG i)]
   [Finite ιG] [∀ i, Nonempty (nnG i)]
 
+set_option linter.unusedFintypeInType false in
 omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] [FaithfulSMul 𝒪 K]
   [DecidableEq (ConjClasses G)] in
-set_option linter.unusedFintypeInType false in
 open scoped Classical in
 /-- **A class function vanishing on the `p`-section of `x` has all its generalized decomposition
 sums zero.**

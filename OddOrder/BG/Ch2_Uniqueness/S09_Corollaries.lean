@@ -801,7 +801,7 @@ theorem centralizer_lt_top_of_mem_scn3Global [Finite G]
     Subgroup.centralizer (A : Set G) < ⊤ := by
   classical
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable

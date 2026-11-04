@@ -63,7 +63,7 @@ theorem exists_maximal_pSubgroup_le_of_le {q : ℕ} [Fact q.Prime] [Finite G]
     have hPT : (P : Subgroup ↥H) ≤ T.subgroupOf H := Subgroup.map_le_iff_le_comap.mp hST
     have e : (P : Subgroup ↥H) = T.subgroupOf H := by
       have hm := P.is_maximal' hTHpg hPT
-      first | exact hm | exact hm.symm
+      exact hm.symm
     rw [e]
     exact Subgroup.map_subgroupOf_eq_of_le hTH
 
@@ -101,7 +101,7 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNA₀ne : Subgroup.normalizer (A₀ : Set G) ≠ ⊤ := by
     intro htop
     have : A₀.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal A₀ inferInstance with hbot | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal A₀ with hbot | ht
     · exact hA₀ne hbot
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hA₀M))
   obtain ⟨Mdag, hMdagCo, hNA₀⟩ :=
@@ -327,7 +327,7 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNPne : Subgroup.normalizer (P : Set G) ≠ ⊤ := by
     intro htop
     have : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P with hb | ht
     · exact hPne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hPM))
   obtain ⟨Mstar, hMstarCo, hNP⟩ :=

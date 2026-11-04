@@ -63,7 +63,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
     rw [hone]
     exact one_dvd _
   · -- pick a nonidentity element of `W` and build the Lemma 5 setup
-    obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
+    obtain ⟨w, hwW, hwbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
     have hw1 : w ≠ 1 := fun h =>
       hwbot (h ▸ Subgroup.one_mem ⊥)
     obtain ⟨s⟩ := hyp.lemmaFiveSetup_of_orderThree_of_mem_W hwW hw1 hst hQsuz
@@ -365,7 +365,7 @@ theorem lemmaFive_of_orderThree
   obtain ⟨hcyc, hdvd⟩ := hyp.isCyclic_W_and_card_dvd_of_orderThree hst hQsuz
     hm hQ0card hcardQ inductionHypothesis
   refine ⟨hcyc, hdvd, fun hWne => ?_⟩
-  obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
+  obtain ⟨w, hwW, hwbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
   exact hyp.isTypeB_Q_of_orderThree_of_mem_W hwW
     (fun h => hwbot (h ▸ Subgroup.one_mem ⊥)) hst hQsuz hm hQ0card hcardQ
     inductionHypothesis

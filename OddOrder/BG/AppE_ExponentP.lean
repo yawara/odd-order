@@ -267,7 +267,7 @@ theorem RegularOperatorSetup.eq_omega_of_omegaInG_normalizer_eq [Finite R]
   have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hTtop : T.subgroupOf P = ⊤ := by
     by_contra hne
-    obtain ⟨x, hxN, hxT⟩ := SetLike.exists_of_lt
+    obtain ⟨x, hxN, hxT⟩ := IsConcreteLE.exists_of_lt
       (OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top
         (H := T.subgroupOf P) (lt_of_le_of_ne le_top hne))
     rw [← Subgroup.subgroupOf_normalizer_eq hTP] at hxN

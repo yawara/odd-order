@@ -11,7 +11,7 @@ import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Data.Setoid.Basic
+import Mathlib.Order.Setoid.Basic
 import Mathlib.Tactic.Group
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.LinearAlgebra.Span.Basic

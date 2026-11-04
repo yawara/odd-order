@@ -576,7 +576,7 @@ theorem exists_maximal_over_normalizer_not_conj_of_le_E3 [Finite G] (hG : IsMini
   have hNQne : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
     intro htop
     have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q with hb | ht
     · exact hQne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hQM))
   obtain ⟨Mstar, hMstarCo, hNQM⟩ :=

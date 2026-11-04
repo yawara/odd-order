@@ -325,7 +325,7 @@ theorem SinfM_isCyclic :
     intro hle
     have : IsCyclic ↥Q.X := Subgroup.isCyclic_zpowers Q.x
     exact hnc (Subgroup.isCyclic_of_le hle)
-  obtain ⟨q, hqQ, hqX⟩ := SetLike.not_le_iff_exists.mp hnotle
+  obtain ⟨q, hqQ, hqX⟩ := IsConcreteLE.not_le_iff_exists.mp hnotle
   obtain ⟨hqS, hqM⟩ := Subgroup.mem_inf.mp hqQ
   obtain ⟨k, rfl | rfl⟩ := Q.mem_iff.mp hqS
   · exact hqX (Q.mem_X_iff.mpr ⟨k, rfl⟩)

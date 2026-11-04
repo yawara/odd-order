@@ -454,7 +454,7 @@ theorem H_not_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (hyp.H0_lt_H.le.trans (hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)))).mpr
       hyp.chief.H0_normalized_by_M
-  obtain ⟨h, hhH, hhH0⟩ := SetLike.exists_of_lt hyp.H0_lt_H
+  obtain ⟨h, hhH, hhH0⟩ := IsConcreteLE.exists_of_lt hyp.H0_lt_H
   have hhM : h ∈ M :=
     hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _) hhH
   have hH0le : hyp.chief.H0 ≤ M :=
@@ -616,7 +616,7 @@ theorem trace_ne_top_of_lt_derived {M : Subgroup G} {H1 : Subgroup G}
     (h : H1 < derivedInG M) :
     ((H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤ := by
   intro htop
-  obtain ⟨x, hxM', hxH1⟩ := SetLike.exists_of_lt h
+  obtain ⟨x, hxM', hxH1⟩ := IsConcreteLE.exists_of_lt h
   have hxM : x ∈ M := Subgroup.map_subtype_le _ hxM'
   have hmem : (⟨⟨x, hxM⟩, Subgroup.mem_subgroupOf.mpr hxM'⟩ :
       ↥((derivedInG M).subgroupOf M)) ∈

@@ -163,7 +163,7 @@ theorem not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor
         ht_central)
   -- endgame: G simple ⇒ G' ∈ {⊥, ⊤}; ⊤ は ↑s ∉ G' に反し, ⊥ は G abelian ⇒ 矛盾
   have h_comm_normal : (commutator G).Normal := inferInstance
-  rcases hSimp.eq_bot_or_eq_top_of_normal _ h_comm_normal with h_bot | h_top
+  rcases hSimp.eq_bot_or_eq_top_of_normal (commutator G) with h_bot | h_top
   · apply hG_nonab
     refine ⟨⟨fun x y => ?_⟩⟩
     have h_comm_mem : ⁅x, y⁆ ∈ commutator G := by

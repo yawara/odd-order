@@ -2,6 +2,9 @@ name = "OddOrder"
 version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["OddOrder"]
+# 一時措置 (issue 0190): mathlib v4.35.0 は `requiresModuleSystem` を立てるので、非 module の
+# file は mathlib の import 1 行ごとに Lake が warning を出す。module 化の commit で外す。
+allowNonModules = true
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -14,7 +17,7 @@ weak.linter.style.longFile = 1500 # mathlib 準拠の分割上限 (CLAUDE.md「�
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "d13f23b723b8a846827a245b89c10fc7d3f11612" # mathlib tag v4.34.1 (= stable, 2026-09-24)
+rev = "56a005855ea17e0b0958f73ec801ae140b0a1679" # mathlib tag v4.35.0 (= stable, 2026-10-13)
 
 [[lean_lib]]
 name = "OddOrder"

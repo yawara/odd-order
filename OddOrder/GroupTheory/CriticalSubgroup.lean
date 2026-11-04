@@ -190,7 +190,7 @@ theorem centralizer_eq_self_of_maximal_abelian_normal
   have : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective M)
   -- `H̄ ≠ ⊥`: pick `h ∈ H \ M`, then `q h ≠ 1`.
   have hHbar_ne : Hbar ≠ ⊥ := by
-    obtain ⟨h, hhH, hhM⟩ := SetLike.exists_of_lt hMH
+    obtain ⟨h, hhH, hhM⟩ := IsConcreteLE.exists_of_lt hMH
     intro hbot
     apply hhM
     have : q h ∈ Hbar := Subgroup.mem_map_of_mem q hhH
@@ -543,7 +543,7 @@ theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C
         -- `Q ≤ C`.
         have hQC : Subgroup.centralizer (C : Set P) ≤ C := by
           by_contra hQnotC
-          rw [SetLike.not_le_iff_exists] at hQnotC
+          rw [IsConcreteLE.not_le_iff_exists] at hQnotC
           obtain ⟨q₀, hq₀Q, hq₀C⟩ := hQnotC
           -- `Q̄ := Q.map q` is normal and nontrivial.
           have hQchar : (Subgroup.centralizer (C : Set P)).Characteristic :=

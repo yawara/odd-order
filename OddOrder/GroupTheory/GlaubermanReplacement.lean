@@ -104,7 +104,7 @@ theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal
   have hMB : M ≤ B := hMBA.trans (commutator_le_left B A)
   have hAstar := thompson_mem_maxAbelianIn hA (mem_top x) hMcomm
   refine ⟨M ⊔ C, hAstar, ?_, ?_⟩
-  · rw [SetLike.lt_iff_le_and_exists]
+  · rw [IsConcreteLE.lt_iff_le_and_exists]
     constructor
     · -- `A ⊓ B ≤ C` (three-subgroup lemma)
       have hAA : ⁅A, A⁆ = (⊥ : Subgroup G) :=
@@ -142,7 +142,7 @@ theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal
         intro hle
         exact hMnc ((le_centralizer_iff_isMulCommutative.mpr hA.2.1).trans
           (centralizer_le (SetLike.coe_subset_coe.mpr hle)))
-      obtain ⟨m, hm, hmA⟩ := SetLike.not_le_iff_exists.mp hMnotA
+      obtain ⟨m, hm, hmA⟩ := IsConcreteLE.not_le_iff_exists.mp hMnotA
       exact ⟨m, ⟨mem_sup_left hm, hMB hm⟩, fun hc => hmA hc.1⟩
   · -- `A* ≤ N(A)` (Lem 2.3)
     rw [le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn hA le_top]

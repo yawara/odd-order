@@ -1087,7 +1087,7 @@ theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
   have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hgrow := Group.normalizerCondition_of_isNilpotent (G := ↥P)
     ((Subgroup.centralizer (A : Set G) ⊓ P).subgroupOf P) hCPlt
-  obtain ⟨w, hwN, hwC⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨w, hwN, hwC⟩ := IsConcreteLE.exists_of_lt hgrow
   -- `A` is exactly the set of exponent-`p` elements of `C_P(A)`
   have hAset : ∀ g : G, g ∈ A ↔ (g ∈ Subgroup.centralizer (A : Set G) ⊓ P ∧ g ^ p = 1) := by
     intro g

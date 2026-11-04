@@ -624,7 +624,7 @@ theorem thompson_replacement [Finite G] {p : ℕ} [Fact p.Prime] {P A B : Subgro
   refine ⟨elementCommutator x A ⊔ (A ⊓ centralizer (elementCommutator x A : Set G)),
     thompson_mem_maxAbelianIn hA (hBP hxB) hMcomm, ?_, ?_⟩
   · -- (i) `A ∩ B < A* ∩ B`
-    rw [SetLike.lt_iff_le_and_exists]
+    rw [IsConcreteLE.lt_iff_le_and_exists]
     constructor
     · -- `A ∩ B ≤ C_A(M) ≤ A*`, かつ `≤ B`
       have hABC : A ⊓ B ≤ A ⊓ centralizer (elementCommutator x A : Set G) := by

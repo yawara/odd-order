@@ -163,7 +163,7 @@ theorem odd_natCard_map_D_residualQuotient :
   have hdvd₁ : Nat.card ↥((hyp.D.subgroupOf (residualImage (G := G) X)).map
         (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
       ∣ Nat.card ↥(hyp.D.subgroupOf (residualImage (G := G) X)) :=
-    Subgroup.card_dvd_of_surjective _
+    Subgroup.card_dvd_of_surjective
       (MonoidHom.subgroupMap_surjective (QuotientGroup.mk' _) _)
   have hdvd₂ : Nat.card ↥(hyp.D.subgroupOf (residualImage (G := G) X))
       ∣ Nat.card ↥hyp.D := by

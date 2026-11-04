@@ -133,7 +133,7 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
     frattini_ne_top_of_nontrivial
   have hPhi_lt_top : frattini P < (⊤ : Subgroup P) :=
     lt_of_le_of_ne le_top hPhi_ne_top
-  obtain ⟨x0, -, hx0Phi⟩ := SetLike.exists_of_lt hPhi_lt_top
+  obtain ⟨x0, -, hx0Phi⟩ := IsConcreteLE.exists_of_lt hPhi_lt_top
   let q0 : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
   have hqx0 : q0 x0 ≠ 1 := by
     intro hx
@@ -433,7 +433,7 @@ theorem lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
     frattini_ne_top_of_nontrivial
   have hPhi_lt_top : frattini P < (⊤ : Subgroup P) :=
     lt_of_le_of_ne le_top hPhi_ne_top
-  obtain ⟨x, -, hxPhi⟩ := SetLike.exists_of_lt hPhi_lt_top
+  obtain ⟨x, -, hxPhi⟩ := IsConcreteLE.exists_of_lt hPhi_lt_top
   let q : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
   have hqx : q x ≠ 1 := by
     intro hx

@@ -439,7 +439,7 @@ theorem nonempty_theoremAConclusion (ih : Hypothesis.TheoremAInductionBelow G Ω
     have hle : (2 : ℕ) ^ m ≤ 2 ^ 1 := Nat.pow_le_pow_right (by norm_num) (by omega)
     omega
   have hm : m ≠ 0 := (Nat.zero_lt_one.trans hn).ne'
-  obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hW)
+  obtain ⟨w, hwW, hwbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hW)
   have hw1 : w ≠ 1 := fun hcon => hwbot (hcon ▸ Subgroup.one_mem ⊥)
   obtain ⟨sfive⟩ := sc.toHypothesis.lemmaFiveSetup_of_orderThree_of_mem_W hwW hw1 hord
     hQsuz hm hQ0card hcardQ ih

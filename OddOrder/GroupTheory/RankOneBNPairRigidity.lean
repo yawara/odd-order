@@ -254,7 +254,7 @@ theorem map_permHom_range_eq (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
           Equiv.Perm (Option ↥Q) →* Equiv.Perm (Option ↥Q'))
       = (permHom hS').range := by
   rw [permHom_range_eq, permHom_range_eq, MonoidHom.map_closure, Set.image_insert_eq]
-  simp only [MonoidHom.coe_coe]
+  simp only [MonoidHom.coe_ofClass]
   rw [ht, hM]
 
 /-- **The Lemma of Peterfalvi Part II, Ch. IV §1** (p. 123), transport step: if a
@@ -300,7 +300,7 @@ theorem map_permHom_conjQ_eq (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
     simp only [Function.comp_apply]
     rw [map_mul, map_mul, ht]
   rw [permHom_map_conjQ_eq, permHom_map_conjQ_eq, MonoidHom.map_closure, Set.image_union]
-  simp only [MonoidHom.coe_coe]
+  simp only [MonoidHom.coe_ofClass]
   rw [himg, hQ]
 
 /-- **The first half of the Lemma**: `⟨Q^x | x ∈ L⟩` is determined up to isomorphism by

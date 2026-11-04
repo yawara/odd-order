@@ -725,7 +725,7 @@ private theorem blackburn_noncentral_centralizer_ne_top
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  obtain ⟨z, hzT, hzZ⟩ := IsConcreteLE.exists_of_lt hT_facts.1
   have hzS : z ∈ S := hT_facts.2.1.le hzT
   intro hC_top
   have hz_center : (⟨z, hzS⟩ : S) ∈ Subgroup.center S := by
@@ -793,7 +793,7 @@ theorem blackburn_noncentral_omega1_not_le_centralizer
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  obtain ⟨z, hzT, hzZ⟩ := IsConcreteLE.exists_of_lt hT_facts.1
   have hzS : z ∈ S := hT_facts.2.1.le hzT
   intro hS_le_C
   have hz_center : (⟨z, hzS⟩ : S) ∈ Subgroup.center S := by

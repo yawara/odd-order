@@ -379,8 +379,8 @@ theorem fitting_map_subtype_pointwise_smul (M : Subgroup G) :
             e.symm.injective)
         exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
       have h3 := Subgroup.map_mono (f := (e : ↥M →* ↥(φ • M))) h2
-      rwa [Subgroup.map_map, ← MulEquiv.coe_monoidHom_trans, MulEquiv.symm_trans_self,
-        MulEquiv.coe_monoidHom_refl, Subgroup.map_id] at h3
+      rwa [Subgroup.map_map, ← MulEquiv.toMonoidHom_trans, MulEquiv.symm_trans_self,
+        MulEquiv.toMonoidHom_refl, Subgroup.map_id] at h3
   calc (OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (φ • M).subtype
       = ((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))).map (φ • M).subtype := by
         rw [hfit]

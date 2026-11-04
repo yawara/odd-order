@@ -408,7 +408,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `Z(G) = 1` (simple nonabelian) — used for `C_G(X) < ⊤`.
   have hZbot : Subgroup.center G = ⊥ := by
     have : IsSimpleGroup G := hG.simple
-    refine (Subgroup.Normal.eq_bot_or_eq_top Subgroup.instNormalCenter).resolve_right
+    refine (Subgroup.Normal.eq_bot_or_eq_top (Subgroup.center G)).resolve_right
       (fun htop => ?_)
     exact hG.notSolvable (Group.isSolvable_of_comm (fun a b =>
       (Subgroup.mem_center_iff.mp (htop ▸ Subgroup.mem_top a) b).symm))
@@ -714,7 +714,7 @@ theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
   by_cases hMsbot : S10.Msigma M = ⊥
   · rw [hMsbot]; infer_instance
   -- BG: take `g ∈ N_G(P) − N_M(P)` (here it suffices that `g ∈ N_G(P)` and `g ∉ M`).
-  obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+  obtain ⟨g, hgN, hgM⟩ := IsConcreteLE.not_le_iff_exists.mp h.normalizer_P_not_le
   have hgP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer hgN
   -- `A₀^g`, contained in `P ⊆ M` since `g` normalizes `P`.
   set Ag : Subgroup G := MulAut.conj g • A₀ with hAg_def
@@ -935,7 +935,7 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
       intro x hx y hy
       have hc := hab.is_comm.comm (⟨x, hx⟩ : ↥P) ⟨y, hy⟩
       simpa using congrArg Subtype.val hc
-    obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+    obtain ⟨g, hgN, hgM⟩ := IsConcreteLE.not_le_iff_exists.mp h.normalizer_P_not_le
     -- `q ∈ σ(M)` via `M_σ ≠ ⊥`.
     have hMσne : S10.Msigma M ≠ ⊥ := S10.Msigma_ne_bot hG h.mem_maximal
     have : Nontrivial ↥(S10.Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
@@ -1181,7 +1181,7 @@ theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [← map_pow, hz, map_one]
   refine ⟨ha_eq, ?_⟩
   -- (b)
-  obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+  obtain ⟨g, hgN, hgM⟩ := IsConcreteLE.not_le_iff_exists.mp h.normalizer_P_not_le
   have hgA : MulAut.conj g • A = A := by
     rw [ha_eq]
     exact conj_smul_eq_self_of_mem_normalizer

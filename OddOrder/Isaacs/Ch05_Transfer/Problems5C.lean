@@ -393,7 +393,7 @@ theorem card_eq_two_of_characteristic_relIndex_eq_two [Finite G] [IsSimpleGroup 
     · intro hcon; exact h2 (by simpa using hcon)
   -- `G` は可換 (さもなくば `G' = ⊤` で矛盾)
   have hcomm : ∀ x y : G, x * y = y * x := by
-    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) inferInstance with
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) with
       hbot | htop
     · intro x y
       have hmem2 : ⁅x, y⁆ ∈ _root_.commutator G := by

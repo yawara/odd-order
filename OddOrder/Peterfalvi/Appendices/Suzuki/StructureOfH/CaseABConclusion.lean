@@ -189,7 +189,7 @@ theorem theoremAConclusion_of_orderFiveCarrier_subgroup (hV : hyp.V ≠ ⊥)
     have := hyp.Q_le_of_orderFiveCarrier hG₀ hyp.distinguishedInvolution_mem_Q
     rwa [hb, Subgroup.mem_bot] at this
   refine hyp.theoremAConclusion_of_not_simple (fun hsimple => ?_) ind
-  rcases hsimple.eq_bot_or_eq_top_of_normal G₀ hnorm with h | h
+  rcases hsimple.eq_bot_or_eq_top_of_normal G₀ with h | h
   · exact hbot h
   · exact hne h
 

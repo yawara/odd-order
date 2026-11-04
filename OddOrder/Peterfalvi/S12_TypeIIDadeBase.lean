@@ -95,7 +95,7 @@ theorem typeII_centralizerSupport_isTISubset [Finite G]
       hSmax.2 _ (lt_of_le_of_ne hle fun h => hne h.symm)
     have hHnormal : (maxNilpotentNormalHall S).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) hHnormal with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) with hb | ht
     · exact hFne hb
     · exact hSmax.1
         (top_le_iff.mp (ht ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le S))

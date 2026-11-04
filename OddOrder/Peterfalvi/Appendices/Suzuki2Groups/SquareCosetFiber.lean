@@ -144,7 +144,7 @@ theorem bijOn_cosetSquare
       rw [hbot, Subgroup.card_bot] at hXcard
       omega
     obtain ⟨q₁, hq₁X, hq₁bot⟩ :=
-      SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hXnontrivial)
+      IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hXnontrivial)
     have hq₁1 : q₁ ≠ 1 := by
       intro h1
       exact hq₁bot (by rw [h1]; exact Subgroup.one_mem ⊥)

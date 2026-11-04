@@ -161,9 +161,9 @@ theorem coe_centerReduce (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))
       = centerReduceHom φ w := rfl
 
 -- The finiteness instances are consumed through the kernel description.
-omit [IsAdicComplete I 𝒪] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [IsAdicComplete I 𝒪] in
 /-- The kernel of `centerReduce` is again `I·Z(𝒪G)`. -/
 theorem mem_centerIdeal_iff_centerReduce_eq_zero (hker : RingHom.ker φ = I)
     (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :

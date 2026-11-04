@@ -257,7 +257,7 @@ private lemma commutator_zpowers_rot5A_invol2A_eq_top :
         rw [hindex, card_alternatingGroup_five]
         decide
       have : IsSimpleGroup (alternatingGroup (Fin 5)) := alternatingGroup.isSimpleGroup (by simp)
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N inferInstance with hbot | htop
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N with hbot | htop
       · rw [hbot, Subgroup.card_bot] at hcard30; omega
       · rw [htop, Subgroup.card_top, card_alternatingGroup_five] at hcard30; omega
     · omega

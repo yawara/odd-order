@@ -311,8 +311,8 @@ theorem exists_mem_centralizer_inf_not_le_commutator
   obtain ⟨a, ha_ne, hnle⟩ :=
     exists_ne_one_actionFixedBy_not_le_commutator φ hCop hSolv hNC hKtop
   -- Translate the abstract conclusion to ambient subgroups.
-  obtain ⟨n, hn_fix, hn_out⟩ := SetLike.not_le_iff_exists.mp hnle
-  refine ⟨(a : G), a.2, fun h => ha_ne (Subtype.ext h), SetLike.not_le_iff_exists.mpr
+  obtain ⟨n, hn_fix, hn_out⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
+  refine ⟨(a : G), a.2, fun h => ha_ne (Subtype.ext h), IsConcreteLE.not_le_iff_exists.mpr
     ⟨(n : G), ?_, ?_⟩⟩
   · -- `n ∈ C_G(a) ⊓ K`: `a` conjugates `n` to itself, and `n ∈ K`.
     rw [Ch06.mem_actionFixedBy] at hn_fix

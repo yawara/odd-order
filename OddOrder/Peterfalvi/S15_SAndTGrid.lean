@@ -255,7 +255,6 @@ theorem typeIBetaL_eq_tau_induce_sub [Finite G] {L : Subgroup G}
   intro _ _ _
   unfold typeIBetaL
   repeat' first
-    | rfl
     | exact Subsingleton.elim _ _
     | congr 1
 

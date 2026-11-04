@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 import Mathlib.GroupTheory.SemidirectProduct
 
 /-!

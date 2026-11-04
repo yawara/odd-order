@@ -471,8 +471,8 @@ variable {πC : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : 
 set_option maxHeartbeats 1600000 in
 -- Two full copies of the splitting data of (6.14), one for `H` and one for `C_G(Q)`; the
 -- ambient `G` only supplies the subgroups, so its own splitting data is not in play.
-omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)] in
 set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)] in
 open scoped Classical in
 /-- **`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)`** for `g ∈ C_G(Q)`, when `Q C_G(Q) ≤ H`.
 
@@ -536,10 +536,10 @@ theorem coeff_principalBlock_eq_centralizer_intermediate [Fact p.Prime]
 set_option maxHeartbeats 800000 in
 -- Both sides are read through Osima's theorem, so both block-idempotent bundles are in play;
 -- the class-sum decidability is consumed there, not by this statement.
-omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)]
-  [Fintype G] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)]
+  [Fintype G] in
 open scoped Classical in
 include hnilH eH hnilC eC in
 /-- **`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)` at a `p`-singular `g`** — both sides are `0`.
@@ -597,9 +597,9 @@ theorem coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular [Fact
 set_option maxHeartbeats 1600000 in
 -- Both routes are instantiated here, so every piece of splitting data for `H` and `C_G(Q)` is
 -- in play at once.
-omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)] in
 open scoped Classical in
 include hnilH eH hnilC eC in
 /-- **`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)` for every `g ∈ C_G(Q)`** — the hypothesis `hcoeff` of
@@ -885,9 +885,9 @@ variable (πG : MonoidAlgebra k G →+* ∀ j, Matrix (nnG j) (nnG j) k)
 -- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14);
 -- the class-sum expansion of `Z(kH)` needs `cl(H)` finite and decidable, which the statement
 -- itself does not mention
-omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
 open scoped Classical in
 /-- **The converse half of Brauer's third main theorem**, for a general intermediate subgroup
 `Q C_G(Q) ≤ H ≤ N_G(Q)`: a block `b` of `H` whose induced central character `λ_b ∘ Br_Q` names

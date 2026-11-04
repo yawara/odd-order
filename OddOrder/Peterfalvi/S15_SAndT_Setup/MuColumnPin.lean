@@ -395,7 +395,6 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
     by_cases h1 : hyp.eta a j ∈ E <;> by_cases h2 : hyp.eta ⟨0, hyp.q_prime.pos⟩ j ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h one_ne_zero
         | exact absurd h.symm one_ne_zero
   have hrow_k : ∀ a : Fin hyp.q,
@@ -406,7 +405,6 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
     by_cases h1 : -hyp.eta a k ∈ E <;> by_cases h2 : -hyp.eta ⟨0, hyp.q_prime.pos⟩ k ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h (by norm_num)
   -- the isometry norm `‖c(μ_j)‖² = q`
   have hnorm : ClassFunction.inner (c.extension μcol) (c.extension μcol) = (hyp.q : ℂ) := by

@@ -1128,8 +1128,8 @@ theorem card_reducible_induce_eq_W2 [NeZero (Nat.card h.W1)] :
   obtain ⟨χ₂, hχ₂⟩ := (h.induce_not_isIrreducible_iff χ).mp hχ
   exact ⟨χ₂, Subtype.ext hχ₂⟩
 
-omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 set_option linter.unusedFintypeInType false in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **`induce` is injective on the reducible-inducing irreducibles** (issue 1012, (9.9.b)
 source↔image, general form): if `χ, χ' ∈ Irr(K)` both induce *reducible* characters of `L` and
 `Ind_K^L χ = Ind_K^L χ'`, then `χ = χ'`.  Every reducible-inducing `χ` is a column `chiRestrict χ₂`

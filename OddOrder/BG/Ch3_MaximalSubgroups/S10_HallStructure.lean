@@ -400,7 +400,7 @@ theorem commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent
     (hab : IsMulCommutative ↥(Ch03.oPiCore πᶜ K)) :
     commutator K ≤ Ch03.oPiCore π K :=
   Subgroup.Normal.commutator_le_of_self_sup_commutative_eq_top
-    (top_le_iff.mp (top_le_oPiCore_sup_compl_of_isNilpotent π)) hab
+    (top_le_iff.mp (top_le_oPiCore_sup_compl_of_isNilpotent π))
 
 /-- **BG Theorem 10.2(b), Hall-`σ` quotient as the Fitting `σ`-core**:
 inside the nilpotent group `F(M/M_α)`, the image of any Hall `σ(M)`-subgroup

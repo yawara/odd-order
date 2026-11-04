@@ -93,7 +93,7 @@ theorem card_mulAut_eq_two_of_isSimpleGroup (hs : IsSimpleGroup (MulAut A))
     obtain ⟨a, ha⟩ := h
     exact ha (invMulAut_eq_one_iff.mp hc a)
   have hcenter : Subgroup.center (MulAut A) = ⊤ := by
-    rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.center (MulAut A)) inferInstance with hb | ht
+    rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.center (MulAut A)) with hb | ht
     · exact absurd (Subgroup.mem_bot.mp (hb ▸ invMulAut_mem_center (A := A))) hne
     · exact ht
   have : IsMulCommutative (MulAut A) := Subgroup.center_eq_top_iff.mp hcenter
@@ -512,7 +512,7 @@ theorem not_isSimpleGroup_of_card_eq_six {G : Type*} [Group G] (hG : Nat.card G 
     rw [hcardH, hG] at hmul
     omega
   have : (Subgroup.zpowers x).Normal := Subgroup.normal_of_index_eq_two hindex
-  rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
+  rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) with hb | ht
   · rw [hb, Subgroup.index_bot, hG] at hindex; omega
   · rw [ht, Subgroup.index_top] at hindex; omega
 

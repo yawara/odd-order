@@ -106,7 +106,7 @@ theorem squareSignChar_ringAut (σ : RingAut K) (y : Kˣ) :
     squareSignChar (Units.map (σ : K →* K) y) = squareSignChar y := by
   classical
   simp only [squareSignChar, MonoidHom.coe_mk, OneHom.coe_mk, Units.coe_map,
-    MonoidHom.coe_coe]
+    MonoidHom.coe_ofClass]
   exact congrArg Multiplicative.ofAdd (if_congr (isSquare_ringAut_iff σ) rfl rfl)
 
 end SquareSignChar

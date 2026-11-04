@@ -478,7 +478,7 @@ theorem pResidual_eq_top_of_not_dvd_card_abelianization {Q : Type*} [Group Q] [F
     obtain ⟨r, hy⟩ := QuotientGroup.mk'_surjective (commutator (Q ⧸ pResidual p Q)) y
     obtain ⟨q, hq⟩ := QuotientGroup.mk'_surjective (pResidual p Q) r
     exact ⟨Abelianization.of q, by rw [Abelianization.map_of, hq]; exact hy⟩
-  exact h (hpAbR.trans (Subgroup.card_dvd_of_surjective _ hsurj))
+  exact h (hpAbR.trans (Subgroup.card_dvd_of_surjective hsurj))
 
 /-- **`p ∤ |B : B'|` なら `O^p(B) = B`** (ambient 版)。9C.3 step (d) の入口。 -/
 theorem pResidualOf_eq_self_of_not_dvd_card_abelianization [Finite G] {p : ℕ}
@@ -494,7 +494,7 @@ theorem pResidualOf_eq_self_of_not_dvd_card_abelianization [Finite G] {p : ℕ}
 private theorem card_abelianization_map_dvd {G K : Type*} [Group G] [Group K]
     (f : G →* K) (A : Subgroup G) :
     Nat.card (Abelianization ↥(A.map f)) ∣ Nat.card (Abelianization ↥A) := by
-  refine Subgroup.card_dvd_of_surjective (Abelianization.map (f.subgroupMap A)) ?_
+  refine Subgroup.card_dvd_of_surjective (f := Abelianization.map (f.subgroupMap A)) ?_
   intro y
   obtain ⟨x, hy⟩ := QuotientGroup.mk'_surjective (commutator ↥(A.map f)) y
   obtain ⟨a, ha⟩ := f.subgroupMap_surjective A x

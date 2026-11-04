@@ -38,7 +38,7 @@ theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall [Finite G]
     exfalso
     have hNtop : Subgroup.normalizer (maxNilpotentNormalHall L : Set G) = ⊤ := hco.2 _ hlt
     have hHnormal : (maxNilpotentNormalHall L).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) hHnormal with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) with hb | ht
     · exact hne hb
     · have hle : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
       rw [ht] at hle

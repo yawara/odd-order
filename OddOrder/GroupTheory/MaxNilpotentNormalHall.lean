@@ -51,7 +51,7 @@ theorem map_subgroupMap_subgroupOf (ψ : MulAut G) (N M' : Subgroup G) :
     (N.subgroupOf M').map (ψ.subgroupMap M' : ↥M' →* ↥(M'.map (ψ : G →* G))) =
       (N.map (ψ : G →* G)).subgroupOf (M'.map (ψ : G →* G)) := by
   ext x
-  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MonoidHom.coe_coe]
+  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MonoidHom.coe_ofClass]
   constructor
   · rintro ⟨y, hyN, rfl⟩
     exact ⟨↑y, hyN, rfl⟩

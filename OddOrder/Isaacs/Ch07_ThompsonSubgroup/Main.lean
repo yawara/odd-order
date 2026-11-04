@@ -359,7 +359,7 @@ theorem step8_sylow_full
   -- `SH.subgroupOf PH < N(SH.subgroupOf PH)`.
   have hlt := hNC (SH.subgroupOf (PH : Subgroup H)) hSH_subOf_lt_top
   -- Get `t : ↥PH` with `t ∈ N(SH.subgroupOf PH)`, `t ∉ SH.subgroupOf PH`.
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   -- `↑t ∈ N_H(SH)` (transport normalizer), `↑t ∉ SH`.
   rw [← Subgroup.subgroupOf_normalizer_eq hSH_le_PH, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not

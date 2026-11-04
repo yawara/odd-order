@@ -884,7 +884,7 @@ theorem le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton [Finite G]
     rw [← hMQtop]
     exact hsup_le_NQ
   have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp hNQtop
-  rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hQbot | hQtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal Q with hQbot | hQtop
   · exact hQne hQbot
   · have hQp : IsPGroup q ↥Q :=
       OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton hQpi

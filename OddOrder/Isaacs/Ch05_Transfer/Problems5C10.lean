@@ -46,7 +46,7 @@ theorem seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight
   have h8G : (8 : ℕ) ∣ Nat.card G := hcard ▸ hPdvd
   -- `G` は非可換単純ゆえ `G' = ⊤`
   have hcomm : _root_.commutator G = ⊤ := by
-    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) inferInstance with
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) with
       hbot | htop
     · exfalso
       have hab : ∀ x y : G, x * y = y * x := by

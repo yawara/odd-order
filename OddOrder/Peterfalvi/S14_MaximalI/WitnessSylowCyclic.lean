@@ -627,7 +627,7 @@ theorem witness_H_sharp_not_isTISubset_of_typeI [Finite G]
     exact witness_P0_le_kernel hG hnoV data data.x_mem_P0
   have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup typeI.typeF.H :=
     ⟨hxH, by simpa using data.x_ne_one⟩
-  obtain ⟨g, hgC, hgL⟩ := SetLike.not_le_iff_exists.mp data.centralizer_x_not_le_L
+  obtain ⟨g, hgC, hgL⟩ := IsConcreteLE.not_le_iff_exists.mp data.centralizer_x_not_le_L
   have hgc : g * data.x * g⁻¹ = data.x := by
     rw [mul_inv_eq_iff_eq_mul]
     exact Subgroup.mem_centralizer_singleton_iff.mp hgC

@@ -611,7 +611,6 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     by_cases h1 : hyp.eta i b ∈ E <;> by_cases h2 : hyp.eta i ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h one_ne_zero
         | exact absurd h.symm one_ne_zero
   have hcol_s : ∀ b : Fin hyp.p,
@@ -622,7 +621,6 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     by_cases h1 : -hyp.eta s b ∈ E <;> by_cases h2 : -hyp.eta s ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h (by norm_num)
   -- the isometry norm `‖c(ν_i)‖² = p`
   have hnorm : ClassFunction.inner (c.extension νrow) (c.extension νrow) = (hyp.p : ℂ) := by

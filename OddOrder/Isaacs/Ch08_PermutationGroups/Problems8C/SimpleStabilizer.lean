@@ -46,8 +46,7 @@ theorem stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer (α : Ω)
     {N : Subgroup G} [hN : N.Normal] [IsPretransitive ↥N Ω] (hNtop : N ≠ ⊤) :
     stabilizer ↥N α = ⊥ := by
   have := hsimple
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (N.subgroupOf (stabilizer G α))
-      inferInstance with hbot | htop
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (N.subgroupOf (stabilizer G α)) with hbot | htop
   · have hdisj : Disjoint N (stabilizer G α) := Subgroup.subgroupOf_eq_bot.mp hbot
     have h : (stabilizer G α).subgroupOf N = ⊥ := Subgroup.subgroupOf_eq_bot.mpr hdisj.symm
     rw [← h]

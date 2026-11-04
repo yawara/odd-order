@@ -145,7 +145,7 @@ theorem exists_mem_ker_ne_zero_ne [FiniteDimensional K V] (h : V →ₗ[K] K) {w
     · rw [finrank_span_singleton hw0]
   have hlt : (Submodule.span K {w}) < LinearMap.ker h :=
     Submodule.lt_of_le_of_finrank_lt_finrank hspan (by omega)
-  obtain ⟨v, hvker, hvspan⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨v, hvker, hvspan⟩ := IsConcreteLE.exists_of_lt hlt
   refine ⟨v, hvker, ?_, ?_⟩
   · rintro rfl
     exact hvspan (Submodule.zero_mem _)

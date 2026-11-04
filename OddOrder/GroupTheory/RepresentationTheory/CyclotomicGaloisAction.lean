@@ -236,7 +236,7 @@ theorem exists_complexRingEquiv_extends (K : IntermediateField ℚ ℂ) (v : K �
     have h3 : hs.1.aevalEquiv (MvPolynomial.C (v x)) = algebraMap K A (v x) := by
       rw [← MvPolynomial.algebraMap_eq, AlgEquiv.commutes]
     rw [he_def]
-    simp only [RingEquiv.trans_apply, AlgEquiv.coe_ringEquiv, MvPolynomial.mapEquiv_apply]
+    simp only [RingEquiv.trans_apply, AlgEquiv.coe_toRingEquiv, MvPolynomial.mapEquiv_apply]
     rw [h1, h2, h3]
   refine ⟨IsAlgClosure.equivOfEquiv ℂ ℂ e, fun x => ?_⟩
   have hx : (x : ℂ) = algebraMap A ℂ (algebraMap K A x) := by

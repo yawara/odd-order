@@ -774,7 +774,7 @@ theorem normalizer_eq_self_of_mem_maximalSubgroups [Finite G]
   · exact le_of_eq heq.symm
   · have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp
       ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop
     · exact absurd hbot hMne
     · exact absurd htop (mem_maximalSubgroups.mp hM).1
 
@@ -795,7 +795,7 @@ theorem normalizer_Msigma_eq_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   · exact le_of_eq heq.symm
   · have hnorm : (OddOrder.BG.Ch3.S10.Msigma M).Normal :=
       Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (OddOrder.BG.Ch3.S10.Msigma M) with hbot | htop
     · exact absurd hbot (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
     · exact absurd (top_le_iff.mp (htop ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
         (mem_maximalSubgroups.mp hM).1
@@ -1092,7 +1092,7 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
     rw [lt_top_iff_ne_top]
     intro htop
     have hSpnormal : (Sp : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hSpnormal with hbot | htop'
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Sp : Subgroup G) with hbot | htop'
     · exact hSbar_ne (hSpcoe ▸ hbot)
     · have : Group.IsSolvable ↥(Sp : Subgroup G) := by
         have := Sp.isPGroup'.isNilpotent; infer_instance

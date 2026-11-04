@@ -933,7 +933,7 @@ private theorem thm34_aux : ∀ (n : ℕ)
       have hψp : ψ ^ p = 1 := by
         rw [← orderOf_dvd_iff_pow_eq_one, ← hpcard]; exact orderOf_dvd_natCard ψ
       have hxp : (ψ : G) ^ p = 1 := by rw [← Subgroup.coe_pow, hψp, Subgroup.coe_one]
-      obtain ⟨ε, hε⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot F p
+      obtain ⟨ε, hε⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot F p
       have hgen : Subgroup.closure ((K : Set G) ∪ {(ψ : G)}) = ⊤ := by
         rw [Subgroup.closure_union, Subgroup.closure_eq, ← Subgroup.zpowers_eq_closure, hψgenR]
         exact hcompl.sup_eq_top

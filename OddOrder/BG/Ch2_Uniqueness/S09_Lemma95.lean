@@ -629,7 +629,7 @@ private theorem normalizer_isUniquelyMaximal_and_le_maximal_of_rank_three_fittin
     rw [lt_top_iff_ne_top]
     intro hN0top
     have : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 with hP0bot | hP0top
     · exact hP0ne hP0bot
     · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
         rw [← hP0top]
@@ -889,7 +889,7 @@ private theorem normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normal
     rw [lt_top_iff_ne_top]
     intro hN0top
     have : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 with hP0bot | hP0top
     · exact hP0ne hP0bot
     · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
         rw [← hP0top]
@@ -950,7 +950,7 @@ private theorem commutator_normalizer_ne_bot_of_isSylow [Finite G]
     exact h
   obtain ⟨N, hNnorm, hNcompl⟩ :=
     OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer P hNC
-  rcases hG.simple.eq_bot_or_eq_top_of_normal N hNnorm with hNbot | hNtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal N with hNbot | hNtop
   · -- `N = ⊥` ⇒ `P = ⊤` ⇒ `G` is a `p`-group ⇒ solvable, contradicting `hG`.
     have hPtop : (P : Subgroup G) = ⊤ :=
       Subgroup.isComplement'_bot_left.mp (hNbot ▸ hNcompl P)
@@ -1293,7 +1293,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨x, hxW, hx1, hxnotM⟩ := hfirst
   -- `Z(G) = ⊥`, hence `C_G(x) < ⊤`
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
@@ -1340,7 +1340,7 @@ theorem centralizer_lt_top_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
     Subgroup.centralizer (K : Set G) < ⊤ := by
   classical
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable

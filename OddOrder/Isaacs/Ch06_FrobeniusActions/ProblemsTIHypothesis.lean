@@ -248,7 +248,7 @@ theorem TI_of_normalizer_le [Finite G] {A : Subgroup G}
       exact fun h => hlt.ne (le_antisymm hPS h)
     have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
     rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
-    obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+    obtain ⟨y0, hy0mem, hy0notin⟩ := IsConcreteLE.exists_of_lt hgrow
     have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
     have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
     have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)
@@ -404,7 +404,7 @@ theorem exists_sylow_coe_eq_of_maximal_pGroup_of_TI [Finite G] {A : Subgroup G}
     exact fun h => hlt.ne (le_antisymm hPS h)
   have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
   rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
-  obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨y0, hy0mem, hy0notin⟩ := IsConcreteLE.exists_of_lt hgrow
   have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
   have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
   have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)

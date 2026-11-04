@@ -312,7 +312,7 @@ theorem eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card [IsSimpleGroup G] {H :
       rw [show g * n * g⁻¹ = n from by
         rw [isMulCommutative_iff.mp hab g n]; group]
       exact hn⟩
-    exact IsSimpleGroup.eq_bot_or_eq_top_of_normal H inferInstance
+    exact IsSimpleGroup.eq_bot_or_eq_top_of_normal H
   · -- 非可換なら `H ∈ L(G)`
     have hHL : H ∈ chermakDelgadoLattice G := by
       intro K
@@ -323,7 +323,7 @@ theorem eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card [IsSimpleGroup G] {H :
     rcases eq_or_lt_of_le (le_top : H ≤ ⊤) with htop | hlt
     · exact Or.inr htop
     · obtain ⟨M, hMnorm, hHM, hMlt⟩ := exists_normal_lt_top_of_mem_lattice hHL hlt
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hM | hM
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M with hM | hM
       · exact Or.inl (le_bot_iff.mp (hM ▸ hHM))
       · exact absurd hM hMlt.ne
 

@@ -385,7 +385,7 @@ theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (
     rw [heq]
     gcongr
     -- 2 ≤ #H-軌道: [1] と [x] (x∉H) が別軌道
-    obtain ⟨x, -, hx⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hH)
+    obtain ⟨x, -, hx⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hH)
     have hnt : Nontrivial (orbitRel.Quotient H (G ⧸ H)) := by
       refine ⟨Quotient.mk'' (QuotientGroup.mk (1 : G) : G ⧸ H),
         Quotient.mk'' (QuotientGroup.mk x : G ⧸ H), ?_⟩

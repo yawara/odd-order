@@ -106,8 +106,8 @@ hence nilpotent, hence solvable. -/
 theorem oPiCore_eq_bot (hyp : MinimalSimpleCNHypothesis G) (p : ℕ) [Fact p.Prime] :
     Isaacs.Ch03.oPiCore ({p} : Set ℕ) G = ⊥ := by
   have := hyp.minimalSimpleOdd.simple
-  rcases (IsSimpleGroup.eq_bot_or_eq_top_of_normal (Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)
-    inferInstance) with hbot | htop
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with
+    hbot | htop
   · exact hbot
   · exfalso
     have hpg : IsPGroup p ↥(Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) :=

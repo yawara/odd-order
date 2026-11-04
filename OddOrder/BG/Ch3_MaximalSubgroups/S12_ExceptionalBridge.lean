@@ -638,7 +638,7 @@ theorem normalizer_lt_top_of_le_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [lt_top_iff_ne_top]
   intro hNtop
   have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-  rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal X with hXbot | hXtop
   · exact hXne hXbot
   · exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (hXtop ▸ hXM))
 

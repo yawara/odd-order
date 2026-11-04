@@ -201,7 +201,7 @@ theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : T
     exact fun h => hPltQ.ne (le_antisymm hPQ h)
   have hnorm := Group.normalizerCondition_of_isNilpotent _ hlt2
   rw [← Subgroup.subgroupOf_normalizer_eq hPQ] at hnorm
-  obtain ⟨g0, hg0mem, hg0notin⟩ := SetLike.exists_of_lt hnorm
+  obtain ⟨g0, hg0mem, hg0notin⟩ := IsConcreteLE.exists_of_lt hnorm
   set g : G := (g0 : G) with hgdef
   have hgN : g ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hg0mem
   have hgQ : g ∈ (Q : Subgroup G) := g0.2
@@ -322,7 +322,7 @@ theorem coprime_card_index_of_disjoint_conj {G : Type*} [Group G] [Finite G] {H 
       exact fun h => hPltQ.ne (le_antisymm inf_le_left h)
     have hnorm := Group.normalizerCondition_of_isNilpotent _ hlt2
     rw [← Subgroup.subgroupOf_normalizer_eq inf_le_left] at hnorm
-    obtain ⟨g0, hg0m, hg0n⟩ := SetLike.exists_of_lt hnorm
+    obtain ⟨g0, hg0m, hg0n⟩ := IsConcreteLE.exists_of_lt hnorm
     exact hg0n (Subgroup.mem_subgroupOf.mpr
       (Subgroup.mem_inf.mpr ⟨g0.2, hNle (Subgroup.mem_subgroupOf.mp hg0m)⟩))
   -- pPart(H) = |P| = |Q| = pPart(G), しかし p ∣ index で pPart(H) < pPart(G)
@@ -1066,7 +1066,7 @@ theorem disjoint_conj_of_forall_normalizer_le {G : Type*} [Group G] [Finite G] {
       exact fun hle => hlt.ne (le_antisymm hlt.le hle)
     have hgrow := lt_normalizer_of_isNilpotent_of_lt_top hlt_top
     rw [← Subgroup.subgroupOf_normalizer_eq hQ₁S] at hgrow
-    obtain ⟨y, hyN, hyQ⟩ := SetLike.exists_of_lt hgrow
+    obtain ⟨y, hyN, hyQ⟩ := IsConcreteLE.exists_of_lt hgrow
     have hynN : (y : ↥H) ∈ Subgroup.normalizer Q₁ := Subgroup.mem_subgroupOf.mp hyN
     have hynQ₁ : (y : ↥H) ∉ Q₁ := fun h => hyQ (Subgroup.mem_subgroupOf.mpr h)
     -- R := (N_{↥H}(Q₁) ⊓ S).map H.subtype は D 内の q-群で Q を真に含む

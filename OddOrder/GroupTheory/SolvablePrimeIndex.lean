@@ -34,7 +34,7 @@ theorem exists_normal_index_prime_of_isSolvable {Q : Type*} [Group Q] [Finite Q]
   refine ⟨N, hNnorm, ?_⟩
   have hsurj : Function.Surjective (QuotientGroup.mk' N) := QuotientGroup.mk'_surjective N
   have hntq : Nontrivial (Q ⧸ N) := by
-    obtain ⟨x, _, hx⟩ := SetLike.exists_of_lt hNlt
+    obtain ⟨x, _, hx⟩ := IsConcreteLE.exists_of_lt hNlt
     exact ⟨QuotientGroup.mk x, 1, by rw [Ne, QuotientGroup.eq_one_iff]; exact hx⟩
   have hsimple : IsSimpleGroup (Q ⧸ N) := by
     refine ⟨fun Nbar hNbar => ?_⟩

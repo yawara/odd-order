@@ -1074,7 +1074,7 @@ private lemma relIndex_eq_two_of_index_two_of_not_le
     (hC_idx : C.index = 2) (hE_not_le_C : ¬ E ≤ C) :
     C.relIndex E = 2 := by
   rw [Subgroup.relIndex_eq_two_iff_exists_notMem_and]
-  rw [SetLike.le_def] at hE_not_le_C
+  rw [IsConcreteLE.le_iff] at hE_not_le_C
   push Not at hE_not_le_C
   obtain ⟨a, haE, haC⟩ := hE_not_le_C
   refine ⟨a, haE, haC, ?_⟩

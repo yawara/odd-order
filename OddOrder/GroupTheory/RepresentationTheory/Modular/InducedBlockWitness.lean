@@ -66,10 +66,10 @@ theorem centerReduce_subgroupTrunc
     rw [coe_centerTrunc, coe_centerReduce, coe_centerReduce, centerReduceHom_apply,
       centerReduceHom_apply, OddOrder.GroupAlgebra.mapRingHom_subgroupTrunc]
 
-omit [Finite ιG] [Finite ιH] in
 -- The finiteness instances for `H` are consumed by (5.5), applied to the group `H`.
 set_option linter.unusedDecidableInType false in
 set_option linter.unusedFintypeInType false in
+omit [Finite ιG] [Finite ιH] in
 /-- **Navarro (5.6).**  If `b` is a block of `H ≤ G` with `b^G = B`, then there is a `w ∈ 𝒪G`
 supported off `H`, centralised by `H`, with `w f_b = w` and `(1 - f_B) f_b = (1 - f_B) w`. -/
 theorem exists_inducedBlock_witness

@@ -73,7 +73,7 @@ private lemma le_center_of_center_not_le {A : Subgroup P} [A.Normal]
     (hnot : ¬ Subgroup.center P ≤ A) : A ≤ Subgroup.center P := by
   have hp_prime : p.Prime := hp.out
   have hQcard : Nat.card (P ⧸ A) = p := by rw [← Subgroup.index_eq_card]; exact hidx
-  obtain ⟨z, hz_mem, hz_notA⟩ := SetLike.not_le_iff_exists.mp hnot
+  obtain ⟨z, hz_mem, hz_notA⟩ := IsConcreteLE.not_le_iff_exists.mp hnot
   -- the image z̄ generates P ⧸ A
   have hz_bar_ne : ((z : P) : P ⧸ A) ≠ 1 := by
     simpa [QuotientGroup.eq_one_iff] using hz_notA
@@ -596,7 +596,7 @@ lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
     intro htop
     rw [htop, Subgroup.index_top] at hidx
     exact hp.out.one_lt.ne' hidx.symm
-  obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
+  obtain ⟨u, -, hu⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
   exact ⟨u, hu⟩
 
 set_option backward.isDefEq.respectTransparency false in
@@ -932,7 +932,7 @@ private theorem cor105_aux (n : ℕ) :
           calc p = p ^ 1 := (pow_one p).symm
             _ < p ^ 2 := Nat.pow_lt_pow_right hp_prime.one_lt (by omega)
         omega
-      obtain ⟨z, hz_cent, hz_nb⟩ := SetLike.not_le_iff_exists.mp hnotle
+      obtain ⟨z, hz_cent, hz_nb⟩ := IsConcreteLE.not_le_iff_exists.mp hnotle
       have hz_ne : z ≠ 1 := fun h => hz_nb (h ▸ Subgroup.one_mem _)
       have hzA : z ∈ A := hZle hz_cent
       have hz_pow : z ^ p = 1 := Subtype.ext_iff.mp (hEA.2 ⟨z, hzA⟩)

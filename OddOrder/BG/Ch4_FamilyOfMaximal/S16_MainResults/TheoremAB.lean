@@ -191,7 +191,7 @@ private theorem normalizer_eq_self_of_maximal_B5 [Finite G]
   have hlt : M < Subgroup.normalizer (M : Set G) :=
     lt_of_le_of_ne Subgroup.le_normalizer (fun heq => hle heq.ge)
   have hnormal : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
-  rcases hG.simple.eq_bot_or_eq_top_of_normal M hnormal with hb | ht
+  rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
   · exact hG.ne_bot_of_isCoatom hco hb
   · exact hco.1 ht
 

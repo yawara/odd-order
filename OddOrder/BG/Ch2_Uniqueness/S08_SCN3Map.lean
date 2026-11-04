@@ -101,7 +101,7 @@ theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hPH_not_le htop
   have hlt := hNC (SH.subgroupOf (PH : Subgroup G)) hSH_subOf_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   rw [← Subgroup.subgroupOf_normalizer_eq hSH_le_PH, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   set tG : G := (t : G) with htG_def

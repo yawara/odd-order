@@ -299,7 +299,7 @@ theorem d_add_one_le_card_quotient_of_le_Q1 [Finite G] {N W : Subgroup G}
     hyp.d + 1 ≤ Nat.card (↥W ⧸ N.subgroupOf W) := by
   have hdvd := hyp.d_dvd_card_quotient_sub_one_of_le_Q1 hNW hWQ1 hNinv hWinv
   have hlt : 1 < Nat.card (↥W ⧸ N.subgroupOf W) := by
-    obtain ⟨w, hwW, hwN⟩ := SetLike.not_le_iff_exists.mp hWN
+    obtain ⟨w, hwW, hwN⟩ := IsConcreteLE.not_le_iff_exists.mp hWN
     have hne : (Quotient.mk'' (⟨w, hwW⟩ : ↥W) : ↥W ⧸ N.subgroupOf W)
         ≠ Quotient.mk'' (1 : ↥W) := by
       intro h
