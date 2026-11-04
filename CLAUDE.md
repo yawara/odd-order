@@ -76,8 +76,8 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (**submodule** 
   - **leaf 命名は mathlib 互換の記述的英語** (`TypePDuality`, `NormEstimates` 等)。`Part1`/`Part2` 等の無内容な名前は不可。
   - **⚠ 新 leaf は同じ commit で `OddOrder.lean` に配線する (2026-07-20 明文化、実害 2 回)**。root aggregator から到達できない leaf は `lake build OddOrder` の import closure に入らず、**hub の合流フルビルド gate が一切検証しない** — jobs 数不変のまま数秒で green が返り、新規数百行が一度も elaborate されない。`OddOrder.lean` は territory 表で**全レーン編集可**の共有ファイルなので、leaf を作ったレーンが自分で追加すること。既発生 2 件 = c の `FormalCommutator`/`FormalCollection`/`PolynomialSequences` (2 tick 素通し) と `AppE_SemidirectFrattini` (289 行、issue 0135)。hub 側の全数監査スクリプトは `notes/meta/merge_monitor.md`。
   - 機械分割の道具と手順 (preamble 再現・private public 化・sorry/宣言/namespace 文脈保存検証) は issue 0103 と `notes/meta/merge_monitor.md` を参照。
-- **最小 import (mathlib の衛生)**: 各ファイルは必要な module だけ import する。一般には import DAG を浅くし full build 並列化 + fan-out 縮小に効く。**ただし FT の spine (§1→§16 が直列依存) のように深い base closure を共有するファイル群では推移閉包が不変ゆえ速度改善はほぼ無い** (2026-06-05 実測: S09 4分割を minimal-import 化しても full build 3580 jobs 不変)。よって本リポジトリでの minimal-import の価値は **DAG 衛生 + 可読性 + upstream 適性**が主で、速度ではない。**注意: `lake exe shake` は本リポジトリで誤判定が多い** (実使用中の import を removable と誤報する) ので鵜呑みにせず必ず build/grep で検証する。
-- **`private` をファイル跨ぎで使わない**: 複数ファイルで使う補題は適切な namespace 付き public にする (mathlib は `private` を真に局所な helper に限定)。
+- **最小 import (mathlib の衛生)**: 各ファイルは必要な module だけ import する。**2026-11 の module 化以降は速度にも効く**: 証明でしか使わない import は `import` (private) にすると下流の公開スコープに伝播しないので、上流の変更で再ビルドされる範囲と各 file の読み込み量が小さくなる (旧記述「深い spine では速度改善ほぼ無し」は非 module 時代の実測で、もう当てはまらない)。整理は **`lake shake OddOrder`** (Lean 同梱、module 専用) で行い、提案ゼロを保つ。旧 Mathlib の `lake exe shake` は誤判定が多かったが、v4.35 同梱版は olean の定数参照と使用記録から判定する別物。ただし盲点があるので 下記「module system」節の `-- shake: keep` 規約に従い、適用後は必ずフルビルドで確認する。
+- **`private` をファイル跨ぎで使わない**: 複数ファイルで使う補題は適切な namespace 付き public にする (mathlib は `private` を真に局所な helper に限定)。module system では加えて、**公開される文・def 本体 (その中のタクティク証明を含む) から `private` 宣言を参照できない** (下記「module system」節)。
 - **計測事実 (2026-06-05)**: `lake build` はファイル単位で全再 elaboration するが、1 ファイルの再 elaboration は **import closure 読み込み固定費 (~5s) が支配的**で行数差は小さい (S09 4440 行 ≈5.5s、分割後 leaf 2544 行 ≈4.7s)。よって**ファイル分割の主目的は速度でなく minimal-import による DAG 衛生 + 可読性 + upstream 適性**。速度の主レバーは「**開発中は leaf build で回し、full build は commit 直前のみ**」。過度な細分化 (<~300 行が乱立) は固定 ~5s/ファイルが効いて逆効果。詳細は [ROADMAP.md#ファイル粒度とトレーサビリティ](ROADMAP.md)。**ただし行数が elaboration を支配し始める例外もある** (2026-06-11 実測: S08 11.8k 行 ≈21s、S03f_Thm36 3.8k 行 ≈50s) — frontier ファイルがこの域に入ると編集ループを直撃する。
 - **🚫 `git merge main` 後のフルビルドは冗長 — やらない (ユーザー 2026-07-19)**。**main は hub が
   合流のたびにフルビルドで gate している**ので、レーンが起動時/定期の `git merge main` で main を
@@ -97,6 +97,44 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (**submodule** 
   - **lane (書き手) の trigger**: 教科書の**次の主結果番号**に着手するときは**新 leaf を切るのがデフォルト**。同一ファイル追記は「現に証明中の定理の helper」のみ。frontier ファイルが **1,500 行超**になったら停止して分割 (または hub に委任)。
   - **⚠ 新 leaf を作ったら同じ commit で [`OddOrder.lean`](OddOrder.lean) に import を足す (2026-07-20 明文化、issue 0135)**。`OddOrder.lean` は全レーンが触ってよい共有ファイル。配線を忘れると leaf が `lake build OddOrder` の import closure 外に落ち、**hub の合流フルビルドが jobs 数不変・数秒で green を返す** — 新規コードが一度も elaborate されないまま gate を通る (実害 2 件、うち 1 件は 289 行が 1 tick 素通り)。上位 leaf 経由で到達する中間 leaf は配線不要だが、**到達性が自明でないなら足す**。
   - **hub (合流側) の gate**: 合流 tick で 1,500 行超ファイルへの追記を検出 → ⚠ flag 報告 + 分割 issue 起票。**分割の実施 owner は hub** (lane の frontier と衝突しない凍結境界で prefix-split: 先頭 K 宣言を上流ファイルへ、残りが import する。前方参照は構文上不可能ゆえ任意の宣言境界で安全)。手順詳細 = [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md)。
+
+### Lean module system (2026-11 移行、issue 0190)
+
+全 `.lean` file は Lean の **module** (mathlib v4.35 と同じ形)。lakefile に `requiresModuleSystem = true`
+を立ててあるので、`module` ヘッダの無い file が混入すると Lake が warning を出し、lint ゼロ gate が赤になる。
+移行の経緯・数値・壊れ方は [`notes/meta/mathlib_v435_migration.md`](notes/meta/mathlib_v435_migration.md)。
+
+- **新 leaf のヘッダ** (copyright の直後):
+  ```lean
+  module
+
+  public import Mathlib.Foo          -- 公開される文・def 本体で使うもの
+  import OddOrder.Bar                -- 証明でしか使わないもの (下流に伝播しない)
+
+  /-! # 見出し ... -/
+
+  @[expose] public section
+  ```
+  `@[expose] public section` で file 内の def の中身を下流に見せる (非 module 時代と同じ挙動)。
+  import 行だけの再エクスポート hub は section を置かず、`module -- shake: keep-all` にする。
+- **見える範囲**: module は import 先の **public import の閉包**しか見えない。非 module 時代のように
+  「どこかで推移的に読み込まれていれば使える」は成り立たないので、使うものは自分で import する。
+  `Unknown identifier` が出たら、まず定義 module を直接 import する。
+- **公開スコープの制約**: theorem の文、def / instance / abbrev の本体、**および def 本体の中のタクティク
+  証明**は公開スコープで elaborate される。そこでは (a) `private` 宣言、(b) private import した
+  module の宣言と instance、(c) mathlib の expose されていない def の中身 (`rfl` で開けない) が見えない。
+  直し方は、補題を public にする / import を `public` にする / `rfl` を補題で書き換える。
+- **再ビルドの性質**: 証明の中身だけを変えた場合、下流は再ビルドされない (公開部分が変わらないため)。
+  文や def 本体、public import を変えると下流が再ビルドされる。leaf 開発の編集ループはこれで速くなる。
+- **`lake shake` の盲点と `-- shake: keep`**: shake は olean の定数参照と使用記録から判定するので、次の依存を
+  見落として import を消す。該当 import には `-- shake: keep (理由)` を付けて保護する:
+  def 本体の中の証明が使う import (shake は private と判定するが、公開スコープで要る) /
+  `example` だけで使う import / `export` の対象 / `letI` で束ねて項から消える `abbrev` /
+  `simp` の congr 集合に入る `@[congr]` 補題の module。また、shake が名前空間ごと import を外すと、
+  使っていない `open X` が `unknown namespace` で落ちる (その `open` は消してよい)。
+- **AxiomsCheck**: `elab` の補助関数は `meta def`。検査対象の定理を定義する module は AxiomsCheck が
+  **直接 import する** (中間 hub の private import の先は見えないため)。新しい定理を検査に足すときは
+  定義 module の import も足す (`module -- shake: keep-all` なので shake は触らない)。
 
 ### lint 警告ゼロ方針 (--strict gate)
 
@@ -265,7 +303,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 ## ツールチェイン
 
-- Lean: [`lean-toolchain`](lean-toolchain) (現状 `leanprover/lean4:v4.34.1`、2026-09-27 に v4.33.0 から bump; 手順と API 変更一覧 [`notes/meta/mathlib_v434_migration.md`](notes/meta/mathlib_v434_migration.md) — 最大の破壊は Lean core の **`if_pos`/`if_neg`/`dif_pos`/`dif_neg` の deprecated 化** (→ `ite_eq_left`/`ite_eq_right`/`dite_eq_left`/`dite_eq_right`、2,403 箇所) と、deprecated 属性の付かない**意味の変更** (`List.TFAE.out` の 1-indexed 化、`Finsupp.mapDomain_apply` / `Equiv.setCongr` の名前再利用)。v4.33 で入れた互換フラグ `set_option backward.isDefEq.respectTransparency false in` は 1 本ずつ要否判定して 269 → 231 に削減。過去の bump 記録: v4.32.2 → v4.33.0 (2026-08-20, `isDefEq` が transparency を尊重) は [`notes/meta/mathlib_v433_migration.md`](notes/meta/mathlib_v433_migration.md)、v4.32.0-rc1 → v4.32.2 (2026-08-04, `MonoidAlgebra` structure 化) は [`notes/meta/mathlib_v4322_migration.md`](notes/meta/mathlib_v4322_migration.md)、v4.30.0-rc2 → v4.32.0-rc1 (2026-07-09) は [`notes/meta/mathlib_v432_migration.md`](notes/meta/mathlib_v432_migration.md)、v4.29.1 → v4.30.0-rc2 (2026-05-27) は [`notes/meta/mathlib_rc2_migration.md`](notes/meta/mathlib_rc2_migration.md))
+- Lean: [`lean-toolchain`](lean-toolchain) (現状 `leanprover/lean4:v4.35.0`、2026-11-05 に v4.34.1 から bump し、同時に **全 file を Lean の module system へ移行** — mathlib v4.35 が `requiresModuleSystem` を立てたので版上げと切り離せない。手順・数値・壊れ方は [`notes/meta/mathlib_v435_migration.md`](notes/meta/mathlib_v435_migration.md)、規約は上の「Lean module system」節。版上げ自体の破壊は小さい (正規性・`IsMulCommutative` の instance 引数化、`Subgroup.FG` の class 化、deprecated 11 名)。互換フラグ `backward.isDefEq.respectTransparency false` は v4.35 で棚卸しして 231 → 227。過去の bump 記録: v4.33.0 → v4.34.1 (2026-09-27, `if_pos` 系の deprecated 化 2,403 箇所、`List.TFAE.out` の 1-indexed 化など文の変わる名前再利用) は [`notes/meta/mathlib_v434_migration.md`](notes/meta/mathlib_v434_migration.md)、v4.32.2 → v4.33.0 (2026-08-20, `isDefEq` が transparency を尊重) は [`notes/meta/mathlib_v433_migration.md`](notes/meta/mathlib_v433_migration.md)、v4.32.0-rc1 → v4.32.2 (2026-08-04, `MonoidAlgebra` structure 化) は [`notes/meta/mathlib_v4322_migration.md`](notes/meta/mathlib_v4322_migration.md)、v4.30.0-rc2 → v4.32.0-rc1 (2026-07-09) は [`notes/meta/mathlib_v432_migration.md`](notes/meta/mathlib_v432_migration.md)、v4.29.1 → v4.30.0-rc2 (2026-05-27) は [`notes/meta/mathlib_rc2_migration.md`](notes/meta/mathlib_rc2_migration.md))
   - **rc には当てない (v4.33 で実践)**: v4.33.0-rc2 の時点で「import 面 407 module 中 260 (64%) を触る」と実測できていたので final (2026-08-10) を待ち、2026-08-20 に一気に上げた。移行の実務で効いた知見は v433 note の「⚙ 必要箇所の特定手順」(逐次ビルドでは 1 ラウンド 1 module しか進まないので、一時グローバルフラグ → 全 file 個別 elaborate → per-declaration 化)。
   - ⚠ **新 linter の有無は `mathlibStandardSet` の所属だけで判断しない** — `linter.style.haveILetI` はセット外だが `defValue := true` で既定 ON だったため、12,169 箇所の `haveI`/`letI` 置換が必要になった。
   - ⚠ **deprecated 一覧の照合だけでは破壊を拾いきれない (v4.34 で実証)** — 同名のまま文が変わる/名前が別物に再利用される変更 (`Finsupp.mapDomain_apply`、`Equiv.setCongr`、`List.TFAE.out` の添字規約) には deprecated 属性が付かない。両 tag の**同名宣言の文 (statement) を機械比較**すると事前に拾える (手順は v434 note)。
