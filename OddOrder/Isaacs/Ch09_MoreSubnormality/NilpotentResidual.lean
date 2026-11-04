@@ -86,29 +86,9 @@ instance nilpotentResidual.characteristic (S : Subgroup G) [S.Characteristic] :
   rw [nilpotentResidual, Subgroup.comap_iInf]
   exact iInf_congr fun n => Subgroup.characteristic_iff_comap_eq.mp inferInstance φ
 
-/-- `S ◁ G` ならば各 `S.lowerCentralSeries n ◁ G` (正規部分群同士の交換子は正規). -/
-theorem lowerCentralSeries_normal (S : Subgroup G) [hS : S.Normal] (n : ℕ) :
-    (S.lowerCentralSeries n).Normal := by
-  induction n with
-  | zero => exact hS
-  | succ d hd =>
-    rw [Subgroup.lowerCentralSeries_succ]
-    have := hd
-    infer_instance
-
 instance nilpotentResidual.normal (S : Subgroup G) [S.Normal] :
     (nilpotentResidual S).Normal :=
-  Subgroup.normal_iInf_normal fun n => lowerCentralSeries_normal S n
-
-/-- 有限部分群の包含は card の逆包含と併せて等号 (mathlib 不在の小補題;
-`Subgroup.eq_top_of_le_card` の相対版). -/
-theorem eq_of_le_of_card_le {H K : Subgroup G} [Finite K] (hle : H ≤ K)
-    (hcard : Nat.card K ≤ Nat.card H) : H = K := by
-  have h1 : Nat.card (H.subgroupOf K) = Nat.card H :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
-  have h2 : H.subgroupOf K = ⊤ :=
-    Subgroup.eq_top_of_le_card _ (h1.symm ▸ hcard)
-  exact le_antisymm hle (Subgroup.subgroupOf_eq_top.mp h2)
+  Subgroup.normal_iInf_normal fun n => Subgroup.lowerCentralSeries_normal S n
 
 /-- 有限群では lower central series は安定し, `S^∞` は final term に一致する. -/
 theorem exists_lowerCentralSeries_eq_nilpotentResidual [Finite G] (S : Subgroup G) :
@@ -118,7 +98,7 @@ theorem exists_lowerCentralSeries_eq_nilpotentResidual [Finite G] (S : Subgroup 
   refine ⟨n, le_antisymm (le_iInf fun m => ?_) (iInf_le _ n)⟩
   rcases le_total m n with hmn | hnm
   · exact S.lowerCentralSeries_antitone hmn
-  · exact (eq_of_le_of_card_le (S.lowerCentralSeries_antitone hnm)
+  · exact (Subgroup.eq_of_le_of_card_ge (S.lowerCentralSeries_antitone hnm)
       (hn.le.trans (Nat.sInf_le ⟨m, rfl⟩))).ge
 
 /-- `S^∞` は任意の準同型の像と可換 (有限性から系列が安定するため, 単射性不要). -/

@@ -359,20 +359,6 @@ theorem inner_induce_trivial_self_mul_card_sq [Invertible (Nat.card Γ : ℂ)]
   push_cast
   rfl
 
-/-- Conjugation by a member fixes the group: `k ∈ K → ᵏK = K`. -/
-theorem conj_smul_eq_self_of_mem' {Γ : Type*} [Group Γ] {K : Subgroup Γ} {k : Γ}
-    (hk : k ∈ K) : MulAut.conj k • K = K := by
-  ext x
-  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def,
-    MulAut.conj_apply]
-  constructor
-  · intro hx
-    have hxx : x = k * (k⁻¹ * x * k⁻¹⁻¹) * k⁻¹ := by group
-    rw [hxx]
-    exact K.mul_mem (K.mul_mem hk hx) (K.inv_mem hk)
-  · intro hx
-    exact K.mul_mem (K.mul_mem (K.inv_mem hk) hx) (K.inv_mem (K.inv_mem hk))
-
 /-- Cardinality of `K ∩ ˣK` is left-`K`-translation invariant in the conjugator:
 `|K ⊓ ᵏˣK| = |K ⊓ ˣK|` for `k ∈ K`. -/
 theorem card_inf_conj_smul_mul_mem {Γ : Type*} [Group Γ] {K : Subgroup Γ} {k : Γ}
@@ -380,7 +366,7 @@ theorem card_inf_conj_smul_mul_mem {Γ : Type*} [Group Γ] {K : Subgroup Γ} {k 
     Nat.card ↥(K ⊓ MulAut.conj (k * x) • K) = Nat.card ↥(K ⊓ MulAut.conj x • K) := by
   have hinf : K ⊓ MulAut.conj (k * x) • K
       = MulAut.conj k • (K ⊓ MulAut.conj x • K) := by
-    rw [map_mul, mul_smul, Subgroup.smul_inf, conj_smul_eq_self_of_mem' hk]
+    rw [map_mul, mul_smul, Subgroup.smul_inf, Subgroup.conj_smul_eq_self_of_mem hk]
   rw [hinf]
   exact Nat.card_congr (Subgroup.equivSMul (MulAut.conj k) _).toEquiv.symm
 

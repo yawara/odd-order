@@ -23,7 +23,6 @@ import OddOrder.BG.Ch1_Preliminary.S03f_R0Action
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.GroupTheory.FittingSelfCentralizing
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 
 /-!
@@ -151,7 +150,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       -- `S ≤ N_G(⁅H,R⁆)`: `⁅H,R⁆` self-normalizes, `R` normalizes `⁅R,H⁆ = ⁅H,R⁆` (Isaacs Lem 4.1).
       have hSnorm : S ≤ Subgroup.normalizer (⁅H, R⁆ : Subgroup G) :=
         sup_le Subgroup.le_normalizer
-          (Subgroup.commutator_comm R H ▸ subgroup_le_normalizer_commutator_self R H)
+          (Subgroup.commutator_comm R H ▸ Subgroup.normalizer_commutator_ge_left R H)
       have hH'normal : ((⁅H, R⁆ : Subgroup G).subgroupOf S).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hSnorm
       -- card transport: `|⁅H,R⁆.subgroupOf S| = |⁅H,R⁆|`, `|R.subgroupOf S| = |R|`.
@@ -638,8 +637,8 @@ private theorem thm36_aux : ∀ (n : ℕ)
       -- `S₂ ≤ N_G(WG)` (Isaacs Lemma 4.1 on both factors) and `WG ≤ HX`
       have hS₂_le_NWG : S₂ ≤ Subgroup.normalizer (WG : Set G) := by
         rw [hS₂def, hWGdef]
-        exact sup_le (subgroup_le_normalizer_commutator_self HX R₀)
-          (subgroup_le_normalizer_commutator_self_right HX R₀)
+        exact sup_le (Subgroup.normalizer_commutator_ge_left HX R₀)
+          (Subgroup.normalizer_commutator_ge_right HX R₀)
       have hWG_le_HX : WG ≤ HX := by
         rw [hWGdef, Subgroup.commutator_le]
         intro g₁ hg₁ g₂ hg₂
@@ -920,7 +919,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           (mem_normalizer_map_subtype_of_isAInvariant hP_inv (hR₀R hg))
       have hPinv : (P.map H.subtype : Subgroup G) ≤ Subgroup.normalizer
           ((⁅KG, (P.map H.subtype : Subgroup G)⁆ : Subgroup G) : Set G) :=
-        subgroup_le_normalizer_commutator_self_right KG (P.map H.subtype)
+        Subgroup.normalizer_commutator_ge_right KG (P.map H.subtype)
       have hbot := h322' _ hle hne24 hR₀inv hPinv
       rw [h16bKP] at hbot
       exact h313G hbot

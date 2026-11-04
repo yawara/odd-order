@@ -160,7 +160,7 @@ theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal
       commutator_sup_le_of_centralizer inf_le_right
         (inf_le_left.trans (le_centralizer_iff_isMulCommutative.mpr hA.2.1))
         (commutator_mono hMR le_rfl)
-        (inf_le_left.trans (le_normalizer_commutator_right R A))
+        (inf_le_left.trans (Subgroup.normalizer_commutator_ge_right R A))
     calc ⁅⁅M ⊔ C, A⁆, A⁆ ≤ ⁅⁅R, A⁆, A⁆ := commutator_mono hstar le_rfl
       _ = ⊥ := h3
 

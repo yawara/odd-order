@@ -21,7 +21,6 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
@@ -186,7 +185,7 @@ theorem subgroupESetup_of_complement [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨H₃, hH₃⟩ := Ch03.hall_E_exists (G := ↥E) (tau3 M)
   have hsupH : H₁ ⊔ H₂ = (⊤ : Subgroup ↥K₀) := by
     apply Ch03.sup_eq_top_of_coprime_index
-    apply coprime_of_forall_prime_not_dvd
+    apply Nat.coprime_of_dvd
     intro r hr_prime hr1 hr2
     have hπK : ∀ s : ℕ, s.Prime → s ∣ Nat.card ↥K₀ → s ∈ tau1 M ∪ tau2 M := by
       intro s hs_prime hs_dvd

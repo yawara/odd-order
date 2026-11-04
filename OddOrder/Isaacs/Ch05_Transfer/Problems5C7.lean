@@ -9,7 +9,9 @@ public import Mathlib.GroupTheory.Sylow
 import Mathlib.CategoryTheory.Category.Init
 import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.CyclicSylowBurnside
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 5C.7 — `|G| = 3^a · 5 · 11` なら Sylow-3 は正規 (p. 163)
@@ -134,7 +136,7 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
   have hL'eq : (L' : Subgroup ↥K) = L := by simp [L']
   have : (L' : Subgroup ↥K).Normal := by rw [hL'eq]; exact hLnormal
   have : L.Characteristic := hL'eq ▸ Sylow.characteristic_of_normal L' inferInstance
-  have : (L.map K.subtype).Normal := normal_map_subtype_of_characteristic
+  have : (L.map K.subtype).Normal := ConjAct.normal_of_characteristic_of_normal
   have hmapcard : Nat.card ↥(L.map K.subtype) = 3 ^ a := by
     rw [← hLcard]
     exact Nat.card_congr

@@ -34,7 +34,7 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
 - `card_conj_smul` / `centralizer_conj_smul` / `chermakDelgadoMeasure_conj_smul` /
   `chermakDelgadoLattice_conj_smul_mem` — **1G.2 の Hint 第 1 文**
   (`L(G)` は共役で閉じる) とその部品。
-- `conj_smul_self_of_mem` — 部分群はその元による共役で不変。
+- `Subgroup.conj_smul_eq_self_of_mem` — 部分群はその元による共役で不変。
 - `exists_normal_lt_top_of_mem_lattice` — **Problem 1G.2**。
 - `eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card` — **Problem 1G.3**。
 - `sInf_mem_lattice_and_centralizer_eq` — `L(G)` の有限族の交わりは `L(G)` に属し
@@ -202,18 +202,6 @@ theorem chermakDelgadoLattice_conj_smul_mem {H : Subgroup G}
   rw [chermakDelgadoMeasure_conj_smul]
   exact hH K
 
-/-- 部分群はその元による共役で不変。 -/
-theorem conj_smul_self_of_mem {H : Subgroup G} {y : G} (hy : y ∈ H) :
-    MulAut.conj y • H = H := by
-  ext u
-  rw [Subgroup.mem_smul_pointwise_iff_exists]
-  constructor
-  · rintro ⟨v, hv, rfl⟩
-    exact H.mul_mem (H.mul_mem hy hv) (H.inv_mem hy)
-  · intro hu
-    exact ⟨y⁻¹ * u * y, H.mul_mem (H.mul_mem (H.inv_mem hy) hu) hy,
-      by change y * (y⁻¹ * u * y) * y⁻¹ = u; group⟩
-
 end -- `L(G)` は共役で閉じる
 
 section /- 1G: Problem 1G.2 (p. 43) -/
@@ -284,7 +272,7 @@ theorem exists_normal_lt_top_of_mem_lattice {H : Subgroup G}
   have hHconj : H = MulAut.conj k • H' := by
     have h1 : MulAut.conj g⁻¹ • H' = H := by
       rw [hH'def, smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
-    rw [← h1, ← hky, map_mul, ← smul_smul, conj_smul_self_of_mem hy]
+    rw [← h1, ← hky, map_mul, ← smul_smul, Subgroup.conj_smul_eq_self_of_mem hy]
   -- したがって `H' ≤ K` で矛盾
   refine hg ?_
   have : H' = MulAut.conj k⁻¹ • H := by
@@ -292,7 +280,7 @@ theorem exists_normal_lt_top_of_mem_lattice {H : Subgroup G}
   rw [this]
   calc MulAut.conj k⁻¹ • H ≤ MulAut.conj k⁻¹ • K :=
         Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hHK
-    _ = K := conj_smul_self_of_mem (K.inv_mem hk)
+    _ = K := Subgroup.conj_smul_eq_self_of_mem (K.inv_mem hk)
 
 end -- Problem 1G.2
 

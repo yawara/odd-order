@@ -10,7 +10,6 @@ import Mathlib.CategoryTheory.Category.Init
 import Mathlib.GroupTheory.Commutator.Finite
 import Mathlib.Tactic.ContinuousFunctionalCalculus
 import Mathlib.Tactic.Positivity.Finset
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!

@@ -100,39 +100,13 @@ theorem le_normalizer_of_forall_conj_mem {S T : Subgroup G}
   have hcancel : x⁻¹ * (x * z * x⁻¹) * x⁻¹⁻¹ = z := by group
   rwa [hcancel] at hz'
 
-/-- **`⁅H, K⁆` は左因子 `H` で正規化される**.
-
-`⁅hx, y⁆ = h⁅x,y⁆h⁻¹ · ⁅h,y⁆` (`commutatorElement_mul_left_eq_conj_mul`) を
-`h⁅x,y⁆h⁻¹ = ⁅hx,y⁆ · ⁅h,y⁆⁻¹` と読み替えると, `hx, h ∈ H` から右辺が `⁅H,K⁆` に入る. -/
-theorem le_normalizer_commutator_left (H K : Subgroup G) :
-    H ≤ Subgroup.normalizer ((⁅H, K⁆ : Subgroup G) : Set G) := by
-  refine le_normalizer_of_forall_conj_mem fun h hh => ?_
-  have hgen : (⁅H, K⁆ : Subgroup G)
-      ≤ (⁅H, K⁆ : Subgroup G).comap (MulAut.conj h).toMonoidHom := by
-    refine Subgroup.commutator_le.2 fun x hx y hy => ?_
-    rw [Subgroup.mem_comap]
-    have happ : (MulAut.conj h).toMonoidHom ⁅x, y⁆ = ⁅h * x, y⁆ * ⁅h, y⁆⁻¹ := by
-      change h * ⁅x, y⁆ * h⁻¹ = ⁅h * x, y⁆ * ⁅h, y⁆⁻¹
-      simp only [commutatorElement_def]
-      group
-    rw [happ]
-    exact Subgroup.mul_mem _ (Subgroup.commutator_mem_commutator (H.mul_mem hh hx) hy)
-      (Subgroup.inv_mem _ (Subgroup.commutator_mem_commutator hh hy))
-  exact fun z hz => hgen hz
-
-/-- **`⁅H, K⁆` は右因子 `K` でも正規化される** (`⁅H,K⁆ = ⁅K,H⁆` と左版). -/
-theorem le_normalizer_commutator_right (H K : Subgroup G) :
-    K ≤ Subgroup.normalizer ((⁅H, K⁆ : Subgroup G) : Set G) := by
-  rw [Subgroup.commutator_comm]
-  exact le_normalizer_commutator_left K H
-
 /-- `A` は系列の全項を正規化する (`i = 0` は仮定, `i ≥ 1` は交換子の右因子). -/
 theorem le_normalizer_commIterate {N A : Subgroup G}
     (hA : A ≤ Subgroup.normalizer (N : Set G)) (i : ℕ) :
     A ≤ Subgroup.normalizer ((commIterate N A i : Subgroup G) : Set G) := by
   cases i with
   | zero => exact hA
-  | succ i => exact le_normalizer_commutator_right _ _
+  | succ i => exact Subgroup.normalizer_commutator_ge_right _ _
 
 /-- 系列は単調減少. -/
 theorem commIterate_succ_le {N A : Subgroup G} (hA : A ≤ Subgroup.normalizer (N : Set G))
@@ -168,7 +142,7 @@ theorem exists_commIterate_stable [Finite G] {N A : Subgroup G}
 /-- **系列の各段が部分正規段**: `L_{i+1} ⊔ A ⊴ L_i ⊔ A` の normalizer 形.
 
 `A` 側は `A ≤ W` から `⁅W, A⁆ ≤ ⁅W,W⁆ ≤ W`。`L_i` 側は generator ごとに:
-`⁅L_i,A⁆` は `le_normalizer_commutator_left` で不変, `x a x⁻¹ = ⁅x,a⁆·a ∈ ⁅L_i,A⁆·A`。 -/
+`⁅L_i,A⁆` は `Subgroup.normalizer_commutator_ge_left` で不変, `x a x⁻¹ = ⁅x,a⁆·a ∈ ⁅L_i,A⁆·A`。 -/
 theorem sup_le_normalizer_commIterate_succ_sup (N A : Subgroup G) (i : ℕ) :
     commIterate N A i ⊔ A
       ≤ Subgroup.normalizer ((commIterate N A (i + 1) ⊔ A : Subgroup G) : Set G) := by
@@ -179,7 +153,8 @@ theorem sup_le_normalizer_commIterate_succ_sup (N A : Subgroup G) (i : ℕ) :
       refine sup_le (fun w hw => ?_) (fun a ha => ?_)
       · rw [Subgroup.mem_comap]
         exact (le_sup_left : (⁅L, A⁆ : Subgroup G) ≤ W)
-          (((Subgroup.mem_normalizer_iff.mp (le_normalizer_commutator_left L A hx)) w).mp hw)
+          (((Subgroup.mem_normalizer_iff.mp
+            (Subgroup.normalizer_commutator_ge_left L A hx)) w).mp hw)
       · rw [Subgroup.mem_comap]
         have happ : (MulAut.conj x).toMonoidHom a = ⁅x, a⁆ * a := by
           change x * a * x⁻¹ = ⁅x, a⁆ * a

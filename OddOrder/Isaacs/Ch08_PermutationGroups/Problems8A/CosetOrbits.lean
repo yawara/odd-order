@@ -187,7 +187,8 @@ lemma relIndex_stabilizer_eq_index [Finite Ω] [IsPretransitive G Ω] {H : Subgr
       = (H ⊓ MulAction.stabilizer G α).index := by
     rw [← Subgroup.inf_relIndex_right]
     exact Subgroup.relIndex_mul_index inf_le_right
-  rw [Subgroup.relIndex, MulAction.stabilizer_subgroupOf, MulAction.index_stabilizer_of_transitive] at e1
+  rw [Subgroup.relIndex, MulAction.stabilizer_subgroupOf,
+    MulAction.index_stabilizer_of_transitive] at e1
   rw [MulAction.index_stabilizer_of_transitive] at e2
   exact Nat.eq_of_mul_eq_mul_right hn (e2.trans (e1.symm.trans (mul_comm _ _)))
 

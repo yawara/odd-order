@@ -36,55 +36,6 @@ private lemma conj_commutator_split (g a b : G) :
   simp only [commutatorElement_def]
   group
 
-/-- **Isaacs Lemma 4.1**: `H, K ≤ G` のとき `H` は `⁅H, K⁆` を正規化する.
-**仮定なし版** (H, K の正規性を要求しない).
-
-証明: 一般 identity `g · ⁅a, b⁆ · g⁻¹ = ⁅g a, b⁆ · ⁅b, g⁆` を使用. h ∈ H に対して
-`h · ⁅h', k⁆ · h⁻¹ = ⁅h h', k⁆ · ⁅k, h⁆`. 両因子は `⁅H, K⁆` 内. 生成元から
-closure_induction で一般元へ. -/
-theorem subgroup_le_normalizer_commutator_self (H K : Subgroup G) :
-    H ≤ Subgroup.normalizer (⁅H, K⁆ : Subgroup G) := by
-  -- For h ∈ H and x ∈ ⁅H,K⁆, both h x h⁻¹ ∈ ⁅H,K⁆ and h⁻¹ x h ∈ ⁅H,K⁆ hold by the
-  -- same closure induction (since h⁻¹ ∈ H as well).
-  have key : ∀ h ∈ H, ∀ x ∈ (⁅H, K⁆ : Subgroup G),
-      h * x * h⁻¹ ∈ (⁅H, K⁆ : Subgroup G) := by
-    intro h hh x hx
-    induction hx using Subgroup.closure_induction with
-    | mem y hy =>
-      rcases hy with ⟨h', hh', k, hk, rfl⟩
-      rw [conj_commutator_split]
-      refine Subgroup.mul_mem _ ?_ ?_
-      · exact Subgroup.commutator_mem_commutator (H.mul_mem hh hh') hk
-      · -- ⁅k, h⁆ ∈ ⁅K, H⁆ = ⁅H, K⁆.
-        have hKH : ⁅k, h⁆ ∈ (⁅K, H⁆ : Subgroup G) :=
-          Subgroup.commutator_mem_commutator hk hh
-        rwa [Subgroup.commutator_comm] at hKH
-    | one => simp
-    | mul x y _ _ ihx ihy =>
-      have eq : h * (x * y) * h⁻¹ = (h * x * h⁻¹) * (h * y * h⁻¹) := by group
-      rw [eq]
-      exact Subgroup.mul_mem _ ihx ihy
-    | inv x _ ihx =>
-      have eq : h * x⁻¹ * h⁻¹ = (h * x * h⁻¹)⁻¹ := by group
-      rw [eq]
-      exact Subgroup.inv_mem _ ihx
-  intro h hh
-  rw [Subgroup.mem_normalizer_iff]
-  intro x
-  refine ⟨key h hh x, fun hx => ?_⟩
-  -- (⇐): conjugate `h * x * h⁻¹` back by `h⁻¹`.
-  have hh_inv : h⁻¹ ∈ H := H.inv_mem hh
-  have := key h⁻¹ hh_inv (h * x * h⁻¹) hx
-  have eq : h⁻¹ * (h * x * h⁻¹) * h⁻¹⁻¹ = x := by group
-  rwa [eq] at this
-
-/-- **Isaacs Lemma 4.1** (symmetric form): `K` も `⁅H, K⁆` を正規化する.
-`⁅H, K⁆ = ⁅K, H⁆` 経由で上記から導出. -/
-theorem subgroup_le_normalizer_commutator_self_right (H K : Subgroup G) :
-    K ≤ Subgroup.normalizer (⁅H, K⁆ : Subgroup G) := by
-  rw [Subgroup.commutator_comm]
-  exact subgroup_le_normalizer_commutator_self K H
-
 /-- **Isaacs Lem 4.1 系**: `H ⊔ K = ⊤` ⇒ `⁅H, K⁆` は G で normal.
 `H` も `K` も `⁅H, K⁆` を正規化 (Lem 4.1) ⇒ `H ⊔ K ≤ N(⁅H, K⁆)`, `⊤ ≤ N(⁅H, K⁆)`,
 よって `⁅H, K⁆.Normal`. mathlib `commutator_normal` instance は `H, K` 両方 G で normal
@@ -93,8 +44,8 @@ theorem commutator_normal_of_sup_eq_top {H K : Subgroup G} (hsup : H ⊔ K = ⊤
     (⁅H, K⁆ : Subgroup G).Normal := by
   refine Subgroup.normalizer_eq_top_iff.mp ?_
   rw [← top_le_iff, ← hsup]
-  exact sup_le (subgroup_le_normalizer_commutator_self H K)
-    (subgroup_le_normalizer_commutator_self_right H K)
+  exact sup_le (Subgroup.normalizer_commutator_ge_left H K)
+    (Subgroup.normalizer_commutator_ge_right H K)
 
 /-! **Isaacs Lemma 4.2** (quotient/map commutator):
 `f : G →* G'` の像での commutator は元の像の commutator.

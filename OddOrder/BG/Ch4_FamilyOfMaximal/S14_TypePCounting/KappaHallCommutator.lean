@@ -176,7 +176,7 @@ private theorem Q_le_fittingInG_of_commutator_centralizesQ [Finite G]
   have hRE : R ≤ E := (Subgroup.commutator_mono le_rfl hQE).trans (Subgroup.commutator_le_self E)
   have hNE : Q ⊔ R ≤ E := sup_le hQE hRE
   have hRnorm : E ≤ Subgroup.normalizer (R : Set G) :=
-    hRdef ▸ Ch04.subgroup_le_normalizer_commutator_self E Q
+    hRdef ▸ Subgroup.normalizer_commutator_ge_left E Q
   have hRE_comm : (⁅R, E⁆ : Subgroup G) ≤ R := Ch04.commutator_le_of_le_normalizer hRnorm
   have hC' : Q ≤ Subgroup.centralizer (R : Set G) := by
     rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
@@ -287,7 +287,7 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
     rintro rfl
     exact tau1_not_mem_derived_primeFactors hqτ1 hpM'
   have hQNK : Q ≤ Subgroup.normalizer (K : Set G) ⊓ M :=
-    le_inf (hQE.trans (hKdef ▸ Ch04.subgroup_le_normalizer_commutator_self E Q)) hQM
+    le_inf (hQE.trans (hKdef ▸ Subgroup.normalizer_commutator_ge_left E Q)) hQM
   -- Proposition 10.11(d): `K' := ⁅K, Q⁆ ≤ C_G(M_σ)`, cyclic, `M ≤ N_G(K')`.
   obtain ⟨hK'cent, hK'cyc, hMNK'⟩ :=
     sigma_complement_commutator_cyclic_normal hG hsetup.mem_maximal hKM hKσ' hqτ1.1 hQ hQNK hCQ

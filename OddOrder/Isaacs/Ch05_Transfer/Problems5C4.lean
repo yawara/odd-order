@@ -11,7 +11,6 @@ import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SchurZassenhaus
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C
 import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
@@ -53,10 +52,6 @@ theorem mem_normalizer_of_normal {M : Subgroup G} [M.Normal] (g : G) :
   · intro hy
     have h := (inferInstance : M.Normal).conj_mem _ hy g⁻¹
     rwa [show g⁻¹ * (g * y * g⁻¹) * g⁻¹⁻¹ = y by group] at h
-
-theorem normal_map_subtype_of_characteristic {N : Subgroup G} [N.Normal] {M : Subgroup ↥N}
-    [M.Characteristic] : (M.map N.subtype).Normal :=
-  ⟨fun _x hx g => conj_mem_map_subtype_of_characteristic (mem_normalizer_of_normal g) hx⟩
 
 /-- Z-群の Schur–Zassenhaus 補群は `G/G'` と同型ゆえ巡回。 -/
 theorem isCyclic_of_isComplement'_commutator [Finite G] [IsZGroup G] {H : Subgroup G}
@@ -107,7 +102,7 @@ theorem exists_subgroup_card_eq_of_isZGroup [Finite G] [IsZGroup G]
   obtain ⟨M', hM'⟩ := exists_subgroup_card_eq_of_isCyclic
     (C := ↥(commutator G)) (Nat.gcd_dvd_right m (Nat.card ↥(commutator G)))
   have : M'.Characteristic := characteristic_of_isCyclic M'
-  have : (M'.map (commutator G).subtype).Normal := normal_map_subtype_of_characteristic
+  have : (M'.map (commutator G).subtype).Normal := ConjAct.normal_of_characteristic_of_normal
   have hMcard : Nat.card ↥(M'.map (commutator G).subtype)
       = Nat.gcd m (Nat.card ↥(commutator G)) := by
     rw [← hM']
@@ -214,7 +209,7 @@ theorem normal_inf_commutator [Finite G] [IsZGroup G] (K : Subgroup G) :
   have hmap : ((K ⊓ commutator G).subgroupOf (commutator G)).map (commutator G).subtype
       = K ⊓ commutator G :=
     Subgroup.map_subgroupOf_eq_of_le inf_le_right
-  exact hmap ▸ normal_map_subtype_of_characteristic
+  exact hmap ▸ ConjAct.normal_of_characteristic_of_normal
 
 /-- `N ≤ L`, `N` 正規なら `|L/N| · |N| = |L|` (商への射の像の位数)。 -/
 theorem card_map_mk'_mul_card [Finite G] {N L : Subgroup G} [N.Normal] (hNL : N ≤ L) :

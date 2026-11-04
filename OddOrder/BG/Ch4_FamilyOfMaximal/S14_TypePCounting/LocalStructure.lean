@@ -17,7 +17,6 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
@@ -948,7 +947,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- `K ∩ M_σ = ⊥` (`K` is a `κ(M) ⊆ σ(M)'`-group, `M_σ` a `σ(M)`-group).
     have hKMσbot : K ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ := by
       apply Disjoint.eq_bot
-      refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
+      refine Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)
       intro r hr hrK hrMσ
       have hrκ : r ∈ kappa M := hK.1 r (by
         rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
@@ -991,7 +990,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have := hN; rw [hkN1, one_mul] at this; exact this
       -- `orderOf s ∣ orderOf x'` and `orderOf s ∣ |M_σ|`, which are coprime, so `s = 1`.
       have hcop : Nat.Coprime (orderOf x') (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)) :=
-        coprime_of_forall_prime_not_dvd (fun r hr hrx' hrMσ => by
+        Nat.coprime_of_dvd (fun r hr hrx' hrMσ => by
           exact hx'sigma r (by
             rw [piSet, Set.mem_ofPred_eq, hcardclos]
             exact Nat.mem_primeFactors.mpr ⟨hr, hrx', (orderOf_pos_iff.mpr

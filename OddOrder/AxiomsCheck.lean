@@ -1039,7 +1039,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 @[expose] public section
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 22000
+set_option linter.style.longFile 21900
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -16649,18 +16649,14 @@ mathlib `Sylow.exists_subgroup_card_pow_prime` がそのまま書籍強度 (ペ�
 -- 非自明で単純性から `Z(G) = ⊤` ⟹ `G` 可換 ⟹ `IsSimpleGroup.prime_card` で `|G|` は素数、
 -- `p` 冪と合わせて `|G| = p`。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch01.not_isSimpleGroup_of_card_sylow_sq_gt
-/-! ### Isaacs Cor 2.4 — `S, T ⊴⊴ G ⟹ S ∩ T ⊴⊴ G` (issue 0176、2026-08-08)
+/-! ### Isaacs Cor 2.4 — `S, T ⊴⊴ G ⟹ S ∩ T ⊴⊴ G`
 
-Ch.2 逐条監査で検出した唯一の真の未形式化。書籍 p.46 の証明どおり Lemma 2.3
-(`inf_isSubnormal_subgroupOf`、repo に既存) + subnormality の推移性
-(mathlib `Subgroup.IsSubnormal.trans`) の 1 行。
+2026-08-08 (issue 0176) に自前の `inf_isSubnormal` として形式化したが、その後 mathlib に
+`Subgroup.IsSubnormal.inf` が入った (v4.34.1 で確認) ので、issue 0190 で自前の版を削除して
+mathlib のものを使うようにした。mathlib の定理なので本 file では検査しない。
 
-⚠ **`Ch02_Subnormality/Basic.lean` の冒頭一覧が長らくこれを `Subgroup.IsSubnormal.inf` と
-記していたが、その名前は mathlib にも repo にも存在しなかった**。実在しない補題名を挙げた
-自己注記の実例で、番号 grep では「cite あり」になってしまう。⟹ **注記の挙げる名前は
-実在確認する**。 -/
-
-#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.inf_isSubnormal
+⚠ 当時の教訓は今も有効: 注記に挙げる補題名は実在を確認する (この節は、存在しなかった名前を
+一覧に挙げていた自己注記の実例として書かれた)。 -/
 
 /-! ### Isaacs Thm 5.26 (Frobenius) — 書籍どおりの 3 条件 TFAE (issue 0176、2026-08-08)
 

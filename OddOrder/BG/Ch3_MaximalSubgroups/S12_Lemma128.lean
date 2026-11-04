@@ -163,7 +163,7 @@ theorem oPiCore_sup_compl_eq_top (K : Type*) [Group K] [Finite K]
   -- coprime orders, hence trivial intersection
   have hcop : Nat.Coprime (Nat.card ↥(Ch03.oPiCore π K))
       (Nat.card ↥(Ch03.oPiCore πᶜ K)) := by
-    refine coprime_of_forall_prime_not_dvd ?_
+    refine Nat.coprime_of_dvd ?_
     intro r hr h1 h2
     have hr1 : r ∈ π := hall1.1 r (Nat.mem_primeFactors.mpr ⟨hr, h1, Nat.card_pos.ne'⟩)
     have hr2 : r ∈ πᶜ := hall2.1 r (Nat.mem_primeFactors.mpr ⟨hr, h2, Nat.card_pos.ne'⟩)
@@ -336,7 +336,7 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
                 (Subgroup.commutator_le_right _ _)
           _ ≤ ⊥ := by
               refine le_of_eq (Subgroup.disjoint_of_coprime_natCard ?_).eq_bot
-              refine coprime_of_forall_prime_not_dvd ?_
+              refine Nat.coprime_of_dvd ?_
               intro r hr h1 h2
               have hr2 : r ∈ ({q} : Set ℕ) := hB_pi r
                 (Nat.mem_primeFactors.mpr ⟨hr, h2, Nat.card_pos.ne'⟩)
@@ -488,7 +488,7 @@ theorem sylow_eq_opiCore_fittingInG_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd 
               (Subgroup.commutator_le_right _ _)
         _ ≤ ⊥ := by
             refine le_of_eq (Subgroup.disjoint_of_coprime_natCard ?_).eq_bot
-            refine coprime_of_forall_prime_not_dvd ?_
+            refine Nat.coprime_of_dvd ?_
             intro r hr h1 h2
             have hr1 : r ∈ (({q} : Set ℕ))ᶜ :=
               S10.oPiCore_isHall_of_isNilpotent (K := ↥FE) (({q} : Set ℕ))ᶜ |>.1 r

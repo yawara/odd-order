@@ -173,7 +173,7 @@ theorem exists_subgroupESetup [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `H₁ ⊔ H₂ = K₀` via coprime indices (`τ₂`-number vs `τ₁`-number).
   have hsupH : H₁ ⊔ H₂ = (⊤ : Subgroup ↥K₀) := by
     apply Ch03.sup_eq_top_of_coprime_index
-    apply coprime_of_forall_prime_not_dvd
+    apply Nat.coprime_of_dvd
     intro r hr_prime hr1 hr2
     have hπK : ∀ s : ℕ, s.Prime → s ∣ Nat.card ↥K₀ → s ∈ tau1 M ∪ tau2 M := by
       intro s hs_prime hs_dvd

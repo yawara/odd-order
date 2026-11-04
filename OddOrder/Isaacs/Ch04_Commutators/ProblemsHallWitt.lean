@@ -12,7 +12,6 @@ import Mathlib.Tactic.ContinuousFunctionalCalculus
 import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsNilpotencyClass
 
@@ -33,7 +32,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 4B (書籍 p. 131)。
 
 4B.4 はどちらも three subgroups lemma (`commutator_commutator_le_of_rotate`) の直接適用。
 ⚠ (b) は書籍が `X ⊴ G` を仮定するが, 実際には**不要** — `⁅X,Y⁆` が `X` で正規化される
-(`le_normalizer_commutator_left`) ことだけ使えばよい。
+(`Subgroup.normalizer_commutator_ge_left`) ことだけ使えばよい。
 -/
 
 @[expose] public section
@@ -79,7 +78,7 @@ theorem commutator_isCommutative_of_centralizes {X Y : Subgroup G}
     rw [Subgroup.commutator_comm]
     exact h
   have hnorm : ⁅(⁅X, Y⁆ : Subgroup G), X⁆ ≤ ⁅X, Y⁆ :=
-    commutator_le_of_le_normalizer (le_normalizer_commutator_left X Y)
+    commutator_le_of_le_normalizer (Subgroup.normalizer_commutator_ge_left X Y)
   refine le_bot_iff.mp ?_
   refine commutator_commutator_le_of_rotate (H₁ := X) (H₂ := Y) (H₃ := ⁅X, Y⁆) ?_ ?_
   · rw [h]

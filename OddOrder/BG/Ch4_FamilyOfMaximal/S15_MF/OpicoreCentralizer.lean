@@ -965,7 +965,7 @@ theorem partner_opiCore_nonabelian [Finite G]
   have hObarpi : Ch03.Subgroup.IsPiGroup ({q}ᶜ : Set ℕ) Obar :=
     hObardef ▸ Ch03.oPiCore.isPiGroup ({q}ᶜ : Set ℕ)
   have hcop : Nat.Coprime (Nat.card ↥Kbar) (Nat.card ↥Obar) := by
-    refine coprime_of_forall_prime_not_dvd (fun r hr hrK hrO => ?_)
+    refine Nat.coprime_of_dvd (fun r hr hrK hrO => ?_)
     have hrq : r = q := by
       have hmem : r ∈ (q : ℕ).primeFactors := by
         rw [hKbarcard] at hrK

@@ -359,9 +359,6 @@ equality exactly when `c ∈ {0, 1}`.  Summed over a finite index set this gives
 facts used to turn the orthonormal Parseval identities into the (5.4.a)
 inequality `‖χ‖² ≤ ‖X‖²` and the (5.4.b) reconstruction `X = ∑_{α ∈ E} α`. -/
 
-/-- For an integer `c`, `c ≤ c²` (since `c (c - 1) ≥ 0`). -/
-theorem int_le_sq (c : ℤ) : c ≤ c ^ 2 := by nlinarith [sq_nonneg (c - 1), sq_nonneg c]
-
 /-- Equality `c = c²` holds for an integer iff `c ∈ {0, 1}`. -/
 theorem int_eq_sq_iff (c : ℤ) : c = c ^ 2 ↔ c = 0 ∨ c = 1 := by
   constructor
@@ -375,7 +372,7 @@ theorem int_eq_sq_iff (c : ℤ) : c = c ^ 2 ↔ c = 0 ∨ c = 1 := by
 /-- **Finite integer Cauchy–Schwarz.** `∑_{a ∈ s} c a ≤ ∑_{a ∈ s} (c a)²`. -/
 theorem finset_sum_le_sum_sq {ι : Type*} (s : Finset ι) (c : ι → ℤ) :
     ∑ a ∈ s, c a ≤ ∑ a ∈ s, (c a) ^ 2 :=
-  Finset.sum_le_sum fun a _ => int_le_sq (c a)
+  Finset.sum_le_sum fun a _ => Int.le_self_sq (c a)
 
 /-- **Tightness of integer Cauchy–Schwarz.** The sum and the sum of squares are
 equal iff every coefficient is `0` or `1`. -/
@@ -384,7 +381,7 @@ theorem finset_sum_eq_sum_sq_iff {ι : Type*} (s : Finset ι) (c : ι → ℤ) :
   constructor
   · intro h a ha
     exact (int_eq_sq_iff (c a)).mp
-      ((Finset.sum_eq_sum_iff_of_le fun a _ => int_le_sq (c a)).mp h a ha)
+      ((Finset.sum_eq_sum_iff_of_le fun a _ => Int.le_self_sq (c a)).mp h a ha)
   · intro h
     exact Finset.sum_congr rfl fun a ha => (int_eq_sq_iff (c a)).mpr (h a ha)
 

@@ -14,7 +14,6 @@ import Mathlib.GroupTheory.FiniteAbelian.Basic
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
-import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 1: J(P) def, Thm 7.1 stmt, Lem 7.3 GL(2,p) lemma
@@ -935,7 +934,7 @@ private theorem lem73_aux
       -- [L, P] は P-不変 (P normalizes L and P, commutator subgroup of normal pair is invariant).
       have hPnorm_LP : P ≤ Subgroup.normalizer (LP_comm : Set _) := by
         simpa [hLP_comm_def] using
-          (OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self_right L P)
+          (Subgroup.normalizer_commutator_ge_right L P)
       by_cases hLP_eq_L : LP_comm = L
       · -- Case [L, P] = L: 続く Step l, m, n へ.
         -- Since the determinant map has abelian target, it kills commutators. Thus

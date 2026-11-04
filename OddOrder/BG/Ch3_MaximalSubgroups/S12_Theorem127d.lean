@@ -80,15 +80,6 @@ theorem le_normalizer_sup {H K L : Subgroup G}
     conj_smul_eq_self_of_mem_normalizer (hK ha),
     conj_smul_eq_self_of_mem_normalizer (hL ha)]
 
-/-- Two naturals with no common prime divisor are coprime.
-(Public: `S12_Lemma128` reuses this for the `O_π × O_π'` order bookkeeping.) -/
-theorem coprime_of_forall_prime_not_dvd {m n : ℕ}
-    (h : ∀ r : ℕ, r.Prime → r ∣ m → ¬ r ∣ n) : Nat.Coprime m n := by
-  by_contra hne
-  obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hne
-  exact h r hr_prime (hr_dvd.trans (Nat.gcd_dvd_left m n))
-    (hr_dvd.trans (Nat.gcd_dvd_right m n))
-
 /-! ## `E₂` is the Sylow `p`-subgroup of `E` (via 12.7(a)) -/
 
 /-- With `τ₂(M)`-primes reduced to `{p}` (12.7(a)), the Hall `τ₂`-subgroup `E₂`
@@ -329,7 +320,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
     rw [hcardE₂_eq]
     exact Dvd.intro _ rfl
   have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₂) := by
-    refine coprime_of_forall_prime_not_dvd ?_
+    refine Nat.coprime_of_dvd ?_
     intro r hr_prime hrE₁ hrE₂
     have hr1 : r ∈ tau1 M := h.E₁_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr_prime, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv],
@@ -434,7 +425,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
       group
   -- order bookkeeping: `|E₀| = |E| / p` for `E₀ := E₁ ⊔ (X ⊔ E₃)`.
   have hX_E₃_bot : X ⊓ E₃ = ⊥ := by
-    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+    refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
     intro r hr hrX hrE₃
     have hrp : r = p := by
       have h1 : r ∣ p ^ (Nat.card ↥E).factorization p :=
@@ -452,7 +443,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
   have hcard_XE₃ : Nat.card ↥(X ⊔ E₃ : Subgroup G) = Nat.card ↥X * Nat.card ↥E₃ :=
     card_sup_eq_mul_of_le_normalizer_of_disjoint hX_norm_E₃ hX_E₃_bot
   have hE₁_XE₃_bot : E₁ ⊓ (X ⊔ E₃) = ⊥ := by
-    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+    refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
     intro r hr hrE₁ hrXE₃
     have hr1 : r ∈ tau1 M := h.E₁_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv],
@@ -492,7 +483,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
       = Nat.card ↥E₁ * Nat.card ↥E₂ :=
     card_sup_eq_mul_of_le_normalizer_of_disjoint hE₁_norm_E₂ hE₁E₂_bot
   have hE₁₂_E₃_bot : (E₁ ⊔ E₂) ⊓ E₃ = ⊥ := by
-    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+    refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
     intro r hr hrE₁₂ hrE₃
     have hr3 : r ∈ tau3 M := h.E₃_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv],

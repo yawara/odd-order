@@ -19,7 +19,6 @@ import OddOrder.GroupTheory.CommGroupAut
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.TransferInvariantTransversal
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 
@@ -123,7 +122,7 @@ private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group 
     ∀ c ∈ commutator P, c ^ 2 = 1 ∧ c ∈ Subgroup.center P := by
   have : Group.IsNilpotent P := hp.isNilpotent
   -- `P' ⊓ Z(P) ≠ 1` から中心的な `z ≠ 1` を取る
-  have hcz := Ch09.inf_center_ne_bot_of_normal_of_isNilpotent (K := commutator P) hncomm
+  have hcz := Group.IsNilpotent.inf_center_ne_bot_of_normal (H := commutator P) hncomm
   have : Nontrivial ↥(commutator P ⊓ Subgroup.center P) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hcz
   obtain ⟨w, hwne⟩ := exists_ne (1 : ↥(commutator P ⊓ Subgroup.center P))

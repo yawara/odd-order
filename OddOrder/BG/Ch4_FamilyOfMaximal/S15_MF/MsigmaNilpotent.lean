@@ -401,7 +401,7 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
   have hAO : A ⊓ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) = ⊥ := by
     apply Disjoint.eq_bot
     refine Subgroup.disjoint_of_coprime_natCard
-      (coprime_of_forall_prime_not_dvd (fun r hr hrA hrO => ?_))
+      (Nat.coprime_of_dvd (fun r hr hrA hrO => ?_))
     have hrq : r = q := by
       have hπA : Subgroup.IsPiSubgroup ({q} : Set ℕ) A :=
         Subgroup.isPiSubgroup_of_isPGroup_of_mem hA rfl

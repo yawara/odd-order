@@ -495,11 +495,6 @@ theorem eq_top_of_forall_sylow_le {H : Type*} [Group H] [Finite H] {K : Subgroup
   rw [h2, Nat.Prime.pow_dvd_iff_le_factorization hp Nat.card_pos.ne'] at h3
   omega
 
-/-- `↥A` の交換子群を `G` へ押し出すと `⁅A, A⁆`。 -/
-theorem map_commutator_subtype (A : Subgroup G) :
-    (commutator ↥A).map A.subtype = ⁅A, A⁆ := by
-  rw [commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map, A.range_subtype]
-
 /-- **Isaacs Problem 6A.10(b) の後半** (p. 186): TI 仮説の下で `G' ⊓ A ≤ A'`。
 
 **証明**: `H := G' ⊓ A` の各 Sylow `p`-部分群 `Q` を取る。`Q ≤ A` なので `Q` を含む `↥A` の
@@ -566,7 +561,7 @@ theorem commutator_inf_le_commutator_self_of_TI [Finite G] {A : Subgroup G}
     obtain ⟨z, hz, hzq⟩ := hqfoc
     rw [← Subgroup.commutator_inf_eq_focalSubgroup S] at hz
     change (q : G) ∈ ⁅A, A⁆
-    rw [← hzq, ← map_commutator_subtype A]
+    rw [← hzq, ← Subgroup.map_subtype_commutator A]
     exact ⟨z, hz.1, rfl⟩
   intro x hx
   have hmem : (⟨x, hx⟩ : ↥(commutator G ⊓ A)) ∈ (⁅A, A⁆).subgroupOf (commutator G ⊓ A) := by

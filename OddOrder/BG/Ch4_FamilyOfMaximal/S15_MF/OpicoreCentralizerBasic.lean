@@ -13,7 +13,6 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
@@ -326,7 +325,7 @@ theorem sigmaComplement_structure_of_not_fittingIsTI [Finite G]
     exact h.symm
   -- `E₁ ∩ E₂ = 1`: `τ₁(M)` has `p`-rank 1 and `τ₂(M)` has `p`-rank 2, so they are disjoint.
   have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₂) := by
-    refine coprime_of_forall_prime_not_dvd ?_
+    refine Nat.coprime_of_dvd ?_
     intro r hr hrE₁ hrE₂
     have hr1 : r ∈ tau1 M := hsetup.E₁_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv],

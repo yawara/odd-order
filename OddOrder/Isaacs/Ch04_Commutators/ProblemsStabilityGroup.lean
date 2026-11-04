@@ -195,7 +195,7 @@ theorem commIterate_le_commIterate_of_le {N A : Subgroup Γ}
 
 /-- **反復交換子列 `⁅G, A; j⁆` の各項は `Γ` で部分正規**。
 
-`⁅L, A⁆` は `L` に正規化される (`le_normalizer_commutator_left`, Problem 4A.9) ので,
+`⁅L, A⁆` は `L` に正規化される (`Subgroup.normalizer_commutator_ge_left`, Problem 4A.9) ので,
 `⁅G, A; j+1⁆ ⊴ ⁅G, A; j⁆`。`⁅G, A; 0⁆ = G ⊴ Γ` から帰納。 -/
 theorem isSubnormal_commIterate (G A : Subgroup Γ) [G.Normal] (j : ℕ) :
     (commIterate G A j).IsSubnormal := by
@@ -205,14 +205,14 @@ theorem isSubnormal_commIterate (G A : Subgroup Γ) [G.Normal] (j : ℕ) :
   | succ j ih =>
     refine Subgroup.IsSubnormal.step _ (commIterate G A j) (commIterate_succ_le hA j) ih ?_
     rw [Subgroup.normal_subgroupOf_iff_le_normalizer (commIterate_succ_le hA j)]
-    exact le_normalizer_commutator_left _ _
+    exact Subgroup.normalizer_commutator_ge_left _ _
 
 /-- 反復交換子列の各段は部分正規段: `⁅G, A; j+1⁆ ⊴ ⁅G, A; j⁆`. -/
 theorem normal_subgroupOf_commIterate_succ (G A : Subgroup Γ) [G.Normal] (j : ℕ) :
     ((commIterate G A (j + 1)).subgroupOf (commIterate G A j)).Normal := by
   have hA : A ≤ Subgroup.normalizer (G : Set Γ) := le_normalizer_of_normal G A
   rw [Subgroup.normal_subgroupOf_iff_le_normalizer (commIterate_succ_le hA j)]
-  exact le_normalizer_commutator_left _ _
+  exact Subgroup.normalizer_commutator_ge_left _ _
 
 /-- 安定化された鎖は反復交換子列を上から押さえる: `⁅G, A; j⁆ ≤ H (m - j)`. -/
 theorem commIterate_le_of_stabilizesChain {G A : Subgroup Γ} {H : ℕ → Subgroup Γ}

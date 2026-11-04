@@ -158,46 +158,6 @@ end
 
 section /- 9B: nilpotent 群の nontrivial normal は中心と交わる (9.22 補助) -/
 
-/-- 冪零群の nontrivial な正規部分群は中心と非自明に交わる: `H` nilpotent, `K ◁ H`,
-`K ≠ ⊥` ⇒ `K ⊓ Z(H) ≠ ⊥`. (Thm 9.22 で使う; mathlib は `center_ne_bot` (K=⊤) しか持たない.)
-
-証明: upper central series `Z_i` は有限で `⊤` に達する (`nilpotent'`). `K ⊓ Z_i ≠ ⊥`
-なら `K ⊓ Z_1 = K ⊓ Z(H) ≠ ⊥` を `i` の帰納法で示す. `K ⊓ Z_j = ⊥` の枝では
-`x ∈ K ⊓ Z_{j+1}` (nontrivial) について `⁅x, g⁆ ∈ Z_j` (upper series の定義) かつ
-`∈ K` (K 正規) ゆえ `⁅x, g⁆ ∈ K ⊓ Z_j = ⊥` で `x` は中心的. -/
-theorem inf_center_ne_bot_of_normal_of_isNilpotent {H : Type*} [Group H]
-    [Group.IsNilpotent H] {K : Subgroup H} [hKn : K.Normal] (hK : K ≠ ⊥) :
-    K ⊓ Subgroup.center H ≠ ⊥ := by
-  obtain ⟨n, hn⟩ := Group.IsNilpotent.nilpotent' (G := H)
-  suffices h : ∀ i, K ⊓ Subgroup.upperCentralSeries H i ≠ ⊥ → K ⊓ Subgroup.center H ≠ ⊥ from
-    h n (by rw [hn, inf_top_eq]; exact hK)
-  intro i
-  induction i with
-  | zero => rw [Subgroup.upperCentralSeries_zero, inf_bot_eq]; exact fun h => absurd rfl h
-  | succ j IH =>
-    intro hne
-    by_cases hj : K ⊓ Subgroup.upperCentralSeries H j = ⊥
-    · obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hne
-      obtain ⟨hxK, hxU⟩ := Subgroup.mem_inf.mp a.2
-      have hx1 : (a : H) ≠ 1 := fun h => ha1 (by ext; exact h)
-      have hxcenter : (a : H) ∈ Subgroup.center H := by
-        rw [Subgroup.mem_center_iff]
-        intro g
-        have hcommU : ⁅(a : H), g⁆ ∈ Subgroup.upperCentralSeries H j :=
-          Subgroup.mem_upperCentralSeries_succ_iff.mp hxU g
-        have hcommK : ⁅(a : H), g⁆ ∈ K := by
-          have heq : ⁅(a : H), g⁆ = (a : H) * (g * (a : H)⁻¹ * g⁻¹) := by
-            rw [commutatorElement_def]; group
-          rw [heq]
-          exact K.mul_mem hxK (hKn.conj_mem (a : H)⁻¹ (K.inv_mem hxK) g)
-        have hmem : ⁅(a : H), g⁆ ∈ K ⊓ Subgroup.upperCentralSeries H j :=
-          Subgroup.mem_inf.mpr ⟨hcommK, hcommU⟩
-        rw [hj, Subgroup.mem_bot, commutatorElement_eq_one_iff_commute] at hmem
-        exact (hmem.symm).eq
-      exact Subgroup.ne_bot_iff_exists_ne_one.mpr
-        ⟨⟨(a : H), Subgroup.mem_inf.mpr ⟨hxK, hxcenter⟩⟩, fun h => hx1 (congrArg Subtype.val h)⟩
-    · exact IH hj
-
 end
 
 section /- 9B: Theorem 9.22 (Schenkman, Z(G) = 1 の場合, p. 282) -/
@@ -231,7 +191,7 @@ theorem centralizer_nilpotentResidual_le_of_center_eq_bot [Finite G]
       have h := congrArg (Subgroup.map H.subtype) hbot
       rwa [Subgroup.subgroupOf_map_subtype, Subgroup.map_bot] at h
     obtain ⟨w, hw1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
-      (inf_center_ne_bot_of_normal_of_isNilpotent hKne)
+      (Group.IsNilpotent.inf_center_ne_bot_of_normal hKne)
     obtain ⟨hwC, hwZ⟩ := Subgroup.mem_inf.mp w.2
     set z : G := ((w : ↥H) : G) with hz
     have hzC : z ∈ C := (Subgroup.mem_subgroupOf).mp hwC

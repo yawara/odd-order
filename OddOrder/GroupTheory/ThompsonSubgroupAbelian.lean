@@ -982,13 +982,6 @@ repo 既存の `OddOrder.Isaacs.Ch04.iterCommutator B A i` そのもの. ここ�
 Lem 2.8(ii) (降下) と正規化の基本性質を与える. -/
 
 open OddOrder.Isaacs.Ch04 in
-/-- `A` は `⁅X, A⁆` を正規化する (`⁅X,A⁆ = ⁅A,X⁆` + 左因子は正規化する). -/
-theorem le_normalizer_commutator_right (X A : Subgroup G) :
-    A ≤ normalizer ((⁅X, A⁆ : Subgroup G) : Set G) := by
-  rw [commutator_comm X A]
-  exact normalizer_commutator_ge_left A X
-
-open OddOrder.Isaacs.Ch04 in
 /-- `A` は各 `[B,A;i]` を正規化する (Gorenstein Lem 2.8 の途中主張;
 `i = 0` は `B ⊴ G`, `i ≥ 1` は右因子正規化で無条件). -/
 theorem le_normalizer_iterCommutator {B : Subgroup G} (A : Subgroup G) [B.Normal]
@@ -1006,7 +999,7 @@ theorem le_normalizer_iterCommutator {B : Subgroup G} (A : Subgroup G) [B.Normal
       rwa [show a⁻¹ * (a * h * a⁻¹) * a⁻¹⁻¹ = h by group] at hconj
   | succ i =>
     rw [iterCommutator_succ]
-    exact le_normalizer_commutator_right _ A
+    exact Subgroup.normalizer_commutator_ge_right _ A
 
 open OddOrder.Isaacs.Ch04 in
 /-- **Gorenstein Lemma 2.8(ii)**: `[B,A;i+1] ≤ [B,A;i]`. -/
