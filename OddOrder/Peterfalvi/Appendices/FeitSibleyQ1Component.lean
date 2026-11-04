@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
 
 /-!
 # Peterfalvi Appendix IV: the `Q₁`-component of induced members (step (3), Part B prep)
@@ -30,6 +39,8 @@ theory:
 The `IsCharacter` transport bricks (`isCharacter_compHom`,
 `isCharacter_restrict`) are `hyp`-independent and upstream-appropriate.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

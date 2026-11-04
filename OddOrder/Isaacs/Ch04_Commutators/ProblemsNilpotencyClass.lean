@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
 
 /-!
@@ -24,6 +31,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.13 (書籍 p. 125)�
 `N = γ₃` は正規なので `{x | ⁅x, y⁆ ∈ N}` は部分群 (`commutatorMemLeft`) であり,
 これが `G'` と `a` を含むことを 2 段階で確かめる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

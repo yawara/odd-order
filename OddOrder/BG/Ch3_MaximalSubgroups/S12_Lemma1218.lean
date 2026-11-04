@@ -3,7 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # BG §12: Lemma 12.18 — `τ₁`-elements against `M_α`
@@ -31,6 +50,8 @@ conjunct of (a) (the hard core), the part (b) reduction, and the assembled
 - `tau1_Malpha_centralizer_PQ_eq_bot`: (a) second conjunct `C_{M_α}(PQ) = 1`
 - `tau1_Malpha_interaction`: **BG Lemma 12.18**
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -741,7 +762,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [disjoint_iff, inf_comm]
     exact OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hR'p hN'cop_p
   -- nontriviality witnesses.
-  obtain ⟨n₀, hn₀N, hn₀R₀⟩ := SetLike.exists_of_lt hR₀ltN
+  obtain ⟨n₀, hn₀N, hn₀R₀⟩ := IsConcreteLE.exists_of_lt hR₀ltN
   have hn₀Y : n₀ ∈ Y := Subgroup.mem_sup_right hn₀N
   have hn₀H : n₀ ∈ Hgrp := Subgroup.mem_sup_left hn₀Y
   have hN'ne : N' ≠ ⊥ := by
@@ -1055,7 +1076,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNQne_top : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
     intro htop
     have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q with h | h
     · exact hQne h
     · exact hMcoatom.1 (top_le_iff.mp (h ▸ hQM))
   have hnotMleNQ : ¬ M ≤ Subgroup.normalizer (Q : Set G) := by

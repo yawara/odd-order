@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutators
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutators
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: equivariance of the square-valued commutator
@@ -19,6 +22,8 @@ commutes with the Suzuki actor on all three layers.  This is the
 equivariance needed to transport the nested commutator into Higman's
 simultaneous eigenbasis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

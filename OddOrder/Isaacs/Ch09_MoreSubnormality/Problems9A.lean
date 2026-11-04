@@ -3,11 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.Holomorph
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.GroupTheory.Commutator.Finite
 import Mathlib.GroupTheory.NoncommCoprod
-import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.Holomorph
-import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 
 /-!
 # Isaacs §9A の演習 (書籍 p. 277)
@@ -69,6 +76,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
 * 直積の同型は `MonoidHom.noncommCoprod` (単射性 = 両者単射 + range が disjoint,
   range = `A ⊔ S`) から `MonoidHom.ofInjective` で得る。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

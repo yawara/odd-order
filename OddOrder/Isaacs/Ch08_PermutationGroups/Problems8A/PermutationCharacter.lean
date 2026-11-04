@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Group.Action.Prod
+public import Mathlib.GroupTheory.GroupAction.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
@@ -28,6 +36,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
   `G` が 3-transitive ⟺ 置換指標の 3 乗の平均が **5**。すなわち求める `m` は **5**
   (3 点の一致パターン `xxx` / `xxz` / `xzx` / `zxx` / 全相異)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 
 /-!
@@ -17,6 +22,8 @@ between two irreducible summands with Singer eigenvalues `λ`, `μ` makes the
 eigenvalues Frobenius-conjugate — the arithmetic obstruction ruling out
 isomorphic summands in the type-C and type-D groups.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

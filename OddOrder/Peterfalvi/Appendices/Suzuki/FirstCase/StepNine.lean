@@ -3,10 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
-import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+public import Mathlib.GroupTheory.Transfer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.TransferInvariantTransversal
-import Mathlib.GroupTheory.SemidirectProduct
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
 
 /-!
 # Peterfalvi Part II, Ch. II, step (9): `p = f`
@@ -31,6 +42,8 @@ This file formalizes the **arithmetic finish** as `char_eq_p_of_p_dvd_card_Q_add
 (from `p ∣ |Q| + 1`, conclude `f = p`).  The transfer computation producing
 `p ∣ |Q| + 1` is the remaining frontier of step (9).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+import OddOrder.Peterfalvi.S10_TypePSupport
 
 /-!
 # Peterfalvi (8.15) claim 1 for the book-literal type-`𝒫` support `A₀(M) = A(M) ∪ V^M`
@@ -25,6 +35,8 @@ but it used to live in `S15_HonestTypeP2A0.lean` (namespace `S15`), i.e. *downst
 ⚠ `escaping_typePACore0_eq_empty` deliberately stays behind in `S15_HonestTypeP2A0`: it is *not*
 part of this closure and genuinely depends on §14 (`S14.typeI_frobenius`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

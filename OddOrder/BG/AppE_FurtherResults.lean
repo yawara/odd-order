@@ -3,16 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_CollectionFormula
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.HallCollection
-import OddOrder.GroupTheory.HallPetresco
-import OddOrder.GroupTheory.RegularPGroup
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.BG.AppE_CentralizerDecomposition
+module
+
+public import OddOrder.BG.AppE_CentralizerDecomposition
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Appendix E: Further Results of Feit and Thompson
@@ -62,6 +66,8 @@ pointer comments here at their book positions.  Per-result status:
 | E.4 (corrected, `+hdc`) | **proved** — in `AppE_PropE4.lean` (printed form is false) |
 | E.5 (`maximalSubgroups_isTypeI_or_isTypeII`) | **proved** — in `AppE_E5Counting.lean` |
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 
@@ -1024,8 +1030,6 @@ end RegularOperator
 /-! ## E.5: the maximal-subgroup application -/
 
 section MaximalApplication
-
-open OddOrder.BG.Ch3.S12 OddOrder.BG.Ch4.S14
 
 variable {G : Type*} [Group G]
 

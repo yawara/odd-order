@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import Mathlib.GroupTheory.NoncommPiCoprod
 
 /-!
 # Isaacs Ch. 9 — §9A: semisimple groups と Lemma 9.5 / Lemma 9.6 (pp. 274-275)
@@ -41,6 +42,8 @@ minimality に食われることから `N` 可換を得る。nonabelian 枝は `
 `center_eq_bot` 系は直積構造 (`noncommPiCoprod` の単射性・全射性) を経由するため
 `[Finite G]` を仮定する (Isaacs は有限群の本; 族の有限性が本質).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

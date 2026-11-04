@@ -1,7 +1,12 @@
-import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S13_Orthogonality
-import OddOrder.Peterfalvi.S06_MuColumnBridge
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # S13_Section16PairData
@@ -15,6 +20,8 @@ importing `FeitThompsonSetup` (whose `AppC_FinalContradiction` import pulls the 
 capstone).  This cuts the §12–16 import inversion back-edge `GridTranspose → FeitThompsonSetup`.
 HUB RULING, issue 9093.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

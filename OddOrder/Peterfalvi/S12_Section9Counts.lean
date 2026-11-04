@@ -3,13 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_HcBound
+module
+
+public import OddOrder.Peterfalvi.S12_HcBound
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Peterfalvi.S12_Section9Counts` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

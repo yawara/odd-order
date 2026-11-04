@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-! # Faithful irreducibles of `p`-groups with center of order `p`, and the square-index theorem
 
@@ -28,9 +33,9 @@ contradiction.  In the Coq formalization this is the `extraspecial`-order step o
 `PFsection11.FTtype34_Fcore_kernel_trivial`.
 -/
 
-namespace OddOrder.RepresentationTheory
+@[expose] public section
 
-open _root_.OddOrder.RepresentationTheory.Representation
+namespace OddOrder.RepresentationTheory
 
 variable {P : Type*} [Group P]
 

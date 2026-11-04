@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.Algebra.BlockIdempotent
+import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 import OddOrder.Algebra.BlockCornerInverse
-import OddOrder.Algebra.CenterIdempotentLift
+import OddOrder.Algebra.CornerInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 
 /-!
 # Navarro (5.5)
@@ -27,6 +33,8 @@ The three ingredients are already in place:
 * `OddOrder.exists_corner_inverse_blockCharacter` — Navarro (5.5)
 -/
 
+@[expose] public section
+
 namespace OddOrder
 
 open OddOrder.MatrixModule OddOrder.GroupTheory.CenterClassSum
@@ -40,9 +48,9 @@ variable (π : MonoidAlgebra F G →+* ∀ j, Matrix (nn j) (nn j) F) (hπ : Fun
   (hlin : ∀ (c : F) (a : MonoidAlgebra F G), π (c • a) = c • π a)
 
 -- The finiteness instances are consumed by the class-sum basis and the kernel description.
-omit [Finite ι] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [Finite ι] in
 /-- **Navarro (5.5).**  If `f` is the idempotent of the block `c` and `x ∈ Z(𝒪G)` has
 `λ_c(x*) = 1`, then `f x` is invertible in the corner `f Z(𝒪G)`. -/
 theorem exists_corner_inverse_blockCharacter

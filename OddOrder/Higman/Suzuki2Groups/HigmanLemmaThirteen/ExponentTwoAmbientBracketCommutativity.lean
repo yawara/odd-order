@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketFaithfulness
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
 
 /-!
 # Higman's Lemma 13: ambient bracket zero implies commutativity
@@ -17,6 +21,8 @@ lower-central bracket is faithful on actual commutators.  Thus vanishing of
 the bracket of two actual zeroth-layer classes says that their representatives
 commute in the ambient group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

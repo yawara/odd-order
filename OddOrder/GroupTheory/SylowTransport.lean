@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Multiplicative equivalences between Sylow subgroups
@@ -18,6 +20,8 @@ It also records the order consequence used to see that a central extension is
 of the same order, then `p` does not divide the order of the kernel
 (`Sylow.not_dvd_natCard_of_natCard_eq`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
 import Mathlib.GroupTheory.IndexNormal
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B6
 
@@ -28,6 +38,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B6
   `|P : Z(P)|` は `|P : ⟨c²⟩| = 4` を割り, 仮定 `> 4` に反する。
 * 残る `j = -1` / `j = 2^(m-1)-1` がちょうど Lemma 6.13 の 2 分岐。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

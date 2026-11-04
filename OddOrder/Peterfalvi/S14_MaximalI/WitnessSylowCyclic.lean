@@ -1,7 +1,15 @@
-import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
-import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 
 /-!
 # WitnessSylowCyclic
@@ -9,6 +17,8 @@ import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
 Prefix-split from `OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample` (2000-line limit, issue
 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (12.8)-(12.12) — minimal counterexample analysis
@@ -627,7 +637,7 @@ theorem witness_H_sharp_not_isTISubset_of_typeI [Finite G]
     exact witness_P0_le_kernel hG hnoV data data.x_mem_P0
   have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup typeI.typeF.H :=
     ⟨hxH, by simpa using data.x_ne_one⟩
-  obtain ⟨g, hgC, hgL⟩ := SetLike.not_le_iff_exists.mp data.centralizer_x_not_le_L
+  obtain ⟨g, hgC, hgL⟩ := IsConcreteLE.not_le_iff_exists.mp data.centralizer_x_not_le_L
   have hgc : g * data.x * g⁻¹ = data.x := by
     rw [mul_inv_eq_iff_eq_mul]
     exact Subgroup.mem_centralizer_singleton_iff.mp hgC

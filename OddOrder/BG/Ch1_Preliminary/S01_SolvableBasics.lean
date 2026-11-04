@@ -3,19 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ChiefFactor
+module
+
+public import OddOrder.GroupTheory.ChiefFactor
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FittingSelfCentralizing
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import Mathlib.Order.Minimal
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.QuotientGroup.Basic
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # BG §1A — Solvable group basics (Lem 1.1, Prop 1.2-1.4)
@@ -28,6 +26,8 @@ Split from `OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside` (issue 0149, the
 longFile-1500 campaign); `S01_FrattiniBurnside` imports this leaf, so downstream
 imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S01
 

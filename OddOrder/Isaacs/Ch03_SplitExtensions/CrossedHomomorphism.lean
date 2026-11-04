@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Action.Defs
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.Index
 
 /-!
 # Isaacs Ch. 3 — Lemma 3.6: crossed homomorphisms (pp. 76-78)
@@ -47,6 +48,8 @@ Lean 実体は不要: 存在は mathlib `Subgroup.exists_right_complement'_of_co
 (一般 SZ) の内部で `QuotientDiff` として証明済み, 共役は repo の Thm 3.12
 (`SchurZassenhausConj.lean`, 可解性両 case で book 強度) が包含する.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

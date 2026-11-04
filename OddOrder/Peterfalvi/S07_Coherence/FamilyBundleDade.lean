@@ -1,11 +1,20 @@
-import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
-import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleBasic
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleBasic
+public import Mathlib.Combinatorics.Matroid.Basic
+public import OddOrder.Peterfalvi.S04_DadeIsometry
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceExtensionTau2
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi (5.6.1) family bundle + (5.1) Dade isometry base map
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory

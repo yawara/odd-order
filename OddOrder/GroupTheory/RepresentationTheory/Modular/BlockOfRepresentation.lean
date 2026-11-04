@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.Jacobson.Radical
+public import OddOrder.Algebra.CentralCharacter
+import Mathlib.RingTheory.Jacobson.Semiprimary
 import OddOrder.Algebra.BlockOfSimpleModule
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
@@ -29,6 +35,8 @@ Navarro's Chapter 3 (3.1)/(3.3).
 
 * `OddOrder.RepresentationTheory.Modular.exists_eq_centralCharacterAlg_of_asAlgebraHom_eq_smul`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

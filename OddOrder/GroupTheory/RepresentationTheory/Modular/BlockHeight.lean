@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AugmentationIdeal
-import OddOrder.Algebra.DefectNumber
+module
+
+public import OddOrder.Algebra.AugmentationIdeal
+public import OddOrder.Algebra.DefectNumber
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+public import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.RelativeTraceCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 
 /-!
 # The height of an ordinary character is non-negative
@@ -46,6 +49,8 @@ characteristic `p`).
 * `OddOrder.RepresentationTheory.Modular.defect_eq_factorization_of_residue_augmentation_ne_zero`
   — the form the principal block uses
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

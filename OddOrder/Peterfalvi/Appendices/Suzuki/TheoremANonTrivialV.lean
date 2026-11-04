@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.TheoremB
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
 
 /-!
 # Peterfalvi Part II, Ch. III §1: hypothesis (C1), and Theorem A for `V ≠ 1`
@@ -47,6 +55,8 @@ Brauer–Suzuki, which was the library's last `sorry` until the modular characte
 needs was built (issues 0147 / 9506, Navarro 1998 Ch. 1–7).  The Chapter III–IV half
 (`SecondCaseHypothesis.nonempty_theoremAConclusion`) was axiom-clean throughout.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

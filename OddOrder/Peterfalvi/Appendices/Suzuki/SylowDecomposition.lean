@@ -3,9 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+module
+
+public import Mathlib.GroupTheory.NoncommCoprod
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import Mathlib.GroupTheory.NoncommCoprod
+import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 
 /-!
 # Peterfalvi Part II, Ch. I §2: the decomposition `Q = S × Q₁`
@@ -25,6 +36,8 @@ form `Q1Subgroup ≤ Q` and its ambient image `Q1 ≤ G`. For every Sylow
 isomorphism `S × Q1Subgroup ≃* Q`.
 -/
 
+@[expose] public section
+
 set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
@@ -34,7 +47,7 @@ namespace Hypothesis
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω)
 
-private theorem exists_normalTwoComplement_Q :
+theorem exists_normalTwoComplement_Q :
     ∃ N : Subgroup ↥hyp.Q, N.Normal ∧
       ∀ S : Sylow 2 ↥hyp.Q,
         Subgroup.IsComplement' N (S : Subgroup ↥hyp.Q) := by

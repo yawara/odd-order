@@ -1,6 +1,12 @@
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.GroupTheory.TISubset
+module
+
+public import Mathlib.Analysis.Complex.Norm
+public import OddOrder.Peterfalvi.S04_DadeIsometry
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi (7.1)-(7.5) — TI-subset hypothesis, cardinality identity, family form
@@ -8,6 +14,8 @@ import OddOrder.GroupTheory.TISubset
 Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
 issue 0103).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §9: Non-existence of a Certain Type of Group of Odd Order
@@ -67,7 +75,6 @@ conflates §9 with BG App.C; this header is the corrected account).
 
 namespace OddOrder.Peterfalvi.S09
 
-open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 open OddOrder.GroupTheory (IsTISubset)
 open OddOrder.RepresentationTheory
 open scoped Pointwise

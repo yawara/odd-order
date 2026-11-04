@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S15_HonestTypeP2A0
 import OddOrder.Peterfalvi.S16_GridExpansion
 
@@ -48,6 +52,8 @@ engine therefore needs an `A(S)`-supported coherence of `Ind_S^G` — the (13.3)
 `cprimeSharpS_subset_supportA : (C')^# ⊆ A(S)`), the remaining upstream step; this file supplies
 the downstream orthogonality engine it feeds.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

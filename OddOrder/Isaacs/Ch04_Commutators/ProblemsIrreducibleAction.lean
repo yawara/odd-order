@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.3 (真の `A`-不変部分群に自明な coprime 作用)
@@ -41,6 +49,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.3 (書籍 p. 145)�
 `Φ(G) = G'` (`frattini_eq_commutator`) + Problem 1D.8, (e) は class `≤ 2` の双線形性,
 (f) は `x ↦ x ^ p` が準同型になること + `⁅G,A⁆ = G`, (g) は (d)+(e) から。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

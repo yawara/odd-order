@@ -1,14 +1,18 @@
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
-import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.PiElementDecomposition
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
 
 /-!
 # BG §14 — notation and the type classification layer
@@ -19,6 +23,8 @@ families, `σ`-length) and the basic type-classification relations.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S14
 

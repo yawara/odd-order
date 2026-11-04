@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import Mathlib.GroupTheory.PGroup
 
 /-!
 # Normal subgroups of prime order in `p`-groups are central
@@ -27,6 +28,8 @@ mathlib v4.34.1 時点で未収載 (`Mathlib/GroupTheory/PGroup.lean` / `Nilpote
 Isaacs Thm 10.15 (Huppert metacyclic; issue 3007) の「`|P'| = p` ⇒ `P' ≤ Z(P)`」ステップ
 (同じ証明の「cyclic `P'` の位数 `p` 部分群の一意性」ステップは mathlib で賄う)。claim = issue 9107。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

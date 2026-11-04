@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Which fields of the standing hypothesis are determined by which
@@ -28,6 +36,8 @@ between that hypothesis and its relabelled-point-set twin.
   matching isomorphism (Ch. IV §4, step (2))
 * `Q0_eq_of_H_eq`, `W_eq_of_H_D_eq`, `distinguishedInvolution_eq_of_eq`
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

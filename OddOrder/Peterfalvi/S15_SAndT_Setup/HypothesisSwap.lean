@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The S↔T swap of the Peterfalvi (13.1) hypothesis
@@ -35,6 +38,8 @@ definitionally fixed.  A generic S15 hypothesis cannot manufacture this bundle b
 canonical bundle explicitly.  The structural fact `IsMulCommutative ↥V` is *not* in the
 bundle — see `Hypothesis.swap`'s separate `hV` argument.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

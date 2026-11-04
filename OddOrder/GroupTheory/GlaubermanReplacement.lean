@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # Glauberman Replacement Theorem (Gorenstein Thm 2.7)
@@ -25,6 +32,8 @@ Issue 9403 (証明分解は同 issue の「Thm 2.7 の完全分解」節)。
 p odd は Case 2 (`[[x,u],[x,v]]² = 1 ⟹ = 1`) でのみ使用 — `Odd (Nat.card G)`
 の形で受ける (Gorenstein 自身が p = 2 でも `[B,A;3] ≠ 1` なら成立と注記)。
 -/
+
+@[expose] public section
 
 namespace Subgroup
 
@@ -104,7 +113,7 @@ theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal
   have hMB : M ≤ B := hMBA.trans (commutator_le_left B A)
   have hAstar := thompson_mem_maxAbelianIn hA (mem_top x) hMcomm
   refine ⟨M ⊔ C, hAstar, ?_, ?_⟩
-  · rw [SetLike.lt_iff_le_and_exists]
+  · rw [IsConcreteLE.lt_iff_le_and_exists]
     constructor
     · -- `A ⊓ B ≤ C` (three-subgroup lemma)
       have hAA : ⁅A, A⁆ = (⊥ : Subgroup G) :=
@@ -142,7 +151,7 @@ theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal
         intro hle
         exact hMnc ((le_centralizer_iff_isMulCommutative.mpr hA.2.1).trans
           (centralizer_le (SetLike.coe_subset_coe.mpr hle)))
-      obtain ⟨m, hm, hmA⟩ := SetLike.not_le_iff_exists.mp hMnotA
+      obtain ⟨m, hm, hmA⟩ := IsConcreteLE.not_le_iff_exists.mp hMnotA
       exact ⟨m, ⟨mem_sup_left hm, hMB hm⟩, fun hc => hmA hc.1⟩
   · -- `A* ≤ N(A)` (Lem 2.3)
     rw [le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn hA le_top]
@@ -151,7 +160,7 @@ theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal
       commutator_sup_le_of_centralizer inf_le_right
         (inf_le_left.trans (le_centralizer_iff_isMulCommutative.mpr hA.2.1))
         (commutator_mono hMR le_rfl)
-        (inf_le_left.trans (le_normalizer_commutator_right R A))
+        (inf_le_left.trans (Subgroup.normalizer_commutator_ge_right R A))
     calc ⁅⁅M ⊔ C, A⁆, A⁆ ≤ ⁅⁅R, A⁆, A⁆ := commutator_mono hstar le_rfl
       _ = ⊥ := h3
 

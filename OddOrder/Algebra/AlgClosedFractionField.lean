@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RingTheory.Henselian
-import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 
 /-!
 # Integrally closed domains with an algebraically closed fraction field
@@ -38,6 +40,8 @@ closed field, with no appeal to Brauer's splitting field theorem.
 * `OddOrder.isAlgClosed_of_isAlgClosed_fractionRing` — any fraction field of `A` is algebraically
   closed once `FractionRing A` is
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

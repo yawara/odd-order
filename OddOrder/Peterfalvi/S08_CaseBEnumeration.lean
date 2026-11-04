@@ -3,9 +3,13 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBAssembly
-import OddOrder.Peterfalvi.S08_CaseBHortho
+module
+
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S08_CaseBAssembly -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CaseBHortho -- shake: keep (used by a proof inside an exposed definition)
 import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §6.8.2 — case-(B) conjugate-pair cover of the `X`-set
@@ -42,6 +46,8 @@ irreducibility of the non-`S₀` part is supplied as the explicit hypothesis `hn
 the regime where `certainTypeSet h46 k` captures every reducible `X`-member, e.g. when the fold is
 applied to the single degree class `k`).  See REPORT note (d).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

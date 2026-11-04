@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.Algebra.Group.Subgroup.Basic
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.GroupTheory.PRank
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.PRank
 
 /-!
 # Self-Centralizing Normal Abelian Subgroups (SCN)
@@ -62,6 +64,8 @@ Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確�
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
 SCN_n 定義 + Prop 4.4(a) 2026-05-30 (`notes/bg/s04_implementation_plan_2026_05_30.md` §4.2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

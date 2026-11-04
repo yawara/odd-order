@@ -1,4 +1,14 @@
-import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.GroupTheory.MaximalSubgroupType
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
 
 /-!
 # CentralizerContainment
@@ -9,6 +19,8 @@ The §8.6.a / §8.16 centralizer-containment facts for type-`P` maximal subgroup
 import cycle back onto the §12 minimal-counterexample analysis (which needs the §11–§13
 type-determination results, in turn downstream of §10).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
@@ -38,7 +50,7 @@ theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall [Finite G]
     exfalso
     have hNtop : Subgroup.normalizer (maxNilpotentNormalHall L : Set G) = ⊤ := hco.2 _ hlt
     have hHnormal : (maxNilpotentNormalHall L).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) hHnormal with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) with hb | ht
     · exact hne hb
     · have hle : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
       rw [ht] at hle

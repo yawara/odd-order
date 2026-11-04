@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+module
+
+public import Mathlib.RepresentationTheory.Character
 
 /-!
 # Character values at an element of order dividing `4` that is real
@@ -31,6 +33,8 @@ ground field has characteristic `≠ 2`.
 * `OddOrder.RepresentationTheory.character_add_character_inv_eq` — `χ(y) + χ(y⁻¹) = 2(r₊ − r₋)`
 * `OddOrder.RepresentationTheory.exists_intCast_character_of_pow_four_eq_one`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

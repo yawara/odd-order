@@ -3,11 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Conj
-import Mathlib.Algebra.Group.Subgroup.Lattice
+module
+
+public import Mathlib.GroupTheory.Index
 import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.Index
-import Mathlib.Data.Set.Card
 
 /-!
 # Conjugacy-closure of a subset `𝒞_G(T)`
@@ -29,6 +28,8 @@ and §16 (Theorems E, II). It lives in the shared `GroupTheory` namespace.
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994),
   Chapter IV §14 (counting), §16.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

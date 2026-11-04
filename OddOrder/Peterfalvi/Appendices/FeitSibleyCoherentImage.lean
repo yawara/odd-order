@@ -3,12 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
-import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibley
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
 import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: member images under the coherent extension
@@ -32,6 +38,8 @@ This leaf provides the three ingredients in coherence-extension form
   `Ind_H^G(χ − a·χ') = e_χ − a·e_{χ'}`: the difference is `A`-supported, where
   the extension agrees with `τ = Ind_H^G`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

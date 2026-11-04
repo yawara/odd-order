@@ -3,12 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Index
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
+import OddOrder.Isaacs.Ch05_Transfer.Problems5D
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 7C.1 — Thompson の normal `p`-complement 判定条件
@@ -36,6 +43,8 @@ normal `p`-complement をもつ。
 - `OddOrder.Isaacs.Ch07.hasNormalPComplement_of_charLocalPControl`:
   **Isaacs Problem 7C.1**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -105,7 +114,7 @@ theorem hasNormalPComplement_of_normal_of_isPGroup_quotient
   -- `M = O` を `G` の部分群として見る
   have hOchar : O.Characteristic := OddOrder.Isaacs.Ch03.oPiCore.characteristic _ _
   set M : Subgroup G := O.map K.subtype with hM_def
-  have hMnormal : M.Normal := OddOrder.Isaacs.Ch05.normal_map_subtype_of_characteristic
+  have hMnormal : M.Normal := ConjAct.normal_of_characteristic_of_normal
   have hMcard : Nat.card ↥M = Nat.card ↥O :=
     (Nat.card_congr (Subgroup.equivMapOfInjective O K.subtype K.subtype_injective).toEquiv).symm
   have hMK : M ≤ K := Subgroup.map_subtype_le O

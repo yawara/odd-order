@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Complement
+module
+
+public import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
@@ -38,6 +40,8 @@ Thm 3.2 (半直積の構成) と対になる。
 
 ノート: [notes/isaacs/ch03_split.md](../../../notes/isaacs/ch03_split.md)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

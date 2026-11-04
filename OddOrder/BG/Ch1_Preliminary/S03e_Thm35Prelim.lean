@@ -3,15 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Invariants
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
 import Mathlib.LinearAlgebra.Eigenspace.Pi
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.GroupTheory.Commutator.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.DedekindDomain.Basic
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
 
 /-!
 # BG §3 — Theorem 3.5, the step infrastructure (mmd L925-951)
@@ -24,6 +31,8 @@ assembly bridges.
 Split from `OddOrder.BG.Ch1_Preliminary.S03e_Thm35` (issue 0149, the longFile-1500
 campaign); `S03e_Thm35` imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03e
 
@@ -629,7 +638,7 @@ theorem finrank_eq_one_of_not_iso_generator
     exact Submodule.coe_eq_zero.mp hbot
   -- range `T` lands in `C_W(R)`.
   have hTinv : LinearMap.range T ≤ Representation.invariants (ρ.comp R.subtype) := by
-    rw [SetLike.le_def]
+    rw [IsConcreteLE.le_iff]
     rintro v ⟨m, rfl⟩
     rw [Representation.mem_invariants]
     have hxfix : ρ x (T m) = T m := by

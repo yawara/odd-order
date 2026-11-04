@@ -3,12 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Subgroup.Centralizer
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.GroupTheory.Sylow
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. I §1: the `Y × Z → X` decomposition (the Lemma)
@@ -29,6 +28,8 @@ The bijection is exhibited with an explicit inverse: for `x ∈ X` set
 and `y = x z⁻¹`; then `x = yz` with `y ∈ Y`, `z ∈ Z`, and every decomposition
 arises this way (`w(yz) = z²`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
@@ -411,7 +412,7 @@ section CauchyInverted
 variable {M : Type*} [Group M] [Finite M] {t : M} {X : Subgroup M}
 
 /-- Conjugation by the involution `t` as an automorphism of `↥X`. -/
-private def conjInvolution (ht : t * t = 1) (hnorm : ∀ x ∈ X, t * x * t ∈ X) :
+def conjInvolution (ht : t * t = 1) (hnorm : ∀ x ∈ X, t * x * t ∈ X) :
     MulAut ↥X where
   toFun x := ⟨t * ↑x * t, hnorm _ x.2⟩
   invFun x := ⟨t * ↑x * t, hnorm _ x.2⟩

@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Determinant
-import Mathlib.RepresentationTheory.Basic
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 
 /-!
@@ -23,6 +26,8 @@ extension theorem** (Isaacs, *Character Theory*, 6.28/8.16): a `G`-invariant `θ
 This feeds the multiplicity-one conclusion of the constructive Clifford decomposition
 (Peterfalvi (1.7), the general type-I `typeI_induced_char_constituents`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

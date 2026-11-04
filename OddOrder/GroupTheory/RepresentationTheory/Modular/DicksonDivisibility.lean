@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.SubgroupAverageTrace
 
@@ -30,6 +38,8 @@ This is the arithmetic input of Navarro (3.8) (Osima): it is what makes the coef
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.8).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

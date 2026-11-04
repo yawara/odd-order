@@ -3,14 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_MaximalIII_IV
-import OddOrder.Peterfalvi.S07_Subcoherent
+module
+
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+public import OddOrder.Peterfalvi.S12_HcBound
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
-import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
-import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
 import OddOrder.Peterfalvi.S11_NineElevenTIWitness
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S13_SixTwoBridge
 
 /-!
 # Peterfalvi (9.11), case (9.7.a): the maximality-induction entry point
@@ -46,6 +51,8 @@ here as a genuine hypothesis `hrefute`; it is discharged separately.  This file 
 
 Reference note: `issues/1017-pf-s5-uniform-degree-coherence.md` (update #27).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 

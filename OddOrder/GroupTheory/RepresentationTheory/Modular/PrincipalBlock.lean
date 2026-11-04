@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CentralCharacterBlock
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+module
+
+public import OddOrder.Algebra.CentralCharacterBlock
+public import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
 
 /-!
 # The principal block
@@ -30,6 +31,8 @@ The augmentation itself is `OddOrder.Algebra.augmentation` and its restriction t
 * `OddOrder.RepresentationTheory.Modular.aug_classSumCenter` — `λ_{B_0}(K̂) = |K|·1`
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_principalBlock`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

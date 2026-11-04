@@ -3,12 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.PrimeOrderSubgroups
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.GroupTheory.PrimeOrderSubgroups
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # Isaacs §10B — Huppert's metacyclic Sylow theorem (pp. 304-307)
@@ -45,6 +58,8 @@ Theory", §10B: Huppert の定理に向けた main lemma。
 issue 3007 参照。
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch10
 
 open OddOrder.GroupTheory
@@ -79,7 +94,7 @@ theorem index_commutator_dvd_of_surjective {G H : Type*} [Group G] [Group H]
       QuotientGroup.eq_one_iff]
     exact hfx
   refine Subgroup.card_dvd_of_surjective
-    (QuotientGroup.lift (commutator G) _ hker) ?_
+    (f := QuotientGroup.lift (commutator G) _ hker) ?_
   intro y
   obtain ⟨h, rfl⟩ := QuotientGroup.mk'_surjective (commutator H) y
   obtain ⟨g, rfl⟩ := hf h
@@ -361,7 +376,7 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     intro v
     obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective (Subgroup.center ↥P) v
     rw [hφ₁_def, quotientMulAutHom_apply_mk']
-    show _ = (1 : MulAut _) ((QuotientGroup.mk' _) y)
+    change _ = (1 : MulAut (↥P ⧸ Subgroup.center ↥P)) ((QuotientGroup.mk' _) y)
     rw [MulAut.one_apply]
     rw [QuotientGroup.mk'_eq_mk']
     refine ⟨⁅(⟨x, hx⟩ : ↥P), y⁻¹⁆, hcomm_le_center

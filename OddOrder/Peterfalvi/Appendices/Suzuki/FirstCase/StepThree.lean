@@ -3,12 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.FieldAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.Algebra.CharP.CharAndCard
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Ideal.Quotient.HasFiniteQuotients.Basic
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.Peterfalvi.Appendices.Huppert
 
 /-!
 # Peterfalvi Part II, Ch. II, step (3): the dimension identity for `M`
@@ -40,6 +53,8 @@ No `r ≠ p` hypothesis is needed — the identity is characteristic-free in
 As a corollary, `C_M(P) ≠ 1` for `M ≠ 1` — the book's opening Frobenius
 argument for `C_M(P) ≠ 0` is subsumed by the identity itself.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,13 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import Mathlib.LinearAlgebra.Isomorphisms
+public import Mathlib.RingTheory.Ideal.Maps
+public import OddOrder.Algebra.AugmentationIdeal
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.GroupTheory.Abelianization.Finite
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.LinearAlgebra.Isomorphisms
-import Mathlib.RingTheory.Ideal.Maps
-import Mathlib.RingTheory.Finiteness.Finsupp
-import OddOrder.Algebra.AugmentationIdeal
+import Mathlib.RingTheory.DedekindDomain.Basic
 import OddOrder.Algebra.FiniteIndexAnnihilator
 import OddOrder.Mathlib.MonoidAlgebra
 
@@ -39,6 +42,8 @@ Theorem 10.24 に向けた基盤。`K ⊴ G` のとき `Δ(K)Δ(G)` は `ℤ[G]`
 
 Theorem 10.24 (range の同型) の仕上げと 10.25/10.26 は後続。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

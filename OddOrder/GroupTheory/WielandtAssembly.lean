@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 
@@ -30,6 +37,8 @@ hypothesis `WielandtPerFactor`, leaving the assembly purely group-theoretic and 
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece B), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -97,7 +106,7 @@ theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E 
       have : N.Normal := hN_normal
       -- Coprimality and the quotient action descend to `H / N`.
       have hcopN : Nat.Coprime (Nat.card L) (Nat.card (H ⧸ N)) :=
-        hcop.coprime_dvd_right (Subgroup.card_dvd_of_surjective _ (QuotientGroup.mk'_surjective N))
+        hcop.coprime_dvd_right (Subgroup.card_dvd_of_surjective (QuotientGroup.mk'_surjective N))
       have hlt : Nat.card (H ⧸ N) < n := by
         rw [← hcard]; exact Subgroup.card_quotient_lt_of_ne_bot hN_ne
       -- Induction hypothesis on the quotient.

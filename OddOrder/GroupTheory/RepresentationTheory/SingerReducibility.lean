@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RepresentationTheory.Maschke
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # Reducibility of a faithful non-cyclic commutative representation over `𝔽_p`
@@ -29,6 +33,8 @@ acting group is elementary abelian of rank `2`, hence non-cyclic, so the `2`-dim
 splits as a sum of two lines — the starting point of the eigenvalue analysis that produces
 `q ∣ p - 1` and the power-map automorphism (issue 0150).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

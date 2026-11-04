@@ -3,9 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SubgroupInAmbient
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG §10 β-radical spine — Prop 10.14 (β(G)-prime の global 構造)
@@ -14,6 +27,8 @@ Bender–Glauberman §10, mmd L2894。`S10_BetaRadicalCore.lean` からの prefi
 (粒度規約, 2026-06-12)。Proposition 10.14 (`beta_global_structure`) と 10.14(d)
 nontrivial `β(M)`-subgroup normalizers。下流は `S10_BetaRadical.lean` (Cor 10.9 + Prop 10.10)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -251,7 +266,7 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
         intro htop
         rw [Subgroup.subgroupOf_eq_top] at htop
         exact hQne (le_antisymm hQP htop)
-      obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hQsub_lt)
+      obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt (hNC _ hQsub_lt)
       rw [← Subgroup.subgroupOf_normalizer_eq hQP, Subgroup.mem_subgroupOf] at ht_norm
       rw [Subgroup.mem_subgroupOf] at ht_not
       -- `↑t ∈ N_G(Q) ⊓ P ≤ Q`, so `↑t ∈ Q`, contradicting `t ∉ Q.subgroupOf P`.
@@ -342,7 +357,7 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
     rw [lt_top_iff_ne_top]
     intro htop
     have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases (hG.simple).eq_bot_or_eq_top_of_normal X hXnormal with hb | ht
+    rcases (hG.simple).eq_bot_or_eq_top_of_normal X with hb | ht
     · exact hXne hb
     · exact hM_co.1 (top_le_iff.mp (ht ▸ hXM))
   -- A coatom `C ⊇ N_G(X)` exists; it contains `N_G(X) ⊓ S`, so `C = M' = M`.

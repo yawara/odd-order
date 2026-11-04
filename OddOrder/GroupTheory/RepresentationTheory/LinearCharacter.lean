@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import Mathlib.Analysis.Complex.Polynomial.Basic
+public import Mathlib.LinearAlgebra.FreeModule.PID -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Linear characters from group homomorphisms to `ℂˣ`
@@ -23,6 +26,8 @@ Main definitions / results:
 * `linearIrreducibleCharacter_apply`, `..._apply_one` (degree one).
 * `linearIrreducibleCharacter_injective`, `linearIrreducibleCharacter_eq_trivial_iff`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
@@ -28,6 +36,8 @@ and Isaacs Cor 6.17 (`isZGroup_of_isFrobeniusAction_of_odd`) then gives the cycl
   acts as a Frobenius complement on `Q ⧸ Z(Q)`.
 * `Hypothesis.isZGroup_D_of_freeD` — hence every Sylow subgroup of `D` is cyclic.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

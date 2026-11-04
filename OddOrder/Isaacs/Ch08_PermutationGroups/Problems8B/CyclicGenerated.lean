@@ -3,11 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Basic
-import Mathlib.GroupTheory.GroupAction.Blocks
-import Mathlib.GroupTheory.GroupAction.Primitive
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.GroupTheory.GroupAction.Jordan
-import Mathlib.GroupTheory.Perm.Cycle.Type
 import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
 import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
@@ -54,6 +54,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
 - `two_mul_lt_factorial`, `card_eq_six_of_index_eq_of_ne_stabilizer` — **Problem 8B.10**:
   `Sym(α)` に指数 `|α|` の部分群で点安定化群でないものがあれば `|α| = 6`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
 
 /-!
 # Higman Lemma 13: primitivity of a factor eigenvalue
@@ -19,6 +23,8 @@ for the primitive kernel eigenvalue `ν`.  In the commutative case this is
 it into `λ^(1 + 2^r) = ν`.  Since every nonzero field element is killed by
 `2^n - 1`, the full order of `ν` forces `λ` itself to have full order.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

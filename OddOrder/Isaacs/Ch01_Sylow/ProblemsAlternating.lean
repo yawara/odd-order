@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Alternating
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Prime.Factorial
 import Mathlib.GroupTheory.Perm.Centralizer
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 
 /-!
@@ -35,6 +43,8 @@ Isaacs は暗黙に `p` 奇素数を仮定しているので、本形式化は `
 - 掛け合わせ: `(2|N|)·(c·p) = 2|A|·(p−1)·p = (p+1)!·(p−1)·p = (p·(p−1))·(c·p)`、
   `c·p > 0` で cancel して `2|N| = p(p−1)`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

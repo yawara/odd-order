@@ -1,10 +1,17 @@
-import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi (5.6.3) 準備 — ψ = 0 decomposition, isometry re-targeting keystone, (1.1)+(1.4)
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory
 

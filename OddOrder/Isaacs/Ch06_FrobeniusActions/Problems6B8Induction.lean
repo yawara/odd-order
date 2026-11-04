@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
 
 /-!
@@ -26,6 +36,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
 「`P/Z` が D/SD/Q だからその指数 `2` の巡回部分群を引き戻す」という段を避けられるので,
 具体群 D/SD/Q の構造 (指数 `2` の巡回部分群を持つこと) を証明せずに済む。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

@@ -3,10 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S06_Additional
-import OddOrder.BG.AppB_Thm62
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import OddOrder.BG.AppA_PStability
-import OddOrder.GroupTheory.GlaubermanZJ
+import OddOrder.BG.AppB_Thm62
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 
 /-!
 # BG Theorem 6.2 一般形 (literal Thompson `J(S)`): `Z(J(S))·O_{p'}(G) ⊴ G` の `O_{p'}` 簡約
@@ -56,6 +63,8 @@ repo の既存 J-エントリ `OddOrder.Isaacs.Ch07.normal_J` は **`J(P) ⊴ G`
 `Isaacs.Ch07.centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot`) + p-stability (odd) を用いた
 **Glauberman ZJ 本体**を新規形式化する必要がある (major; book 推奨代替 = L(S) 版は既に完了).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

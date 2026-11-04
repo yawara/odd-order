@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AugmentationIdeal
-import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
-import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
+module
+
+public import OddOrder.Algebra.AugmentationIdeal
+public import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
+public import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
+public import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 
 /-!
 # The `MulAut G`-action on the simples, and its compatibility with `centerRep`
@@ -22,6 +26,8 @@ The key compatibility — the `hρ` the cornerstone needs — is
 automorphism `autCongr φ (...)` of `Fin N → k`, which permutes the standard idempotents by
 `simplesAction φ g` (`algAutPerm_apply_single`).
 -/
+
+@[expose] public section
 
 open OddOrder.GroupTheory.CenterClassSum (centerRep centerEnd CenterCarrier centerRep' centerBasis'
   centerRep'_apply_centerBasis' finrank_centerRep_invariants_eq_card_orbits)

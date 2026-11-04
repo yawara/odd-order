@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+public import OddOrder.Peterfalvi.S13_Section16PairData
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_Orthogonality
 
 /-!
 # S13_TypeDetermination — Peterfalvi (13.2.a) and the κ-ordered maximal pair
@@ -28,6 +39,8 @@ The `OddOrder`-root declarations keep their names and namespace (they are the
 Feit–Thompson assembly layer, continuing `FeitThompsonSetup`); only their home moved
 below `S12_Noncoherence` to consume the honest (10.10).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # `Irr(G)` is a basis of the class functions
@@ -23,6 +28,8 @@ defined without any inner product: the coefficients are read off from the unique
 * `OddOrder.RepresentationTheory.Modular.existsUnique_coeff_ordinaryCharacter`
 * `OddOrder.RepresentationTheory.Modular.ordinaryCoeff` — the coefficients of the expansion
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

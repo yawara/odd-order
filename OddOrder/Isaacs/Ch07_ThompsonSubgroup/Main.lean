@@ -3,13 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
+import Mathlib.Algebra.Order.Star.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Basic
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch07
 open scoped commutatorElement
 open scoped Pointwise
@@ -359,7 +371,7 @@ theorem step8_sylow_full
   -- `SH.subgroupOf PH < N(SH.subgroupOf PH)`.
   have hlt := hNC (SH.subgroupOf (PH : Subgroup H)) hSH_subOf_lt_top
   -- Get `t : ↥PH` with `t ∈ N(SH.subgroupOf PH)`, `t ∉ SH.subgroupOf PH`.
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   -- `↑t ∈ N_H(SH)` (transport normalizer), `↑t ∉ SH`.
   rw [← Subgroup.subgroupOf_normalizer_eq hSH_le_PH, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not

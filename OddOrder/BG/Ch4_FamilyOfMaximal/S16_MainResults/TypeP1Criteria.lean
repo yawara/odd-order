@@ -1,4 +1,16 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
 
 /-!
@@ -7,6 +19,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Proposition 16.1 forward bridges — shared type data の構成

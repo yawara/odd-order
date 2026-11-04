@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.Transfer
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.GroupTheory.TransferTransitivity
 
@@ -27,6 +34,8 @@ Theory", §10C の結論部。群環側の重労働 (Lemma 10.19 – Theorem 10.
   (Thm 10.8 = `OddOrder.GroupTheory.transfer_transfer`) で `V = W ∘ U` に
   分解し、Thm 10.18 で `U(g) ∈ G'' ⊆ ker W`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 

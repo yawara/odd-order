@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Hall 部分群と冪零性
@@ -40,6 +45,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 * `sup_eq_top_of_isHallSubgroup_compl` — `π`-Hall と `π'`-Hall は全体を生成する
   (冪零性不要)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

@@ -3,10 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Pi
-import Mathlib.Algebra.Module.End
-import Mathlib.Algebra.Ring.Pi
-import Mathlib.RingTheory.SimpleModule.Basic
+module
+
+public import Mathlib.RingTheory.SimpleModule.Basic
 import OddOrder.Algebra.CentralIdempotentModule
 
 /-!
@@ -25,6 +24,8 @@ factors through that single factor.
 * `OddOrder.PiModule.factorModule` — the resulting `R i`-module structure
 * `OddOrder.PiModule.isSimpleModule_factor` — which has the same submodules, hence is simple
 -/
+
+@[expose] public section
 
 namespace OddOrder.PiModule
 

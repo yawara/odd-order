@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch01_Sylow.Basic
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Isaacs, Finite Group Theory — Problem 9D.4: Kegel 予想の極小反例 (p. 294)
@@ -30,6 +36,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 9D.4 (書籍 p. 294):
 * `IsKegelMinimalCounterexample.sup_eq_top` — skeleton 2: 非自明な正規部分群 `N` は
   `S` と合わせて `G` 全体を生成する (`SN = G`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -728,7 +736,7 @@ theorem not_isMulCommutative_of_isKegelMinimalCounterexample : ¬ IsMulCommutati
   intro hcomm
   have : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
   have : S.Normal := Subgroup.normal_of_isMulCommutative S
-  rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S inferInstance with h | h
+  rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S with h | h
   · exact hmc.ne_bot h
   · exact hmc.ne_top h
 
@@ -776,8 +784,8 @@ theorem not_isMulCommutative_subgroup_of_isKegelMinimalCounterexample :
   have hncl_ne : Subgroup.normalClosure (S : Set G) ≠ ⊥ := fun h =>
     hmc.ne_bot (le_bot_iff.mp (h ▸ Subgroup.le_normalClosure))
   have hPtop : (P : Subgroup G) = ⊤ :=
-    top_le_iff.mp (((‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal _
-      Subgroup.normalClosure_normal).resolve_left hncl_ne) ▸ hncl)
+    top_le_iff.mp (((‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal
+      (Subgroup.normalClosure (S : Set G))).resolve_left hncl_ne) ▸ hncl)
   -- `G` は `q`-群 ⟹ 冪零 ⟹ 可解 ⟹ 可換
   have hGq : IsPGroup (Nat.card ↥S) G := by
     intro g
@@ -788,7 +796,7 @@ theorem not_isMulCommutative_subgroup_of_isKegelMinimalCounterexample :
     IsSimpleGroup.comm_iff_isSolvable.mpr inferInstance
   have : S.Normal := ⟨fun n hn g => by
     rw [hGcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
-  rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S inferInstance with h | h
+  rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S with h | h
   · exact hmc.ne_bot h
   · exact hmc.ne_top h
 

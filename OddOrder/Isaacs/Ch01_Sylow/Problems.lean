@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.DoubleCoset
-import Mathlib.GroupTheory.GroupAction.Quotient
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import Mathlib.GroupTheory.DoubleCoset
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)
@@ -26,6 +28,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 1 "Sylow Theory"
   場合は **仮定変換の橋渡し補題**を書く (意味のあるラッパー例外)。
 - それ以外は実証明。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 
@@ -385,7 +389,7 @@ theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (
     rw [heq]
     gcongr
     -- 2 ≤ #H-軌道: [1] と [x] (x∉H) が別軌道
-    obtain ⟨x, -, hx⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hH)
+    obtain ⟨x, -, hx⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hH)
     have hnt : Nontrivial (orbitRel.Quotient H (G ⧸ H)) := by
       refine ⟨Quotient.mk'' (QuotientGroup.mk (1 : G) : G ⧸ H),
         Quotient.mk'' (QuotientGroup.mk x : G ⧸ H), ?_⟩

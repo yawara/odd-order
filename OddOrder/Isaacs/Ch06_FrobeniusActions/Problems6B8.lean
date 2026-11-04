@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+import OddOrder.Isaacs.Ch06_FrobeniusActions.InvolutionRecognition
 
 /-!
 # Isaacs Problem 6B.8 — Taussky-Todd (書籍 p. 196)
@@ -25,6 +35,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
 排除)。帰納法本体と主定理 `tausskyTodd` の組み立ては
 [`Problems6B8Induction.lean`](Problems6B8Induction.lean) にある。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

@@ -3,18 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppC_NormOneInduce
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
 import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.BG.AppC_NormSet
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.ConjClassCardinality
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.Mathlib.SemidirectProduct
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
-import OddOrder.BG.AppC_NormOneInduce
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # BG Appendix C: Frobenius Class-Sum Bridge
@@ -27,6 +28,8 @@ keeps the concrete norm and semidirect-product setup; this file is the first
 class-sum dependent layer for the `q >= 5` branch of Lemma C.2.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

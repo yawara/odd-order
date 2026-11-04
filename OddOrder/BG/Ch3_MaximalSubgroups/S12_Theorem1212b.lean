@@ -3,8 +3,29 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # BG §12: Theorem 12.12 — Case 3 (abelian Sylow `p`), building blocks
@@ -19,6 +40,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 自動的に `C_{M_σ}(L) = 1` を満たす (BG L3345-3347 の「key fact」)。`L ≤ Ω₁(S) = A` ゆえ
 Cor 12.6(c) が `N_G(L) ⊆ M` を与え、`N_G(S) ≤ N_G(L) ⊆ M` が `N_G(S) ⊄ M` に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

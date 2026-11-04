@@ -3,26 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RepresentationTheory.Submodule
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Sylow
-import Mathlib.LinearAlgebra.Charpoly.BaseChange
-import Mathlib.LinearAlgebra.Determinant
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.TensorProduct.Finiteness
-import Mathlib.LinearAlgebra.TensorProduct.Tower
-import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch05_Transfer.Main
+module
+
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG §2A-§2E — the basic representation propositions (Prop 2.1-2.4, Thm 2.5)
@@ -35,6 +25,8 @@ Split from `OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic` (issue 0149, t
 longFile-1500 campaign); that file imports this leaf, so downstream imports are
 unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 

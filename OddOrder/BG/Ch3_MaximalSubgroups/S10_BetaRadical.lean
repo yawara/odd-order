@@ -3,7 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S07_Hypothesis75
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 
 /-!
 # BG §10 β-radical spine — Cor 10.9 + Prop 10.10
@@ -14,6 +34,8 @@ module 名は分割前のまま、下流 import 不変): `S10_BetaRadicalCore` (
 Corollary 10.9 (β(M)'-部分群の centralization) + 10.9(a)(3)/(b) normalizer gates +
 Proposition 10.10 (`N_G(P)` の分解)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -1263,7 +1285,7 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
       intro htop
       have hQnorm : Q.Normal := by
         rw [← Subgroup.normalizer_eq_top_iff]; exact htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal Q hQnorm with h | h
+      rcases hG.simple.eq_bot_or_eq_top_of_normal Q with h | h
       · exact hQne h
       · have hGpg : IsPGroup q G := (h ▸ hQpg : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
           (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective

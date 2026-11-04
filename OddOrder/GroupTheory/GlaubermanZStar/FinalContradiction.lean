@@ -3,10 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.PurelyInseparable.Basic
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import OddOrder.GroupTheory.GlaubermanZStar.Fusion
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Valuation.LocalSubring
 import OddOrder.GroupTheory.GlaubermanZStar.CharacterCore
 import OddOrder.GroupTheory.GlaubermanZStar.CharacterIdentity
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
 
 /-!
@@ -30,6 +45,8 @@ Navarro (7.9), Step 9 and the closing paragraph.  With `v ∈ P` a second involu
 
 * `OddOrder.GroupTheory.MinimalConfig.false_of_exists_involution`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03 OddOrder.RepresentationTheory.Modular
 open OddOrder.RepresentationTheory OddOrder.MatrixModule

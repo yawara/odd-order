@@ -1,8 +1,17 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.GroupTheory.FittingSelfCentralizing
 
 /-!
 # BG §15 — notation and the Aut-abelian core
@@ -12,6 +21,8 @@ The §15 notation layer and the `§14`-independent, reusable Aut-abelian core.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 

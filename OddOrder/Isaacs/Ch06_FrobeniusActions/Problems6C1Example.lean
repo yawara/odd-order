@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C1
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Mathlib.SemidirectProduct
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Problem 6C.1(b) — 位数 4 の固定点自由自己同型では冪零にならない例 (書籍 p. 197)
@@ -26,6 +34,8 @@ import OddOrder.Mathlib.SemidirectProduct
 
 となる (`A` は固有値 `1` を持たず, `|⟨B⟩| = 3` は奇数)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

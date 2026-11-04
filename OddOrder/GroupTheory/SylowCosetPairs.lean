@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Map
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # Factorisations through a subgroup, and pairs in the same coset
@@ -26,6 +34,8 @@ set for the conjugate subgroup, and `S`, `T` are unions of conjugacy classes.
 * `OddOrder.GroupTheory.factorThroughEquivCosetPairs` — the bijection
 * `OddOrder.GroupTheory.cosetPairsEquivConj` — independence of the chosen Sylow subgroup
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

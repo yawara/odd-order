@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.FrobeniusExponentPairs
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 
 /-!
@@ -40,6 +49,8 @@ order (`odd_orderOf_of_mul_self_surjective`): writing `θ|_F = Frob^r`, an even
 * `Hypothesis.odd_orderOf_scalingPair_of_model` — hence so does the twist `σ⁻¹τ` of the
   type-`B` scaling pair, which is what Ch. IV §3 (3) consumes.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

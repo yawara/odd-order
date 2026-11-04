@@ -3,10 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+public import OddOrder.Algebra.SubgroupTruncation
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.GroupAlgebraConjugation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 
@@ -42,6 +52,8 @@ irreducibility of `χ` is needed anywhere.
 
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero` — Navarro (5.2)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

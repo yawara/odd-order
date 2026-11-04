@@ -3,10 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
-import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-import OddOrder.Isaacs.Ch01_Sylow.Basic
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman Lemma 7: abelian normal covers
@@ -19,6 +26,8 @@ subgroup of the cover quotient lifts to an ambient-normal subgroup, which is
 the group-theoretic input behind Higman's assertion that `C / Phi(C)` is
 irreducible.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -626,7 +635,7 @@ universe uP uS uT uX
 /-- Transport two subgroups whose injective images agree in a common ambient
 group.  This is the reusable group-level core of Higman's `C' / (C'^2 C₃)`
 Agemo-factor identification. -/
-private noncomputable def subgroupEquivOfInjectiveAmbientMaps
+noncomputable def subgroupEquivOfInjectiveAmbientMaps
     {P : Type uP} {S : Type uS} {T : Type uT}
     [Group P] [Group S] [Group T]
     (f : S →* P) (g : T →* P)
@@ -657,7 +666,7 @@ private noncomputable def subgroupEquivOfInjectiveAmbientMaps
       simp [y, MulEquiv.subgroupCongr_apply,
         Subgroup.coe_equivMapOfInjective_apply]
 
-private theorem subgroupEquivOfInjectiveAmbientMaps_map_eq
+theorem subgroupEquivOfInjectiveAmbientMaps_map_eq
     {P : Type uP} {S : Type uS} {T : Type uT}
     [Group P] [Group S] [Group T]
     (f : S →* P) (g : T →* P)
@@ -681,7 +690,7 @@ private theorem subgroupEquivOfInjectiveAmbientMaps_map_eq
 
 /-- Quotient-level transport associated to
 `subgroupEquivOfInjectiveAmbientMaps`. -/
-private noncomputable def subgroupQuotientEquivOfInjectiveAmbientMaps
+noncomputable def subgroupQuotientEquivOfInjectiveAmbientMaps
     {P : Type uP} {S : Type uS} {T : Type uT}
     [Group P] [Group S] [Group T]
     (f : S →* P) (g : T →* P)
@@ -767,7 +776,7 @@ private theorem lowerCentralTermEquivAgemoAt_equivariant
         ((agemoRestrictAction hAinv.restrict s g
           (lowerCentralTermEquivAgemoAt A C i s hB x) : Agemo A 2 s) : A) := rfl
 
-private theorem lowerCentralLayerKernel_agemo_kernel_ambient
+theorem lowerCentralLayerKernel_agemo_kernel_ambient
     {P : Type uP} [Group P] (A C : Subgroup P)
     (i s : ℕ)
     (hD : (lowerCentralLayerKernelInAmbient C i).map C.subtype =
@@ -781,7 +790,7 @@ private theorem lowerCentralLayerKernel_agemo_kernel_ambient
   exact hD
 
 /-- Internal group equivalence underlying the indexed linear transport. -/
-private noncomputable def lowerCentralLayerEquivAgemoSuccAt
+noncomputable def lowerCentralLayerEquivAgemoSuccAt
     {P : Type uP} [Group P] (A C : Subgroup P)
     (hAcomm : IsMulCommutative A) :
     letI : CommGroup A :=
@@ -931,7 +940,7 @@ noncomputable def lowerCentralTermOneEquivAgemo
     C.subtype A.subtype C.subtype_injective A.subtype_injective
     (lowerCentralTerm C 1) (Agemo A 2 s) hB x
 
-private theorem lowerCentralLayerOne_agemo_kernel_ambient
+theorem lowerCentralLayerOne_agemo_kernel_ambient
     {P : Type uP} [Group P] (A C : Subgroup P)
     (s : ℕ)
     (hD : (lowerCentralLayerKernelInAmbient C 1).map C.subtype =

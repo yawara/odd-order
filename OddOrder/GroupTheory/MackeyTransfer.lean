@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import Mathlib.GroupTheory.DoubleCoset
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import Mathlib.GroupTheory.DoubleCoset
 import OddOrder.GroupTheory.TransferTransitivity
 
 /-!
@@ -40,6 +42,8 @@ mathlib の transfer は左剰余類 `G ⧸ H` ベースなので、Isaacs の�
 4. `transfer_def` で両辺を結ぶ。
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

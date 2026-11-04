@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 
 /-!
@@ -36,6 +41,8 @@ The `TICyclicHypothesis`-generic layer of the (8.8)/(10.7) grid transpose
   swap, a full `hyp₁`-grid column is a full `hyp₂`-grid row at the two-level
   `subgroupOf`-transported index (value-level transports, no `Eq.rec`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Field.Basic
-import Mathlib.Algebra.Field.Subfield.Basic
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Algebra.Field.Subfield.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Ring.RingNF
 import OddOrder.Algebra.FixedPointDensity
 
 /-!
@@ -52,6 +54,8 @@ numerator and denominator by `a^{2μ}` gives the form used here, which avoids in
 * `sectionFour_lambda_eq_one` — `λ = 1` and `b² + a^{-2μ²} = ζ + ζ⁻¹`, from `ζ ∉ F`.
 * `eq_one_of_sq_eq_one_of_odd_pow` — `μ² = 1` and odd order give `μ = 1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

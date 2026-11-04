@@ -1,4 +1,24 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # BG Theorem 15.7(e) — pinning the witness prime to the TI-failure intersection
@@ -14,6 +34,8 @@ takes three steps (BG mmd L4264-4266):
 Split out of `PisetBetaDisjoint` (which supplies the witness and the `O_p`/`O_{p'}` structure) to
 keep that file under the 1500-line split trigger; see issues 3022 and 0124.
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S15
 
 open OddOrder.GroupTheory

@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SplitSemisimpleCount
+module
+
+public import OddOrder.Algebra.SplitSemisimpleCount
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
 /-!
@@ -27,6 +33,8 @@ modulo the maximal ideal of `𝒪` gives a relation among the `τ_i`
 
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_blockTrace_pRegular_eq_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

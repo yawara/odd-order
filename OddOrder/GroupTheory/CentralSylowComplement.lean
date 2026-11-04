@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # A central Sylow subgroup gives a normal `p`-complement
@@ -23,6 +28,8 @@ central element of order `4`, so `⟨y⟩` is one of them.
 * `OddOrder.GroupTheory.hasNormalPComplement_of_sylow_le_center`
 * `OddOrder.GroupTheory.hasNormalPComplement_centralizer_of_sylow_zpowers`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

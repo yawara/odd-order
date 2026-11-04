@@ -3,9 +3,21 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # The general Peterfalvi (1.7.b): equal-degree induced constituents (abelian inertia quotient)
@@ -30,6 +42,8 @@ The proof assembles the bottom-up chain:
 Here `induce_smul_eq_mul_sum_of_invariant` combines the last two into
 `e · Ind_H^K θ = ψ · ∑_β Inf(β)`, exhibiting the constituents `ψ·Inf(β)` (all of degree `ψ(1)`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

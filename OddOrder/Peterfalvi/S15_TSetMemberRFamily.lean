@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_BridgeCharacter
+module
+
+public import OddOrder.Peterfalvi.S15_BridgeCharacter
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+public import OddOrder.Peterfalvi.S16_GridExpansion -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §9/§13 — the (5.2.d) member `R`-families for the `T`-instance §9 family
@@ -20,6 +28,8 @@ Everything is parametric in the ν-grid supply `pins : NuGridSupplyData` and the
 (14.9)-conclusional `hTP`/`Tdata` (the established `T`-side parameter layer, cf.
 `dadeHypT0`/`tauTbetaGrid`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

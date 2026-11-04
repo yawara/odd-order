@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
-import OddOrder.GroupTheory.RepresentationTheory.PermutationCharacter
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.PermutationCharacter
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # Peterfalvi Part II, Ch. III: `⟨Ind λ, Ind λ⟩ = 2` (Theorem C, step (7))
@@ -25,6 +32,8 @@ the induction formula.  The norm chain is Frobenius reciprocity
 permutation character of the doubly transitive action on `Ω`
 (`inner_induce_trivial_of_eq_stabilizer`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

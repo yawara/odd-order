@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
 
 /-!
 # Isaacs Ch. 9 — §9A: components と Theorem 9.4 (pp. 273-274)
@@ -35,6 +37,8 @@ Lemma 9.3 は Thm 2.6 (`Ch02.isMinimalNormal_le_normalizer_of_isSubnormal`) を�
    `⁅H,K⁆ ≤ H ⊓ K`. `⁅H,K⁆ ≠ ⊥` なら中の minimal normal `M ≤ H ⊓ K` を取り,
    `M` での同じ場合分けが全て矛盾または `key` で閉じる.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

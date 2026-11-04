@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 /-!
 # Block-partitioned square matrices have blocks of equal size
@@ -23,6 +25,8 @@ rather than a rank argument: a nonzero determinant forces a permutation `σ` wit
 * `OddOrder.Matrix.exists_perm_forall_ne_zero`
 * `OddOrder.Matrix.card_eq_card_of_det_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Matrix
 

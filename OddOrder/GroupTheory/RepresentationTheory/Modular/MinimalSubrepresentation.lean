@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.SimpleModule.Basic
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 
 /-!
@@ -23,6 +26,8 @@ which is what `exists_irreducibleBrauerCharacter_eq` consumes.
 * `OddOrder.RepresentationTheory.Modular.exists_minimal_invariant`
 * `OddOrder.RepresentationTheory.Modular.isSimpleModule_subrepresentation_of_minimal`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

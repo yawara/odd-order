@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FixedPointFree
-import Mathlib.GroupTheory.Nilpotent
+module
+
+public import Mathlib.GroupTheory.FixedPointFree
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 
@@ -23,6 +27,8 @@ Kapitel II, Satz 10.13 for this fact rather than proving it.  The hypothesis
 `1 < n` is the exact translation of Peterfalvi's `q > 2`; the case `n = 1`
 has group order `72` and is not simple.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MackeyTransfer
-import OddOrder.GroupTheory.WeaklyClosed
+module
+
+public import OddOrder.GroupTheory.MackeyTransfer
+public import OddOrder.GroupTheory.WeaklyClosed
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
 
@@ -32,6 +38,8 @@ This file develops the transfer ingredients:
 * the resulting double-coset difference formula (formula (17)), on top of the Mackey
   formula `transfer_eq_prod_doubleCoset` (Isaacs Thm 10.10) already available.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -412,7 +420,7 @@ theorem sylow_le_commutator_normalizer [Finite G] (hp2 : p ≠ 2) (P : Sylow p G
   obtain ⟨x, ⟨hxP, hxNc⟩, hmin⟩ :=
     exists_min_orderOf (S := {y : G | y ∈ (P : Subgroup G) ∧ y ∉ Nc})
       (by
-        obtain ⟨y, hyP, hyNc⟩ := SetLike.not_le_iff_exists.mp hcon
+        obtain ⟨y, hyP, hyNc⟩ := IsConcreteLE.not_le_iff_exists.mp hcon
         exact ⟨y, hyP, hyNc⟩)
   have hmin' : ∀ y ∈ (P : Subgroup G), orderOf y < orderOf x → y ∈ Nc := by
     intro y hyP hlt

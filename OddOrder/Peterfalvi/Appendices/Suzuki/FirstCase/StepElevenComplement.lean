@@ -3,7 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): the complement `T = [R, s]` and regularity
@@ -17,6 +32,8 @@ inverted by the distinguished involution, the decomposition `R = T × P`, the
 The remaining clause of step (11), `T ⋊ C_Q(P) ≅ F ⋊ F^*`, is in
 `StepElevenSemidirect.lean`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

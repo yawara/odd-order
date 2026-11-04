@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the conjugate summand split
@@ -24,6 +31,8 @@ coprime fixed-point lifting would produce an `ω`-fixed representative outside
 isomorphism `ω` itself forms an `IsomorphicOrderQModuleSplit`, the input of
 the type-B recognition of Appendix III, Theorem (e).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -137,7 +146,7 @@ theorem map_quotientCongr_ne_of_fixedPoints_le
   intro hstab
   classical
   -- a nonidentity central involution `s`
-  obtain ⟨s, hsZ, hsbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hZbot)
+  obtain ⟨s, hsZ, hsbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hZbot)
   have hs1 : s ≠ 1 := by
     intro h1
     exact hsbot (by rw [h1]; exact Subgroup.one_mem ⊥)

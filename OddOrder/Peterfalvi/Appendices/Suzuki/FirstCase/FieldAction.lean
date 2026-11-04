@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
-import Mathlib.FieldTheory.Fixed
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II, Ch. II, step (1): the field model adapted to `P`
@@ -19,6 +26,8 @@ the field `F ≅ Q₀`.  The adapted model records the coordinates `eQ` on
 key consequence of (B1): the only elements of `F` fixed by all of `P` are
 `0` and `1`.  Artin's lemma then gives `[F : F₂] = p`, so `|Q₀| = 2^p`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

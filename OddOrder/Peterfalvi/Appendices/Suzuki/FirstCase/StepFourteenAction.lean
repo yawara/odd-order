@@ -3,7 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteen
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (14): the action of `N_G(RΣ)` on `𝒜₂`
@@ -25,6 +41,8 @@ Conjugation is written with the pointwise action of `MulAut G` on `Subgroup G`,
 which is the mathlib idiom; `smul_eq_map_conj` bridges it to the `Subgroup.map`
 form used in `StepFourteen`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -684,7 +702,7 @@ theorem exists_orderOf_pow_three_mem_normalizerRSigma_notMem_sup
     norm_num at hcon
   have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
     (p := 3) X.isPGroup' hRltX
-  obtain ⟨x, hxY, hxR⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨x, hxY, hxR⟩ := IsConcreteLE.exists_of_lt hgrow
   refine ⟨x, hxY.2, hxR, ?_⟩
   obtain ⟨j, hj⟩ := (IsPGroup.iff_orderOf).mp X.isPGroup' ⟨x, hxY.1⟩
   exact ⟨j, by rwa [Subgroup.orderOf_mk] at hj⟩

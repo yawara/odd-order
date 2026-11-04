@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
@@ -24,6 +30,8 @@ fiber has `2`-power cardinality would not suffice for an arbitrary odd-order
 permutation; the invariant normal coset is the essential group-theoretic
 input.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeParameterBranching
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFirstAlignedParameterBranch
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPrescribedFactorTransport
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
 import OddOrder.Isaacs.Appendix.SubgroupBasics
 
@@ -17,6 +23,8 @@ This leaf dispatches all three oriented aligned-parameter alternatives.  The
 second and third alternatives require genuinely reversed pairwise joins; their
 normalized coordinate packages are reconstructed on those literal joins.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

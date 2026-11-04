@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
 # The defining field and Tits twist for Suzuki groups
@@ -15,6 +17,8 @@ For `m : ℕ`, the Suzuki group `Sz(q)` is defined over the finite field of orde
 This is shared infrastructure for the Suzuki target in **Peterfalvi, Part II,
 Chapter I, Theorem A** (pp. 97–98).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

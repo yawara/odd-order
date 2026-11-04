@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockOfSimpleModule
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # An irreducible representation has one of the irreducible Brauer characters
@@ -22,6 +28,8 @@ This is the step that makes the decomposition numbers meaningful: every composit
 
 * `OddOrder.RepresentationTheory.Modular.exists_irreducibleBrauerCharacter_eq`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,10 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_TypeIIIGalois
-import OddOrder.Peterfalvi.S13_TypeDetermination
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+module
+
+public import OddOrder.Peterfalvi.S12_Section9Counts
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.NilpotentAbelianization
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S13_TypeDetermination
+import OddOrder.Peterfalvi.S13_TypeIIIGalois
 
 /-!
 # Peterfalvi (11.9.c) — the non-Galois `u = a` pin
@@ -45,6 +59,8 @@ This is the keystone of the (11.9.c) non-Galois exclusion: downstream, `u = a` c
 `q ∣ u − 1` (`card_uActionHom_range_modEq_one`) and `a ∣ p − 1` into `q ≤ p − 2 < p`,
 contradicting (11.9.b) `p < q` — so case (9.7.b) (Galois) holds and `U` is cyclic.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialKeystone
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
@@ -26,6 +32,8 @@ decomposition `hV`).  Two inputs are taken as hypotheses, to be discharged separ
 * `hcent` — **BG Prop 1.5** (`C_{P/Z}(xᵏ) = 1`, i.e. `x` is fixed-point-free on `P/Z`), from the
   hypothesis `C_P(xᵏ) = Z(P)` via coprime action.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

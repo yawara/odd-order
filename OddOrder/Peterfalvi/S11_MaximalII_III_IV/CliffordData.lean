@@ -1,4 +1,14 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.Mathlib.SchurZassenhausConj -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # TAIL
@@ -6,6 +16,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData` (2000-line limit, issue
 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
@@ -122,7 +134,7 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
     apply hfixne
     rw [← hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
     exact hle
-  obtain ⟨c, hcCfix, hcN⟩ := SetLike.not_le_iff_exists.mp hCfixN
+  obtain ⟨c, hcCfix, hcN⟩ := IsConcreteLE.not_le_iff_exists.mp hCfixN
   intro hW2H0
   have hcG_W2 : (data.typeP.H.subtype c) ∈ data.typeP.W2 := by
     rw [← hCHW1]; exact Subgroup.mem_map_of_mem _ hcCfix

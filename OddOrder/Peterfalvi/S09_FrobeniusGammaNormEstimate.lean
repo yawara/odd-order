@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Frobenius-family Gamma norm estimate (Peterfalvi 7.8.b)
@@ -18,6 +24,8 @@ Textbook: Peterfalvi, Section 7, pp. 40-42, equation (7.8.b).
 Coq comparison: `PFsection7.v`, `coherent_norm_1` and the proof of
 `CoherentFrobeniusPartition`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 
@@ -39,10 +47,7 @@ variable (C : Subgroup ↥(F.L i))
 variable (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
   ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
 
-private noncomputable abbrev localH78 :=
-  F.hypothesis78 i hodd hnilp C hFrob
-
-private noncomputable abbrev localBD :=
+noncomputable abbrev localBD :=
   F.hypothesis78_betaDecomp i hodd hnilp C hFrob
 
 /-- The induced principal member has norm square equal to the Frobenius

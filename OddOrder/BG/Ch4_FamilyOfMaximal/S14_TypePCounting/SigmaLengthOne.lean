@@ -1,4 +1,27 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Conjugacy145C
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Conjugacy145C
+import Mathlib.Algebra.Group.Pointwise.Set.Card
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # TAIL
@@ -6,6 +29,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Conjugacy145C
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
@@ -31,7 +56,7 @@ theorem normalizer_eq_self_of_mem_maximalSubgroups [Finite G]
   · exact h.symm
   · exfalso
     have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hcoatom.2 _ h)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
     · exact hG.ne_bot_of_isCoatom hcoatom hb
     · exact hcoatom.1 ht
 

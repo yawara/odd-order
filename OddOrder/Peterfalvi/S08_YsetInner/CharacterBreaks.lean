@@ -3,21 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_Coherence
-import OddOrder.Peterfalvi.S06_CertainHypothesis46
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.FixedPointFree
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import Mathlib.GroupTheory.FiniteAbelian.Duality
-import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
 # Peterfalvi §8: character expansions and coherence breaks
@@ -29,6 +24,8 @@ coherent-break construction used by the §8 descent.  Split from `S08_YsetInner`
 
 Reference note: `notes/peterfalvi/s08_coherence_theorems.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

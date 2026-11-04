@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.7 — §7C Thompson normal p-complement (pp. 215–219)
@@ -11,6 +22,8 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 This leaf contains the quotient identifications and the minimum-counterexample
 assembly for Thompson's normal `p`-complement theorem (Isaacs Theorem 7.1).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -361,7 +374,7 @@ theorem lt_normalizer_inf_sylow_of_lt
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact (ne_of_lt hD_lt) (le_antisymm hD_le htop)
   have hlt := hNC (D.subgroupOf (S : Subgroup H)) hsub_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   rw [← Subgroup.subgroupOf_normalizer_eq hD_le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hD_le) ?_

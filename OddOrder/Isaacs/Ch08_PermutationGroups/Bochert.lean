@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.GroupTheory.GroupAction.Jordan
 import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 
@@ -22,6 +26,8 @@ nonidentity `x, y ∈ G` moving exactly one common point, so `⁅x, y⁆ ∈ G` 
 `3`-cycle (Lem 8.25) and the `3`-cycle Jordan theorem forces
 `Alt(Ω) ≤ G`, a contradiction; hence `m ≤ n/2` and `(n-m)! ≥ ⌊(n+1)/2⌋!`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

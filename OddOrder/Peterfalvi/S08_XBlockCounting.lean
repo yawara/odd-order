@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.Peterfalvi.S08_CoherenceBasic
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
 
 /-!
@@ -17,6 +23,8 @@ Prefix-split from `OddOrder.Peterfalvi.S08_CoherenceCore` (2000-line limit, issu
 the restriction/orthogonality family was further moved to
 `OddOrder.Peterfalvi.S08_CentralCommutatorRestriction` (issue 0189, 1500-line limit).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

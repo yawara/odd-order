@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
 
 /-!
 # The Wedderburn splitting of `K[G]` is a block splitting
@@ -28,6 +34,8 @@ through `e` — inside the trace computation of `OrdinaryDecomposition`, which i
 * `OddOrder.RepresentationTheory.Modular.trace_wedderburn_eq_sum_decompositionMatrix` — the
   defining property of `D`, read in `K`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

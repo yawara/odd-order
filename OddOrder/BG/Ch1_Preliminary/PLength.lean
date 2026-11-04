@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # `p`-length one
@@ -22,6 +27,8 @@ and the `GroupTheory` layer sits *below* `Isaacs`.
 `O_{p',p,p'}(G)/O_{p',p}(G) = O_{p'}(G/O_{p',p}(G))` and a group equals its own `O_{p'}` iff
 it is a `p'`-group. So we encode it directly as `p ∤ |G / O_{p',p}(G)|`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1
 

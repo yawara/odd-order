@@ -3,12 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
+module
+
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7D part 1: Burnside p^a q^b setup (Thm 7.8 stmt,
 scaffolding, Steps 2-9 decomp, faithful-action bridge) (pp. 219-222)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -187,8 +199,7 @@ theorem opCore_eq_bot_of_simple_nonsolvable
     (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H) :
     OddOrder.Isaacs.Ch01.opCore r H = ⊥ := by
   have := OddOrder.Isaacs.Ch01.opCore.normal r H
-  rcases Subgroup.Normal.eq_bot_or_eq_top
-    (OddOrder.Isaacs.Ch01.opCore.normal r H) with h | h
+  rcases Subgroup.Normal.eq_bot_or_eq_top (OddOrder.Isaacs.Ch01.opCore r H) with h | h
   · exact h
   · exfalso
     -- opCore r H = ⊤ ⇒ H is an r-group ⇒ solvable, contradiction.
@@ -277,8 +288,7 @@ theorem normalClosure_eq_top_of_simple_of_ne_bot
     {V : Subgroup G} (hV_ne_bot : V ≠ ⊥) :
     Subgroup.normalClosure (V : Set G) = ⊤ := by
   have := Subgroup.normalClosure_normal (s := (V : Set G))
-  rcases Subgroup.Normal.eq_bot_or_eq_top
-    (Subgroup.normalClosure_normal (s := (V : Set G))) with h | h
+  rcases Subgroup.Normal.eq_bot_or_eq_top (Subgroup.normalClosure (V : Set G)) with h | h
   · -- V ≤ normalClosure V = ⊥ ⇒ V = ⊥, contradiction.
     exfalso
     apply hV_ne_bot

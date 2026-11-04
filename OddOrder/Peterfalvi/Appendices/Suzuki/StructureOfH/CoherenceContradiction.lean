@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
 import OddOrder.Peterfalvi.Appendices.FeitSibleyCoherentImage
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
 
 /-!
 # Peterfalvi Part II, Ch. III, Theorem C: `Q` is a `2`-group
@@ -42,6 +51,8 @@ orthogonality used above, reads:
 * `Q1_eq_bot` — `Q₁ = 1`, the form the proof produces.
 * `isPGroup_two_Q` — **Theorem C** as the book states it: `Q` is a `2`-group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -344,7 +355,8 @@ theorem Q1_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   -- `G` is not simple, so `Q₁ = 1` — contradiction
   have hG : ¬ IsSimpleGroup G := by
     intro hs
-    rcases hs.eq_bot_or_eq_top_of_normal _ hN_normal with h | h
+    rcases hs.eq_bot_or_eq_top_of_normal
+      (OddOrder.Peterfalvi.S03.characterKernelSubgroup hf.isCharacter) with h | h
     · exact hN_ne_bot h
     · exact hN_ne_top h
   exact hQ1 (sc.Q1_eq_bot_of_not_isSimpleGroup ind hG)

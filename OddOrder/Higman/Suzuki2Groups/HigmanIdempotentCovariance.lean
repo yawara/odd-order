@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
 
 /-!
 # Higman Lemma 3: covariance and the zero-or-one conclusion
@@ -25,6 +30,8 @@ steps of Higman's argument:
 The kernel of the resulting homomorphism, the calculation of `C / A`, and the
 final exponent-at-most-four conclusion are not claimed here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

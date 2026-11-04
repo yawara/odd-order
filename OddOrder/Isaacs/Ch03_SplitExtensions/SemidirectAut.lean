@@ -3,17 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.Frattini
-import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.Solvable
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Mathlib.Subgroup
-import OddOrder.Mathlib.SchurZassenhausConj
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.PGroup
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 
@@ -28,6 +26,8 @@ automorphism-order bounds Thm 3.3 (Horosevskii, via Ch.2 Thm 2.20 Lucchini) and 
 Split from `OddOrder.Isaacs.Ch03_SplitExtensions.Basic` (issue 0149, the longFile-1500
 campaign); `Basic` imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

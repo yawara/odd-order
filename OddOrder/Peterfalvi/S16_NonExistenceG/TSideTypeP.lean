@@ -1,14 +1,15 @@
-import OddOrder.BG.AppC_NormSet
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+module
+
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.Peterfalvi.S15_SAndT
-import OddOrder.Peterfalvi.S16_CaseBOrder
-import OddOrder.BG.AppC_LemmaC3_FixedPointFree
-import OddOrder.Peterfalvi.S16_CoreLemmas
-import OddOrder.Peterfalvi.S16_G0Coprime
-import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S16_PairingBessel
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
 
 /-!
 # TSideTypeP
@@ -16,6 +17,8 @@ import OddOrder.Peterfalvi.S16_PairingBessel
 Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (14.3)-(14.7) — the subgroup L over N_G(U)

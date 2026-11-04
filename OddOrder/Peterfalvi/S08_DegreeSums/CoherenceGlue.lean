@@ -3,14 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_YsetConjugation
-import OddOrder.Peterfalvi.S08_InducedKernelFamily
+module
+
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
 
 /-!
 # Peterfalvi §8: X/Y coherence glue
 
 Y-set coherence, X-set character facts, and X/Y glue split under issue 0073.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

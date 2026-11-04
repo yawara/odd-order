@@ -3,10 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Case (3) of the Ch. III §1 Proposition: `W ≠ 1`
@@ -44,6 +57,8 @@ that is equivalent to `p ∤ q₀ − 1` and genuinely fails otherwise (issue 01
 * `SecondCaseHypothesis.trichotomy` — the Proposition itself, now with no
   hypothesis left over.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

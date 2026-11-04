@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.HermitianCocycle
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+module
+
+public import OddOrder.Algebra.HermitianCocycle
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The unitary coordinates of a Hermitian twisted product
@@ -34,6 +42,8 @@ directly on the twisted product of Chapter III §3.
 * `ofUnitary` — the element with prescribed unitary coordinates, and
   `eq_of_unitaryCoord_eq` — those coordinates determine it.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

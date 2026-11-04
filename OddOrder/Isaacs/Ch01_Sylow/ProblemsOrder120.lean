@@ -3,10 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch01_Sylow.Basic
-import OddOrder.Isaacs.Ch01_Sylow.Theorem131
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.Theorem131
 
 /-!
 # Isaacs Problem 1C.4 — 位数 120 の群の指数 3 または 5 の部分群
@@ -40,6 +45,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1C (p. 18) のうち�
   部分群を持つ (`n₅ = 6 ∧ n₃ = 10` は計数矛盾 24 + 20 > 29 ⟹ 正規 Sylow 5 か 3 が存在、
   Sylow 2 との join が位数 10 か 6)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

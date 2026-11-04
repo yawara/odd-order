@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.GroupTheory.Subgroup.Simple
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
@@ -39,6 +46,8 @@ Wielandt 9.1 (`SubMulAction.ofStabilizer.isMultiplyPretransitive`) で 1 点ず�
 - `isSimpleGroup_of_five_transitive_degree_twentyfour` — **Problem 8C.5** 本体。
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch08
 
 open MulAction
@@ -70,7 +79,7 @@ theorem not_isSimpleGroup_of_card_eq_twentytwo {H : Type*} [Group H] (h : Nat.ca
       omega
   have : Subsingleton (Sylow 11 H) := (Nat.card_eq_one_iff_unique.mp hn).1
   have : (P : Subgroup H).Normal := Sylow.normal_of_subsingleton P
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (P : Subgroup H) inferInstance with hb | ht
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (P : Subgroup H) with hb | ht
   · rw [hb] at hPcard
     simp at hPcard
   · rw [ht, Subgroup.card_top, h] at hPcard

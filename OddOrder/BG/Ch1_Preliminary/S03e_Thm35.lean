@@ -3,16 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.LinearAlgebra.Eigenspace.Pi
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.GroupTheory.Commutator.Basic
-import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+module
+
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35Prelim
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 
 /-!
 # BG §3: Theorem 3.5 (Frobenius action with one-dimensional fixed space)
@@ -51,6 +55,8 @@ Sibling of Theorem 3.4 (`S03d_Thm34.lean`, complete); upstream of Theorem 3.6 (m
 `notes/bg/s03_thm35.md`.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03e
 

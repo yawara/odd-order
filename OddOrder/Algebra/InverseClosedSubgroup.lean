@@ -3,13 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Field.Subfield.Basic
-import Mathlib.Algebra.Ring.Subring.Basic
+module
+
+public import Mathlib.Algebra.Field.Subfield.Basic
+public import Mathlib.Algebra.CharP.Defs
 import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Finiteness
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.Ring
+public import Mathlib.Tactic.Ring.Basic -- shake: keep (used by a proof inside an exposed definition)
+public import Mathlib.Algebra.Field.IsField -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Additive subgroups of a field that are closed under inversion
@@ -46,6 +46,8 @@ crucially *no* hypothesis on the trace is needed.
 * `pow_four_eq_one_or_forall_mem` — **the dichotomy**: in `𝔽_{3^q}` with `q` prime such a `W`
   either is everything, or has `s ^ 4 = 1` for each of its nonzero elements.
 -/
+
+@[expose] public section
 
 namespace OddOrder.InverseClosed
 

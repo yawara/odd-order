@@ -3,13 +3,30 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
-import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
 
 /-!
 # BG §10 局所補題 — Core (Prop 10.11, Lemma 10.12)
@@ -24,6 +41,8 @@ mmd `references/bg/local-analysis.mmd` L2856-2894 周辺。
 Lemma 10.13 cluster は leaf `S10_LocalLemmas.lean` (本ファイルを import) に在る。
 粒度規約による prefix-split (issue 0063; module 名は下流 import 不変のため leaf 側が保持)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -209,7 +228,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
     · exact h
     · exfalso
       have : R.Normal := Subgroup.normalizer_eq_top_iff.mp h
-      rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with h' | h'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal R with h' | h'
       · exact hRne h'
       · exact (mem_maximalSubgroups.mp hM).1
           (top_le_iff.mp (h' ▸ hRE.trans hEM : (⊤ : Subgroup G) ≤ M))
@@ -430,7 +449,7 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
     · exact h
     · exfalso
       have : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp h
-      rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) inferInstance with h' | h'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) with h' | h'
       · exact hPne h'
       · exact (mem_maximalSubgroups.mp hM).1
           (top_le_iff.mp (h' ▸ hP_le_M : (⊤ : Subgroup G) ≤ M))

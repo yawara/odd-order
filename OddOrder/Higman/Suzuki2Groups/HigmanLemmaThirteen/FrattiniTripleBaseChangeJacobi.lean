@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleJacobi
 
 /-!
@@ -17,6 +21,8 @@ actual `Phi(P)^2`-valued triple commutator survive extension of scalars to the
 common Singer field.  In particular, a nonzero diagonal triple bracket is
 incompatible with the two off-diagonal vanishings used in Higman's B/B case.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,6 +3,12 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
 import OddOrder.Peterfalvi.S08_CoherenceCore
 
@@ -26,6 +32,8 @@ feeds the norm-weighted (5.6) bound `xSum_le_two_psi_caseB`, a column break feed
 (`centralCommutator_card_subgroupOf_lower_c2_caseA`, `W₁` FPF on `Z`), the arithmetic core
 `false_of_centralCommutator_break_arith` yields a contradiction.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

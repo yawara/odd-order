@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-import Mathlib.GroupTheory.Index
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the normal subgroups of `Sym Ω` (Cor 8.28)
@@ -22,6 +24,8 @@ The proof needs `Z(Sym Ω) = 1`, which is also absent from mathlib (mathlib's
 `Equiv.Perm.alternatingGroup.center_eq_bot` is the centre of the *alternating* group), so it is
 proved here first as `center_perm_eq_bot`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 
@@ -89,7 +93,7 @@ theorem normal_perm_eq_bot_or_alternating_or_top (hα : 5 ≤ Fintype.card α)
   have hsimple : IsSimpleGroup (alternatingGroup α) :=
     alternatingGroup.isSimpleGroup (by rwa [Nat.card_eq_fintype_card])
   have : (N.subgroupOf (alternatingGroup α)).Normal := Subgroup.Normal.subgroupOf ‹N.Normal› _
-  rcases hsimple.eq_bot_or_eq_top_of_normal (N.subgroupOf (alternatingGroup α)) inferInstance with
+  rcases hsimple.eq_bot_or_eq_top_of_normal (N.subgroupOf (alternatingGroup α)) with
     hbot | htop
   · -- `N ⊓ A = 1`: `sign` separates the elements of `N`, so `N ≤ Z(Sym Ω) = 1`.
     left

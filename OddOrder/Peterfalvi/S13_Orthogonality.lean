@@ -3,12 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
-import OddOrder.Peterfalvi.S11_NineElevenCaseA
-import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
-import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
+public import OddOrder.Peterfalvi.S12_Section9Counts
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S07_BridgeCoherent
+import OddOrder.Peterfalvi.S09_Building78C
+import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.Peterfalvi.S12_MaximalTypesSetup
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_MaximalIII_IV
 
 /-!
 # Peterfalvi Section 13: the (11.8.6) orthogonality endpoint — unconditional `𝒮(H₀C)` coherence
@@ -29,6 +37,8 @@ transfer, the Clifford dispatch, the reducible-μ-column witness, and — since 
 (9.11.1)–(9.11.8) squeeze completed — the caseA branch too, whose endpoint
 `S11.nineEleven_coherent_A0` takes no refuter hypothesis (see the re-measurement note below).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 

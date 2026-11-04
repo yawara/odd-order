@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibley
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibley
+public import Mathlib.GroupTheory.Complement
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 
 /-!
 # Peterfalvi Appendix IV: coherence of `𝒮(Q')` (pp. 145–146)
@@ -17,6 +27,8 @@ Notation" block (p. 145) with their elementary facts, the `H = Q ⋊ D` counting
 (`ssetOf_Qder_coherent`), and the degree-square bound of step (1)–(2)
 (`exists_deg_sq_le_of_mem_SsetOf`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
@@ -721,7 +733,7 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
     have := hyp.sup_S_Qder_conj_mem_of_mem_Q hgQ hn
     simpa using this
   -- the quotient is nontrivial
-  obtain ⟨q0, hq0Q, hq0N⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨q0, hq0Q, hq0N⟩ := IsConcreteLE.exists_of_lt hlt
   set k0 : ↥(hyp.Q.subgroupOf hyp.H) :=
     ⟨⟨q0, hyp.Q_le_H hq0Q⟩, Subgroup.mem_subgroupOf.mpr hq0Q⟩ with hk0
   have : Nontrivial (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := by

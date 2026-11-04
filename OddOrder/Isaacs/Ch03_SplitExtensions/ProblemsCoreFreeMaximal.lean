@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
 
 /-!
@@ -43,9 +51,11 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.5 の形式化
 - `conj_of_isCoatom_normalCore_eq_bot` — **Problem 3C.5 後半** (核自明な極大部分群は共役)。
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch03
 
-open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
+open Pointwise
 
 section /- 3C: Problem 3C.5 (p. 91) -/
 

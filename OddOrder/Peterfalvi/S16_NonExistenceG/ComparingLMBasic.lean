@@ -1,5 +1,14 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S15_SAndT -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # Peterfalvi §16 — comparing L and M: opening layer
@@ -7,6 +16,8 @@ import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory

@@ -3,10 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.Higman.Suzuki2Groups.Classification
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
 
 /-!
 # The two `K`-subgroups of `S` of order `q²`
@@ -34,6 +48,8 @@ and its properties — and packages the resulting pair.
   is a Suzuki `2`-group with `|Q| = |Q₀|³`, there are two distinct `K`-invariant
   subgroups `X ≠ Y` with `Q₀ ≤ X, Y ≤ Q` and `|X| = |Y| = |Q₀|²`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

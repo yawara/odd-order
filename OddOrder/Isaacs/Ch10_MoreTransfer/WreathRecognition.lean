@@ -3,14 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Pointwise.Set.Card
+module
+
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.IsMetacyclic
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.LinearAlgebra.Eigenspace.Zero
-import Mathlib.GroupTheory.RegularWreathProduct
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.IsMetacyclic
-import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 
 /-!
 # Isaacs §10A — structure of class-generated index-`p` elementary abelian setups (pp. 295-301)
@@ -45,6 +51,8 @@ Lem 10.14 = `not_isMetacyclic_wreath`) も本 leaf に実装済み。
   `Ch04.nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p_pow`
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch10
 
 open OddOrder.GroupTheory
@@ -73,7 +81,7 @@ private lemma le_center_of_center_not_le {A : Subgroup P} [A.Normal]
     (hnot : ¬ Subgroup.center P ≤ A) : A ≤ Subgroup.center P := by
   have hp_prime : p.Prime := hp.out
   have hQcard : Nat.card (P ⧸ A) = p := by rw [← Subgroup.index_eq_card]; exact hidx
-  obtain ⟨z, hz_mem, hz_notA⟩ := SetLike.not_le_iff_exists.mp hnot
+  obtain ⟨z, hz_mem, hz_notA⟩ := IsConcreteLE.not_le_iff_exists.mp hnot
   -- the image z̄ generates P ⧸ A
   have hz_bar_ne : ((z : P) : P ⧸ A) ≠ 1 := by
     simpa [QuotientGroup.eq_one_iff] using hz_notA
@@ -596,7 +604,7 @@ lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
     intro htop
     rw [htop, Subgroup.index_top] at hidx
     exact hp.out.one_lt.ne' hidx.symm
-  obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
+  obtain ⟨u, -, hu⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
   exact ⟨u, hu⟩
 
 set_option backward.isDefEq.respectTransparency false in
@@ -932,7 +940,7 @@ private theorem cor105_aux (n : ℕ) :
           calc p = p ^ 1 := (pow_one p).symm
             _ < p ^ 2 := Nat.pow_lt_pow_right hp_prime.one_lt (by omega)
         omega
-      obtain ⟨z, hz_cent, hz_nb⟩ := SetLike.not_le_iff_exists.mp hnotle
+      obtain ⟨z, hz_cent, hz_nb⟩ := IsConcreteLE.not_le_iff_exists.mp hnotle
       have hz_ne : z ≠ 1 := fun h => hz_nb (h ▸ Subgroup.one_mem _)
       have hzA : z ∈ A := hZle hz_cent
       have hz_pow : z ^ p = 1 := Subtype.ext_iff.mp (hEA.2 ⟨z, hzA⟩)

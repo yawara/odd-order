@@ -3,13 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.GroupTheory.Complement
 import OddOrder.Isaacs.Ch01_Sylow.Theorem131
+public import OddOrder.GroupTheory.ChermakDelgado -- shake: keep (re-exported via `export`)
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Isaacs.Ch01_Sylow.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch01
 open scoped IsMulCommutative
 
@@ -284,7 +291,7 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
   -- Extract an element x ∈ S, x ∈ Nd, x ∉ D.
   obtain ⟨⟨x, hxS⟩, hxNd_sub, hxD_sub⟩ :
       ∃ y : Ssub, y ∈ Nd.subgroupOf Ssub ∧ y ∉ D.subgroupOf Ssub := by
-    obtain ⟨y, hyN, hyD⟩ := SetLike.exists_of_lt hlt_S
+    obtain ⟨y, hyN, hyD⟩ := IsConcreteLE.exists_of_lt hlt_S
     exact ⟨y, hyN, hyD⟩
   have hxNd : x ∈ Nd := (Subgroup.mem_subgroupOf).mp hxNd_sub
   have hxD : x ∉ D := fun hxD =>
@@ -322,7 +329,7 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
     -- Symmetric for T.
     obtain ⟨⟨xT, hxTS⟩, hxTN_sub, hxTD_sub⟩ :
         ∃ y : Tsub, y ∈ Nd.subgroupOf Tsub ∧ y ∉ D.subgroupOf Tsub := by
-      obtain ⟨y, hyN, hyD⟩ := SetLike.exists_of_lt hlt_T
+      obtain ⟨y, hyN, hyD⟩ := IsConcreteLE.exists_of_lt hlt_T
       exact ⟨y, hyN, hyD⟩
     have hxTN : xT ∈ Nd := (Subgroup.mem_subgroupOf).mp hxTN_sub
     have hxTD : xT ∉ D := fun hxTD' =>
@@ -1074,7 +1081,7 @@ theorem not_isSimpleGroup_of_card_sylow_sq_gt
   have hOp : opCore p G ≠ ⊥ := opCore_ne_bot_of_card_sylow_sq_gt hAbel P hcard
   -- 単純性から `O_p(G) = ⊤`
   have hOptop : opCore p G = ⊤ :=
-    (hsimple.eq_bot_or_eq_top_of_normal (opCore p G) inferInstance).resolve_left hOp
+    (hsimple.eq_bot_or_eq_top_of_normal (opCore p G)).resolve_left hOp
   -- したがって `G` 自身が `p`-群
   have hPG : IsPGroup p G := by
     have h := opCore_isPGroup p G
@@ -1086,7 +1093,7 @@ theorem not_isSimpleGroup_of_card_sylow_sq_gt
     have := hPG.center_nontrivial (G := G)
     exact (Subgroup.nontrivial_iff_ne_bot _).mp this
   have hZtop : Subgroup.center G = ⊤ :=
-    (hsimple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance).resolve_left hZ
+    (hsimple.eq_bot_or_eq_top_of_normal (Subgroup.center G)).resolve_left hZ
   let : CommGroup G := Group.commGroupOfCenterEqTop hZtop
   -- 可換単純群の位数は素数。`p`-群なので `p` 冪 ⟹ 指数は `1` ⟹ `|G| = p`。
   have hprime : (Nat.card G).Prime := IsSimpleGroup.prime_card

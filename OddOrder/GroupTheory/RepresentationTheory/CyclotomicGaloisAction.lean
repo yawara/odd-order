@@ -3,16 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import Mathlib.Algebra.DirectSum.LinearMap
-import Mathlib.Algebra.MvPolynomial.Equiv
-import Mathlib.Data.Nat.ChineseRemainder
+import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.FieldTheory.IsAlgClosed.Classification
-import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
 import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-import Mathlib.LinearAlgebra.Semisimple
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
-import Mathlib.RingTheory.RootsOfUnity.Complex
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 
 /-!
 # Peterfalvi (1.9): cyclotomic Galois automorphisms acting on character values
@@ -51,6 +49,8 @@ Note that a nontrivial such `σ` is necessarily discontinuous and does **not** c
 complex conjugation globally — but it does commute with conjugation on cyclotomic values
 (the Galois group of `ℚ_n/ℚ` is abelian), which is what coherence transport needs.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 
@@ -236,7 +236,7 @@ theorem exists_complexRingEquiv_extends (K : IntermediateField ℚ ℂ) (v : K �
     have h3 : hs.1.aevalEquiv (MvPolynomial.C (v x)) = algebraMap K A (v x) := by
       rw [← MvPolynomial.algebraMap_eq, AlgEquiv.commutes]
     rw [he_def]
-    simp only [RingEquiv.trans_apply, AlgEquiv.coe_ringEquiv, MvPolynomial.mapEquiv_apply]
+    simp only [RingEquiv.trans_apply, AlgEquiv.coe_toRingEquiv, MvPolynomial.mapEquiv_apply]
     rw [h1, h2, h3]
   refine ⟨IsAlgClosure.equivOfEquiv ℂ ℂ e, fun x => ?_⟩
   have hx : (x : ℂ) = algebraMap A ℂ (algebraMap K A x) := by

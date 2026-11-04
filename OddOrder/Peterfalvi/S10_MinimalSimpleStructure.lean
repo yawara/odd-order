@@ -3,6 +3,29 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
+public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_ConjugationTransport
 import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 import OddOrder.Peterfalvi.S10_TypePSupport
 
@@ -12,6 +35,8 @@ import OddOrder.Peterfalvi.S10_TypePSupport
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleStructure` (2000-line limit, issue 0103 第 2
 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S10
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
@@ -1259,7 +1284,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         exact Subtype.ext
           ((huniq _ ⟨(e.symm j.down).2, OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl _⟩).trans
             (huniq _ ⟨(e.symm k.down).2, hconj⟩).symm)
-      exact ULift.ext _ _ (e.symm.injective hsub)
+      exact ULift.ext (e.symm.injective hsub)
     primeFactors_cover := fun p _ => by
       rw [OddOrder.BG.Ch4.S16.sigma_reps_prime_cover hG hrepsMax hreps p]
       constructor
@@ -1274,7 +1299,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [Finset.disjoint_left]
       intro p hpj hpk
       have hne : (e.symm j.down).1 ≠ (e.symm k.down).1 := fun h =>
-        hjk (ULift.ext _ _ (e.symm.injective (Subtype.ext h)))
+        hjk (ULift.ext (e.symm.injective (Subtype.ext h)))
       have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (e.symm j.down).1 ∩
           OddOrder.BG.Ch3.S10.sigma (e.symm k.down).1 :=
         ⟨(hbridge (e.symm j.down) _ (htyped (e.symm j.down)) p).mp hpj,
@@ -1339,7 +1364,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         intro hconj
         apply hjk
         obtain ⟨_, _, huniq⟩ := hreps (e.symm j.down).1 (hrepsMax _ (e.symm j.down).2)
-        exact ULift.ext _ _ (e.symm.injective (Subtype.ext
+        exact ULift.ext (e.symm.injective (Subtype.ext
           ((huniq _ ⟨(e.symm j.down).2, OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl _⟩).trans
             (huniq _ ⟨(e.symm k.down).2, hconj⟩).symm)))
       exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D

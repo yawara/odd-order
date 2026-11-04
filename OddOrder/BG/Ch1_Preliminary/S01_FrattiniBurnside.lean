@@ -3,26 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ChiefFactor
-import OddOrder.GroupTheory.FittingSelfCentralizing
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import Mathlib.Order.Minimal
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # S01_FrattiniBurnside
 
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S01_Solvable` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §1: Elementary Properties of Solvable Groups

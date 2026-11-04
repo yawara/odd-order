@@ -1,13 +1,14 @@
+module
+
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Module.ZMod
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Solvable
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Mathlib.SemidirectProduct
-import OddOrder.Mathlib.Subgroup
+import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs §4A (part 1) — commutator identities, coatom lemmas, Lem 4.5/4.6 (pp. 113-122)
@@ -17,6 +18,8 @@ import OddOrder.Mathlib.Subgroup
 `commutatorElement_pow_left_of_class_le_two` は分割に伴い private を外した
 (ファイル跨ぎ private 禁止規約)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 
@@ -33,55 +36,6 @@ private lemma conj_commutator_split (g a b : G) :
   simp only [commutatorElement_def]
   group
 
-/-- **Isaacs Lemma 4.1**: `H, K ≤ G` のとき `H` は `⁅H, K⁆` を正規化する.
-**仮定なし版** (H, K の正規性を要求しない).
-
-証明: 一般 identity `g · ⁅a, b⁆ · g⁻¹ = ⁅g a, b⁆ · ⁅b, g⁆` を使用. h ∈ H に対して
-`h · ⁅h', k⁆ · h⁻¹ = ⁅h h', k⁆ · ⁅k, h⁆`. 両因子は `⁅H, K⁆` 内. 生成元から
-closure_induction で一般元へ. -/
-theorem subgroup_le_normalizer_commutator_self (H K : Subgroup G) :
-    H ≤ Subgroup.normalizer (⁅H, K⁆ : Subgroup G) := by
-  -- For h ∈ H and x ∈ ⁅H,K⁆, both h x h⁻¹ ∈ ⁅H,K⁆ and h⁻¹ x h ∈ ⁅H,K⁆ hold by the
-  -- same closure induction (since h⁻¹ ∈ H as well).
-  have key : ∀ h ∈ H, ∀ x ∈ (⁅H, K⁆ : Subgroup G),
-      h * x * h⁻¹ ∈ (⁅H, K⁆ : Subgroup G) := by
-    intro h hh x hx
-    induction hx using Subgroup.closure_induction with
-    | mem y hy =>
-      rcases hy with ⟨h', hh', k, hk, rfl⟩
-      rw [conj_commutator_split]
-      refine Subgroup.mul_mem _ ?_ ?_
-      · exact Subgroup.commutator_mem_commutator (H.mul_mem hh hh') hk
-      · -- ⁅k, h⁆ ∈ ⁅K, H⁆ = ⁅H, K⁆.
-        have hKH : ⁅k, h⁆ ∈ (⁅K, H⁆ : Subgroup G) :=
-          Subgroup.commutator_mem_commutator hk hh
-        rwa [Subgroup.commutator_comm] at hKH
-    | one => simp
-    | mul x y _ _ ihx ihy =>
-      have eq : h * (x * y) * h⁻¹ = (h * x * h⁻¹) * (h * y * h⁻¹) := by group
-      rw [eq]
-      exact Subgroup.mul_mem _ ihx ihy
-    | inv x _ ihx =>
-      have eq : h * x⁻¹ * h⁻¹ = (h * x * h⁻¹)⁻¹ := by group
-      rw [eq]
-      exact Subgroup.inv_mem _ ihx
-  intro h hh
-  rw [Subgroup.mem_normalizer_iff]
-  intro x
-  refine ⟨key h hh x, fun hx => ?_⟩
-  -- (⇐): conjugate `h * x * h⁻¹` back by `h⁻¹`.
-  have hh_inv : h⁻¹ ∈ H := H.inv_mem hh
-  have := key h⁻¹ hh_inv (h * x * h⁻¹) hx
-  have eq : h⁻¹ * (h * x * h⁻¹) * h⁻¹⁻¹ = x := by group
-  rwa [eq] at this
-
-/-- **Isaacs Lemma 4.1** (symmetric form): `K` も `⁅H, K⁆` を正規化する.
-`⁅H, K⁆ = ⁅K, H⁆` 経由で上記から導出. -/
-theorem subgroup_le_normalizer_commutator_self_right (H K : Subgroup G) :
-    K ≤ Subgroup.normalizer (⁅H, K⁆ : Subgroup G) := by
-  rw [Subgroup.commutator_comm]
-  exact subgroup_le_normalizer_commutator_self K H
-
 /-- **Isaacs Lem 4.1 系**: `H ⊔ K = ⊤` ⇒ `⁅H, K⁆` は G で normal.
 `H` も `K` も `⁅H, K⁆` を正規化 (Lem 4.1) ⇒ `H ⊔ K ≤ N(⁅H, K⁆)`, `⊤ ≤ N(⁅H, K⁆)`,
 よって `⁅H, K⁆.Normal`. mathlib `commutator_normal` instance は `H, K` 両方 G で normal
@@ -90,8 +44,8 @@ theorem commutator_normal_of_sup_eq_top {H K : Subgroup G} (hsup : H ⊔ K = ⊤
     (⁅H, K⁆ : Subgroup G).Normal := by
   refine Subgroup.normalizer_eq_top_iff.mp ?_
   rw [← top_le_iff, ← hsup]
-  exact sup_le (subgroup_le_normalizer_commutator_self H K)
-    (subgroup_le_normalizer_commutator_self_right H K)
+  exact sup_le (Subgroup.normalizer_commutator_ge_left H K)
+    (Subgroup.normalizer_commutator_ge_right H K)
 
 /-! **Isaacs Lemma 4.2** (quotient/map commutator):
 `f : G →* G'` の像での commutator は元の像の commutator.
@@ -193,7 +147,7 @@ mathlib `Subgroup.commutator_top_left_le_iff` 直接 (Lemma 4.3 iff の `K = ⊤
 
 /-- General commutator identity (no hypothesis):
 `⁅x * y, z⁆ = x * ⁅y, z⁆ * x⁻¹ * ⁅x, z⁆`. -/
-private lemma commutatorElement_mul_left_eq (x y z : G) :
+lemma commutatorElement_mul_left_eq (x y z : G) :
     ⁅x * y, z⁆ = x * ⁅y, z⁆ * x⁻¹ * ⁅x, z⁆ := by
   simp only [commutatorElement_def]
   group
@@ -434,48 +388,6 @@ theorem isElementaryAbelian_quotient_of_frattini_le_of_pgroup
     rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
     exact hΦ (pow_p_mem_frattini_of_pgroup hP x)
 
-/-- **Helper**: For any group `G` and subgroup `M ≤ G` with prime index, `M` is a coatom
-(maximal proper subgroup) in the subgroup lattice.
-
-**証明**: M.index = p ≥ 2 ⇒ M ≠ ⊤. For M < K, by `relIndex_mul_index`,
-`M.relIndex K * K.index = M.index = p`, so K.index = 1 or p. If K.index = p, then
-`M.relIndex K = 1` so K = M, contradicting M < K. Hence K.index = 1, K = ⊤. -/
-private lemma isCoatom_of_index_prime {G : Type*} [Group G] {M : Subgroup G}
-    {p : ℕ} (hp : p.Prime) (h_idx : M.index = p) : IsCoatom M := by
-  refine ⟨?_, ?_⟩
-  · -- M ≠ ⊤
-    intro h_top
-    rw [h_top, Subgroup.index_top] at h_idx
-    exact hp.one_lt.ne' h_idx.symm
-  · -- ∀ K, M < K → K = ⊤
-    intro K hMK
-    by_contra h_K_ne_top
-    -- M ≤ K, use relIndex_mul_index
-    have hMK_le : M ≤ K := hMK.le
-    have h_eq : M.relIndex K * K.index = M.index :=
-      Subgroup.relIndex_mul_index hMK_le
-    rw [h_idx] at h_eq
-    -- K.index ∣ p, so K.index = 1 or p
-    have h_dvd : K.index ∣ p := by
-      refine ⟨M.relIndex K, ?_⟩
-      linarith [h_eq, Nat.mul_comm K.index (M.relIndex K)]
-    rcases hp.eq_one_or_self_of_dvd _ h_dvd with h1 | hp_eq
-    · -- K.index = 1 ⇒ K = ⊤
-      have hK_top : K = ⊤ := Subgroup.index_eq_one.mp h1
-      exact h_K_ne_top hK_top
-    · -- K.index = p ⇒ M.relIndex K = 1 ⇒ M = K, contradicting M < K
-      rw [hp_eq] at h_eq
-      have h_rel_one : M.relIndex K = 1 := by
-        have hp_pos : 0 < p := hp.pos
-        have : M.relIndex K * p = 1 * p := by rw [h_eq, one_mul]
-        exact Nat.eq_of_mul_eq_mul_right hp_pos this
-      have hM_eq_K : M = K := by
-        -- M.relIndex K = 1 ⇒ M.subgroupOf K = ⊤
-        have := Subgroup.relIndex_eq_one.mp h_rel_one
-        -- this : K ≤ M (since M.subgroupOf K = ⊤ means everything in K is in M)
-        exact le_antisymm hMK_le this
-      exact absurd hM_eq_K (ne_of_lt hMK)
-
 -- rc2: scoped `IsMulCommutative → CommGroup` (consistent with the ambient `Group`,
 -- unlike an explicit `{ … with mul_comm }` which makes a diamond).
 open scoped IsMulCommutative in
@@ -580,7 +492,7 @@ theorem frattini_le_of_isElementaryAbelian_quotient_of_pgroup
     rw [Subgroup.index_comap_of_surjective _ QuotientGroup.mk_surjective]
     exact h_M_quot_index
   -- M is a coatom (maximal proper subgroup)
-  have h_M_coatom : IsCoatom M := isCoatom_of_index_prime hp.out h_M_index
+  have h_M_coatom : IsCoatom M := Subgroup.isCoatom_of_index_prime (h_M_index ▸ hp.out)
   -- Φ(P) ⊆ M
   have hfrat_le_M : frattini P ≤ M := frattini_le_coatom h_M_coatom
   -- Contradiction: x ∈ Φ(P) ⊆ M but x ∉ M
@@ -694,7 +606,7 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
 /-- Helper: For `A ⊴ G` and `b ∈ A`, `⁅b, g⁆ ∈ A` for any `g : G`.
 
 `⁅b, g⁆ = b · (g · b⁻¹ · g⁻¹)`. `b⁻¹ ∈ A` + A normal ⇒ `g · b⁻¹ · g⁻¹ ∈ A`. -/
-private lemma commutatorElement_mem_of_normal {A : Subgroup G} [A.Normal]
+lemma commutatorElement_mem_of_normal {A : Subgroup G} [A.Normal]
     {b : G} (hb : b ∈ A) (g : G) : ⁅b, g⁆ ∈ A := by
   have heq : ⁅b, g⁆ = b * (g * b⁻¹ * g⁻¹) := by
     rw [commutatorElement_def]; group

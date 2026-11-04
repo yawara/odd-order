@@ -3,11 +3,16 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.Peterfalvi.S08_YsetInner
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
-import OddOrder.Peterfalvi.S08_InducedKernelFamily
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 /-!
 # Peterfalvi (6.2), general kernel: the induced family `S(X)`
@@ -33,6 +38,8 @@ consuming the break is `S08_CoherenceWeighted` (`coherentDegreeSqNormBound_of_no
 (`S08_CoherenceCorePart1`, already general).  Reference: issue 2022; Coq `PFsection6.v`
 `coherent_seqIndD_bound` (the `\unless` induction whose contrapositive the break realizes).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

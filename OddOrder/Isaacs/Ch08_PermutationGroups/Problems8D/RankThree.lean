@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
 
 /-!
@@ -28,6 +37,8 @@ Isaacs のヒント通り `k_m` が `1 + m + n` を割ることを使う。
 
 - `succ_dvd_of_rank_three` — **Problem 8D.5** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

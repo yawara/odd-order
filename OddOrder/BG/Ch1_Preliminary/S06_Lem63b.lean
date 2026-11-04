@@ -3,11 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S06_Additional
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.Complement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
 import OddOrder.GroupTheory.FrattiniPGroup
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Sylow
-import Mathlib.Data.Nat.Factorization.Basic
 
 /-!
 # BG §6.3(b): the derived subgroup of a solvable group with `|G/G'|` prime
@@ -48,6 +54,8 @@ clause is Lemma 6.3(a) applied to `H := G'` (`⁅G',K⁆ = G'`) sandwiched betwe
 
 * BG, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), Lemma 6.3(b).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

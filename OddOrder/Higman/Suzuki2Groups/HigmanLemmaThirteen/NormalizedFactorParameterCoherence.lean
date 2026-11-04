@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Tactic.NormNum.Ineq
+import Mathlib.Tactic.NormNum.Pow
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
@@ -21,6 +27,8 @@ that the two source eigenvalues lie in one Frobenius orbit.  Higman's
 alternative would make the two positive lower-half representatives sum to
 `n`, which can happen only when they are already equal.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

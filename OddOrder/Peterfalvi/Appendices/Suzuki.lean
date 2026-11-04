@@ -3,52 +3,58 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
-import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
-import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
-import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
-import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
-import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.FieldAction
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+module -- shake: keep-all
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
+public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.FieldAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BrauerHomomorphism
-import OddOrder.Algebra.SubgroupTruncation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+module
+
+public import OddOrder.Algebra.BrauerHomomorphism
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The Brauer homomorphism as a map into `k[H]`
@@ -31,6 +37,8 @@ homomorphism, hence the induced block `b^G` is defined.
 * `OddOrder.RepresentationTheory.Modular.brauerTrunc_mul_of_mem_center` — multiplicativity
 * `OddOrder.RepresentationTheory.Modular.brauerTrunc_classSum`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

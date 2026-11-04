@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.GlaubermanReplacement
+import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
@@ -31,6 +40,8 @@ Thm 2.10 の仮定に取る. ⚠ repo 既存の `OddOrder.BG.AppA.IsPStable` は
 (odd solvable) では `AppA.stabilityLiftAux` (Gorenstein 6.5.3) が本条件をそのまま与える
 ので, discharge は BG 側 (issue 3017/3024) で行う. Issue 9403.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

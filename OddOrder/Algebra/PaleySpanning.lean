@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.CharP.Defs
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Algebra.Ring.Parity
+public import Mathlib.Data.Fintype.Card
 import Mathlib.FieldTheory.Finite.Basic
 
 /-!
@@ -76,6 +83,8 @@ the problem: that graph is symmetric, hence never Sidon.
 * `exists_paley_collision_of_pow_add` — **one Paley point** at which `z ↦ z ^ E` is additive on
   `(a, 1)` collides with its own inverse.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Paley
 

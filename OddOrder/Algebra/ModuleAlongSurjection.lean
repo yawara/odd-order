@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Ideal.Quotient.Operations
-import Mathlib.RingTheory.SimpleModule.Basic
+module
+
+public import Mathlib.RingTheory.SimpleModule.Basic
 
 /-!
 # Modules along a surjection of rings
@@ -25,6 +26,8 @@ either way.
 * `OddOrder.moduleOfSurjective` — the push-forward module structure
 * `OddOrder.isSimpleModule_of_surjective`, `OddOrder.isSimpleModule_compHom`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

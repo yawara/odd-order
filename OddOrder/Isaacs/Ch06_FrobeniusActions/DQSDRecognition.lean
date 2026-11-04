@@ -3,15 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.QuaternionRecognition
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.13/6.14 D/Q/SD recognition + Thm 6.12 first
 enlargement (pp. 192-193)
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

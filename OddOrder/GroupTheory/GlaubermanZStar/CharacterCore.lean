@@ -3,9 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.Fusion
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
+module
+
+public import OddOrder.GroupTheory.GlaubermanZStar.Fusion
+public import Mathlib.FieldTheory.PurelyInseparable.Basic
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Valuation.LocalSubring
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 
 /-!
@@ -30,6 +42,8 @@ Brauer–Suzuki.
 * `OddOrder.GroupTheory.MinimalConfig.character_conj_mul_eq` — Step 8 at `h = 1`
 * `OddOrder.GroupTheory.MinimalConfig.character_const_on_class_product` — Step 8
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03 OddOrder.RepresentationTheory.Modular
 open OddOrder.RepresentationTheory OddOrder.MatrixModule

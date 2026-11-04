@@ -3,27 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.Combinatorics.Matroid.Init
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Dimension.Finite
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.Order.OrderIsoNat
-import Mathlib.RingTheory.Artinian.Module
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import Mathlib.RingTheory.DedekindDomain.Basic
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
-import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
-import OddOrder.GroupTheory.ChiefFactor
-import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # AppA_PStabilityBasic
 
 Prefix-split from `OddOrder.BG.AppA_PStability` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Appendix A: p-Stability — Theorems A.1 and A.2

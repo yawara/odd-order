@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.Henselian
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
@@ -34,6 +37,8 @@ occur in the statements, so as an instance it would be reported as unused.
 * `OddOrder.henselianRing_centerGroupAlgebra`
 * `OddOrder.existsUnique_isIdempotentElem_centerGroupAlgebra`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

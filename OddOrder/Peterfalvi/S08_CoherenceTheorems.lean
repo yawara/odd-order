@@ -3,10 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCore
-import OddOrder.Peterfalvi.S08_Theorem65c2
-import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
-import OddOrder.Peterfalvi.S08_PGroupReduction
+module
+
+public import OddOrder.Peterfalvi.S08_XBlockCounting
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CaseBSeedGlue -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_PGroupReduction -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_Theorem65c2 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -23,6 +28,8 @@ constructor).
 
 Reference note: `notes/peterfalvi/s08_coherence_theorems.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

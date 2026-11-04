@@ -1,4 +1,23 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # Conjugacy145C
@@ -6,6 +25,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Theorem 14.4 / Lemma 14.5 — sigma-length one centralizers
@@ -200,9 +221,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     have hNMle : Subgroup.normalizer M ≤ M := by
       rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
       · exact heq.ge
-      · rcases hG.simple.eq_bot_or_eq_top_of_normal M
-            (Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hMmax).2 _ hlt)) with hb |
-                ht
+      · have := Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hMmax).2 _ hlt)
+        rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
         · exact absurd hb hMne
         · exact absurd ht (mem_maximalSubgroups.mp hMmax).1
     -- Decompose `c = v * a` with `v ∈ N_σ`, `a ∈ M ⊓ N` (in `↥N`, since `N_σ ⊴ N`).
@@ -547,9 +567,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
       have hN_M₂_le : Subgroup.normalizer M₂ ≤ M₂ := by
         rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M₂)) with heq | hlt
         · exact heq.ge
-        · rcases hG.simple.eq_bot_or_eq_top_of_normal M₂
-              (Subgroup.normalizer_eq_top_iff.mp
-                ((mem_maximalSubgroups.mp hM₂max).2 _ hlt)) with hb | ht
+        · have := Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM₂max).2 _ hlt)
+          rcases hG.simple.eq_bot_or_eq_top_of_normal M₂ with hb | ht
           · exact absurd hb hM₂ne
           · exact absurd ht (mem_maximalSubgroups.mp hM₂max).1
       -- `L` conjugate to `M₂` (else Thm 13.9 σ-disjoint, but `q ∈ σ(M₂) ∩ σ(L)`).

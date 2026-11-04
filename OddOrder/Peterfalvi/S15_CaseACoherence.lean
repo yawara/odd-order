@@ -3,9 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 import OddOrder.Peterfalvi.S15_NineElevenSevenEight
+import OddOrder.Peterfalvi.S15_NineElevenSteps
 import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
-import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.8) — the `S`-instance caseA coherence endgame and assembly
@@ -27,6 +41,8 @@ The endgame of the honest `S`-instance (9.11) campaign, on the step lemmas of
   `tau1S_ofHonest_inner_induce`, `tau1S_ofHonest_induce_mem_ZIrr`) for the (13.3)
   `CharacterDegreeData` `τ₁`-fields.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

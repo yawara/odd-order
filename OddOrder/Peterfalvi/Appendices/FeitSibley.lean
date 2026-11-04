@@ -3,9 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
-import OddOrder.Peterfalvi.S08_GeneralAdjoin
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+import Mathlib.GroupTheory.FixedPointFree
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S08_GeneralAdjoin
 
 /-!
 # Peterfalvi Appendix IV: The Feit-Sibley Theorem
@@ -63,6 +75,8 @@ Per-result status:
 | Lemma 2(c) (`hasNoRealCharacters_Sset`) | **proved** (issue 1053, `Odd |Q₁|` hyp.) |
 | Theorem (`feit_sibley_coherence`) | **proved** (`FeitSibleyMain`, issue 1054) |
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

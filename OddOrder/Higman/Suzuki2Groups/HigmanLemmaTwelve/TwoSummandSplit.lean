@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+public import Mathlib.GroupTheory.Commutator.Finite -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities -- shake: keep (used by a proof inside an exposed definition)
+public import Mathlib.Algebra.Torsor.Defs -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Higman theorem (d): the actual two-summand split
@@ -22,6 +32,8 @@ model count `|X| = |F|²`, and complementarity descends from
 `X ⊓ Y = Φ(P)`, `X ⊔ Y = ⊤`.  This constructs Peterfalvi's
 `OrderQModuleSplit` payload with `Z := Z(P)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

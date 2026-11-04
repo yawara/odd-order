@@ -3,14 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Critical subgroups (Gorenstein Thm 5.3.11 / 5.3.13)
@@ -56,6 +57,8 @@ predicate `IsCritical : Subgroup G → Prop` を採用 (mathlib 互換, no-wrapp
 Gorenstein の (i) は `C/Z(C)` elementary abelian も含むが, それは (i-a)+commutator
 から導出可能なので def には入れず補題で与える.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -190,7 +193,7 @@ theorem centralizer_eq_self_of_maximal_abelian_normal
   have : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective M)
   -- `H̄ ≠ ⊥`: pick `h ∈ H \ M`, then `q h ≠ 1`.
   have hHbar_ne : Hbar ≠ ⊥ := by
-    obtain ⟨h, hhH, hhM⟩ := SetLike.exists_of_lt hMH
+    obtain ⟨h, hhH, hhM⟩ := IsConcreteLE.exists_of_lt hMH
     intro hbot
     apply hhM
     have : q h ∈ Hbar := Subgroup.mem_map_of_mem q hhH
@@ -543,7 +546,7 @@ theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C
         -- `Q ≤ C`.
         have hQC : Subgroup.centralizer (C : Set P) ≤ C := by
           by_contra hQnotC
-          rw [SetLike.not_le_iff_exists] at hQnotC
+          rw [IsConcreteLE.not_le_iff_exists] at hQnotC
           obtain ⟨q₀, hq₀Q, hq₀C⟩ := hQnotC
           -- `Q̄ := Q.map q` is normal and nontrivial.
           have hQchar : (Subgroup.centralizer (C : Set P)).Characteristic :=

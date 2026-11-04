@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Character
-import Mathlib.RepresentationTheory.Invariants
+module
+
+public import Mathlib.RepresentationTheory.Character
 
 /-!
 # The sum of a character over the group counts the invariants
@@ -25,6 +26,8 @@ reduction to the residue field.
 
 * `OddOrder.RepresentationTheory.sum_character_eq_card_mul_finrank_invariants`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -1,4 +1,10 @@
-import OddOrder.Peterfalvi.S15_NuRowPin
+module
+
+public import OddOrder.Peterfalvi.S15_NuRowPin
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Peterfalvi.S15_CaseACoherence
 
 /-!
@@ -29,6 +35,8 @@ The pin is **bundled at construction** (`[[lean-nonempty-some-erases-witness-pin
 invariant across inhabitants (the `q = 3` flip), so it cannot be recovered from a bare
 `Nonempty.some`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

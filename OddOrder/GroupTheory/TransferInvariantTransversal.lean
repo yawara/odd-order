@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
+module
+
+public import Mathlib.GroupTheory.Transfer
 
 /-!
 # Transfer over a transversal invariant under conjugation
@@ -27,6 +29,8 @@ It is genuinely different from `MonoidHom.transfer_eq_pow`, whose hypothesis (ev
 conjugate `g₀⁻¹ xᵏ g₀` that lands in `H` already equals `xᵏ`) *fails* in that
 application: here only a *single* transversal need be closed under `x`-conjugation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

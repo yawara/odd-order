@@ -3,11 +3,33 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # BG §13: Prime Action
@@ -49,6 +71,8 @@ Thm 13.4/13.5/13.9/13.10)。
   `S10.sigma_complement_commutator_cyclic_normal` (Prop 10.11(d)). Keep those as
   upstream proof gates when filling Lemma 13.8 / Theorem 13.10.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 
@@ -195,7 +219,7 @@ theorem actsPrimeOn_Msigma_of_mem_tau13 [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNZne : Subgroup.normalizer (Subgroup.zpowers g : Set G) ≠ ⊤ := by
     intro htop
     have : (Subgroup.zpowers g).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers g) inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers g) with hb | ht
     · exact hZne hb
     · exact hMcoatom.1 (top_le_iff.mp (ht ▸ hZM))
   obtain ⟨Mstar, hMstarCo, hNZM⟩ :=
@@ -352,7 +376,7 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     have hNxne : Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≠ ⊤ := by
       intro htop
       have : (Subgroup.zpowers x).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) with hb | ht
       · exact hxne hb
       · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hxM))
     obtain ⟨Mstar, hMstarCo, hNxM⟩ :=

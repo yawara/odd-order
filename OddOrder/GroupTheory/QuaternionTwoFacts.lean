@@ -3,11 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
-import Mathlib.Tactic.Push
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
 
 /-!
 # Elementary facts about the quaternion group of order `8`
@@ -38,6 +36,8 @@ what `GroupTheory/BrauerSuzukiQ8.lean` uses, `P` being a Sylow `2`-subgroup.
 * `OddOrder.GroupTheory.eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo` — the elements of order `4`
   of `⟨y⟩` are `y` and `y⁻¹`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

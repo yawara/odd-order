@@ -1,4 +1,17 @@
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHomBasic
 
 /-!
 # TAIL
@@ -6,6 +19,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

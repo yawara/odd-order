@@ -3,12 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.SetTheory.Cardinal.NatCard
+module
+
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.Data.Fintype.Lattice
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.Subgroup.Simple
-import Mathlib.Tactic.Ring
 import OddOrder.Mathlib.Subgroup
 
 /-!
@@ -40,6 +39,8 @@ Thm 1.44 / Cor 1.45 / Thm 1.41 / Cor 1.46 は同ファイル後半.
   H1 (`card_HK_mul_card_inf_eq_card_mul_card`), H2 (`le_centralizer_centralizer`),
   `centralizer_sup` を使用.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 
@@ -600,7 +601,7 @@ theorem not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt [Finite G]
   have : M.Normal := inferInstance
   -- G simple ⟹ M = ⊥ or M = ⊤. M ≠ ⊥ ⟹ M = ⊤
   have h_M_top : M = ⊤ :=
-    (h_simple.eq_bot_or_eq_top_of_normal M ‹M.Normal›).resolve_left h_M_ne_bot
+    (h_simple.eq_bot_or_eq_top_of_normal M).resolve_left h_M_ne_bot
   -- M abelian
   have hM_comm : IsMulCommutative M := inferInstance
   -- IsMulCommutative G derivation

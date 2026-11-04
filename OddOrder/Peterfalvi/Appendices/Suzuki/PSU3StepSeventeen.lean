@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (17): `v_i = u_i + α`
@@ -40,6 +46,8 @@ induction can start at `i = 1`.
 * `Hypothesis.stepElevenSeq_snd_fst_eq` — **step (17)**, group form: `w_i = y z_i`.
 * `Hypothesis.stepSeventeen` — the invariant of (11) with `w_i` eliminated.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.AdicCompletion.Basic
+module
+
+public import Mathlib.RingTheory.AdicCompletion.Basic
 
 /-!
 # Adic completeness of a finite product
@@ -30,6 +32,8 @@ an instance it would be reported as unused.
 * `OddOrder.isAdicComplete_of_linearEquiv`
 * `OddOrder.isAdicComplete_of_basis` — a finite free module over a complete ring is complete
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

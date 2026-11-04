@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_NormSet
+module
+
+public import OddOrder.BG.AppC_NormSetBasic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # BG Appendix C: the hypotheses (A) and (B) of Theorem C
@@ -44,6 +47,8 @@ Section 16 configuration.
 identify `H` with its image in `G`"), the two normalizer clauses of (B) are stated for the
 *images* `σ(P₀)` and `σ(U)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

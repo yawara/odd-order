@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.Algebra.PowerMonomialIndependence
+module
+
+public import OddOrder.Algebra.PowerMonomialIndependence
+public import Mathlib.FieldTheory.Separable
+import Mathlib.RingTheory.Trace.Basic
 
 /-!
 # The relation lattice of BG Appendix C, Problem 1
@@ -33,6 +36,8 @@ This file supplies the two ingredients that turn the independence of power monom
 * `span_eq_top_of_trace_annihilator` — the trace-duality spanning criterion for `F³`.
 * `span_triples_eq_top` — **Lemma D**: the relation lattice is everything.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RelationLattice
 

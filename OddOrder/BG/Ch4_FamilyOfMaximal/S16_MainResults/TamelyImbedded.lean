@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
 
 /-! # BG §16, Remark after Theorem II: tamely imbedded subsets
 
@@ -39,6 +47,8 @@ of Type I, a fact we cannot prove"; BG instead add (Tiii) (see `FrobeniusTypeIWi
 which Feit–Thompson confirmed suffices for FT Chapter V (§33).  The definitions below therefore
 encode the **BG** conditions (Ti)–(Tiii), not the FT ones.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

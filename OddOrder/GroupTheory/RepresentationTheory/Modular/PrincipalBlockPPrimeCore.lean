@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+module
+
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
 # Navarro (7.7): `χ(u v) = χ(u)` for `v` in the `p'`-core of `C_G(u)`
@@ -43,6 +54,8 @@ ever used it in that form.  Here the sum stays a sum.
   Navarro (7.7), with the hypothesis `v ∈ O_{p'}(C_G(u))` presented as
   "every Brauer character of `b_0` takes the same value at `v` as at `1`"
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

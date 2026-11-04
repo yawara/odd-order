@@ -3,10 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Sylow
-import Mathlib.RingTheory.Int.Basic
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RingTheory.Coprime.Basic
+import Mathlib.RingTheory.Coprime.Lemmas
 
 /-!
 # Conjugacy-class cardinality: centralizer index and Sylow coprimality
@@ -16,6 +17,8 @@ generic material relocated to a light-import leaf so downstream consumers need n
 class-sum congruence machinery (rep theory + complex analysis + integral closure).  Declarations
 keep their original `OddOrder.RepresentationTheory` namespace so existing call sites are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

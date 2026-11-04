@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.PRegularProjection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 
 /-!
 # Navarro (2.15): `θ̂(x) = θ(x_{p'})` is a virtual character
@@ -38,6 +46,8 @@ ordinary after the `p`-part has been projected away).
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.15) (p. 28).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

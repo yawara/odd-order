@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+import OddOrder.Higman.Suzuki2Groups.HigmanMaximalNormalAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman's Lemma 13: the exponent-four factors
@@ -20,6 +28,8 @@ be maximal normal invariant abelian, so Lemma 9 bounds its exponent by four;
 the homocyclic Agemo classification is incompatible with restricted
 `ξ`-length three at that exponent.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

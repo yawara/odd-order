@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.Jacobson.Radical
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+import Mathlib.RingTheory.Jacobson.Ideal
 import Mathlib.RingTheory.Nilpotent.Basic
 import OddOrder.Algebra.JacobsonCentralSubring
 
@@ -36,6 +41,8 @@ the radical.
 * `OddOrder.exists_corner_inverse_of_isNilpotent` — the characteristic-`p` variant
 * `OddOrder.exists_corner_inverse_of_approx` — an approximate corner inverse can be corrected
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

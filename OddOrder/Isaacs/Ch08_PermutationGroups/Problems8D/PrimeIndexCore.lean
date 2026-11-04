@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.PGroup
-import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # 指数が素数の部分群の `p`-元は核に入る (Isaacs Problem 8D.6 の Hint)
@@ -32,6 +35,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 - `conj_mem_of_orderOf_eq_prime_pow` / `le_normalizer_closure_primePow` — ambient 群
   `G` の部分群 `X ≤ Y` として述べた版 (8D.6 本体はこちらを使う)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

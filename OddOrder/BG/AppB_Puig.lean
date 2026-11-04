@@ -3,11 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.Order.OrderIsoNat
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+module
+
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
 
 /-!
 # BG Appendix B: The Puig Subgroup `L(S)`
@@ -49,6 +53,8 @@ routing: [`bg_s6_appAB_route_2026_05_28.md`](../../notes/meta/bg_s6_appAB_route_
 * `lNIn_even_mono` / `lNIn_odd_anti` / `lNIn_even_le_odd` — **B.1(b)** (`L4547`): 偶増加・奇減少・偶 ≤ 奇.
 * `lStarIn_le_lOddIn` — **B.1(d)** (`L4549`): `L_*(H) ⊆ L(H)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppB
 

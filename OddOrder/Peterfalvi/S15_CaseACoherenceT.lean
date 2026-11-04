@@ -3,7 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S15_NineElevenPairBoundT
 import OddOrder.Peterfalvi.S15_NineElevenSevenEightT
+import OddOrder.Peterfalvi.S15_NineElevenSteps
+import OddOrder.Peterfalvi.S15_NineElevenStepsT
 
 /-!
 # Peterfalvi (9.11) at `T` — norm bound and equality refutation (pp. 87–91)
@@ -22,6 +37,8 @@ The final refuter assembly (`sSet_caseA_nineElevenRefutation_T`) and the `𝒯`-
 dispatch consume these; they live downstream with the pin machinery re-exported through
 `S15_NuRowPin.lean`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

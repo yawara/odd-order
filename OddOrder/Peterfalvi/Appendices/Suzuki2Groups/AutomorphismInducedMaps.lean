@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.End
-import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+module
+
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
@@ -37,6 +41,8 @@ Main declarations:
 * `QuadraticExtension.isElementaryAbelian_ker_autQuotientHom` — hence
   elementary abelian of exponent `2`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

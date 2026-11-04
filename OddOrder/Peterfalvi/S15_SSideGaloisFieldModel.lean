@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S11_GaloisFieldModel
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
 import OddOrder.Peterfalvi.S15_CaseAContradiction
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Peterfalvi (14.6) — the S-side Galois-field model
@@ -28,6 +35,8 @@ provided for callers that already have both equalities unconditionally.
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6), pp. 87–88.
 Coq reference: `coq/theories/PFsection14.v`, `typeP_Galois_P`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

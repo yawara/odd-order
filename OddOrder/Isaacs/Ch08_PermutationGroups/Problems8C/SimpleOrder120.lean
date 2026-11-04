@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+public import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
 import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Isaacs.Ch01_Sylow.Basic
@@ -22,6 +26,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Basic
   忠実なので `G ↪ S₆`, さらに符号写像の核が単純性から `G` 全体になり `G ↪ A₆`,
   前半に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

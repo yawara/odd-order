@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_LemmaC3_Step4Capstone
+module
+
+public import OddOrder.BG.AppC_LemmaC3_Step4Capstone
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: the fixed-point-free argument and `s₁ = s⁻¹`
@@ -28,6 +33,8 @@ Lemma C.3 must produce -- follows from hypotheses (A) and (B) alone.
 
 Migrated from `OddOrder.Peterfalvi.S16_NonExistenceGCore` (issue 0151).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

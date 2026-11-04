@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_LemmaC3_ScalarCalculus
+module
+
+public import OddOrder.BG.AppC_LemmaC3_ScalarCalculus
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: relations (C.4)--(C.7) and the (C.5) normal forms
@@ -23,6 +28,8 @@ relation (C.7).
 
 Migrated from `OddOrder.Peterfalvi.S16_CoreSetupBasic` (issue 0151).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
 
 /-!
@@ -16,6 +25,8 @@ actor-invariant subgroups of restricted `ξ`-length two.  Besides their
 pairwise intersections and joins, this leaf retains the directness identity
 `(X ⊔ Z) ⊓ T = Φ(P)` already supplied by the raw preimage construction.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

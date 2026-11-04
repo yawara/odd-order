@@ -3,13 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_Isometry32
+module
+
+public import OddOrder.Peterfalvi.S05_Isometry32
+public import OddOrder.Peterfalvi.S05_NormThree
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.FieldTheory.Minpoly.IsConjRoot
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Peterfalvi.S05_SigmaIsometry` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S05
 open OddOrder.RepresentationTheory
 

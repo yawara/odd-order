@@ -3,11 +3,30 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+public import OddOrder.GroupTheory.IsExtraspecial
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Theorem 12.13 — every nonabelian `p`-subgroup of `G` lies in `𝒰`
@@ -23,6 +42,8 @@ order `p`。`Q/Z` の `K = C_{M_α}(Z)` 上の作用 + Proposition 1.16 + Propos
 `N_M(Z) ⊆ M*`、`ℳ(N_G(Z)) ≠ {M}`、`M_α ≠ 1`。最後に Proposition 12.4(b) で `A₀, A₀* ∈ ℰ¹(A)−{Z}`
 が `M ∩ M*`(⊇ `Q`)内で非共役となり、`Q` の構造に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -46,7 +67,7 @@ private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hXS.ne (le_antisymm hXS.le htop)
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hsub_lt)
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt (hNC _ hsub_lt)
   rw [← Subgroup.subgroupOf_normalizer_eq hXS.le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hXS.le) (fun heq => ht_not ?_)

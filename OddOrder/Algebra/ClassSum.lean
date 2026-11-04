@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import OddOrder.Algebra.GroupAlgebraConjugation
+module
+
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import OddOrder.Algebra.RelativeTrace
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
@@ -34,6 +41,8 @@ turns statements about defect groups (`e_B ∈ Tr^G_D((𝒪G)^D)`) into statemen
 * `OddOrder.GroupAlgebra.eq_sum_classSum` — the class sum expansion `x = ∑_K x_K · K̂`.
 * `OddOrder.GroupAlgebra.mem_span_classSum` — the centre is spanned by the class sums.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

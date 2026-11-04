@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 import Mathlib.Analysis.Complex.Polynomial.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # Row orthogonality of irreducible characters (first orthogonality), discharged
@@ -32,6 +34,8 @@ The off-diagonal case uses that isomorphic representations have equal characters
 (`Representation.char_iso`): distinct irreducible characters cannot come from isomorphic
 representations, so `char_orthonormal`'s `if Nonempty (Equiv ..)` branch is the `0` branch.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

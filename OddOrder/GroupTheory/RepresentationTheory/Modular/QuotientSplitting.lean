@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.NormalPSubgroupTrivialAction
 import OddOrder.GroupTheory.PRegularQuotient
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 
 /-!
 # The splitting of `k[G/P]` induced by a splitting of `k[G]`
@@ -38,6 +45,8 @@ The Jacobson condition transports because `f : kG ↠ k[G/N]` is surjective with
 * `OddOrder.RepresentationTheory.Modular.ker_quotientPi`
 * `OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_quotientPi` — `φ(g) = φ̄(ḡ)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,8 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): `R = T × P` and the regular action
@@ -28,6 +40,8 @@ to the quotient).  The abelianity of `R`, the `T = [R, s]` decomposition and
 the regularity claim land in subsequent commits (campaign issue 2053; proof
 plan recorded there from the p. 111 reading).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

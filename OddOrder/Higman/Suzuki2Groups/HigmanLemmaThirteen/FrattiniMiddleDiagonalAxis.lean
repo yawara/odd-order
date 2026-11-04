@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman's Lemma 13: the diagonal middle-commutator axis
@@ -15,6 +22,8 @@ For two type-B Frobenius eigenvectors with the same index, a nonzero middle
 Frattini commutator lies on the canonical middle eigenline whose index is the
 cyclic successor of the input index.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

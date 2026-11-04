@@ -3,10 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Dihedral
-import Mathlib.Data.ZMod.Aut
-import Mathlib.Algebra.Group.End
-import Mathlib.GroupTheory.Commutator.Basic
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+import Mathlib.Tactic.Group
 import Mathlib.Tactic.LinearCombination
 
 /-!
@@ -32,6 +32,8 @@ import Mathlib.Tactic.LinearCombination
 回転へ写すことが分かり, `ℤ/n` の加法自己同型 = 単元倍 (`ZMod.AddAutEquivUnits` と同じ
 `f x = f 1 * x` の筋) に帰着する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

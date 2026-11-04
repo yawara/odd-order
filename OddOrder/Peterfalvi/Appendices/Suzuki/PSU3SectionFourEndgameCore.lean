@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.FixedPointDensity
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the field-theoretic endgame
@@ -20,6 +30,8 @@ their assembly — is in `PSU3SectionFourEndgame`, which imports this file.
 This is a prefix split of `PSU3SectionFourEndgame` (it had grown past the 1500-line
 `longFile` limit); the module names of the downstream consumers are unchanged.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

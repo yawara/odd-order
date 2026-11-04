@@ -1,4 +1,11 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # TAIL
@@ -6,6 +13,8 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit` (2000-line limit, issue
 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

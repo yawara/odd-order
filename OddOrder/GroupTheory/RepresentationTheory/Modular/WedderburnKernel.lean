@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 
@@ -37,6 +44,8 @@ This file turns the character-theoretic conclusion into that subgroup:
 * `OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_character_eq` — Navarro's
   objective, packaged as the subgroup
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

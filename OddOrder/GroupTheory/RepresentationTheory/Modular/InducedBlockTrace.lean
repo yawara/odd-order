@@ -3,10 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.SubgroupTruncation
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+public import OddOrder.GroupTheory.PRegularElement
 import OddOrder.Algebra.EigenCornerInverse
 import OddOrder.Algebra.EigenTraceVanishing
 import OddOrder.Algebra.GroupAlgebraIdeal
-import OddOrder.Algebra.SubgroupTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
 
 /-!
@@ -31,6 +36,8 @@ are exactly the four conclusions of (5.6), so the last step towards (5.2) is to 
 
 * `OddOrder.RepresentationTheory.Modular.trace_blockIdempotent_mul_eq_zero` — Navarro (5.7)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Bruhat coordinates for the projective unitary group
@@ -24,6 +27,8 @@ Chapter IV §3, Proposition and Corollary 2** (pp. 129–132).  They supply
 the coordinate input for the canonical-form decomposition
 analogous to **Peterfalvi, Part II, Chapter I §1, Proposition 4(a)**.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

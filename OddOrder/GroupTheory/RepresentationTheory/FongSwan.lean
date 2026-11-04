@@ -3,17 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SolvablePrimeIndex
-import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateDirectSum
-import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import Mathlib.GroupTheory.Solvable
+import Mathlib.LinearAlgebra.FreeModule.PID
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Solvable
-import Mathlib.Data.Set.Finite.Lemmas
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateDirectSum
+import OddOrder.GroupTheory.SolvablePrimeIndex
 
 /-!
 # Fong–Swan: `dim M ∣ |G|` for an absolutely irreducible solvable-group module (BG Lemma 2.3)
@@ -46,6 +43,8 @@ Lemma 2.3), **not** the modular Fong–Swan theorem via Brauer lifting:
 
 * Bender, Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 1994), Lemma 2.3.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 
@@ -105,7 +104,7 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
         -- Pick `x ∉ H`; then `G = ⟨H, x⟩` because `[G:H]` is prime.
         have hHtop : H ≠ ⊤ := by
           intro h; rw [h, Subgroup.index_top] at hHprime; exact Nat.not_prime_one hHprime
-        obtain ⟨x, -, hxH⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hHtop)
+        obtain ⟨x, -, hxH⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hHtop)
         have hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤ := by
           have hHleK : H ≤ Subgroup.closure ((H : Set G) ∪ {x}) := by
             intro h hh; exact Subgroup.subset_closure (Set.mem_union_left _ hh)

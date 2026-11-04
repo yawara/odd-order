@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgameSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
-import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgameSetup
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley endgame (steps (4)–(8))
@@ -26,6 +35,8 @@ class-algebra congruence → (8) conclusion) is built on top.
   `x = 1 ∧ m = 2` (the latter reduces to the former by a sign swap of the `e'`).
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

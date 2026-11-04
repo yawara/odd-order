@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.RingTheory.Finiteness.Prod
 import OddOrder.Higman.Suzuki2Groups.Classification
 
 /-!
@@ -18,6 +26,8 @@ calculation through the honest type-`A`/`B`/`C`/`D` model equivalences and then
 applying the classification theorem proves the exponent-four clause for every
 Suzuki `2`-group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. IV §4, opening paragraph: the dichotomy that closes Theorem A
@@ -47,6 +62,8 @@ not assumed: "`C_G(P)` has 2-rank ≥ 2" is the field
 `SecondCaseHypothesis.twoRank_centralizer_ge_two`, and `ℓ > 2` is
 `PSU3InductionTarget.one_lt_n` transported along `|C_{Q₀}(P)| = ℓ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -439,7 +456,7 @@ theorem nonempty_theoremAConclusion (ih : Hypothesis.TheoremAInductionBelow G Ω
     have hle : (2 : ℕ) ^ m ≤ 2 ^ 1 := Nat.pow_le_pow_right (by norm_num) (by omega)
     omega
   have hm : m ≠ 0 := (Nat.zero_lt_one.trans hn).ne'
-  obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hW)
+  obtain ⟨w, hwW, hwbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hW)
   have hw1 : w ≠ 1 := fun hcon => hwbot (hcon ▸ Subgroup.one_mem ⊥)
   obtain ⟨sfive⟩ := sc.toHypothesis.lemmaFiveSetup_of_orderThree_of_mem_W hwW hw1 hord
     hQsuz hm hQ0card hcardQ ih

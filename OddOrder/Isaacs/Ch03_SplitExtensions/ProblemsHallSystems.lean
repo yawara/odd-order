@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 
 /-!
 # Isaacs Problems 3C (書籍 pp. 90–91) — Hall 部分群と Sylow system
@@ -57,6 +62,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 3C の形式化
 - `IsSylowSystem.exists_isHallSubgroup` — **Problem 3C.3 (a)**。
 - `exists_isSylowSystem` — **Problem 3C.3 (b)**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

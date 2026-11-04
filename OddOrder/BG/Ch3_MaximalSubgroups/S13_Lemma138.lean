@@ -3,7 +3,29 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_FittingHallInvariance
 
 /-!
 # BG §13: Lemma 13.8 (forbidden configuration is impossible)
@@ -15,6 +37,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
 `q`-部分群・`q*`-部分群を持つ対称配置は不可能。Uniqueness / Thm 10.1(b)·10.2 / Lem 12.18 /
 Prop 10.14(d) / Thm 13.4 に依存（13.6 非依存）。`S13_Lemma137` の下流。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 
@@ -252,7 +276,7 @@ theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   apply hG.isSolvable_of_lt_top
   rw [lt_top_iff_ne_top]
   intro htop
-  rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with hc | hc
+  rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with hc | hc
   · apply hP
     rw [eq_bot_iff, ← hc]
     intro x hx
@@ -441,67 +465,6 @@ theorem gap3_assembly [Finite G] {M Mstar Q P : Subgroup G} (hQM : Q ≤ M)
     rw [Subgroup.centralizer_sup]
     exact le_inf inf_le_right hXCQ
   exact hXne (le_bot_iff.mp (hCMαPQ ▸ le_inf inf_le_left hXCPQ))
-
-/-! ## helper: Fitting の同型不変性 (Lemma 13.8 dispatch — Hall 共役の F-primes 一致) -/
-
-/-- **`p`-core の像 ≤ `p`-core** (群同型 `e`): `(O_p(A)).map e ≤ O_p(B)`。像は正規 `p`-部分群
-ゆえ `normal_pgroup_le_opCore`。 -/
-theorem opCore_map_le_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
-    {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
-    (Ch01.opCore p A).map e.toMonoidHom ≤ Ch01.opCore p B := by
-  have : ((Ch01.opCore p A).map e.toMonoidHom).Normal :=
-    (Ch01.opCore.normal p A).map e.toMonoidHom e.surjective
-  exact Ch01.normal_pgroup_le_opCore
-    ((Ch01.opCore_isPGroup p A).of_equiv
-      (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective))
-
-/-- **`p`-core は群同型で保たれる**: `e : A ≃* B` なら `(O_p(A)).map e = O_p(B)`。 -/
-theorem opCore_map_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
-    {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
-    (Ch01.opCore p A).map e.toMonoidHom = Ch01.opCore p B := by
-  refine le_antisymm (opCore_map_le_of_mulEquiv e) ?_
-  have h2 := opCore_map_le_of_mulEquiv (p := p) e.symm
-  have hid : e.toMonoidHom.comp e.symm.toMonoidHom = MonoidHom.id B := by ext x; simp
-  calc Ch01.opCore p B
-      = (Ch01.opCore p B).map (MonoidHom.id B) := (Subgroup.map_id _).symm
-    _ = ((Ch01.opCore p B).map e.symm.toMonoidHom).map e.toMonoidHom := by
-        rw [← hid, Subgroup.map_map]
-    _ ≤ (Ch01.opCore p A).map e.toMonoidHom := Subgroup.map_mono h2
-
-/-- **Fitting 部分群の位数は群同型で不変**: `e : A ≃* B` なら `|F(A)| = |F(B)|`。
-`F = ⨆ O_p` を `opCore_map_of_mulEquiv` + `map_iSup` で写し、`card_map_of_injective`。 -/
-theorem fitting_card_eq_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
-    (e : A ≃* B) : Nat.card ↥(Ch01.fitting A) = Nat.card ↥(Ch01.fitting B) := by
-  have hmap : (Ch01.fitting A).map e.toMonoidHom = Ch01.fitting B := by
-    unfold Ch01.fitting
-    rw [Subgroup.map_iSup]
-    refine iSup_congr (fun p => ?_)
-    have : Fact (p : ℕ).Prime := ⟨p.2⟩
-    exact opCore_map_of_mulEquiv e
-  rw [← hmap, Subgroup.card_map_of_injective e.injective]
-
-/-- **共役 Hall 部分群の `F`-素因子は一致** (Lemma 13.8 dispatch の核): `C` 可解で `H, K` が
-`C` の Hall `θ`-部分群 (相対) なら `π(F(H)) = π(F(K))`。`hall_C` で `H, K` は `C` 内共役、
-`fitting_card_eq_of_mulEquiv` で `|F(H)| = |F(K)|`。
-
-13.8 main: `s ∈ π(F(H))` (`H ⊇ C_{M_β}(P)`) を `π(F(H*))` (`H* ⊇ C_{M*_β}(P)`) へ移送し
-WLOG `s ∈ β(M)` / `β(M*)` の向き切替を可能にする。 -/
-theorem fittingInG_primeFactors_eq_of_isHall_subgroupOf [Finite G] {C H K : Subgroup G}
-    [Group.IsSolvable ↥C] {θ : Set ℕ} (hHC : H ≤ C) (hKC : K ≤ C)
-    (hH : Ch03.IsHallSubgroup θ (H.subgroupOf C)) (hK : Ch03.IsHallSubgroup θ (K.subgroupOf C)) :
-    (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors
-      = (Nat.card ↥(Ch2.S08.fittingInG K)).primeFactors := by
-  obtain ⟨c, hc⟩ := Ch03.hall_C hH hK
-  have ehk : ↥(H.subgroupOf C) ≃* ↥(K.subgroupOf C) := by
-    rw [← hc]
-    exact Subgroup.equivMapOfInjective _ (MulAut.conj c).toMonoidHom (MulAut.conj c).injective
-  have e : ↥H ≃* ↥K :=
-    (Subgroup.subgroupOfEquivOfLe hHC).symm.trans (ehk.trans (Subgroup.subgroupOfEquivOfLe hKC))
-  have h1 : Nat.card ↥(Ch2.S08.fittingInG H) = Nat.card ↥(Ch01.fitting ↥H) :=
-    Subgroup.card_map_of_injective H.subtype_injective
-  have h2 : Nat.card ↥(Ch2.S08.fittingInG K) = Nat.card ↥(Ch01.fitting ↥K) :=
-    Subgroup.card_map_of_injective K.subtype_injective
-  rw [h1, h2, fitting_card_eq_of_mulEquiv e]
 
 /-- **Lemma 13.8 GAP 2 capstone (WLOG dispatch)**: step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
 `C_{M*_α}(P)≠1`) から、`r ∈ β(M*)` が `|C_M(P)|` を割り `r∉σ(M)`、**または** 対称な

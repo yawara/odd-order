@@ -3,11 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.Basic.Complex.Basic
 import Mathlib.Analysis.Complex.Basic
-import Mathlib.Analysis.RCLike.Basic
-import Mathlib.RepresentationTheory.Character
 import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 /-!
 # Conjugate of a character: `χ(g⁻¹) = conj (χ(g))`
@@ -30,6 +31,8 @@ class-function inner product `(α, β)_G = |G|⁻¹ ∑ α(g) · conj(β(g))` us
 this lemma bridges the two and is the foundation for discharging
 `CharacterTableRowOrthogonality`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

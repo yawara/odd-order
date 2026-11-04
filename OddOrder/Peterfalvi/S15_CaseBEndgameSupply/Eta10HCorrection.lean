@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
 import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
 import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
@@ -13,6 +21,8 @@ This file reconstructs the (13.7) correction and norm estimate from the honest
 `CharacterDegreeCore`.  The (7.6) family is based at a `P`-nonkernel irreducible supplied
 by the reducible Core column, so the guarded coefficient-vanishing theorem applies.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

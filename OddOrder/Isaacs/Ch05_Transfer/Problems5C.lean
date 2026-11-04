@@ -3,10 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.AbelianPowerSubgroups
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SchurZassenhaus
-import OddOrder.GroupTheory.AbelianPowerSubgroups
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.WeaklyClosed
-import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # Isaacs Chapter 5 — Problems 5C (transfer と非単純性)
@@ -24,6 +31,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5C (書籍 pp. 162-16
 着手中** (issue 9503; `IsWeaklyClosed` / `exists_mem_normalizer_conj_eq` 等) なので
 本ファイルでは扱わない。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 
@@ -393,7 +402,7 @@ theorem card_eq_two_of_characteristic_relIndex_eq_two [Finite G] [IsSimpleGroup 
     · intro hcon; exact h2 (by simpa using hcon)
   -- `G` は可換 (さもなくば `G' = ⊤` で矛盾)
   have hcomm : ∀ x y : G, x * y = y * x := by
-    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) inferInstance with
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) with
       hbot | htop
     · intro x y
       have hmem2 : ⁅x, y⁆ ∈ _root_.commutator G := by

@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.Isomorphisms
+public import Mathlib.LinearAlgebra.Matrix.Trace
+public import OddOrder.Algebra.CommutatorSpan
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.CommutatorSpanPi
@@ -45,6 +51,8 @@ independent.
 * `OddOrder.ker_blockTrace`, `OddOrder.blockTraceQuotientEquiv`
 * `OddOrder.finrank_quotient_commutatorRadical_eq_card`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

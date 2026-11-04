@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RankOneBNPair
-import OddOrder.GroupTheory.PrimeComplementResidual
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.GroupTheory.PrimeComplementResidual
+import Mathlib.GroupTheory.Nilpotent
 import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
@@ -46,6 +49,8 @@ into a homomorphism `permHom : L →* Equiv.Perm (Option ↥Q)` and reads the Le
 * `Setup.normalCore_eq_bot_of_isSimpleGroup` — the same conclusion in one line when `L`
   happens to be simple, which is the case Peterfalvi Ch. IV §4, step (2) needs.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -254,7 +259,7 @@ theorem map_permHom_range_eq (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
           Equiv.Perm (Option ↥Q) →* Equiv.Perm (Option ↥Q'))
       = (permHom hS').range := by
   rw [permHom_range_eq, permHom_range_eq, MonoidHom.map_closure, Set.image_insert_eq]
-  simp only [MonoidHom.coe_coe]
+  simp only [MonoidHom.coe_ofClass]
   rw [ht, hM]
 
 /-- **The Lemma of Peterfalvi Part II, Ch. IV §1** (p. 123), transport step: if a
@@ -300,7 +305,7 @@ theorem map_permHom_conjQ_eq (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
     simp only [Function.comp_apply]
     rw [map_mul, map_mul, ht]
   rw [permHom_map_conjQ_eq, permHom_map_conjQ_eq, MonoidHom.map_closure, Set.image_union]
-  simp only [MonoidHom.coe_coe]
+  simp only [MonoidHom.coe_ofClass]
   rw [himg, hQ]
 
 /-- **The first half of the Lemma**: `⟨Q^x | x ∈ L⟩` is determined up to isomorphism by

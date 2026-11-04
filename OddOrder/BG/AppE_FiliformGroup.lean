@@ -3,13 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_FiliformCounterexample
-import Mathlib.Algebra.Group.MinimalAxioms
-import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
-import Mathlib.Data.ZMod.QuotientGroup
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.PGroup
+module
+
+public import OddOrder.BG.AppE_FiliformCounterexample
+public import Mathlib.Algebra.Group.MinimalAxioms
+public import Mathlib.GroupTheory.Nilpotent
 import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The Lazard group of `Q₆`: the group-level counterexample to BG Proposition E.4
@@ -48,6 +48,8 @@ this group is the exponent-`197`, order-`197⁶`, class-`5` Lazard group of `Q�
 but nothing below relies on the correspondence; all group facts are proved directly
 against `gmul`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE.Filiform
 

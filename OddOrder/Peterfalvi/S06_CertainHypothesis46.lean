@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_DadeIsometryCertain
-import OddOrder.Peterfalvi.S05_TICyclic
-import OddOrder.GroupTheory.ConjClassSet
+module
+
+public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+public import OddOrder.GroupTheory.ConjClassSet
 
 /-!
 # Peterfalvi Hypothesis (4.6): the certain-type Dade configuration in an ambient `G`
@@ -28,6 +29,8 @@ The Dade data (`dade`, `dade0`, `tau`) are *assumed* here as fields; their const
 the `K`-local and `V`-TI Dade maps) is the responsibility of the instantiator (the §8 (6.8)
 application).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

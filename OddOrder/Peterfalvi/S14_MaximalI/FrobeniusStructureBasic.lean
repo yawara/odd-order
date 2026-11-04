@@ -1,4 +1,14 @@
+module
+
+public import OddOrder.Peterfalvi.S10_CoherenceWiring
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
+import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.Peterfalvi.S12_TypeVSibley -- shake: keep (used by a proof inside an exposed definition)
 import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
 # Peterfalvi §14 — Frobenius structure: opening layer
@@ -6,6 +16,8 @@ import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory

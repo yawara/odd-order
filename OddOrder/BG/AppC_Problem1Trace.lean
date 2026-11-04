@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_Problem1Lattice
+module
+
+public import OddOrder.BG.AppC_Problem1Lattice
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Algebra.PaleySpanning
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Problem 1: the trace obstruction
@@ -49,6 +55,8 @@ non-Frobenius (`hnotfrob`), because the contradiction no longer runs through the
 * `false_of_collisionPair_trace` — its final form: one collision suffices unless *both* traces
   vanish.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

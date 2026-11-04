@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Polynomial.Roots
+module
+
+public import Mathlib.Algebra.Polynomial.Degree.Defs
+public import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Polynomial.BigOperators
+import Mathlib.Algebra.Polynomial.Div
 
 /-!
 # Lagrange interpolation over a commutative ring with separated nodes
@@ -29,6 +34,8 @@ a module into eigen-submodules, over `𝒪` just as over a field.
 * `OddOrder.ringLagrangeBasis` and `OddOrder.sum_ringLagrangeBasis`
 * `OddOrder.X_sub_C_mul_ringLagrangeBasis` — `(X - ζ) · L_ζ` is a multiple of `∏_{η ∈ s} (X - η)`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

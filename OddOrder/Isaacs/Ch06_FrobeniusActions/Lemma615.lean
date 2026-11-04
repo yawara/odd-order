@@ -3,12 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.15 characteristic elementary-abelian p^2 (odd + p=2
 cases) (pp. 193-197)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -1074,7 +1082,7 @@ private lemma relIndex_eq_two_of_index_two_of_not_le
     (hC_idx : C.index = 2) (hE_not_le_C : ¬ E ≤ C) :
     C.relIndex E = 2 := by
   rw [Subgroup.relIndex_eq_two_iff_exists_notMem_and]
-  rw [SetLike.le_def] at hE_not_le_C
+  rw [IsConcreteLE.le_iff] at hE_not_le_C
   push Not at hE_not_le_C
   obtain ⟨a, haE, haC⟩ := hE_not_le_C
   refine ⟨a, haE, haC, ?_⟩

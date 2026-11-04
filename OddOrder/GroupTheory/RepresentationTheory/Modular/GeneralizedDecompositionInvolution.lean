@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 
 /-!
@@ -37,6 +42,8 @@ normal `2`-complement, `c_{φ_0 φ_0} = |C_G(t)|_2` (Navarro (6.13),
   `.sum_mul_basicDecompositionNumber_eq_cartanMatrix_of_involution` — Navarro (7.5)(c) at an
   involution, in the form the "analysis at `t`" reads as `(D^t_i, D^t_j)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

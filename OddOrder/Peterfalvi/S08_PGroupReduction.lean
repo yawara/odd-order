@@ -3,9 +3,16 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Peterfalvi.S08_CaseBEndgame
 import OddOrder.Peterfalvi.S08_CaseBSeedGlue
 import OddOrder.Peterfalvi.S08_CoherenceCore
-import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 /-!
@@ -29,6 +36,8 @@ coherent ⟹ the bound), which is the remaining gate (via (6.2)).
 This leaf supplies the two odd-order side conditions and wires the **(6.8)(c1) Frobenius** reduction
 into the `SibleyDadeHypothesis` context, isolating `hbound` as the residual obligation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

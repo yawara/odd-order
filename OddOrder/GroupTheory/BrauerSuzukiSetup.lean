@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.OrderOfElement
+module
+
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Brauer–Suzuki: the generalized quaternion Sylow setup (Gorenstein Ch. 12, p. 373)
@@ -27,6 +28,8 @@ structure of `S` that Ch. 12 uses throughout:
 The subsequent lemmas of Ch. 12 (`N = SH` and `C = XH`, the TI subset `A = C − RH`,
 the character computation) live in sibling leaves.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

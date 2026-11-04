@@ -3,9 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+module
+
+public import OddOrder.GroupTheory.TransferTransitivity
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.TransferInvariantTransversal
-import OddOrder.GroupTheory.TransferTransitivity
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
 
 /-!
@@ -24,6 +35,8 @@ the Hall–Wielandt strengthening via Yoshida).  Hypothesis (B2)
 `T₁` — absurd.  Consequently `(Nat.card G).factorization p ≠ 3` under the
 standing hypotheses of the first case.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

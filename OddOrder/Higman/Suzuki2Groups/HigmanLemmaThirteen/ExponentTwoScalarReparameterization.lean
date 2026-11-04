@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaCoherence
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
 
 /-!
 # Higman Lemma 13: scalar reparameterization of a common factor
@@ -18,6 +24,8 @@ is multiplication by one nonzero scalar.
 This is the linear-algebra core of the cross-join alignment.  A downstream
 bridge supplies the two inclusions from the actual prescribed factor copies.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

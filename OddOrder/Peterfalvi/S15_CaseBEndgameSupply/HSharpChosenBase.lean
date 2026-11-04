@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+module
+
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — chosen-base `H^#` endgame supply
@@ -17,6 +20,8 @@ core.  Its induction cannot equal `λ`, since that would make the column irreduc
 gives a chosen (7.6) family whose base is distinct from `λ`, so `λ` occurs at a positive
 index and the guarded coefficient theorem `lambda_tau1_cCoeff_base` applies.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

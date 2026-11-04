@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsSylowCounting
 
 /-!
@@ -25,6 +35,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1E の後半。道具
 - `not_isSimpleGroup_of_card_eq_twofourty` — **Problem 1E.7**。
 - `not_isSimpleGroup_of_card_eq_twofivetwo` — **Problem 1E.8**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 
@@ -183,8 +195,8 @@ theorem not_isSimpleGroup_of_card_eq_oneeighty {G : Type*} [Group G] [Finite G]
     · exact hindex_absurd 2 (by rw [he, he1]) (by norm_num) (by norm_num)
     · -- `|N| = 180`: `D ⊴ G`
       have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, he1, hG])
-      rcases hsimple.eq_bot_or_eq_top_of_normal _
-        (Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)) with h1 | h1
+      have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
+      rcases hsimple.eq_bot_or_eq_top_of_normal D with h1 | h1
       · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
       · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
   · -- `|S : D| = 9` ⟹ `D = ⊥`, 最大性より全対が自明交叉 ⟹ 計数矛盾
@@ -359,8 +371,8 @@ theorem not_isSimpleGroup_of_card_eq_twofourty {G : Type*} [Group G] [Finite G]
   · exact hindex_absurd 3 (by rw [he, he1]) (by norm_num) (by norm_num)
   · -- `|N| = 240`: `D ⊴ G`
     have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, he1, hG])
-    rcases hsimple.eq_bot_or_eq_top_of_normal _
-      (Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)) with h1 | h1
+    have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
+    rcases hsimple.eq_bot_or_eq_top_of_normal D with h1 | h1
     · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
     · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
 
@@ -536,15 +548,15 @@ theorem not_isSimpleGroup_of_card_eq_twofivetwo {G : Type*} [Group G] [Finite G]
           rw [← Subgroup.orderOf_mk x hx]; exact orderOf_dvd_natCard _
         rw [heN, hc] at hdvd
         norm_num at hdvd
-      rcases hsimple.eq_bot_or_eq_top_of_normal N hNnormal with h1 | h1
+      rcases hsimple.eq_bot_or_eq_top_of_normal N with h1 | h1
       · rw [h1, Subgroup.card_bot] at heN; norm_num at heN
       · rw [h1, Subgroup.card_top, hG] at heN; norm_num at heN
     · exact hindex_absurd 4 (by rw [he, he1]) (by norm_num) (by norm_num)
     · exact hindex_absurd 2 (by rw [he, he1]) (by norm_num) (by norm_num)
     · -- `|N| = 252`: `D ⊴ G`
       have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, he1, hG])
-      rcases hsimple.eq_bot_or_eq_top_of_normal _
-        (Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)) with h1 | h1
+      have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
+      rcases hsimple.eq_bot_or_eq_top_of_normal D with h1 | h1
       · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
       · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
   · -- `D = ⊥`: 全対が自明交叉 ⟹ 計数矛盾

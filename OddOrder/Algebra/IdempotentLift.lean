@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Henselian
+module
+
+public import Mathlib.RingTheory.Henselian
 import Mathlib.Tactic.LinearCombination
 
 /-!
@@ -31,6 +33,8 @@ unit, forcing `d = 0`.
 * `OddOrder.eq_of_isIdempotentElem_of_sub_mem` — uniqueness
 * `OddOrder.existsUnique_isIdempotentElem_sub_mem`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

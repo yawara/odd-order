@@ -3,10 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Peterfalvi.S07_Subcoherent
-import OddOrder.Peterfalvi.S08_CoherenceWeighted
-import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
 
 /-!
 # S11_SingleFactorCentralizer
@@ -14,6 +23,8 @@ import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
 Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (9.11): coherence of `𝒮(H₀C′)` — the maximality induction
@@ -628,7 +639,7 @@ theorem nineElevenOne_squeeze_arithmetic
   -- The circle: `r₀ ≤ r₁ ≤ s₂ ≤ r₂ ≤ r₃ ≤ r₄ ≤ r₀`.
   have h01 : r₀ ≤ r₁ := by
     have hc : ((p1 : ℝ) * iUU') ≤ (n₁ : ℝ) * (a * a) := by exact_mod_cast hcount
-    calc r₀ = ((p1 : ℝ) * iUU') * (q : ℝ) ^ 2 := by rw [hr₀]; try ring
+    calc r₀ = ((p1 : ℝ) * iUU') * (q : ℝ) ^ 2 := by rw [hr₀]
       _ ≤ ((n₁ : ℝ) * (a * a)) * (q : ℝ) ^ 2 :=
           mul_le_mul_of_nonneg_right hc (by positivity)
       _ = r₁ := by rw [hr₁]; push_cast; try ring
@@ -644,7 +655,7 @@ theorem nineElevenOne_squeeze_arithmetic
       _ = r₄ := by rw [hr₄]; try ring
   have h40 : r₄ ≤ r₀ := by
     have hule' : (u : ℝ) ≤ (iUU' : ℝ) := by exact_mod_cast hule
-    calc r₄ = ((p1 : ℝ) * (q : ℝ) ^ 2) * u := by rw [hr₄]; try ring
+    calc r₄ = ((p1 : ℝ) * (q : ℝ) ^ 2) * u := by rw [hr₄]
       _ ≤ ((p1 : ℝ) * (q : ℝ) ^ 2) * iUU' :=
           mul_le_mul_of_nonneg_left hule' (by positivity)
       _ = r₀ := by rw [hr₀]; try ring

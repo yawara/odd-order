@@ -3,11 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.CoprimeFixedPoints
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 
 /-!
@@ -90,6 +98,8 @@ element of `Q − Q₀` does *not* square to `1`.
   centralizer quotient on §4's ambient hypotheses alone**: both standing bundles and the
   numerics of `exists_standardModel`, with no residual hypothesis about the quotient.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

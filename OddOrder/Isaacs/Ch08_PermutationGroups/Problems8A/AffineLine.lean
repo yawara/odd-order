@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Field.Basic
-import Mathlib.Algebra.GroupWithZero.Units.Equiv
-import Mathlib.GroupTheory.Solvable
+module
+
+public import Mathlib.Algebra.GroupWithZero.Units.Equiv
+public import Mathlib.GroupTheory.Solvable
 import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Ring.RingNF
+public import Mathlib.Tactic.Ring.Basic -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 1 次元アフィン群
@@ -21,6 +23,8 @@ sharply 2-transitive 群が得られる。
 - `affineLineGroup`, `existsUnique_affineLineGroup_of_ne`,
   `affineLineGroup_isSolvable` — **Problem 8A.11**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

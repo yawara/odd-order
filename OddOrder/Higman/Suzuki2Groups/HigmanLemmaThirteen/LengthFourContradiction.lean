@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourContradiction
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoContradiction
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
 
 /-!
 # Higman's Lemma 13: exact length-four contradiction
@@ -18,6 +24,8 @@ commutative and reduces its exponent to the two cases treated by the
 preceding developments.  Both exponent two and genuine exponent four
 contradict exact `ξ`-length four.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

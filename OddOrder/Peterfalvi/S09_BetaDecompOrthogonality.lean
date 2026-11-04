@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S09_Building78C
 
 /-!
@@ -16,6 +26,8 @@ Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limi
 `sum_collapse_to_single`, `inner_sub_smul_left_eq_zero`) feeding the `(7.8.c)` collapse in
 `S09_CertificateDischarge`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09.Cert
 open OddOrder.RepresentationTheory

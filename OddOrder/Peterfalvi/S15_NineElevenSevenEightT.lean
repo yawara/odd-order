@@ -3,6 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_UnionPairBridge
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S15_NineElevenPairBoundT
 import OddOrder.Peterfalvi.S15_NineElevenStepsT
 
 /-!
@@ -23,6 +34,8 @@ The `T`-side mirror of `S15_NineElevenSevenEight.lean` (issue 2035 refuter-`T` c
   contradicting the no-pair clause.  Consumed by the (9.11.6) norm bound
   `nineElevenNormBoundT` (next brick).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

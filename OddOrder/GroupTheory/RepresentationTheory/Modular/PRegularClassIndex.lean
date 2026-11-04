@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+public import Mathlib.Algebra.Group.ConjFinite -- shake: keep (instance used inside an exposed def body)
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 
@@ -25,6 +35,8 @@ one-sided inverse is two-sided and `[Φ_θ, φ]⁰ = δ_{θφ}` follows.
 * `OddOrder.RepresentationTheory.Modular.equivPRegularClass`
 * `OddOrder.RepresentationTheory.Modular.pRegularRep` and its two characterising lemmas
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

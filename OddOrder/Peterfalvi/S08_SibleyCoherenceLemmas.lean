@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceBasic
+import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
 import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
+import OddOrder.Peterfalvi.S08_SibleyRestrictionLemmas
 
 /-!
 # Peterfalvi §8 — Sibley–Dade coherence: opening lemma layer
@@ -11,6 +16,8 @@ import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory

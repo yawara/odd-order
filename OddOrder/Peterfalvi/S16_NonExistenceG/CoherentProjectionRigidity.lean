@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+public import OddOrder.Peterfalvi.S16_PairingCoherence
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S16_GridExpansion
 import OddOrder.Peterfalvi.S16_PairingBessel
 
@@ -26,6 +31,8 @@ The statements take the projection coefficient identity as an explicit hypothesi
 are upstream of the separate Dade-support argument that proves orthogonality of the coherent
 images to a particular `eta`-grid, and can be reused on both the `L`- and `M`-sides.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

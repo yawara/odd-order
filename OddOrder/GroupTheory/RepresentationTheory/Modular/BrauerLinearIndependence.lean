@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Valuation.ValuationRing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 
 /-!
@@ -30,6 +37,8 @@ denominators, which is not recorded here.
 * `OddOrder.RepresentationTheory.Modular.exists_dvd_forall_of_valuationRing`
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

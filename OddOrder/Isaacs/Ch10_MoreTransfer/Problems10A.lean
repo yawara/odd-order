@@ -3,16 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.TransferTransitivity
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CommGroupAut
 import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.TransferInvariantTransversal
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-import OddOrder.GroupTheory.TransferInvariantTransversal
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
-import OddOrder.GroupTheory.CommGroupAut
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 
 /-!
 # Isaacs §10A の演習 (書籍 pp. 307-308)
@@ -59,6 +67,8 @@ Isaacs は p. 297 で「`p`-群 `P` が **regular** とは, 任意の `x, y ∈ 
   regular 性の `c` は `⟨x,y⟩' ≤ P'` にあるので `c² = 1`, つまり `(xy)² = x² y²`。
   合わせて `⁅y,x⁆ = 1` となり矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 
@@ -112,7 +122,7 @@ private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group 
     ∀ c ∈ commutator P, c ^ 2 = 1 ∧ c ∈ Subgroup.center P := by
   have : Group.IsNilpotent P := hp.isNilpotent
   -- `P' ⊓ Z(P) ≠ 1` から中心的な `z ≠ 1` を取る
-  have hcz := Ch09.inf_center_ne_bot_of_normal_of_isNilpotent (K := commutator P) hncomm
+  have hcz := Group.IsNilpotent.inf_center_ne_bot_of_normal (H := commutator P) hncomm
   have : Nontrivial ↥(commutator P ⊓ Subgroup.center P) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hcz
   obtain ⟨w, hwne⟩ := exists_ne (1 : ↥(commutator P ⊓ Subgroup.center P))

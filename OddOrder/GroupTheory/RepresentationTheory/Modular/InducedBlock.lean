@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CentralCharacterBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
+module
+
+public import OddOrder.Algebra.CentralCharacterBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 
 /-!
 # The induced block `b^G` (Brauer correspondence)
@@ -36,6 +38,8 @@ and Alperin–Burry's); they agree in the cases that matter.
   defining property `λ_{b^G}(K̂) = λ_b(∑_{x ∈ K ∩ H} x)`
 * `OddOrder.RepresentationTheory.Modular.eq_inducedBlock` — uniqueness
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

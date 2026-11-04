@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.SupportedSpanOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi Section 3, result (1.3)
@@ -44,6 +50,8 @@ Neither is needed: the proof of (1.3)(a) uses only that the `ψⱼ` are `A`-supp
 hypothesis, so a caller holding a spanning family (rather than a basis) can apply them directly.
 Orthonormality of `(μᵢ)` is genuinely used in (1.3)(b) and is kept.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S03
 

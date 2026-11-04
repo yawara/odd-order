@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Ker
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 
 /-!
 # Subgroups of a finite cyclic group are determined by their order
@@ -16,6 +20,8 @@ Used by Peterfalvi (9.7)(a) (issue 0152): the block scalar characters `φ_i : Ū
 `W₁`-conjugate blocks have images of equal order `a = |U : C_U(H₁)|`, and since `𝔽_p^×` is cyclic
 that already forces the images to *coincide* -- which is what feeds the book's `|U| ∣ a^{q−1}`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -51,7 +57,6 @@ theorem eq_powMonoidHom_ker_card [Finite A] [IsCyclic A] (B : Subgroup A) :
       #{a : A | a ^ Nat.card B = 1} := by
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     congr 1
-    exact Finset.filter_congr fun x _ => by simp
   omega
 
 /-- **Subgroups of a finite cyclic group are determined by their order.**  Two subgroups of the

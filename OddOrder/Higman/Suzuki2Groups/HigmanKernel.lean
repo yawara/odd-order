@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
 import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
 import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
@@ -23,6 +29,8 @@ abelian subgroup `A` is trivial.
 No order calculation for `C / A` and no exponent bound for `A` are claimed
 here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

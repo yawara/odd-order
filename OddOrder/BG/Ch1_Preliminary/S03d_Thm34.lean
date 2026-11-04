@@ -3,20 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.GroupTheory.Commutator.Basic
+module
+
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG §3: Theorem 3.4 (coprime action, fixed-point-free complement)
@@ -65,6 +66,8 @@ core (`thm34_algClosed`) は **`[IsAlgClosed F]` 付き**で証明し (Thm 2.5 /
 (`ρ.comp (H ⊔ R).subtype`), (b) `G/N` on submodule `M` (`Subrepresentation.toRepresentation` →
 `Representation.ofQuotient`).  一般 `F` は base change (BG (2.9) = `BaseChange.lean`) で導く.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03d
 
@@ -933,7 +936,7 @@ private theorem thm34_aux : ∀ (n : ℕ)
       have hψp : ψ ^ p = 1 := by
         rw [← orderOf_dvd_iff_pow_eq_one, ← hpcard]; exact orderOf_dvd_natCard ψ
       have hxp : (ψ : G) ^ p = 1 := by rw [← Subgroup.coe_pow, hψp, Subgroup.coe_one]
-      obtain ⟨ε, hε⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot F p
+      obtain ⟨ε, hε⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot F p
       have hgen : Subgroup.closure ((K : Set G) ∪ {(ψ : G)}) = ⊤ := by
         rw [Subgroup.closure_union, Subgroup.closure_eq, ← Subgroup.zpowers_eq_closure, hψgenR]
         exact hcompl.sup_eq_top

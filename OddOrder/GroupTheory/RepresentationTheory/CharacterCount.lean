@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.Dimension.Finite
-import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import Mathlib.Algebra.CharP.Invertible -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Finiteness of `Irr G` and the bound `|Irr G| ≤ |ConjClasses G|`
@@ -32,6 +35,8 @@ for later.
 * `OddOrder.RepresentationTheory.card_irreducibleCharacter_le` —
   `Nat.card (IrreducibleCharacter G) ≤ Nat.card (ConjClasses G)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

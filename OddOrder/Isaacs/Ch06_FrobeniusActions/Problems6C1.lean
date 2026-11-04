@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
@@ -17,6 +24,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 書籍の (b) 「位数 `4` では冪零でない例 (`|G| = 75`) がある」は別 leaf で扱う。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

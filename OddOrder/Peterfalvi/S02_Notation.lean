@@ -3,7 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S01_Introduction
+module
+
 
 /-!
 # Peterfalvi §2: Notation
@@ -178,6 +179,8 @@ grep しやすく、mathlib 互換の命名 (リポジトリのラッパー方�
 - §3-§8 audit (mathlib 対応訂正): [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../../notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md)
 - Wave 1a 計画 (上記 audit §6.1): 11 modules ~1100 LOC, `OddOrder/GroupTheory/RepresentationTheory/` 配下に逐次配置中
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S02
 

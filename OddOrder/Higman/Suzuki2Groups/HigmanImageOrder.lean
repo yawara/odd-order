@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
 import OddOrder.Higman.Suzuki2Groups.HigmanKernel
 
 /-!
@@ -18,6 +24,8 @@ two elements. Noether’s first isomorphism theorem then gives `|C / A| = 2`.
 The final exponent-at-most-four case split in Higman’s Lemma 3 is not claimed
 here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -36,7 +44,7 @@ theorem natCard_range_eq_two_of_forall_eq_one_or_eq
     (hvalues : ∀ u : C, f u = 1 ∨ f u = t)
     (hker : f.ker < ⊤) :
     Nat.card ↥f.range = 2 := by
-  obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt hker
+  obtain ⟨u, -, hu⟩ := IsConcreteLE.exists_of_lt hker
   have hfu_ne : f u ≠ 1 := by
     simpa only [MonoidHom.mem_ker] using hu
   have hfut : f u = t := (hvalues u).resolve_left hfu_ne

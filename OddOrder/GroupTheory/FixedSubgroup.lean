@@ -3,10 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.End
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
-import Mathlib.GroupTheory.GroupAction.Basic
+module
+
+public import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
+public import Mathlib.Algebra.Group.Action.End
+public import Mathlib.Algebra.Group.Subgroup.Ker
+public import Mathlib.GroupTheory.GroupAction.Defs
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Data.Finset.Attr
 
 /-!
 # Fixed subgroup of an automorphic action
@@ -16,6 +20,8 @@ import Mathlib.GroupTheory.GroupAction.Basic
 Tier-1 forward-dep leaf (`Ch04_Commutators/ForwardFromCh03.lean`) が `CoprimeAction`
 本体 (Ch.6 経由の import 循環) を避けて `fixedSubgroup` を参照できるようにする.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

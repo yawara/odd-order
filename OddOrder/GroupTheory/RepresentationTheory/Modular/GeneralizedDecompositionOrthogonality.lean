@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 
 /-!
 # The orthogonality of the generalized decomposition numbers — Navarro (5.13)
@@ -51,6 +60,8 @@ the `C_G(x)`-class of `y`.
 * `OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_zero` —
   Navarro (5.13)(a), first part
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

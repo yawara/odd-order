@@ -3,8 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
+import OddOrder.GroupTheory.SylowTransport
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the distinguished PSU pair
@@ -30,6 +44,8 @@ through the odd central kernel.
 This is the PSU branch of T. Peterfalvi, Character Theory for the Odd Order
 Theorem, Part II, Ch. I section 3, Proposition 1(c), pp. 105--106.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,8 +1,27 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
+module
+
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S15_BridgeCharacter
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Peterfalvi.S09_ParityPrimitive
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapMemberResidual
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionRigidity
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
@@ -10,6 +29,8 @@ import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 The T-side type-III character estimate and the deduction that `T` is of Type II.
 Topic-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

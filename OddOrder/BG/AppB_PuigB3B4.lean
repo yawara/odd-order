@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppB_Puig
+module
+
+public import OddOrder.BG.AppB_Puig
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import OddOrder.BG.AppA_PStability
-import Mathlib.GroupTheory.GroupAction.ConjAct
 
 /-!
 # BG Appendix B: Lemma B.3 + Theorem B.4 (Puig, = Thm 6.2 代替)
@@ -25,6 +29,8 @@ B.4(a) (`G = O_{p'}(G)·N_G(Z(L(S)))`) は異群 iso 共変性を要するため
 * `OddOrder.BG.AppB.b3_chain` — **BG Lemma B.3** (L4646): `p` odd solvable, `O_{p'}(G)=1`,
   `S ∈ Syl_p(G)`, `T = O_p(G)` ⇒ `L_*(S) ⊆ L_*(T) ⊆ L(T) ⊆ L(S)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppB
 
@@ -261,7 +267,7 @@ theorem normalizer_le_normalizer_map_of_characteristic
 
 /-- **第2同型の指数版** (積公式): `N ⊴ G` で `[N : Q⊓N] = [Q⊔N : Q]`.
 `Sylow ∩ normal` が `normal` 内で Sylow であることの index 義務に使う. -/
-private theorem relIndex_inf_eq_relIndex_sup [Finite G] {Q N : Subgroup G} [N.Normal] :
+theorem relIndex_inf_eq_relIndex_sup [Finite G] {Q N : Subgroup G} [N.Normal] :
     (Q ⊓ N).relIndex N = Q.relIndex (Q ⊔ N) := by
   have hpos : 0 < N.relIndex Q :=
     Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite (H := N.subgroupOf Q))

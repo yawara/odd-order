@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBAxis
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBAxis
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBSupport
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleBaseChangeJacobi
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman's Lemma 13: vanishing of type-C/B middle brackets
@@ -18,6 +26,8 @@ eigenline at index `i + 2`.  Pairing that line with the matching member of
 the type-B family contradicts Jacobi: the other B/B and C/B middle brackets
 have distinct support indices.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

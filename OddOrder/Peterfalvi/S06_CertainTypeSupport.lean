@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainHypothesis46
-import OddOrder.Peterfalvi.S06_CertainTypeClifford
+module
+
+public import OddOrder.Peterfalvi.S06_CertainHypothesis46
+public import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Peterfalvi.S03b_Vanishing
 
 /-!
@@ -29,6 +32,8 @@ of (4.7) build on this core statement and are developed separately.
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

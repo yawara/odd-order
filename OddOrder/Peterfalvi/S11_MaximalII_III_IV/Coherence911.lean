@@ -1,3 +1,9 @@
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 
 /-!
@@ -10,6 +16,8 @@ The former (9.11) declarations in this leaf routed through an inapplicable (6.8)
 `SibleyTarget`.  They were withdrawn after the honest `Ind_S^G` / `A(S)` coherence construction
 landed in `S15_CaseACoherence` (issues 7001/1017).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

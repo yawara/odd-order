@@ -3,10 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Commute.Defs
-import Mathlib.Algebra.Group.Basic
-import OddOrder.Algebra.PowerMonomialIndependence
+module
+
+public import OddOrder.Algebra.PowerMonomialIndependence
+public import OddOrder.BG.AppC_LemmaC3_Setup
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
 import OddOrder.Algebra.PaleySpanning
+import OddOrder.BG.AppC_FrobeniusBasics
 import OddOrder.BG.AppC_LemmaC3_ConjugateLine
 
 /-!
@@ -71,6 +75,8 @@ first recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
 * `le_closure_orbitS` — Lemma B, transported into `G`, which discharges that hypothesis; hence
   `false_of_centralizing` — **Theorem 1, unconditional**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

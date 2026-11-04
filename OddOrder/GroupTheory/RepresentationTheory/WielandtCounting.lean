@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.LinearAlgebra.Projection
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+module
+
+public import Mathlib.RepresentationTheory.Invariants
 
 /-!
 # Wielandt's fixed-point formula — the module-level counting (Peterfalvi (9.1))
@@ -33,6 +33,8 @@ permutation lemma instead of the averaging-operator trace.
 * `finrank_invariants_add_finrank_ker_averageMap`: the coprime decomposition
   `V = V^G ⊕ [V,G]` at the level of dimensions, `dim V^G + dim [V,G] = dim V`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.WielandtCounting
 

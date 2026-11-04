@@ -3,8 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
 
 /-!
 # BG Theorem 3.10 for elementary abelian `M` — the reducible-module induction (issue 8013, piece 5)
@@ -26,6 +40,8 @@ via Maschke (`W = W₀ ⊕ W₁`, both subreps) and combine `finrank` additively
 **Status (issue 8013 piece 5)**: building the bridging infrastructure (invariants of a
 subrepresentation vs. ambient `C_V(H) ⊓ W`); the induction follows.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03
 

@@ -1,4 +1,10 @@
-import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 
 /-!
 # Peterfalvi §12 — (12.3)-(12.5) 直交性と分解データ (前半)
@@ -7,6 +13,8 @@ Prefix-split from `RhoConstancy.lean` (2000 行のハード上限、CLAUDE.md「
 本ファイルは構成側 (直交性と `CharacterDecompositionData` 周辺)。
 `RhoConstancy.lean` が本ファイルを import し、(12.4) の coherence pin 以降を続ける。
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

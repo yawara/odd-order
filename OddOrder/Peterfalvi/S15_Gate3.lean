@@ -3,13 +3,32 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
 import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # S15_Gate3
 
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
@@ -519,7 +538,7 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
   have hNUtop : Subgroup.normalizer (hyp.U : Set G) ≠ ⊤ := by
     intro hNtop
     have hUnormal : (hyp.U).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.U hUnormal with h | h
+    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.U with h | h
     · exact hUne h
     · exact hUneTop h
   -- a maximal subgroup `L ⊇ N_G(U)`.
@@ -730,7 +749,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
   have hNVtop : Subgroup.normalizer (hyp.V : Set G) ≠ ⊤ := by
     intro hNtop
     have hVnormal : (hyp.V).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.V hVnormal with h | h
+    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.V with h | h
     · exact hVne h
     · exact hVneTop h
   obtain ⟨L, hNVL, hLmaximal⟩ :=

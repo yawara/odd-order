@@ -3,10 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.BG.AppB_PuigB3B4
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG §10 局所判定補題 (Lemmas 10.3 / 10.4)
@@ -27,6 +43,8 @@ Lemma 10.4(b) (`exists_prime_orderOf_zgroupCentralizer_of_complement`) を**実�
 (`S10_LocalLemmas` 内に置くと import が循環する)。残りの §10 局所補題
 (10.5 / 10.11 / 10.12 / 10.13) は従来どおり `S10_LocalLemmas`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -402,7 +420,7 @@ theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [lt_top_iff_ne_top]
         intro htop
         have hPGnormal : (PG : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-        rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPGnormal with hbot | htop'
+        rcases hG.simple.eq_bot_or_eq_top_of_normal (PG : Subgroup G) with hbot | htop'
         · exact hPGne hbot
         · have hsolv : Group.IsSolvable ↥(PG : Subgroup G) := by
             have := (PG.isPGroup').isNilpotent; infer_instance
@@ -561,7 +579,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
   have hNP_not_le : ¬ Subgroup.normalizer (PG : Set G) ≤ M := by
     intro hle
     exact hpσ ⟨hpM, P, by rw [← hPGdef]; exact hle⟩
-  obtain ⟨u, huN, huM⟩ := SetLike.not_le_iff_exists.mp hNP_not_le
+  obtain ⟨u, huN, huM⟩ := IsConcreteLE.not_le_iff_exists.mp hNP_not_le
   -- Step 3: `Ω₁(Z(P))^#` is nonempty (the `p`-group `P` is nontrivial since `p ∈ π(M)`).
   have hp_dvd_P : p ∣ Nat.card ↥(P : Subgroup ↥M) := by
     have hdvd : p ∣ Nat.card ↥(P : Subgroup ↥M) * (P : Subgroup ↥M).index := by
@@ -595,7 +613,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
     exact mul_left_cancel (mul_right_cancel h2)
   -- The centralizer of `⟨y'⟩` is proper (the center of the simple nonabelian `G` is trivial).
   have hcenter : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exfalso
       refine hG.notSolvable (Group.isSolvable_of_comm fun a b => ?_)
@@ -658,7 +676,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
     exact huM huNM
   · have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp
       ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop
     · exact hMα (le_bot_iff.mp (hbot ▸ Malpha_le M))
     · exact (mem_maximalSubgroups.mp hM).1 htop
 

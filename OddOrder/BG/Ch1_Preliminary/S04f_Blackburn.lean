@@ -3,7 +3,20 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04f_Omega1
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04f_Omega1
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch1_Preliminary.S04f_BlackburnNoncentral
 
 /-!
@@ -11,6 +24,8 @@ import OddOrder.BG.Ch1_Preliminary.S04f_BlackburnNoncentral
 
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04f_Blackburn` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 
@@ -412,8 +427,8 @@ private theorem blackburn_noncentral_commutator_witnesses
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  obtain ⟨y, hyS, hyT⟩ := SetLike.exists_of_lt hT_facts.2.1
-  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  obtain ⟨y, hyS, hyT⟩ := IsConcreteLE.exists_of_lt hT_facts.2.1
+  obtain ⟨z, hzT, hzZ⟩ := IsConcreteLE.exists_of_lt hT_facts.1
   exact ⟨y, hyS, hyT, z, hzT, hzZ⟩
 
 

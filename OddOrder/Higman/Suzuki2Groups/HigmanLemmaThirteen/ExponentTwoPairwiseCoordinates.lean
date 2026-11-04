@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFrattini
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: common Frattini coordinates in the exponent-two branch
@@ -21,6 +30,8 @@ Choosing the ambient coordinate before restricting to any pair is essential:
 the three pairwise applications of Higman's Lemma 12 must compare the
 parameters of the same length-two factors in one coordinate system.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

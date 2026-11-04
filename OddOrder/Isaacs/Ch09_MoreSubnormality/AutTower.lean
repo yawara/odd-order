@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
 import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
-import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
 
 /-!
 # Isaacs Ch. 9 — §9B: Theorem 9.10 (Wielandt automorphism tower), p. 278
@@ -23,6 +27,8 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
 `Type u` と `Group` を 1 つの structure に束ねて**同時に再帰**すればこれを回避できる.
 (mathlib の `Bundled`/`GroupCat` と同型の手法だが, 圏の重い API を引かずに済ませる.)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

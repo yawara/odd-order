@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoSupportCancellation
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
 
 /-!
 # Higman Lemma 13: two-support cancellation in the all-isomorphic case
@@ -27,6 +30,8 @@ This file records that coefficient calculation and derives the genuine
 self-bracket coordinate of a factor inclusion by polarizing its ambient
 square law.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

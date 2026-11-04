@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorAmbientInclusion
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorRange
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoScalarReparameterization
@@ -17,6 +21,8 @@ range.  Once their quotient eigenvalues are identified with one primitive
 Singer scalar, the two ambient inclusions differ only by a nonzero scalar
 reparameterization of the field coordinate.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

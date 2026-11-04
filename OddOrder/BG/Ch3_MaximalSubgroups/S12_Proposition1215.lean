@@ -3,11 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
@@ -29,6 +42,8 @@ S12_E の旧 forward-declaration `sigma_subgroup_maximal_interaction` (旧 `sorr
 (証明は 12.5(e)/12.6/12.10(d)/12.2(a)(b)/10.9 を要し、それらの leaf は S12_E より downstream
 ゆえ S12_E 内 in-place 証明不可; 12.13 と同型の downstream leaf 方式)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -170,7 +185,7 @@ theorem subgroupESetup_of_complement [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨H₃, hH₃⟩ := Ch03.hall_E_exists (G := ↥E) (tau3 M)
   have hsupH : H₁ ⊔ H₂ = (⊤ : Subgroup ↥K₀) := by
     apply Ch03.sup_eq_top_of_coprime_index
-    apply coprime_of_forall_prime_not_dvd
+    apply Nat.coprime_of_dvd
     intro r hr_prime hr1 hr2
     have hπK : ∀ s : ℕ, s.Prime → s ∣ Nat.card ↥K₀ → s ∈ tau1 M ∪ tau2 M := by
       intro s hs_prime hs_dvd

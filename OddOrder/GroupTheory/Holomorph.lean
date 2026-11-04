@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.Algebra.Group.Subgroup.Ker
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
 import Mathlib.Tactic.Group
 
 /-!
@@ -37,6 +38,8 @@ Isaacs Problem 9A.8 (書籍 p. 277, characteristically simple な有限群は同
 `y (inl x) y⁻¹ = inl (a · σ(x) · a⁻¹)` と分解する (`Aut` 部分が characteristic 性,
 `G` 部分が normal 性に対応)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

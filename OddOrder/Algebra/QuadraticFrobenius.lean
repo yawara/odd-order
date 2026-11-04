@@ -3,12 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.FixedPointsGalois
+module
+
+public import OddOrder.Algebra.FixedPointsGalois
+public import Mathlib.FieldTheory.Perfect
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Perfect
-import Mathlib.Algebra.CharP.Subring
 
 /-!
 # The `q`-power Frobenius of a field of order `q²`
@@ -41,6 +46,8 @@ other are `σ` and `σ̄ = σ σ₀`, the two preimages of `θ` under the restri
   odd order whenever the restriction does.  This is the book's "possibly on replacing `σ`
   by `σ̄`".
 -/
+
+@[expose] public section
 
 namespace OddOrder.FiniteField
 

@@ -1,5 +1,22 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Basic
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG Theorem 15.2 — §14-gated conditional helpers
@@ -7,6 +24,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -774,7 +793,7 @@ theorem normalizer_eq_self_of_mem_maximalSubgroups [Finite G]
   · exact le_of_eq heq.symm
   · have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp
       ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop
     · exact absurd hbot hMne
     · exact absurd htop (mem_maximalSubgroups.mp hM).1
 
@@ -795,7 +814,7 @@ theorem normalizer_Msigma_eq_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   · exact le_of_eq heq.symm
   · have hnorm : (OddOrder.BG.Ch3.S10.Msigma M).Normal :=
       Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (OddOrder.BG.Ch3.S10.Msigma M) with hbot | htop
     · exact absurd hbot (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
     · exact absurd (top_le_iff.mp (htop ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
         (mem_maximalSubgroups.mp hM).1
@@ -1092,7 +1111,7 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
     rw [lt_top_iff_ne_top]
     intro htop
     have hSpnormal : (Sp : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hSpnormal with hbot | htop'
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Sp : Subgroup G) with hbot | htop'
     · exact hSbar_ne (hSpcoe ▸ hbot)
     · have : Group.IsSolvable ↥(Sp : Subgroup G) := by
         have := Sp.isPGroup'.isNilpotent; infer_instance

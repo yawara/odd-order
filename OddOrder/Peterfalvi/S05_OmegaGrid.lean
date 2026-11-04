@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_SigmaIsometry
+module
+
+public import OddOrder.Peterfalvi.S05_TICyclic
 
 /-!
 # Peterfalvi §5: the (3.3) ω-grid indexed by `Fin |W₁| × Fin |W₂|`
@@ -27,6 +29,8 @@ of any `TICyclicHypothesis`.  Pure §5 character theory — **not** gated on the
 §10–16 maximal-subgroup structure.  Pinning the consumer side
 (`S15.Hypothesis.omega := …`) is the §13-spine owner's wiring step.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

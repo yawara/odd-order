@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Subgroup.Center
-import Mathlib.GroupTheory.OrderOfElement
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.Group
 
 /-!
@@ -30,6 +30,8 @@ BG 側の重複解消は hub の判断に委ねる (issue 9207)。
 `Isaacs/Ch04_Commutators/Problems.lean` の
 `commutatorElement_pow_left_of_commutator_le_center` は本補題の類 2 特殊化にあたる。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 

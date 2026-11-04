@@ -3,7 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.AppE_CorollaryE5
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
 
 /-!
 # BG Corollary E.5: final assembly and the `(E.33)`/`(E.34)` counting
@@ -26,6 +46,8 @@ This leaf finishes Corollary E.5 (issue 3028 WP5) on top of the staged material 
   `𝒞_G(M̃), 𝒞_G(Ñ*), 𝒞_G(Ñ), 𝒞_G(Ẑ)` then measure more than `|G|`
   (`(E.33)` = Lemma 14.5(c), `(E.34)` = the `Ẑ` TI-count), a contradiction.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 
@@ -221,7 +243,7 @@ theorem normalizer_zpowers_le_of_centralizer_singleton [Finite G]
   have hne : Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≠ ⊤ := by
     intro htop
     have hnorm : (Subgroup.zpowers x).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop2
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) with hbot | htop2
     · exact hx1 (Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_zpowers x))
     · refine hG.notSolvable ?_
       have : IsCyclic G := ⟨⟨x, fun g =>

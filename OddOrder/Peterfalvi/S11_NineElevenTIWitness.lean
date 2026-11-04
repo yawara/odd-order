@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+module
+
+public import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+public import OddOrder.Peterfalvi.S11_NineElevenSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_Subcoherent
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11.2): the TI-witness `U₁ ∩ U₁^w = C` for `w ∈ W₁^#`
@@ -45,6 +55,8 @@ whence `U₁ ∩ U₁^w = C` by index equality (`relIndex_cSub_U_eq_u`).
 
 Reference note: `issues/closed/9083-lane-a-1007-decomp-moot-revised-frontier.md` (Phase E).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

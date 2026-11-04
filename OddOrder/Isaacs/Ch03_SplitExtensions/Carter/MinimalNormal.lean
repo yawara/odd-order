@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
 import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
-import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Problem 3C.7(b) — 極小正規部分群まわりの部品
@@ -41,6 +49,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
 - `exists_conj_of_isCarterSubgroup_of_isComplement` — 補元の場合の共役性。
 - `exists_conj_of_isCarterSubgroup_of_isMinimalNormal` — **step 4 の総括**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 
@@ -99,7 +109,7 @@ theorem exists_mem_normalizer_notMem_of_isNilpotent {X Y : Subgroup G}
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hne (le_antisymm hYX htop)
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt
     (Group.normalizerCondition_of_isNilpotent (G := ↥X) _ hlt)
   rw [← Subgroup.subgroupOf_normalizer_eq hYX, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not

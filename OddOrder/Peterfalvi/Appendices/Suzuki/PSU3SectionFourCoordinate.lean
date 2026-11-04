@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the linear equation (4)
@@ -41,6 +51,8 @@ because `ζ ∈ C_W(P)` and `η ∈ P`.  That collapses the two `ζ`-conjugation
   `η` moved past `ζ`: `(ζ³η) · (X^{ζ⁻¹}) · (ζ³η)⁻¹ = ζ² · (X^η) · ζ⁻²`.
 * `Hypothesis.sectionFour_four_linear` — **the book's (4)**.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

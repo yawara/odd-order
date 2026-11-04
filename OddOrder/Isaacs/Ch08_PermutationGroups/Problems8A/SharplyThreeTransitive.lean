@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.Two
-import Mathlib.LinearAlgebra.Projectivization.Action
+module
+
+public import Mathlib.LinearAlgebra.Projectivization.Action
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Projectivization.Cardinality
 
 /-!
@@ -35,6 +37,8 @@ import Mathlib.LinearAlgebra.Projectivization.Cardinality
   (教科書の形): `q` が 2 の冪なら `SL(2, q)` は `q + 1` 個の 1 次元部分空間に
   sharply 3-transitive。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

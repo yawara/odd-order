@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Abelianization.Defs
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Thm 5.24: nilpotent maximal subgroups of simple groups (p. 172)
@@ -42,6 +45,8 @@ Assume distinct primes `p ≠ q` divide `|H|`.
   `H ≤ G` whose `G`-normalizer lies in `H` is a full Sylow `p`-subgroup of `G`.
 - `OddOrder.Isaacs.Ch05.exists_isPGroup_of_isCoatom_of_isNilpotent`: **Isaacs Thm 5.24**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 
@@ -145,7 +150,7 @@ theorem exists_sylow_coe_eq_of_normalizer_le
     exact hlt.not_ge (Subgroup.subgroupOf_eq_top.mp htop)
   have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   obtain ⟨x, hx_norm, hx_not⟩ :=
-    SetLike.exists_of_lt (Ch01.lt_normalizer_of_isNilpotent_of_lt_top hlt_top)
+    IsConcreteLE.exists_of_lt (Ch01.lt_normalizer_of_isNilpotent_of_lt_top hlt_top)
   -- `x` normalizes `P` in `G`
   have hxG_norm : (x : G) ∈ Subgroup.normalizer (P : Set G) := by
     rw [Subgroup.mem_normalizer_iff]
@@ -220,7 +225,7 @@ private lemma sylowSetup (hSimp : IsSimpleGroup G) {H : Subgroup G}
       intro n hn g
       have hg : g ∈ Subgroup.normalizer (P' : Set G) := htop ▸ Subgroup.mem_top g
       exact (Subgroup.mem_normalizer_iff.mp hg n).mp hn
-    rcases hSimp.eq_bot_or_eq_top_of_normal P' hnormal with hbot | htop'
+    rcases hSimp.eq_bot_or_eq_top_of_normal P' with hbot | htop'
     · exact hP'_ne_bot hbot
     · exact hmax.1 (top_le_iff.mp (htop' ▸ hP'_le_H))
   -- (4) maximality: `H = N_G(P')`
@@ -292,7 +297,7 @@ theorem exists_isPGroup_of_isCoatom_of_isNilpotent
       rw [h522, htop, Subgroup.top_subgroupOf] at hlt
       exact lt_irrefl _ hlt
     -- simplicity: `A^p(G) = ⊥`, so `|G|` is a `p`-power — contradicting `q ∣ |G|`
-    rcases hSimp.eq_bot_or_eq_top_of_normal (APrime p G) inferInstance with hbot | htop
+    rcases hSimp.eq_bot_or_eq_top_of_normal (APrime p G) with hbot | htop
     swap
     · exact hA_ne_top htop
     obtain ⟨k, hk⟩ := APrime_index_isPGroup p G

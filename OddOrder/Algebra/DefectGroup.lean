@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.RelativeTrace
+public import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
-import OddOrder.Algebra.RelativeTrace
 
 /-!
 # Defect groups
@@ -32,6 +35,8 @@ Two basic facts are proved here, and they use nothing beyond the relative-trace 
 * `OddOrder.GAlgebra.exists_isDefectGroup`
 * `OddOrder.GAlgebra.isPGroup_of_isDefectGroup`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GAlgebra
 

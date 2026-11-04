@@ -1,5 +1,30 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
 
 /-!
 # OpicoreCentralizer
@@ -7,6 +32,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -938,7 +965,7 @@ theorem partner_opiCore_nonabelian [Finite G]
   have hObarpi : Ch03.Subgroup.IsPiGroup ({q}ᶜ : Set ℕ) Obar :=
     hObardef ▸ Ch03.oPiCore.isPiGroup ({q}ᶜ : Set ℕ)
   have hcop : Nat.Coprime (Nat.card ↥Kbar) (Nat.card ↥Obar) := by
-    refine coprime_of_forall_prime_not_dvd (fun r hr hrK hrO => ?_)
+    refine Nat.coprime_of_dvd (fun r hr hrK hrO => ?_)
     have hrq : r = q := by
       have hmem : r ∈ (q : ℕ).primeFactors := by
         rw [hKbarcard] at hrK

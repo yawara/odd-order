@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A8
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
 
 /-!
 # Isaacs Problem 6A.10(c) — 可解な場合の Frobenius の定理 (書籍 p. 186)
@@ -29,6 +37,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A8
   `X ⊆ M` で, `G = X ∪ ⋃ A^g ⊆ M` すなわち **`AG' = G`**。このとき
   `|X| = |G : A| = |G' : A ⊓ G'| = |G'|` なので **`X = G'`**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

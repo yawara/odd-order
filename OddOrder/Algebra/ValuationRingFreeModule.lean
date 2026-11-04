@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.LinearAlgebra.FreeModule.Basic
+public import Mathlib.RingTheory.Valuation.ValuationRing
 import Mathlib.RingTheory.Flat.TorsionFree
 import Mathlib.RingTheory.LocalRing.Module
 
@@ -31,6 +35,8 @@ trace.
 
 * `OddOrder.free_of_isTorsionFree` — finite + torsion-free ⟹ free
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CyclicCharacterExtension
 import OddOrder.GroupTheory.RepresentationTheory.ExtensionLinearTwist
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
@@ -41,6 +46,8 @@ This file assembles the determinantal bookkeeping on top of
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, 6.25/6.28/8.16.
 * Peterfalvi §3 (1.7)(c); issue 9002 (v-c).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

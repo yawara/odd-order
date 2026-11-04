@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 
 /-!
@@ -28,6 +34,8 @@ constant on each `Irr(B)` — gives Navarro (4.19) in the residue field.
 * `OddOrder.RepresentationTheory.Modular.residue_ordCompl_mul_sum_sylow_coeff` — its reduction,
   grouped by blocks
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

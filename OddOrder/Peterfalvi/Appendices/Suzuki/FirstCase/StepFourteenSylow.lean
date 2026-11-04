@@ -3,7 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenAction
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenAction
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThirteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (14): the `3`-subgroup `R₁`
@@ -20,6 +33,8 @@ choice-free description taken as the definition of `R₁` here.
 The file then proves the assertions of (14) about `R₁`: `|R₁| = 3⁵`,
 `C_{R₁}(P) = RΣ` and `Z(R₁) = Z₁`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

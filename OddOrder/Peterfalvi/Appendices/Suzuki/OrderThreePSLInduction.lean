@@ -3,10 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.OddOrderInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 
 /-!
 # Peterfalvi Part II, Ch. I §3 Lemma 4: the order-three PSL subgroup
@@ -30,6 +38,8 @@ are excluded because their root groups are noncommutative Suzuki 2-groups,
 whereas `Q₀` is commutative. The remaining target gives the source conclusion
 `⟨Q₀, K, t⟩ ≅ PSL(2,q)` with `q = |Q₀|`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -259,7 +269,6 @@ lemma exists_four_subgroup_le_Q0 :
 
 
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi Part II, Ch. I §3, Lemma 4.** The group `Q₀` acts
 regularly on the generated orbit with its base point removed. -/
 noncomputable def orderThreeQ0RegularEquiv

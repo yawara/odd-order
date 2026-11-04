@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.FixedSubgroup
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+module
+
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 
@@ -44,6 +52,8 @@ Schur-Zassenhaus + Sylow + Frattini のみで実装可能 (2026-05-23 audit).
 - [`notes/isaacs/ch03_split.md`](../../../notes/isaacs/ch03_split.md) §3E セクション.
 - [`notes/meta/forward_dep_policy.md`](../../../notes/meta/forward_dep_policy.md).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

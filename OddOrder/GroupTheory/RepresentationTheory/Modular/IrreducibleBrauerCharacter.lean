@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The irreducible Brauer characters `IBr(G)`
@@ -27,6 +34,8 @@ For an algebraically closed `k` such a datum exists with `#ι = #{p`-regular cla
 * `irreducibleBrauerCharacter_one` — the value at `1` is the size of the block
 * `residue_irreducibleBrauerCharacter` — reduction is the modular trace of the block
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

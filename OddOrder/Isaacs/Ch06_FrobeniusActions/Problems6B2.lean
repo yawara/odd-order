@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Basic.Finite.Defs
+public import Mathlib.GroupTheory.GroupAction.Hom
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
@@ -23,6 +31,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
   (`isCyclic_of_faithful_trivial_on_proper_invariant`) に流し込めばよい
   (真の不変部分群は `⊥` しかなく, `A` はその上で自明に作用する)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

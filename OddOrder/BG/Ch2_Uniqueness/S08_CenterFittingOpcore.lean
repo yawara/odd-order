@@ -3,16 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.AppB_Thm62
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # S08_CenterFittingOpcore
@@ -20,6 +23,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Main
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §8: The Fitting Subgroup of a Maximal Subgroup
@@ -884,7 +889,7 @@ theorem le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton [Finite G]
     rw [← hMQtop]
     exact hsup_le_NQ
   have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp hNQtop
-  rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hQbot | hQtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal Q with hQbot | hQtop
   · exact hQne hQbot
   · have hQp : IsPGroup q ↥Q :=
       OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton hQpi

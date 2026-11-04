@@ -3,11 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 
 /-!
 # Peterfalvi Part II, Ch. I §3: the centralizer trichotomy
@@ -33,6 +46,8 @@ In accordance with Proposition 1(c), the unitary branch does not assert a
 type-B structure: that stronger conclusion belongs to a later result with
 an additional hypothesis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

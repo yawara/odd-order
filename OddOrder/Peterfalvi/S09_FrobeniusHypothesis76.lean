@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_CertificateDischarge
+module
+
+public import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (7.6) for a Frobenius family — the induced-family coherent datum
@@ -13,6 +17,8 @@ Downstream of `S09_CertificateDischarge` (`hypothesis76OfDade` discharges the (7
 `Hypothesis76 G (H_i^#) (L_i)` with **no certificate assumed** — the coherence layer of
 `card_G0_lower_bound` (issue 0044).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

@@ -3,15 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
-import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.GroupTheory.PRank
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 
 /-!
 # BG §12: The Subgroup `E` — 定義層 + 証明済みコア
@@ -35,6 +44,8 @@ Lem 12.2(a) / Lem 12.17 / Lem 12.19 / Lem 12.18 building block
 Import boundary: §12 mathematically sits after §11 (Prop 12.4 activates the
 exceptional-maximal setup; Thm 12.5 uses the §11 consequences under Hypothesis 11.1)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

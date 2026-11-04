@@ -3,25 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
-import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Data.Nat.Choose.Dvd
-import Mathlib.Data.Nat.Factorization.Basic
-import Mathlib.Algebra.Module.ZMod
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
-import OddOrder.BG.Ch1_Preliminary.S02_Representations
+module
+
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.IsMetacyclic
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
@@ -30,6 +26,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §4: p-Groups of Small Rank
@@ -86,8 +84,6 @@ Lemma 4.17 の本体は `S04_PGroupsSmallRank`、Cor 4.19 は `S04g_Cor419` に�
 
 
 namespace OddOrder.BG.Ch1.S04
-
-open OddOrder.BG.Ch1.S02
 
 
 /-! ## §4B: existence of elementary abelian `E_{p²}` subgroups (Lemma 4.5(a))
@@ -162,7 +158,7 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic (hR : IsPGroup 
 /-- `Ω₁(Z(R))` as a subgroup of `R`: the central elements of order dividing `p`.
 The center is abelian, so this is the genuine `Ω₁` (the set is closed under
 multiplication). -/
-private def omega1Center (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
+def omega1Center (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
   omega1OfAbelian R (Subgroup.center R) p
     (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)
 

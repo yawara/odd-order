@@ -3,10 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SubgroupSum
+module
+
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.OpResidual
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+import Mathlib.FieldTheory.PurelyInseparable.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.TorsionFree
 import OddOrder.Algebra.SubgroupSumBlockAction
-import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # Navarro (6.9)/(6.10): the kernel of a block
@@ -61,6 +73,8 @@ halves say `ker(B)` is the **largest normal `p'`-subgroup of `G` inside `ker χ`
 * `OddOrder.RepresentationTheory.Modular.sum_character_one_mul_character_eq_zero` — weak block
   orthogonality, i.e. (5.11) at `h = 1`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

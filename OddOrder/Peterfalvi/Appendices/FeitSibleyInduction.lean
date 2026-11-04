@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (1) chief-factor induction support (pp. 146–147)
@@ -27,6 +36,8 @@ the Theorem (campaign issue 1054) from the one-step lemma
   `K` (via the normal `p`-complement), feeding the "`Z(Q₁/Q₃)` is not a
   `q`-group" step.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
@@ -298,7 +309,7 @@ theorem minimal_le_centralLiftIn [Finite G] (W : Subgroup G)
     Subgroup.Normal.map ‹(Q₂.subgroupOf W).Normal› π
       (QuotientGroup.mk'_surjective _)
   have hQbar_ne : Qbar ≠ ⊥ := by
-    obtain ⟨x, hxQ₂, hxQ₃⟩ := SetLike.exists_of_lt hQ₃Q₂
+    obtain ⟨x, hxQ₂, hxQ₃⟩ := IsConcreteLE.exists_of_lt hQ₃Q₂
     intro hbot
     have hxmem : π (⟨x, hQ₂W hxQ₂⟩ : ↥W) ∈ Qbar :=
       Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr hxQ₂)
@@ -403,19 +414,12 @@ theorem exists_center_pow_prime_eq_one_of_dvd {K : Type*} [Group K] [Finite K]
 
 /-! ## The `p`-primary lift and the properness `Z ⊄ Q₂` (p. 146) -/
 
-/-- **The commutator subgroup of `↥W` maps onto `⁅W, W⁆`** under the
-inclusion, for any subgroup `W`. -/
-theorem map_subtype_commutator (W : Subgroup G) :
-    Subgroup.map W.subtype (commutator ↥W) = ⁅W, W⁆ := by
-  change Subgroup.map W.subtype ⁅(⊤ : Subgroup ↥W), ⊤⁆ = ⁅W, W⁆
-  rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
-
 /-- A subgroup below `⁅Q₁, Q₁⁆` relativises below `commutator ↥Q₁`. -/
 theorem subgroupOf_le_commutator {R : Subgroup G} (hR : R ≤ ⁅hyp.Q1, hyp.Q1⁆) :
     R.subgroupOf hyp.Q1 ≤ commutator ↥hyp.Q1 := by
   intro x hx
   have hmem : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
-    rw [map_subtype_commutator hyp.Q1]
+    rw [Subgroup.map_subtype_commutator hyp.Q1]
     exact hR (Subgroup.mem_subgroupOf.mp hx)
   obtain ⟨y, hy, hyx⟩ := hmem
   rwa [show y = x from Subtype.ext hyx] at hy
@@ -590,7 +594,7 @@ theorem sup_S_Qder_lt_Q [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
     rw [eq_top_iff]
     intro x _
     have hx : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
-      rw [map_subtype_commutator hyp.Q1, heq]
+      rw [Subgroup.map_subtype_commutator hyp.Q1, heq]
       exact x.2
     obtain ⟨y, hy, hyx⟩ := hx
     rwa [show y = x from Subtype.ext hyx] at hy
@@ -648,7 +652,7 @@ theorem ssetOf_sup_sder_coherent_of_conjInvariant
       have hcard_le : Nat.card ↥(⁅hyp.Q1, hyp.Q1⁆ : Subgroup G) ≤ Nat.card ↥Q₃' := by
         have hpos : 0 < Nat.card ↥Q₃' := Nat.card_pos
         omega
-      rw [OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hle hcard_le]
+      rw [Subgroup.eq_of_le_of_card_ge hle hcard_le]
       exact hbase
     | succ n ih =>
       intro Q₃' hle hinvH hcard
@@ -669,7 +673,7 @@ theorem ssetOf_sup_sder_coherent_of_conjInvariant
         have h1 : Nat.card ↥Q₃' < Nat.card ↥Q₂ := by
           rcases lt_or_ge (Nat.card ↥Q₃') (Nat.card ↥Q₂) with h | h
           · exact h
-          · exact absurd (OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hQ₃Q₂.le h) hQ₃Q₂.ne
+          · exact absurd (Subgroup.eq_of_le_of_card_ge hQ₃Q₂.le h) hQ₃Q₂.ne
         have h2 : Nat.card ↥Q₂ ≤ Nat.card ↥(⁅hyp.Q1, hyp.Q1⁆ : Subgroup G) :=
           Subgroup.card_le_of_le hQ₂le
         omega

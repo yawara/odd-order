@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_LemmaC3_Setup
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.BG.AppC_LemmaC3_Setup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
@@ -29,6 +33,8 @@ Migrated from `OddOrder.Peterfalvi.S16_CoreBounds` (issue 0151): the content is 
 so it is stated against the book's hypotheses (A) + (B), not against the Section 16
 configuration, which merely supplies one instance of (B).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

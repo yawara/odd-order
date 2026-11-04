@@ -3,9 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: The exceptional bridge — Lemma 12.3 (+ Lemma 12.2(b))
@@ -34,6 +50,8 @@ mmd L3089-3123)。§11 (exceptional maximal subgroups) を §12 へ接続する�
   場合分け仮定 (`p ∉ σ(M)` / `p ∈ σ(M) − α(M)`) と `M* ≠ M` を欠いた unfaithful な
   statement だったため、原典 faithful な 2 定理に置き換えた。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3
 
@@ -638,7 +656,7 @@ theorem normalizer_lt_top_of_le_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [lt_top_iff_ne_top]
   intro hNtop
   have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-  rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal X with hXbot | hXtop
   · exact hXne hXbot
   · exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (hXtop ▸ hXM))
 

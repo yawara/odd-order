@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Basic
-import OddOrder.Algebra.GroupAlgebraConjugation
-import OddOrder.GroupTheory.PRegularElement
+module
+
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import OddOrder.GroupTheory.PRegularElement
 import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
@@ -41,6 +42,8 @@ it visibly increases by `1` under conjugation by `h`.  The layers are the level 
 * `OddOrder.GroupTheory.sum_conjLayer` — `∑_i w_i = w`
 * `OddOrder.GroupTheory.conjLayer_conj_smul` — `h • w_i = w_{i+1}`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

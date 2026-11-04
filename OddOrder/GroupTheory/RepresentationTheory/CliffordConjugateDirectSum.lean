@@ -3,14 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
-import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne -- shake: keep (used by a proof inside an exposed definition)
 import OddOrder.GroupTheory.RepresentationTheory.SimpleSubmoduleIndependence
-import Mathlib.Algebra.DirectSum.Module
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # The restriction as a direct sum of conjugates (BG Lemma 2.3, case (ii))
@@ -41,6 +37,8 @@ Then the restriction decomposes as the internal direct sum of the `p` conjugates
 * Independence (`iSupIndep_of_pairwise_not_linearEquiv_of_isSimpleModule`) plus spanning
   (`iSup_map_conjSemilinearEnd_eq_top`) give an internal direct sum, and the dimensions add up.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

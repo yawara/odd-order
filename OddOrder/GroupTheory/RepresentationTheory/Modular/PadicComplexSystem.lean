@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.NumberTheory.Padics.Complex
+module
+
+public import Mathlib.NumberTheory.Padics.Complex
+public import OddOrder.GroupTheory.PRegularElement
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import Mathlib.RepresentationTheory.Maschke
 import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import Mathlib.RingTheory.Valuation.LocalSubring
 import OddOrder.Algebra.AlgClosedFractionField
-import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
@@ -53,6 +57,8 @@ residue class.
 * `OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent` and its residue
   companion — the `ω`/`ω'` of *any* finite group, with no side condition to discharge
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 
@@ -136,14 +142,14 @@ theorem exists_isPrimitiveRoot_padicComplexInt {n : ℕ} (hn : ¬ p ∣ n) (hn0 
     ∃ ζ : 𝓞_ℂ_[p], IsPrimitiveRoot ζ n := by
   have : NeZero n := ⟨hn0⟩
   have := hasEnoughRootsOfUnity_padicComplexInt p hn hn0
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
+  exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot _ n
 
 /-- The residue-field companion of `exists_isPrimitiveRoot_padicComplexInt`. -/
 theorem exists_isPrimitiveRoot_residueField_padicComplexInt {n : ℕ} (hn : ¬ p ∣ n) (hn0 : n ≠ 0) :
     ∃ ζ : ResidueField 𝓞_ℂ_[p], IsPrimitiveRoot ζ n := by
   have : NeZero n := ⟨hn0⟩
   have := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
+  exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot _ n
 
 /-- **`ℂ_[p]` has a primitive `n`-th root of unity for every `n ≠ 0`.**
 
@@ -156,7 +162,7 @@ characterisation of virtual characters runs over `ℚ(ζ_{|G|})`, and `|G|` is d
 theorem exists_isPrimitiveRoot_padicComplex {n : ℕ} (hn0 : n ≠ 0) :
     ∃ ζ : ℂ_[p], IsPrimitiveRoot ζ n := by
   have : NeZero ((n : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hn0⟩
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] n
+  exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot ℂ_[p] n
 
 /-- **A primitive `p`-th root of unity in `𝓞_ℂ_[p]`, congruent to `1` modulo `𝔪`.**
 
@@ -171,7 +177,7 @@ theorem exists_pow_eq_one_residue_eq_one_padicComplexInt :
     ∃ ζ : 𝓞_ℂ_[p], ζ ^ p = 1 ∧ residue 𝓞_ℂ_[p] ζ = 1 ∧
       algebraMap 𝓞_ℂ_[p] ℂ_[p] ζ ≠ 1 := by
   have : NeZero ((p : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hp.out.ne_zero⟩
-  obtain ⟨z, hz⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] p
+  obtain ⟨z, hz⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot ℂ_[p] p
   have hzp : z ^ p = 1 := hz.pow_eq_one
   have hz1 : z ≠ 1 := hz.ne_one hp.out.one_lt
   -- a root of unity lies in the valuation subring

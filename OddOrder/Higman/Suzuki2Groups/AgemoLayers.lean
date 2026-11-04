@@ -3,12 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Irreducible
-import OddOrder.GroupTheory.Homocyclic
+module
+
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.GroupTheory.Homocyclic
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import OddOrder.GroupTheory.PRank
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # Higman Lemma 1: successive Agemo layers
@@ -23,6 +26,8 @@ on the involutions is transitive on the nonidentity elements of every
 successive quotient.  This is the precise Lean form of Higman's sentence that
 the power mappings are linear and all these quotients are irreducible.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

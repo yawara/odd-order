@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 13: ambient span of a restricted factor
@@ -16,6 +20,8 @@ Frattini subgroup `Φ(P)`, that factor vanishes in `L₀(P)`.  Consequently the
 ambient eigenfamily supplied by the other factor spans the image of every
 element of `S`, not only elements represented directly by that factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

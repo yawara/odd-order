@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
 # Odd Frobenius complements: prime-order subgroups are normal (Huppert V.8.18 b)
@@ -44,6 +47,8 @@ Let `A` be a finite Frobenius complement of odd order.
    `r ∤ |N|` both centralize `N` and lie over the unique order-`r` subgroup of the cyclic
    `A ⧸ N`.  A unique subgroup of its order is characteristic, hence normal.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -369,7 +374,7 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
       rwa [map_pow, map_one, Subgroup.coe_subtype] at this
     rw [hRgdef, Subgroup.mem_map] at hk
     obtain ⟨r₀, hr₀, hkval⟩ := hk
-    simp only [MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_coe, MulAut.conj_apply] at hkval
+    simp only [MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_ofClass, MulAut.conj_apply] at hkval
     have hr₀r : r₀ ^ r = 1 := by
       have h : (⟨r₀, hr₀⟩ : ↥R) ^ r = 1 := by rw [← hRcard]; exact pow_card_eq_one'
       have := congrArg (Subgroup.subtype R) h

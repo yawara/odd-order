@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.FieldTheory.PurelyInseparable.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.TorsionFree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 
@@ -33,6 +43,8 @@ force every term to be exactly what it must be: `c_{φφ} = 1` and `c_{φμ} = 0
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.12) (p. 25).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

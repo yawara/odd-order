@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.FiniteAbelian.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
 /-!
@@ -30,6 +31,8 @@ Ch.3 (Isaacs Thm 3.11), Ch.6 (6.9/6.15), Ch.7 (J(P) 定義) 共通の shared con
   `IsPGroup p G ∧ Monoid.exponent G ∣ p` への bridge は将来追加可.
 * 将来 mathlib upstream 視野で `OddOrder/Mathlib/ElementaryAbelian.lean` 候補.
 -/
+
+@[expose] public section
 
 -- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
 open scoped IsMulCommutative

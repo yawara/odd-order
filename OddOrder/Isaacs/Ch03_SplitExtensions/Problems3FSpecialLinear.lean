@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+module
+
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
 
 /-!
@@ -28,6 +35,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
 正規性 (24×8 通り) はすべて kernel で決定できる (合計 ~6s)。
 **`native_decide` は使わない** (`ofReduceBool` 公理が入り axiom-clean が壊れる)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 
@@ -130,7 +139,7 @@ def glReflection : GeneralLinearTwoThree :=
 /-- `-I ∈ SL(2,3)`: `SL(2,3)` の唯一の位数 2 の元 (= `Q_8` の中心元)。 -/
 def slNegOne : SpecialLinearTwoThree := ⟨!![-1, 0; 0, -1], by decide⟩
 
-private theorem reflection_conj_aux (A : Matrix (Fin 2) (Fin 2) (ZMod 3)) :
+theorem reflection_conj_aux (A : Matrix (Fin 2) (Fin 2) (ZMod 3)) :
     glReflectionMatrix * (glReflectionMatrix * A * glReflectionMatrix) * glReflectionMatrix
       = A := by
   rw [show glReflectionMatrix * (glReflectionMatrix * A * glReflectionMatrix) * glReflectionMatrix

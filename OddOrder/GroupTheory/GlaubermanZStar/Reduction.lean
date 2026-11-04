@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.Basic
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
+import OddOrder.GroupTheory.GlaubermanZStar.Basic
+import OddOrder.GroupTheory.IsolatedInvolution
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
 
 /-!
@@ -31,6 +39,8 @@ order at most `n` in a fixed universe.
 * `OddOrder.GroupTheory.commutator_eq_one_of_mem_normal`
 * `OddOrder.GroupTheory.commutator_eq_one_of_center_ne_bot`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

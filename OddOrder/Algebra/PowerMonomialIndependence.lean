@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.LinearIndependent.Basic
-import Mathlib.Algebra.Group.Units.Hom
-import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
+module
+
+public import Mathlib.RingTheory.Trace.Defs
 import Mathlib.FieldTheory.Finite.Trace
 
 /-!
@@ -30,6 +30,8 @@ are pairwise disjoint precisely when `e ∉ ⟨3⟩` — whence all coefficients
 * `powHom_ne_of_apply_ne` — a witness separating two exponents separates the two homomorphisms.
 * `eq_zero_of_sum_powHom_eq_zero` — **the independence statement**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.PowerMonomial
 

@@ -3,12 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.FeitThompson
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Peterfalvi.S16_NonExistenceG
+module
+
+public import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RepresentationTheory.Submodule
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.FeitThompson
+import OddOrder.GroupTheory.FittingSelfCentralizing
 import OddOrder.GroupTheory.PrimeOrderSubgroups
-import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Appendix I: A Special Case of a Theorem of Huppert
@@ -49,6 +60,8 @@ this family, and a centrality argument supplies at least two nonzero summands,
 so part (1) gives fixed-point-freeness.  Thus the Lemma and Proposition 1 are
 both unconditional.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
 

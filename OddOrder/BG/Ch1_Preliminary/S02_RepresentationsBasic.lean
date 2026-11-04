@@ -3,27 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S02_RepresentationPropositions
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Sylow
+import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RepresentationTheory.Submodule
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Sylow
-import Mathlib.LinearAlgebra.Charpoly.BaseChange
-import Mathlib.LinearAlgebra.Determinant
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.TensorProduct.Finiteness
-import Mathlib.LinearAlgebra.TensorProduct.Tower
-import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # S02_RepresentationsBasic
@@ -31,6 +21,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §2: General Results on Representations
@@ -212,8 +204,6 @@ Frobenius Actions であって Clifford 章ではない). したがって本節�
 namespace OddOrder.BG.Ch1.S02
 
 open scoped Pointwise
-open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
-  baseChangeRepresentation_faithful)
 
 /-! ## §2F: Odd-Order Two-Dim Representation (Thm 2.6, mmd L774-793)
 
@@ -575,7 +565,7 @@ private theorem exists_scalar_apply_of_finrank_eq_one
   simpa using congrArg (fun u : Module.End F M => u m) hc
 
 /-- A representation on a one-dimensional module has a scalar monoid character. -/
-private noncomputable def scalarMonoidHomOfFinrankEqOne
+noncomputable def scalarMonoidHomOfFinrankEqOne
     {F : Type*} [Field F] {G : Type*} [Monoid G]
     {M : Type*} [AddCommGroup M] [Module F M] [Module.Free F M]
     (hdim : Module.finrank F M = 1) (ρ : Representation F G M) : G →* F where

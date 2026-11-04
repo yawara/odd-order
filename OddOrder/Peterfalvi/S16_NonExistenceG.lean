@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
-import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
-import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
-import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM
+module -- shake: keep-all
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
+public import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
+public import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM
+import Mathlib.Tactic.NormNum.Prime

@@ -3,15 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+module
+
+public import Mathlib.Algebra.Module.Pi
+public import Mathlib.Algebra.Star.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Algebra.Module.Submodule.Defs
 import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.Group.Conj
-import Mathlib.Algebra.GroupWithZero.Invertible
-import Mathlib.Algebra.Module.Pi
-import Mathlib.Algebra.Module.Submodule.Basic
-import Mathlib.Algebra.Star.Basic
-import Mathlib.Data.Fintype.Card
-import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Class functions on a group
@@ -46,6 +44,8 @@ mathlib に `ClassFunction G k` という型は **存在しない** (Peterfalvi 
   (../../../notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md) §3.1, §6.1.
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.PElementSum
+module
+
+public import OddOrder.Algebra.PElementSum
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 
 /-!
 # The block characters of `Ĝ⁰`
@@ -32,6 +40,8 @@ the principal-block value.
 * `OddOrder.RepresentationTheory.Modular.centralScalar_pRegularSum_mul_character_one`
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_principalBlock_pRegularSum`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

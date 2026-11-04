@@ -2,19 +2,37 @@
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.GroupTheory.Perm.Cycle.Type
+module
+
+public import OddOrder.GroupTheory.CentralProduct
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S04_ExtraspecialCommutator
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
 import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
-import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
-import OddOrder.GroupTheory.CentralProduct
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # S04f_Omega1
 
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04f_Blackburn` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §4F — Blackburn rank-two classification
@@ -725,7 +743,7 @@ private theorem blackburn_noncentral_centralizer_ne_top
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  obtain ⟨z, hzT, hzZ⟩ := IsConcreteLE.exists_of_lt hT_facts.1
   have hzS : z ∈ S := hT_facts.2.1.le hzT
   intro hC_top
   have hz_center : (⟨z, hzS⟩ : S) ∈ Subgroup.center S := by
@@ -793,7 +811,7 @@ theorem blackburn_noncentral_omega1_not_le_centralizer
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  obtain ⟨z, hzT, hzZ⟩ := SetLike.exists_of_lt hT_facts.1
+  obtain ⟨z, hzT, hzZ⟩ := IsConcreteLE.exists_of_lt hT_facts.1
   have hzS : z ∈ S := hT_facts.2.1.le hzT
   intro hS_le_C
   have hz_center : (⟨z, hzS⟩ : S) ∈ Subgroup.center S := by

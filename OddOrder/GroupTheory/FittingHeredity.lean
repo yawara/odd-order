@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import OddOrder.Isaacs.Ch01_Sylow.Basic
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 import OddOrder.Mathlib.QuotientGroup
 
 /-!
@@ -55,6 +56,8 @@ induction on `|G| + |H|` carries the hypotheses "`G₀/F(G₀)` and `(G/G₀)/F(
 nilpotent" both to a subgroup (`L ⊔ H ≤ G`) and to a quotient (`G ⧸ N` for a minimal
 normal `N`), which is exactly the pair of facts proved here.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

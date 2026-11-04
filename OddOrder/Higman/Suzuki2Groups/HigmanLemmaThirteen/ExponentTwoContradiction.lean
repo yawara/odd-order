@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAlignedParameterBranches
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicParameterBranch
 
@@ -18,6 +22,8 @@ parameter coincidence refines into three aligned branches and one all-equal
 nontrivial branch.  The corresponding branch contradictions therefore rule
 out exponent two in the Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

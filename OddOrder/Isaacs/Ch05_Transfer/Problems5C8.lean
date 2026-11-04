@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 5C.8 — 最小奇素数 `p` で `p^3 ∤ |G|` なら正規 `p`-補群 (p. 163)
@@ -25,6 +30,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Basic
 (書籍の標準証明は `|Aut(C_p × C_p)| = |GL_2(F_p)| = p(p-1)^2(p+1)` を使うが、
 mathlib に `Aut` の同型計算が無いので軌道数え上げで置き換えた。)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

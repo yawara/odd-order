@@ -3,13 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.AdjoinRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import Mathlib.Algebra.Polynomial.SpecificDegree
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.LinearAlgebra.Pi
-import Mathlib.RingTheory.AdjoinRoot
-import Mathlib.Algebra.CharP.Two
-import Mathlib.Tactic.ComputeDegree
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Perfect
 
 /-!
 # Peterfalvi Appendix III, Proposition 1: the field model of `B(n, 1, ε)`
@@ -38,6 +39,8 @@ Main declarations:
   finite `F` the norm (equivalently the square map `q`) is surjective, since
   in characteristic `2` already the scalars `a·ā = a²` exhaust `F`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

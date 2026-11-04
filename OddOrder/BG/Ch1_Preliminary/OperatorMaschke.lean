@@ -3,14 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import Mathlib.RepresentationTheory.Maschke
 import Mathlib.RepresentationTheory.Submodule
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.Algebra.Module.ZMod
 
 /-!
 # BG §4 — N-4: Maschke A-invariant complement bridge
@@ -36,6 +36,8 @@ bridge**: it views `Ω₁(R ⧸ S)` additively as a `ZMod p`-module, lifts the `
 * `isElementaryAbelian_omega_one_of_comm` — `Ω₁` of an abelian group is elementary abelian.
 * `exists_aInvariant_complement_in_omega1_quotient` — the Maschke bridge (N-4).
 -/
+
+@[expose] public section
 
 open scoped IsMulCommutative
 

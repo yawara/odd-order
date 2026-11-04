@@ -3,11 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 import OddOrder.Peterfalvi.S13_TypeDetermination
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
-import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
 
 /-! # T-side degree arithmetic for Peterfalvi (13.3.a,c) (pp. 76-77)
 
@@ -32,6 +43,8 @@ The `T`-side mirrors of the `S`-side (13.3) degree/counting layer, giving the `Î
 Consumed by `Hypothesis.deltaPrime_eq_one_T` (`S15_CharacterDegreeSupply`), whose only
 remaining input is the Î½-grid supply itself (`nuGridSupply`, a-owned producer threading).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

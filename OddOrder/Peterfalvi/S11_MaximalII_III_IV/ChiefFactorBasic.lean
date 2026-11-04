@@ -1,4 +1,11 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §11 — chief-factor core: opening layer
@@ -6,6 +13,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

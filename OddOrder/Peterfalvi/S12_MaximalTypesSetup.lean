@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
 import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
@@ -11,6 +17,8 @@ import OddOrder.Peterfalvi.S12_Props109To1011
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory

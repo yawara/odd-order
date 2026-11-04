@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
 
 /-!
@@ -35,6 +43,8 @@ applies.  The degenerate case `P = ⊥` is `hasNormalPComplement_of_sylow_eq_bot
 - `OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer`:
   **Isaacs Thm 6.23**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

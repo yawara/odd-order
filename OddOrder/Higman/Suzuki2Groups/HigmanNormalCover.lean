@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Order.Atoms.Finite
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.MinimalInvariantNormal
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman Lemma 3: normal invariant covers
@@ -18,6 +24,8 @@ The cover relation in Higman Lemma 3 is taken in the poset of normal actor-invar
 subgroups, not in the lattice of all subgroups. This file models that poset
 honestly and proves the cover--Frattini paragraph on p. 83.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

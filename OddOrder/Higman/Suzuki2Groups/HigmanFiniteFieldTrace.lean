@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.Perfect
+public import Mathlib.RingTheory.Trace.Defs
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.RingTheory.Trace.Basic
 import OddOrder.Algebra.ChevalleyWarning
-import Mathlib.FieldTheory.Finite.Trace
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Higman Lemma 10: finite-field trace
@@ -29,6 +33,8 @@ forces the required dimension inequality. This proves exactly Higman's
 statement, including negative integer Frobenius powers, while the first
 result retains the opening case of Higman's direct field-theoretic proof.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Peterfalvi (1.3.a), the restriction–complement equivalence core
@@ -20,6 +24,8 @@ The nontrivial direction splits `D = D_A + (D − D_A)` along the indicator of `
 function by conjugation-invariance of `A`), places `D_A` in the span of `Φ`, and forces
 `⟨D_A, D_A⟩ = 0`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

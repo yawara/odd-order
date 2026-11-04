@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CommutatorSpan
+module
+
+public import OddOrder.Algebra.CommutatorSpan
+public import Mathlib.Algebra.Algebra.Hom
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # The commutator span and its `p`-radical along algebra maps
@@ -24,6 +29,8 @@ using the iterated freshman's dream, `x ^ (p ^ (m + r)) ≡ t ^ (p ^ r) ∈ T(A)
 * `OddOrder.map_mem_commutatorRadical` — `T'` maps into `T'`
 * `OddOrder.mem_commutatorRadical_of_map_mem` — and conversely, for a nil kernel
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

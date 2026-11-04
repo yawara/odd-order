@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppE_FurtherResults
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.BG.AppE_AbelianCentralizer
+import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.GroupTheory.CommutatorSup
 
 /-!
@@ -36,6 +47,8 @@ Three things are supplied here:
 The lower bound `3 ≤ k` is the one BG does not state; it is what rules out the alternative
 recursion in `(E.23)` (see `commutator_self_le_of_generator`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

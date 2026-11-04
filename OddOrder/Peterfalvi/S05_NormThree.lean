@@ -3,20 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_TICyclic
-import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+module
+
+public import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-import Mathlib.FieldTheory.Minpoly.IsConjRoot
-import Mathlib.LinearAlgebra.Basis.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # S05_NormThree
 
 Prefix-split from `OddOrder.Peterfalvi.S05_SignedTripleGrid` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §5: signed-triple / sunflower combinatorics for the `σ`-construction

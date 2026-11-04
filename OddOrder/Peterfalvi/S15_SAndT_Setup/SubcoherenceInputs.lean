@@ -1,15 +1,15 @@
-import OddOrder.Peterfalvi.S14_MaximalI
-import OddOrder.Peterfalvi.S07_Subcoherent
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.Peterfalvi.S09_CertificateDischarge
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.Algebra.GaloisRationalInteger
-import OddOrder.GroupTheory.TISubsetCounting
-import Mathlib.Algebra.BigOperators.ModEq
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
+module
+
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S10_BGInterface
+public import OddOrder.Peterfalvi.S10_TypePSupport -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S12_Noncoherence
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 
 /-!
 # SubcoherenceInputs
@@ -17,6 +17,8 @@ import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue
 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (13.1)-(13.2) — S,T hypothesis and basic structure

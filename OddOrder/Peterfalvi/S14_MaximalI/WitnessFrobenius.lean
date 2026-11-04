@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
 import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
@@ -14,6 +24,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 This leaf proves the witness subgroup is Frobenius, identifies the intersection with the
 counterexample subgroup, and supplies the witness coherence used by the later (12.12) analysis.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
@@ -343,7 +355,7 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
   obtain ⟨n, hnK, hn1, hnA⟩ := exists_ne_one_centralized_by_complement_of_kernel_not_centralizes
     hHL hFrobL hP_le_H hPne hAL hAH hAne hAP hPAK hKsolv hcop hPnc
   -- **`C_K(x) ≠ 1`** (Peterfalvi (12.9)).
-  obtain ⟨n', hn'mem, hn'K'⟩ := SetLike.not_le_iff_exists.mp data.CKx_not_le_Kprime
+  obtain ⟨n', hn'mem, hn'K'⟩ := IsConcreteLE.not_le_iff_exists.mp data.CKx_not_le_Kprime
   obtain ⟨hn'C, hn'K⟩ := Subgroup.mem_inf.mp hn'mem
   have hn'1 : n' ≠ 1 := fun h => hn'K' (by rw [h]; exact Subgroup.one_mem _)
   -- **`A` and `x` in a common abelian `W ≤ M ∩ L`** (step (8.1.b), `V = M ∩ L`).

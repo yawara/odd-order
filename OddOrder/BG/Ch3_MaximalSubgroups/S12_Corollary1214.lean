@@ -3,7 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12 Corollary 12.14 — `ℳ(C_G(X)) = {M}` for central `ℰ_p¹` subgroups (downstream leaf)
@@ -32,6 +46,8 @@ Suppose `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`, and `p ∈ β(M)` or `X ⊆ M_σ'`. T
   Cor 10.7(b) の中心積で `P' ⊆ Z(P)`、`X ⊆ P'` ゆえ `P` は nonabelian かつ `X ≤ Z(P)`、
   Thm 12.13 で `P ∈ 𝒰`。`X ⊆ M_σ'` は Lemma 10.8(c) (`p ∉ β(M)`) 経由で `X ⊆ P'`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12.Cor1214
 
@@ -141,7 +157,7 @@ theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
     exact Subgroup.map_mono hXPM
   -- **`C_G(X) < ⊤`**: else `X ≤ Z(G) = ⊥`, contradicting `X ≠ ⊥`.
   have hcenter_bot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exfalso
       refine hG.notSolvable (Group.isSolvable_of_comm fun a b => ?_)

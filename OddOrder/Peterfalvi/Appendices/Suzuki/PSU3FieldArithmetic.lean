@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.RootsOfUnity.Basic
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.QuadraticFrobenius
 
 /-!
@@ -29,6 +38,8 @@ automorphism `θ` of odd order.
 The group-theoretic side of §2 - the orbit counts of steps (8) and (9) - is in
 `PSU3OrbitCount`, which imports this file.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

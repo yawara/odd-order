@@ -3,10 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Star.Basic
-import Mathlib.FieldTheory.Finite.Extension
+module
+
+public import Mathlib.FieldTheory.Finite.Extension
+public import Mathlib.RingTheory.Trace.Defs
 import Mathlib.FieldTheory.Finite.Trace
-import Mathlib.GroupTheory.Coset.Basic
 
 /-!
 # The quadratic field for three-dimensional projective unitary groups
@@ -25,6 +26,8 @@ Lemma 1 and Proposition 1(c)** (pp. 104–106).  Peterfalvi's `PSU(3,q)` is
 Huppert's `PSU(3,q²)`; the standard unitary model is cited as Huppert,
 Kapitel II, Satz 10.12 (p. 242).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
 import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
 /-!
 # Peterfalvi §13 (pp. 80–83) — Core-typed `λ` correction supply
@@ -14,6 +20,8 @@ This file constructs the S-side ingredients of Peterfalvi (13.5)/(13.6) from the
 generic `hypothesis76AlphaFun` for the chosen-base `(S, H^#)` family; only the S-side
 coefficient integrality, support, and coherence inputs are specialized here.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

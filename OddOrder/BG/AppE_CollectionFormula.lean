@@ -3,11 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+module
+
+public import OddOrder.GroupTheory.HallCollection
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
 import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.HallPetresco
-import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.RegularPGroup
 
 /-!
@@ -26,6 +34,8 @@ further upstream, in `OddOrder/GroupTheory/`: `HallCollection.lean` (the ordered
 its collapse lemmas), `HallPetresco.lean` (`(E.1)` in general form, via Mann's route), and
 `RegularPGroup.lean` (BG's unnumbered "Step 1", stated for arbitrary groups).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

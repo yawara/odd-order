@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 
 /-!
@@ -36,6 +41,8 @@ to define it.
   is nonzero
 * `OddOrder.RepresentationTheory.Modular.sum_blockPart` — `∑_B θ_B = θ`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

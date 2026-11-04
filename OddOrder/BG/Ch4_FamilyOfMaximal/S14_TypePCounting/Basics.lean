@@ -1,15 +1,21 @@
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+module
+
+public import OddOrder.GroupTheory.MaximalSubgroupType
+public import OddOrder.GroupTheory.PiElementDecomposition
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
-import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.PiElementDecomposition
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
 
 /-!
 # BG §14 — split-extension derived subgroup + kappa(M), type-P families, sigma-length
@@ -17,6 +23,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
 split, issue 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S14
 

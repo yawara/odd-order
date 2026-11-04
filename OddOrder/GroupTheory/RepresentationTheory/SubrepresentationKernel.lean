@@ -1,4 +1,6 @@
-import Mathlib.RepresentationTheory.Subrepresentation
+module
+
+public import Mathlib.RepresentationTheory.Subrepresentation
 import OddOrder.Mathlib.Subgroup
 
 /-!
@@ -6,6 +8,8 @@ import OddOrder.Mathlib.Subgroup
 
 Shared representation-theoretic kernel lemmas used by the odd-order formalization.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.RepresentationTheory
 

@@ -3,8 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
-import OddOrder.Peterfalvi.S12_TypeVSibley
+module
+
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+public import OddOrder.Peterfalvi.S12_TypeVSibley
+public import OddOrder.Peterfalvi.S07_PivotCoherence
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S13_SixTwoBridge -- shake: keep (used by a proof inside an exposed definition)
 import OddOrder.Peterfalvi.S13_SixTwoImageData
 
 /-!
@@ -12,6 +22,8 @@ import OddOrder.Peterfalvi.S13_SixTwoImageData
 
 Prefix-split from `OddOrder.Peterfalvi.S13_MaximalIII_IV` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S13
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorCopyTransport
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
 
@@ -15,6 +19,8 @@ The canonical equivalence between its two `subgroupOf` copies intertwines the
 restricted ambient actor.  Consequently, normalized factor coordinates in
 the two joins have the same square-law automorphism.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.CompositionSeries
 
 /-!
@@ -20,6 +27,8 @@ The no-long-chain clauses are proved by pulling an arbitrary quotient chain
 back to `P`.  Prepending the already constructed lower Frattini step gives
 a five-step ambient chain, contradicting exact `ξ`-length four.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

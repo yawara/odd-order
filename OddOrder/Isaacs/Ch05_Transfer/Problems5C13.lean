@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C12
 
 /-!
 # Isaacs Problem 5C.13 (Navarro) — 自己正規化 Sylow と `N_G(P')` (p. 164)
@@ -33,6 +41,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C12
 5. `L ≤ P ≤ N_G(X)` なので 3 と合わせて `N_G(X) = G`, すなわち `X ⊴ G`。`|X|` は `p` と素で
    `|G:X| = |L|·|G:K|` は `p`-冪 ⟹ `X` が正規 `p`-補群。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

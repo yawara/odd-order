@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.BlockCornerLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 
 /-!
 # Navarro (5.6)
@@ -32,6 +36,8 @@ The proof is the textbook one.  Split the block idempotent as `f_B = a - c`, wit
 
 * `OddOrder.RepresentationTheory.Modular.exists_inducedBlock_witness` — Navarro (5.6)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 
@@ -66,10 +72,10 @@ theorem centerReduce_subgroupTrunc
     rw [coe_centerTrunc, coe_centerReduce, coe_centerReduce, centerReduceHom_apply,
       centerReduceHom_apply, OddOrder.GroupAlgebra.mapRingHom_subgroupTrunc]
 
-omit [Finite ιG] [Finite ιH] in
 -- The finiteness instances for `H` are consumed by (5.5), applied to the group `H`.
 set_option linter.unusedDecidableInType false in
 set_option linter.unusedFintypeInType false in
+omit [Finite ιG] [Finite ιH] in
 /-- **Navarro (5.6).**  If `b` is a block of `H ≤ G` with `b^G = B`, then there is a `w ∈ 𝒪G`
 supported off `H`, centralised by `H`, with `w f_b = w` and `(1 - f_B) f_b = (1 - f_B) w`. -/
 theorem exists_inducedBlock_witness

@@ -3,18 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.Coset.Card
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Data.Setoid.Basic
-import Mathlib.Tactic.Group
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.LinearAlgebra.Span.Basic
+module
+
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.LinearAlgebra.Span.Defs
+import Mathlib.Order.Hom.CompleteLattice
 
 /-!
 # Auxiliary `Subgroup` lemmas
@@ -46,6 +41,8 @@ mathlib に不在の汎用 `Subgroup` 補題 (v4.34.1 で全宣言名の不在�
   `centralizer_sup`, `isMulCommutative_sup_of_le_centralizer`
   → `Mathlib/GroupTheory/Subgroup/Centralizer.lean`
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

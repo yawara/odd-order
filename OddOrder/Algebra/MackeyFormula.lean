@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Quotient
-import OddOrder.Algebra.RelativeTrace
+module
+
+public import OddOrder.Algebra.RelativeTrace
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Mackey's formula for relative traces
@@ -28,6 +35,8 @@ groups of a block to form a single conjugacy class.
 * `OddOrder.GAlgebra.exists_mackey` — Mackey's formula, with the double-coset representatives
   produced as a `Finset G`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GAlgebra
 

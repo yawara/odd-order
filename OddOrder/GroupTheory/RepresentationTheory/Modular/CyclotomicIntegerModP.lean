@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.Adjoin.Polynomial.Basic
+public import Mathlib.RingTheory.Ideal.Quotient.Defs
+public import Mathlib.RingTheory.Ideal.Span
+public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 
 /-!
@@ -33,6 +43,8 @@ Both facts come from the `ℤ`-basis `1, ω, …, ω^{n-1}` of `ℤ[ω]` establi
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.5 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

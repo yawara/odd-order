@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Theorem 12.5 — the τ₂-case gateway
@@ -29,6 +41,8 @@ Corollary 11.6。(e) は二分: `N_G(A₀') ⊆ M*` なる線があれば Lemma 
 `M*_α S = S ⊴ M*` (`normalizer_Malpha_sup_sylow_of_mem_sigma`) で
 `⁅A, M_σ ∩ M*⁆ ≤ (M_σ ∩ M*) ⊓ S = 1` から同結論。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

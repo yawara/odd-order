@@ -3,6 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.Algebra.NormalPSubgroupTrivialAction
+import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -32,6 +43,8 @@ i.e. the Cartan matrix of `B_0` is the `1 × 1` matrix `(|G|_p)`.
 * `OddOrder.RepresentationTheory.Modular.forall_eq_one_iff_blockOfIrr_eq_principalBlock`
 * `OddOrder.RepresentationTheory.Modular.card_mul_sum_sq_principalBlock` — the Cartan value
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

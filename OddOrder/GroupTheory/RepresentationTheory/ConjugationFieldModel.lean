@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_NormSet
+module
+
+public import OddOrder.BG.AppC_NormSetBasic
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.RepresentationTheory.Basic
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
@@ -26,6 +32,8 @@ This is side-agnostic: Peterfalvi's `S`-side uses `(E,C)=(P,U)` and the `T`-side
 * Peterfalvi, `(9.7.b)`, `(14.2)(a)`, and `(14.4)`.
 * `issues/9097-conjugation-galois-field-model.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.ConjugationFieldModel
 

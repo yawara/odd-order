@@ -1,8 +1,17 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+public import OddOrder.Peterfalvi.S07_Subcoherent
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
-import OddOrder.Peterfalvi.S11_CaseAOddPartBound
-import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_TypeDetermination
 
 /-!
 # TAIL
@@ -10,6 +19,8 @@ import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue
 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

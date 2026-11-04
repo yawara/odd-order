@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
-import OddOrder.GroupTheory.PrimeComplementResidual
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+public import OddOrder.GroupTheory.PrimeComplementResidual
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 
 /-!
 # Peterfalvi Part II, Ch. I §3: Proposition 1(c), centralizer residual
@@ -20,6 +28,8 @@ the source's center equality for the normal closure `⟨C_Q(X)^L⟩`; its
 identification with `O^{2′}(L)` and quotient transport are packaged once
 the induction target supplies the honest proof that `C_Q(X)` is a `2`-group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

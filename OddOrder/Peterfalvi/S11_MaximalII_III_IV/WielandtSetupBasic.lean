@@ -1,20 +1,14 @@
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.GroupTheory.CoprimeFixedPoints
+module
+
+public import OddOrder.GroupTheory.CoprimeAction
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_StructureSetup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §11 — the Wielandt setup: opening layer
@@ -22,6 +16,8 @@ import OddOrder.Mathlib.SchurZassenhausConj
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -537,7 +533,7 @@ private theorem maximal_normalizer_eq_self [Finite G] (hG : OddOrder.BG.IsMinima
   have hlt : M < Subgroup.normalizer (M : Set G) :=
     lt_of_le_of_ne Subgroup.le_normalizer (fun heq => hle heq.ge)
   have hnormal : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
-  rcases hG.simple.eq_bot_or_eq_top_of_normal M hnormal with hb | ht
+  rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
   · exact hG.ne_bot_of_isCoatom hco hb
   · exact hco.1 ht
 

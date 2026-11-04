@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The primitive central idempotents of `K[G]`
@@ -35,6 +45,8 @@ so this is the entry point to the character side of Külshammer's formula.
 * `OddOrder.RepresentationTheory.Modular.eq_sum_centralScalar_smul_ordinaryIdempotent` — the
   spectral decomposition of `Z(K[G])`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

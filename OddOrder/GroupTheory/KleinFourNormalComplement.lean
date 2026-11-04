@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.KleinFourSylowFusion
-import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # Klein four Sylow `2`-subgroups: two non-conjugate involutions force a normal `2`-complement
@@ -26,6 +32,8 @@ a single class, and `C` has a normal `2`-complement.
 * `OddOrder.GroupTheory.exists_not_isConj_of_mem_center` — a central involution keeps a Klein four
   Sylow `2`-subgroup from having a single class
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

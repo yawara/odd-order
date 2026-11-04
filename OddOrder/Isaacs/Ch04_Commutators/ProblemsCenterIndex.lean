@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+module
+
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.10 (中心の指数が小さい `p`-群の導来部分群)
@@ -26,6 +32,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.10 (書籍 p. 124)�
 `|Ḡ'| · |Ā ⊓ Z(Ḡ)| = |Ā|` を与える。`Z(G)` の像が `Ā ⊓ Z(Ḡ)` に入ることと
 像・核の位数関係を組み合わせる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 
@@ -176,7 +184,7 @@ theorem card_commutator_le_pow_choose_two {p : ℕ} [Fact p.Prime] :
       Subgroup.NormalizerCondition.normal_of_coatom Q
         (Group.normalizerCondition_of_isNilpotent (G := G)) hQco
     have hQprime : (Q.index).Prime :=
-      (OddOrder.Isaacs.Ch01.isCoatom_iff_index_prime Q).mp hQco
+      (Subgroup.isCoatom_iff_index_prime Q).mp hQco
     have hQp : Q.index = p := by
       obtain ⟨k, hk⟩ := hP.exists_card_eq
       have hdvd : Q.index ∣ p ^ k := hk ▸ Subgroup.index_dvd_card Q

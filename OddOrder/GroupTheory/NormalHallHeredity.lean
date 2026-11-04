@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.Index
 
 /-!
 # Heredity of the normal Hall condition for subgroups and quotients
@@ -51,6 +53,8 @@ Hall subgroup of `G`" both to a subgroup (`L ⊔ H ≤ G`) and to a quotient (`G
 minimal normal `N`).  The companion Fitting-quotient half of the same transport is
 `OddOrder.GroupTheory.FittingHeredity`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

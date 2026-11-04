@@ -1,5 +1,9 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # TAIL
@@ -7,6 +11,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

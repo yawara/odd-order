@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The standard `PSU(3, ℓ)` model satisfies Peterfalvi's hypothesis
@@ -51,6 +57,8 @@ it from the ambient induction hypothesis together with
   set moved to an arbitrary universe, which is what lets §4 hand it the ambient induction
   hypothesis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

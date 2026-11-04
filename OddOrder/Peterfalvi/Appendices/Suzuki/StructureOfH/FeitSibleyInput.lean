@@ -3,10 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+public import OddOrder.Peterfalvi.Appendices.FeitSibley
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 
 /-!
 # Peterfalvi Part II, Ch. III: the Feit–Sibley configuration
@@ -28,6 +35,8 @@ This leaf supplies the remaining inputs of `FeitSibley.Hypothesis`:
 * `(|Q|, |D|) = 1`: an odd prime dividing `|Q|` divides the odd part `|Q₁|`,
   and `|D|` is odd, so the `2`-part is excluded as well.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

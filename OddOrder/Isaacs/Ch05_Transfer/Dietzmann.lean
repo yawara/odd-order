@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Algebra.Group.Submonoid.Membership
+module
+
+public import Mathlib.Data.Set.Finite.Basic
+public import Mathlib.Algebra.BigOperators.Group.List.Defs
+public import Mathlib.Algebra.Group.Subgroup.Lattice
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Basic.Finite.Prod
-import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Tactic.Group
 
 /-!
@@ -55,6 +57,8 @@ of Isaacs §5B at book strength.
 - `OddOrder.Isaacs.Ch05.dietzmann_setFinite`: **Isaacs Thm 5.10**, `Set.Finite` form.
 - `OddOrder.Isaacs.Ch05.dietzmann`: **Isaacs Thm 5.10**, `Finite`-subtype form.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

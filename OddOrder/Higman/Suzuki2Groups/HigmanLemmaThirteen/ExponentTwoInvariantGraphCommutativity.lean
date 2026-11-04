@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketCommutativity
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphPreimage
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketCommutativity
+public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketFaithfulness
 
 /-!
 # Higman's Lemma 13: invariant graph factors commute with the common factor
@@ -18,6 +23,8 @@ coordinate be reparameterized while applying the same actor power.  Quotient
 range descriptions then lift this family cancellation to elementwise
 commutativity of the actual canonical graph preimage and common factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

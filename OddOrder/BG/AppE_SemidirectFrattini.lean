@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_ExponentP
+module
+
+public import OddOrder.BG.AppE_ExponentP
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_FurtherResults
+import OddOrder.GroupTheory.MaxNilpotentNormalHall
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
@@ -34,6 +44,8 @@ The counting half of Step 4 (`(E.15)`, `(E.17)`, the class/coset identification 
 to `R₀^β = R₀^x`, the semidirect product `G = S ⋊ B`, the Frattini variation, and the
 Schur–Zassenhaus descent.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

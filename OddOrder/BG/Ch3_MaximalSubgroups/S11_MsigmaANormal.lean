@@ -3,9 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch1_Preliminary.S05b_Thm420Hall
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG Theorem 11.7: `M_σ A ⊴ M`
@@ -37,6 +53,8 @@ Theorem 11.5 / Corollary 11.6 を消費する単一定理 leaf。
     `[Q₀,Aᵢ] ⊴ M`。ゆえに `Q₀ ⊴ M`、`N_G(Q) ≤ N_G(Q₀) = M`。だが `Q` は `M` の
     Sylow `q` (Hall 連鎖) かつ `q ∉ σ(M)`、σ の定義に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S11
 
@@ -915,7 +933,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
       have hlt : M < Subgroup.normalizer (Q₀ : Set G) :=
         lt_of_le_of_ne hM_norm_Q₀ (Ne.symm hne')
       have hnormal : Q₀.Normal := Subgroup.normalizer_eq_top_iff.mp (hM.2 _ hlt)
-      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnormal with hbot | htop'
+      rcases hG.simple.eq_bot_or_eq_top_of_normal Q₀ with hbot | htop'
       · exact hQ₀_ne_bot hbot
       · exact hM.1 (top_le_iff.mp (htop' ▸ hQ₀_le_M))
     have hNQ_le_M : Subgroup.normalizer (Q : Set G) ≤ M := hNQ₀_eq_M ▸ hN_le

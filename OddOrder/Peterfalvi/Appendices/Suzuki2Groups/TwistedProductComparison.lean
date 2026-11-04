@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+public import Mathlib.Algebra.Algebra.ZMod -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.RingTheory.DedekindDomain.Basic
 import OddOrder.GroupTheory.CentralElementaryExtension
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 
 /-!
 # Twisted products with corresponding diagonals are isomorphic
@@ -32,6 +38,8 @@ the two diagonals are matched by
 * `BilinearTwistedProduct.exists_mulEquiv_of_diag` — the comparison, together with its
   effect on the two coordinates; `nonempty_mulEquiv_of_diag` is the bare form.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

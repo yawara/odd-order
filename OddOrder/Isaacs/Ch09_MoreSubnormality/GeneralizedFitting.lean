@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
-import OddOrder.Isaacs.Ch01_Sylow.Basic
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 
 /-!
 # Isaacs Ch. 9 — §9A: generalized Fitting subgroup F*(G) と Thm 9.8 / Cor 9.9 (p. 275)
@@ -22,6 +23,8 @@ Cor 9.9 の `←` (`F ⊇ C(F) ⇒ F* = F`) は Thm 9.7(c) のみに依る: `F(G
 なので `[E(G), F(G)] = 1`, ゆえ `E(G) ⊆ C_G(F(G)) ⊆ F(G)`, `F* = F(G) E(G) = F(G)`.
 `→` は Thm 9.8 (`F* ⊇ C(F*)`) を要する.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

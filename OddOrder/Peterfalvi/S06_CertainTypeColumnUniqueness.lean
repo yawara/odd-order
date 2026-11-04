@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (5.8), the uniqueness rider: a third equal-degree column forces the first case
@@ -42,6 +45,8 @@ The signs of the two columns agree (`certainType_columnSign_eq`) precisely becau
 
 Reference: issue 0161.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

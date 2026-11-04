@@ -3,12 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SubgroupInAmbient
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+module
+
+public import OddOrder.GroupTheory.NarrowPGroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.NarrowPGroup
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
@@ -68,6 +74,8 @@ is elementary abelian.
   `OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient`.
 * Issue 3013.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 

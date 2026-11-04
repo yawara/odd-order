@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Jacobson.Semiprimary
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
@@ -26,6 +34,8 @@ at all, since only there is `ρ g` of order prime to `p`.  The resulting multipl
 * `OddOrder.RepresentationTheory.Modular.exists_decomposition_of_finrank_le`
 * `OddOrder.RepresentationTheory.Modular.exists_decomposition`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

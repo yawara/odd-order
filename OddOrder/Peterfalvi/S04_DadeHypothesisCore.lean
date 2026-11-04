@@ -3,19 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Fintype.Card
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Algebra.Module.Submodule.LinearMap
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
-import OddOrder.GroupTheory.TISubset
-import OddOrder.GroupTheory.CoprimeConjugacy
-import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.Peterfalvi.S02_Notation
+module
+
+public import Mathlib.Algebra.Module.Submodule.LinearMap
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.Positivity.Finset
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (2.2) — the Dade hypothesis: core structure
@@ -27,6 +24,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S04
 

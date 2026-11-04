@@ -3,10 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Pi
-import Mathlib.Algebra.Algebra.Subalgebra.Lattice
-import Mathlib.Algebra.BigOperators.Pi
-import Mathlib.LinearAlgebra.Pi
+module
+
+public import Mathlib.Algebra.Algebra.Pi
+public import Mathlib.Algebra.Algebra.Subalgebra.Lattice
 
 /-!
 # A separating subalgebra of a finite product of copies of a field is everything
@@ -25,6 +25,8 @@ other, and multiplying those together produces the indicators.
 * `OddOrder.exists_mem_eq_one_eq_zero`
 * `OddOrder.Subalgebra.eq_top_of_separates`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

@@ -3,14 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S08_SibleyCoherenceLemmas
+public import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction -- shake: keep (used by a proof inside an exposed definition)
 import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
-import OddOrder.Peterfalvi.S08_SibleyCoherenceLemmas
+import OddOrder.Peterfalvi.S08_SibleyRestrictionLemmas
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Peterfalvi.S08_CoherenceCore` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory

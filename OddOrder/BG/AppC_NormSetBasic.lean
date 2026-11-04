@@ -3,16 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.Algebra.Module.ZMod
 import Mathlib.FieldTheory.Finite.Trace
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.Algebra.Ring.AddAut
-import Mathlib.Algebra.Polynomial.Roots
-import Mathlib.Algebra.Polynomial.SpecificDegree
-import Mathlib.Algebra.Ring.GeomSum
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Algebra.Module.ZMod
 
 /-!
 # BG Appendix C — the norm set: basics, Remark (I), the Frobenius product
@@ -26,6 +22,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

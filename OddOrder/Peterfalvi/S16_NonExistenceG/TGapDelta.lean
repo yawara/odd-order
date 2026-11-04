@@ -1,5 +1,11 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
 
 /-!
 # Peterfalvi (14.9): the T-side residual character
@@ -8,6 +14,8 @@ Coherence consequences used for
 `Δ = τ_T (ν₀ - ζ) - 1_G + τ₁ ζ`: first, every coherent image of a
 nonprincipal conjugate-paired source is orthogonal to the trivial character.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

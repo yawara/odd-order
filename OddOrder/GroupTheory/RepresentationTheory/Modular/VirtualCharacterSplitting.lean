@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 
 /-!
 # `ch(G)` through a Wedderburn splitting: the integrality criterion
@@ -39,6 +47,8 @@ than `ℤ[Irr(G)]`.
 
 * D. Gorenstein, *Finite Groups*, §4.7 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

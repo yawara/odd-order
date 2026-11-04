@@ -3,10 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Algebra.SubgroupSum
 import OddOrder.Algebra.NormalPSubgroupTrivialAction
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.GroupTheory.ThreeStepGroup
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 
 /-!
 # The kernel of the principal block
@@ -38,6 +42,8 @@ of trivial Brauer characters.
   `OddOrder.RepresentationTheory.Modular.subsingleton_of_principalBlock_of_normalPComplement` —
   `IBr(B_0) = {1_{G^0}}`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

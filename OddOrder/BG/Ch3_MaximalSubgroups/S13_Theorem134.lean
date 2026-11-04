@@ -3,10 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG §13: Theorem 13.4 (the main step — `C_{M_σ}(P) ⊆ C_{M_σ}(R)`)
@@ -31,6 +45,8 @@ prime action 解析の中心。
 `uniform_exclusion` で sorry-free に。Theorem 13.4 全体が証明完了 (axiom-clean; sorryAx は §12
 scaffold [Cor 12.16 / Prop 12.15 / Thm 12.13] 由来のみ、Lane F 完成で自動 unconditional 化)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 
@@ -63,7 +79,7 @@ theorem exists_maximal_pSubgroup_le_of_le {q : ℕ} [Fact q.Prime] [Finite G]
     have hPT : (P : Subgroup ↥H) ≤ T.subgroupOf H := Subgroup.map_le_iff_le_comap.mp hST
     have e : (P : Subgroup ↥H) = T.subgroupOf H := by
       have hm := P.is_maximal' hTHpg hPT
-      first | exact hm | exact hm.symm
+      exact hm.symm
     rw [e]
     exact Subgroup.map_subgroupOf_eq_of_le hTH
 
@@ -101,7 +117,7 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNA₀ne : Subgroup.normalizer (A₀ : Set G) ≠ ⊤ := by
     intro htop
     have : A₀.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal A₀ inferInstance with hbot | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal A₀ with hbot | ht
     · exact hA₀ne hbot
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hA₀M))
   obtain ⟨Mdag, hMdagCo, hNA₀⟩ :=
@@ -327,7 +343,7 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNPne : Subgroup.normalizer (P : Set G) ≠ ⊤ := by
     intro htop
     have : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P with hb | ht
     · exact hPne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hPM))
   obtain ⟨Mstar, hMstarCo, hNP⟩ :=

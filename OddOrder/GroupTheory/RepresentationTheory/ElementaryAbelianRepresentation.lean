@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRank
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import Mathlib.Algebra.Group.Action.End
+public import Mathlib.Data.ZMod.Defs
+public import Mathlib.GroupTheory.GroupAction.Hom
+public import Mathlib.GroupTheory.QuotientGroup.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.RepresentationTheory.Basic -- shake: keep (used only in an `example`)
+import OddOrder.GroupTheory.PRank -- shake: keep (used only in an `example`)
 
 /-!
 # `ZMod n`-modules with a group action: the missing `SMulCommClass`
@@ -24,6 +33,8 @@ between `ZMod n`-modules are automatically `ZMod n`-linear (`ZMod.map_smul`).
 
 plan = `notes/bg/s03_thm37_plan.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

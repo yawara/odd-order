@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.FeitSibleyConclusion
+import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgame
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley Theorem, final assembly (pp. 146–150)
@@ -33,6 +45,8 @@ The added hypotheses on `feit_sibley_coherence` beyond the `Hypothesis` block ar
 `Nat.Coprime |Q| [G:Q]` (`Q` is a Hall subgroup of `G`); all three are genuine
 standing hypotheses of the Appendix IV configuration.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

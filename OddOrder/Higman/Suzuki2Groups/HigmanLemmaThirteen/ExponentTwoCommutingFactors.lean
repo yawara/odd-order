@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
 
 /-!
@@ -22,6 +26,8 @@ involution. If the factors commute, the quotient of those roots is an
 involution outside `Φ(P)`, contradicting that every ambient involution lies
 in the Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

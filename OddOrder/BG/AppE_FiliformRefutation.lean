@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_FiliformGroup
-import OddOrder.BG.AppE_FurtherResults
+module
+
+public import OddOrder.BG.AppE_FiliformGroup
+public import OddOrder.BG.AppE_CentralizerDecomposition
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import Mathlib.Tactic.NormNum.Prime -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG Proposition E.4, as printed, is false: the assembled refutation
@@ -37,6 +46,8 @@ E.4 — the same statement with that hypothesis added as `hdc` — is **proved**
 This leaf deliberately isolates the heavy `AppE_FurtherResults` import away from
 `AppE_FiliformGroup.lean`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE.Filiform
 

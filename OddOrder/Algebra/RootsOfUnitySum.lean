@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.Algebra
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.CharZero.Defs
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Data.Fintype.Card
 import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RingTheory.Localization.FractionRing
 import OddOrder.Algebra.AlgInt
 
 /-!
@@ -34,6 +37,8 @@ of characteristic zero in which the statement is already known.
 * `OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card'` — over an integral domain, which is
   the shape a `p`-modular system provides
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

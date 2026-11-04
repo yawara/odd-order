@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.RingTheory.SimpleRing.Congr
+import Mathlib.RingTheory.SimpleRing.Matrix
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RepresentationTheory.Semisimple
-import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # Multiplicity one: the restriction `V_H` is irreducible (BG Prop 2.2(a), the `m = 1` finish)
@@ -26,6 +28,8 @@ irreducible over the algebraically closed `k`).  `E` is a simple algebra (isotyp
 
 * `cliffordConj` — conjugation by `ρ x`, as a `k`-algebra automorphism of `End_{k[H]} V`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

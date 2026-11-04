@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_TICyclic
+module
+
+public import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.SupportedSpanOrthogonality
 
 /-!
@@ -18,6 +22,8 @@ This is the base layer of the Coq `V2basis` step of `primeTIirr_spec` (`PFsectio
 the `ω`-difference family spanning `CF(W, W ∖ W₂)`, toward the prime-TI value identity
 (4.3.c)/`prTIirr_id` and the Peterfalvi (13.18)/(13.19) grid facts (issue 2038 chain).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05.TICyclicHypothesis
 

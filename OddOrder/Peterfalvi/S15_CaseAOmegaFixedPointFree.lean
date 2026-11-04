@@ -1,4 +1,10 @@
-import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
+module
+
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 
 /-!
 # Peterfalvi (14.6) — the fixed-point-free action on the case-A Sylow center
@@ -12,6 +18,8 @@ Together with `|R₁| = r` or `r²`, this gives `p ∣ r² - 1`.
 
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,8 +3,12 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.Peterfalvi.S07_RetargetScaled
+module
+
+public import OddOrder.Peterfalvi.S07_RetargetScaled
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi (5.6.3): the corrected-extension-image coherence adjoin for a **reducible** break
@@ -26,6 +30,8 @@ reducible-break weighted family bound (`crux1_of_memberFamilyW`) in the case-(c2
 
 Reference note: `notes/peterfalvi/s08_6_8_resume_roadmap.md` (cont.²⁰).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

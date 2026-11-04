@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.RingTheory.ZMod.UnitsCyclic
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Sylow subgroups at the sharp two-block scalar bound
@@ -20,6 +26,8 @@ and `n = (p - 1) / 2`.  Oddness removes the factor `2` from the order of every s
 coordinate.  Together with (13.13), this supplies the noncyclic Sylow subgroup to which BG
 Proposition 1.16 is applied in (14.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

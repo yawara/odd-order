@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+public import OddOrder.GroupTheory.FrattiniPGroup -- shake: keep (used by a proof inside an exposed definition)
 import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
 
 /-!
 # Higman's Lemma 13: the ambient zeroth layer in the Frattini quotient
@@ -20,6 +24,8 @@ on the lower-central layer with the induced action on the Frattini quotient.
 The linear map in this file is the quotient-side target for the genuine
 factor maps `restrictedFactorAmbientInclusion`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

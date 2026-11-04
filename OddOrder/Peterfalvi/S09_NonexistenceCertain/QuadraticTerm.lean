@@ -1,4 +1,8 @@
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.NormalCase
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.NormalCase
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # QuadraticTerm
@@ -6,6 +10,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.NormalCase
 Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (7.8) — coherence-based formula for χ^ρ

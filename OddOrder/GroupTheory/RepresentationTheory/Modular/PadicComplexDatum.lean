@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.NumberTheory.Padics.Complex
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 
@@ -30,6 +38,8 @@ in advance.  It is also the `CLAUDE.md` doneness criterion for the carrier: the 
 
 * `OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

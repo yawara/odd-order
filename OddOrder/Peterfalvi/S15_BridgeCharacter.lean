@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_ComplementStructure
-import OddOrder.Peterfalvi.S15_BridgeCharacterBasic
+module
+
+public import OddOrder.Peterfalvi.S15_BridgeCharacterBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (13.18): the bridge characters `β_j` and `Γ`
@@ -15,6 +22,8 @@ bridge character `β_j = Ind_{PW₁}^S 1 − μ_{0j}`, its Dade image `τ_S(β_{
 `j`-independence, `⟨Γ,1⟩ = 0`, `Γ` real, and the `‖Y‖²` residual bound), packaged in
 `BetaData` / `betaData_of_grid`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory

@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Data.Finset.Attr
 
 /-!
 # Commutators with subgroup joins modulo a normal subgroup
@@ -13,6 +16,8 @@ The subgroup commutator does not distribute over joins as an equality in a
 general group.  Modulo a normal subgroup, however, centralising two subgroups
 implies centralising their join.  This file records that reusable inclusion.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

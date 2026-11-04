@@ -1,3 +1,12 @@
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-!
@@ -6,6 +15,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §9 — C_U(S₀) layer and character grid preparation

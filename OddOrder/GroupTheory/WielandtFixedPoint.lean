@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.WielandtPerFactorDischarge
+module
+
+public import OddOrder.GroupTheory.CoprimeAction
+public import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import Mathlib.Combinatorics.Matroid.Init
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 
 /-!
@@ -29,6 +32,8 @@ the modular Brauer / free-orbit count plus base change `𝔽_p → 𝔽̄_p`).
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece E), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

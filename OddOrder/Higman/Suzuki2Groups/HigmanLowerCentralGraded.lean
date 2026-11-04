@@ -3,10 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.AgemoLayers
-import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's elementary lower-central layers
@@ -26,6 +34,8 @@ common carrier and automorphism-action infrastructure for Higman's Lemmas
 4--9, together with the actual commutator pairing, its alternating
 linearization, and its full-span theorem for the spectral argument.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.GroupAlgebraConjugation
+module
+
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # The sum of a subgroup in the group algebra
@@ -40,6 +48,8 @@ needed only for the direction that uses it.
 * `OddOrder.GroupAlgebra.map_single_eq_one_of_isUnit_map_subgroupSum` — the kernel criterion
 * `OddOrder.GroupAlgebra.map_single_eq_one_of_map_subgroupSum` — its `|N| · 1` form
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

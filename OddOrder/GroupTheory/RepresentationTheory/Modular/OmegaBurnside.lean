@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
@@ -30,6 +39,8 @@ statement holds over the splitting field with no valuation bookkeeping.
 * `OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul` — with the
   `p`-part cancelled
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

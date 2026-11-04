@@ -3,13 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Algebra.Module.Pi
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.Algebra.Module.Pi
+public import Mathlib.LinearAlgebra.Span.Defs
 import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # BG Proposition E.4 is false as printed: the Lie-ring core of the counterexample
@@ -74,6 +74,8 @@ Pi type of commutative rings, so mathlib already endows it with the *commutator*
 create a diamond.  The named lemmas `br_leibniz`, `br_self`, `br_add_left`, … carry the
 full Lie-ring content without the typeclass.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE.Filiform
 

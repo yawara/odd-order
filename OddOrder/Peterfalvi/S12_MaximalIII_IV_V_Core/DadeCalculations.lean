@@ -1,4 +1,9 @@
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
 
 /-!
 # TAIL
@@ -6,6 +11,8 @@ import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
 Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

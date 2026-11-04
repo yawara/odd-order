@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
-import Mathlib.LinearAlgebra.Trace
+module
+
+public import Mathlib.LinearAlgebra.Trace
 
 /-!
 # Navarro (5.7): the trace vanishes
@@ -32,6 +33,8 @@ the direct sum decomposition `M = V ⊕ M(1 - f_b)`: the intertwiner is `T = S +
 * `OddOrder.trace_eq_zero_of_conj_smul` — `H T = ζ (T H)` with `T` injective forces `trace H = 0`
 * `OddOrder.trace_idempotent_mul_eq_zero` — Navarro (5.7): `χ(f_b h) = 0`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

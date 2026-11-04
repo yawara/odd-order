@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C1
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # Isaacs Problem 6C.2(a) — 位数 `p²` の elementary abelian 作用と `p + 1` 個の冪零部分群
@@ -26,6 +34,8 @@ import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 `A_i ⊔ A_j = A` (`i ≠ j`) は「位数 `p` の相異なる部分群の交わりは自明, 位数 `p²` の群で
 指数を数える」ことから。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

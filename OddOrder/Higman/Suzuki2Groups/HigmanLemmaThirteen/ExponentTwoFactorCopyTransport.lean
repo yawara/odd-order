@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralTransport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralTransport
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Higman Lemma 13: transport between copies of one pairwise factor
@@ -21,6 +26,8 @@ Combining that observation with the functoriality of elementary
 lower-central layers gives the equivariant linear equivalence consumed by
 the cross-join Frobenius-parameter comparison.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,13 +1,17 @@
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+module
+
+public import OddOrder.GroupTheory.ZGroup
+public import OddOrder.BG.Ch1_Preliminary.PLength
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.ZGroup
+import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # BG §3: Theorem 3.6 — Phase C, the action of `R₀` ((3.17)–(3.21))
@@ -30,6 +34,8 @@ Split from `S03f_Thm36.lean` (issue 0149, the longFile-1500 campaign).  The subg
 definitions), so the returned facts are stated with `V.map H.subtype` etc. spelled out;
 the caller's own `set` variables fold them back.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03f
 

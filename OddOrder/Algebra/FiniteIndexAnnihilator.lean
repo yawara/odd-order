@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Algebra.Operations
+public import Mathlib.GroupTheory.Finiteness
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.LinearAlgebra.Quotient.Defs
+public import Mathlib.RingTheory.Ideal.Defs
 import Mathlib.GroupTheory.FiniteAbelian.Basic
-import Mathlib.LinearAlgebra.Matrix.Adjugate
-import Mathlib.RingTheory.Ideal.Quotient.Defs
 
 /-!
 # Annihilators of modules with finite-index ideal multiples
@@ -32,6 +37,8 @@ ideal, and suppose `A` and `U` are finitely generated as additive groups and
 `m = 1` の特殊形のみなので独立に証明する。
 -/
 
+@[expose] public section
+
 namespace OddOrder.Algebra
 
 open scoped DirectSum
@@ -47,9 +54,9 @@ theorem smul_top_toAddSubgroup_fg (U : Ideal R)
     (hU : U.toAddSubgroup.FG) (hA : (⊤ : AddSubgroup A).FG) :
     (U • (⊤ : Submodule R A)).toAddSubgroup.FG := by
   classical
-  obtain ⟨su, hsu⟩ := hU
-  obtain ⟨sa, hsa⟩ := hA
-  refine ⟨(su ×ˢ sa).image fun p => p.1 • p.2, le_antisymm ?_ ?_⟩
+  obtain ⟨su, hsu⟩ := AddSubgroup.isAddFG_iff.mp hU
+  obtain ⟨sa, hsa⟩ := AddSubgroup.isAddFG_iff.mp hA
+  refine AddSubgroup.isAddFG_iff.mpr ⟨(su ×ˢ sa).image fun p => p.1 • p.2, le_antisymm ?_ ?_⟩
   · rw [AddSubgroup.closure_le]
     intro w hw
     rw [Finset.coe_image, Set.mem_image] at hw
@@ -191,7 +198,7 @@ theorem exists_smul_eq_zero_and_sub_card_mem (U : Ideal R)
   set a : κ → A :=
     fun i => lift (e.symm (DirectSum.of (fun i => ZMod (n i)) i 1)) with ha
   -- additive generators of `UA`
-  obtain ⟨sb, hsb⟩ := smul_top_toAddSubgroup_fg U hU hA
+  obtain ⟨sb, hsb⟩ := AddSubgroup.isAddFG_iff.mp (smul_top_toAddSubgroup_fg U hU hA)
   -- the combined generating family
   set g : κ ⊕ {x // x ∈ sb} → A := Sum.elim a Subtype.val with hg
   set μ : κ ⊕ {x // x ∈ sb} → ℕ := Sum.elim n fun _ => 1 with hμ

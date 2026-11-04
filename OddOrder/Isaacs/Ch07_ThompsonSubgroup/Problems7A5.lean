@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ThompsonSubgroup
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
@@ -27,6 +33,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
 ⚠ 書籍は `P` を `p`-群としているが, **証明は `P` が `p`-群であることを使わない** ので
 一般の有限群の部分群 `P` (と `U ⊴ P` elementary abelian) で形式化する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

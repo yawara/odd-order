@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Data.Rat.Floor
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 
 /-!
 # Brauer's third main theorem: the principal block induces the principal block
@@ -32,6 +34,8 @@ characteristic `p` says the two agree.
 
 * `OddOrder.RepresentationTheory.Modular.inducedBlockOfNormalizer_principalBlock` — `b_0^G = B_0`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

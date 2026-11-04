@@ -1,13 +1,22 @@
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+module
+
+public import OddOrder.GroupTheory.ZGroup
+public import OddOrder.GroupTheory.IsExtraspecial
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.ZGroup
+import OddOrder.BG.Ch1_Preliminary.S03e_Thm35Prelim
+import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG §3: Theorem 3.6 — the (3.29)–(3.38) endgame
@@ -36,10 +45,12 @@ IH-free, so the induction lives entirely in `S03f_Thm36.thm36_aux`, which ends b
 `endgame_contradiction`.
 -/
 
+@[expose] public section
+
 namespace OddOrder.BG.Ch1.S03f
 
 open scoped commutatorElement Pointwise IsMulCommutative
-open OddOrder.GroupTheory OddOrder.Isaacs.Ch04 OddOrder.BG.Ch1.OperatorQuotientAction
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch04
 
 set_option maxHeartbeats 2400000 in
 -- the `IsMulCommutative` scoped instances (priority 50) cycle with `CommMagma.to_isCommutative`;
@@ -520,7 +531,7 @@ theorem endgame_contradiction
     have hT_le_NKR : T ≤ Subgroup.normalizer ((⁅KG, R₀⁆ : Subgroup G) : Set G) := by
       rw [hTdef]
       exact sup_le Subgroup.le_normalizer
-        (OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self_right KG R₀)
+        (Subgroup.normalizer_commutator_ge_right KG R₀)
     have hKRnormT : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf T).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hT_le_NKR
     have hT_le_S₁ : T ≤ S₁ := by
@@ -651,7 +662,7 @@ theorem endgame_contradiction
         rw [hTdef]
         exact card_sup_of_le_normalizer_of_disjoint
           (fun g hg =>
-            OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self_right KG R₀ hg)
+            Subgroup.normalizer_commutator_ge_right KG R₀ hg)
           hdisjT
       rw [hcardT, hr_card] at hdvd
       rcases (Nat.Prime.dvd_mul hp).mp hdvd with h4 | h4
@@ -719,7 +730,7 @@ theorem endgame_contradiction
           : Subgroup G) = ⊥ :=
         h322' _ hKR_le_KG h332
           (fun g hg =>
-            OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self_right KG R₀ hg)
+            Subgroup.normalizer_commutator_ge_right KG R₀ hg)
           hPG_le_NKR
       -- the `P`-action commutator on `K/K'` is everything (`K = ⁅K,P⁆`, (3.24))
       have hbridgeP : ∀ x ∈ (⁅KG, (P.map H.subtype : Subgroup G)⁆ : Subgroup G),
@@ -967,7 +978,7 @@ theorem endgame_contradiction
       exact Subtype.ext h1
     -- `⁅K,R₀⁆ ⊴ K`
     have hKG_le_NKR : KG ≤ Subgroup.normalizer ((⁅KG, R₀⁆ : Subgroup G) : Set G) :=
-      OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self KG R₀
+      Subgroup.normalizer_commutator_ge_left KG R₀
     have hKRsnorm : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf KG).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hKG_le_NKR
     -- `|K| = |⁅K,R₀⁆|·q`

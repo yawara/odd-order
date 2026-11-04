@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.NearFieldClass
+module
+
+public import OddOrder.Peterfalvi.Appendices.NearFieldClass
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
 
 /-!
 # Units of the near-field of order 9 are quaternion
@@ -29,6 +34,8 @@ This backs the `F ≅ F_{9,2}` branch of step (6): together with
 `card_dvd_three_of_odd_mulAutQuaternion` it bounds the odd automorphism
 group `Σ` by `|Σ| ∣ 3`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 

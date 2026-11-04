@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
-import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (11.9)/(14.9): T-side eta-grid projection data
@@ -14,6 +17,8 @@ This is the linear-algebraic first half of Coq `FTtype34_structure`'s `bridgeS1`
 calculation, before the orbit and non-orthogonality arguments force its off-axis
 coefficients to vanish.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

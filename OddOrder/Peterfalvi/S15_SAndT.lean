@@ -3,16 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_SAndTGrid
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+import OddOrder.Peterfalvi.S09_ParityPrimitive
 import OddOrder.Peterfalvi.S15_BridgeCharacter
-import OddOrder.Peterfalvi.S15_CaseASylowCenter
-import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
-import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
-import OddOrder.Peterfalvi.S15_CaseAContradiction
-import OddOrder.Peterfalvi.S15_SSideGaloisFieldModel
-import OddOrder.Peterfalvi.S16_PairingCoherence
-import OddOrder.Peterfalvi.S16_PairingBessel
+import OddOrder.Peterfalvi.S15_ComplementStructure
+import OddOrder.Peterfalvi.S15_Gate3
 import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S15_SAndTGrid
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # TAIL — (13.19.c) dichotomy + (14.5) complement exclusion
@@ -25,6 +28,8 @@ the Peterfalvi (14.5) exclusion of the small complement `E = W₁`.
 The (13.19) grid data is stated against the (12.6) coherence bundle `S16.TypeICoherent78Data L`
 (existence: `TypeICoherent78Data.nonempty`); `coh.extension` is the honest coherent extension `τ₁`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
@@ -734,7 +739,7 @@ theorem typeI_caseC_dichotomy_of_c_eq_one [Finite G]
       typeI_caseC_bound_c1_of_c_eq_one _hG hnoV hyp hc1 dataL nS hnS
         (by rintro rfl; obtain ⟨m, hm⟩ := hSodd; omega)⟩
     intro _ _
-    convert hbridge using 2; first | rfl | exact Subsingleton.elim _ _
+    convert hbridge using 2; exact Subsingleton.elim _ _
   · -- case (c2): `nS` even, so `nL` is odd and `p ≤ e`.
     have hLodd : Odd nL := by
       rw [Int.not_odd_iff_even] at hSodd
@@ -756,7 +761,7 @@ theorem typeI_caseC_dichotomy_of_c_eq_one [Finite G]
     refine Or.inr ⟨fun j hj => ⟨nL, hLodd, ?_⟩,
       typeI_caseC_bound_c2_of_c_eq_one _hG hnoV hyp hc1 dataL nL hnL hnL0⟩
     intro _ _
-    convert hbridge j hj using 2; first | rfl | exact Subsingleton.elim _ _
+    convert hbridge j hj using 2; exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) T-side dichotomy** (S↔T swapped): the `typeI_caseC_dichotomy` instance at

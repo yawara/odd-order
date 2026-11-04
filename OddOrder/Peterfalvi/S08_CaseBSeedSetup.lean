@@ -3,9 +3,18 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBAssembly
-import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S08_CaseBEnumeration
+import OddOrder.Peterfalvi.S08_CaseBTransport
+import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §8 — the case-B anchored seed: setup layer
@@ -14,6 +23,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

@@ -3,22 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.CharAndCard
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Data.Set.Card
-import Mathlib.Tactic.Abel
-import Mathlib.Tactic.Common
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.Group
-import Mathlib.Tactic.IntervalCases
-import Mathlib.Tactic.Linarith
+module
+
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Data.Set.Card
+import Mathlib.Data.Sym.Sym2.Init
 import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.Module
+import Mathlib.Tactic.NormNum.GCD
 import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Zify
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi (3.8): the additive-grid trichotomy
@@ -42,6 +35,8 @@ The key simplification over the textbook's index-relabelling argument: an additi
 factors as `a (i, j) = f i + g j` (`exists_param`).  Then the trichotomy is a clean case split on
 whether `f` / `g` is constant, with a double-counting bound ruling out the "both non-constant" case.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

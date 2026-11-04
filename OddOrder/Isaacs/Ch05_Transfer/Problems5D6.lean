@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
 
 /-!
@@ -26,6 +37,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
    一意性 (`map_mulAut_of_normal_pcomplement`) から `A` に characteristic, `A ⊴ G` ゆえ `K ⊴ G`。
    `p ∤ |K|` と `|G:K| = |G:A|·|A:K|` が `p`-冪 ⟹ 結論。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
@@ -29,6 +36,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 一般の体 `F` で述べる (`p = 331` はその特殊化)。共通部分は
 `OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup` に括り出してある。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -318,7 +327,7 @@ theorem isFrobeniusAction_grpA5 [Finite F] (hα : orderOf α = 11) (hε : orderO
   have key : ∀ c i : ℕ, Nat.Coprime 11 c → α ^ (c * i) = 1 → α ^ i = 1 := by
     intro c i hc h
     have h11 : (11 : ℕ) ∣ c * i := hα ▸ orderOf_dvd_of_pow_eq_one h
-    obtain ⟨s, rfl⟩ := hc.dvd_of_dvd_mul_left (by rwa [mul_comm] at h11)
+    obtain ⟨s, rfl⟩ := hc.dvd_of_dvd_mul_left h11
     rw [pow_mul, hα11, one_pow]
   obtain ⟨i, j, hij⟩ := exists_pow_mul_pow_of_mem_closure_pair (vB_mem_normalizer hα hε) x.2
   obtain ⟨m, t, ht, hjmt⟩ : ∃ m t, t < 5 ∧ j = 5 * m + t :=

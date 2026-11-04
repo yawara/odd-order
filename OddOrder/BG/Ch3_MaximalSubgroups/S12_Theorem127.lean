@@ -3,7 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Theorem 12.7 — the nonabelian Sylow `p`-subgroup case
@@ -25,6 +43,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 - Theorem 12.5 / Corollary 12.6 (前 leaf 群)。
 - Maschke = `Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient` ((d) で)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

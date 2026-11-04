@@ -3,7 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG §12: The Subgroup `E` — active scaffold leaf
@@ -39,6 +56,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
   Uniqueness Theorem (mmd L3454-L3482). Do not replace it by downstream
   prime-action assumptions in §13.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -476,7 +495,7 @@ theorem rank_centralizer_Malpha_le_one_of_not_uniqueMaximal [Finite G]
     rw [lt_top_iff_ne_top]
     intro hNtop
     have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal X with hXbot | hXtop
     · exact hXne hXbot
     · exact hMcoatom.1 (top_le_iff.mp (hXtop ▸ hXM))
   have hUNX : IsUniquelyMaximal (Subgroup.normalizer (X : Set G)) := hU.of_le_of_lt_top hCN hNXlt

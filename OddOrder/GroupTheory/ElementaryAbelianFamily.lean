@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Elementary abelian subgroup families `ℰ_p^n(G)`
@@ -25,6 +31,8 @@ order-indexed family `ℰ_p^n` is new and lives here.
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994),
   Chapter I §4–§5, Chapter III §10–§13.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

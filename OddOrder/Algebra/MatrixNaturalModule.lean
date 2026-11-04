@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.RingTheory.Artinian.Ring
+module
+
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import Mathlib.RingTheory.Artinian.Defs
+public import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.RingTheory.LocalRing.Basic
 import Mathlib.RingTheory.SimpleModule.WedderburnArtin
 import Mathlib.RingTheory.SimpleRing.Matrix
 
@@ -32,6 +36,8 @@ Conversely a simple Artinian ring has, up to isomorphism, only one simple module
 * `OddOrder.MatrixModule.linearEquiv_of_isSimpleRing`
 * `OddOrder.MatrixModule.linearEquiv_natural_of_isSimpleModule`
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 
 /-!
 # The determinant-one torus does not act faithfully on `Ω₁(S₀)`
@@ -66,6 +68,8 @@ its kernel.
   Ch. III §1 Proposition consumes, because there the Sylow `2`-subgroup is the
   image of `C_Q(P)` and is not the standard one on the nose.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

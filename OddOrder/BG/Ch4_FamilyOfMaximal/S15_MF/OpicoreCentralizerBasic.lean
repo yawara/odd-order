@@ -1,10 +1,31 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
 
 /-!
 # BG §15 — `O_p`-core centralizer: opening layer
 
 {D}
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -304,7 +325,7 @@ theorem sigmaComplement_structure_of_not_fittingIsTI [Finite G]
     exact h.symm
   -- `E₁ ∩ E₂ = 1`: `τ₁(M)` has `p`-rank 1 and `τ₂(M)` has `p`-rank 2, so they are disjoint.
   have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₂) := by
-    refine coprime_of_forall_prime_not_dvd ?_
+    refine Nat.coprime_of_dvd ?_
     intro r hr hrE₁ hrE₂
     have hr1 : r ∈ tau1 M := hsetup.E₁_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv],

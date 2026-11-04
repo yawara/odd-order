@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Henselian
 import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 
 /-!
 # The character table over a splitting field is square
@@ -30,6 +38,8 @@ two-sided.
 * `OddOrder.RepresentationTheory.Modular.card_eq_card_conjClasses`
 * `OddOrder.RepresentationTheory.Modular.equivConjClasses` — the resulting bijection
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

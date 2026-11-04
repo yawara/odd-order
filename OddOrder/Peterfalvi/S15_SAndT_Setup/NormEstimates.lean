@@ -1,4 +1,10 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 
 /-!
 # Peterfalvi §13 — reusable norm and arithmetic estimates
@@ -8,6 +14,8 @@ order bound, Galois/AM–GM lower bounds on cyclic-closed sets, and the rational
 endpoint of (13.10).  The former monolithic `CharacterDegreeData` cascade has been retired;
 its honest replacement supplies these lemmas with explicit Core data.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 
 open OddOrder.GroupTheory

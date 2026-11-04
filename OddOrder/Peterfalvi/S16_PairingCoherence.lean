@@ -3,10 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI
-import OddOrder.Peterfalvi.S09_ParityPrimitive
+module
+
+public import OddOrder.Peterfalvi.S09_CertificateDischarge
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S09_CrossOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
 import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
+import OddOrder.Peterfalvi.S09_ParityPrimitive
+public import OddOrder.Peterfalvi.S10_MinimalSimpleStructure -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
+public import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (14.14), coherence pairing data for a type-I pair
@@ -39,6 +52,8 @@ Main definitions and results:
   (`ftThickenedSupport_A1_disjoint_of_nonconjugate`) through the faithful-support
   bridge `dadeSupport_eq_ftThickenedSupport`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

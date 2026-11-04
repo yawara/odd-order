@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 
 /-!
@@ -27,6 +33,8 @@ had `c_{μθ} = 0`, and for `θ` outside it both sides vanish.  Since `C` is inv
 * `OddOrder.RepresentationTheory.Modular.sum_pRegular_trace_eq_zero_of_centralCharacterAlg_ne` —
   `∑_{g ∈ G⁰} χ(g) = 0` for `χ ∉ Irr(B_0)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

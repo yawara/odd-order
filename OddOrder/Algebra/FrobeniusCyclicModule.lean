@@ -3,12 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.Algebra.Module.PID
-import Mathlib.Algebra.Polynomial.Module.AEval
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.Separable
 import Mathlib.LinearAlgebra.AnnihilatingPolynomial
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # The Frobenius polynomial action on `GaloisField p q` is cyclic
@@ -32,6 +32,8 @@ The bridge `aeval_frobEnd_apply` re-expresses the abstract `Polynomial.aeval` ac
 `∑ cⱼ • y ^ p ^ j` form used by the `ConjPair` machinery in
 `OddOrder/BG/AppC_Problem1PairComposition.lean`.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

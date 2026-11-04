@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Index
 import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
@@ -34,6 +37,8 @@ Lemma 2.14 の核心 (inversion `t * z * t = z⁻¹` と `⟨{s, t}⟩` の cose
 `DihedralGroup (orderOf c)` との同型は Ch06 `DQSDRecognition.lean`
 (`dihedralOrQuaternion_of_invertingConjugation` の dihedral 枝) が担う.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch02
 

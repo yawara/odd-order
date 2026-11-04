@@ -3,20 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+module
+
+public import OddOrder.BG.Ch1_Preliminary.PLength
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04g_Thm418Core
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.GroupTheory.CentralProduct
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §10: The Subgroups `M_α` and `M_σ` — Core (定義層 + Thm 10.1 + Thm 10.2 前半)
@@ -71,6 +74,8 @@ BG 10.1--10.14 の証明本体は §10 の各 leaf に landing 済み (例: Lemm
   These are exact upstream interfaces, not hypotheses to hide in the downstream §12--§16 spine.
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -474,7 +479,7 @@ theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
   · exact heq.ge
   · exfalso
     have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop'
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M with hbot | htop'
     · -- `M = ⊥`: every nontrivial subgroup is `⊤`, so `G` is cyclic, hence solvable.
       have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hbot]; exact hco.2
       have : Nontrivial G := hG.simple.toNontrivial
@@ -524,7 +529,7 @@ private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hXS.ne (le_antisymm hXS.le htop)
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hsub_lt)
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt (hNC _ hsub_lt)
   rw [← Subgroup.subgroupOf_normalizer_eq hXS.le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hXS.le) (fun heq => ht_not ?_)
@@ -690,7 +695,7 @@ private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
       intro htop
       rw [hLdef] at htop
       have hXnorm : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases hG.simple.eq_bot_or_eq_top_of_normal X hXnorm with hbot | htopX
+      rcases hG.simple.eq_bot_or_eq_top_of_normal X with hbot | htopX
       · exact hXne hbot
       · have hGpg : IsPGroup p G := hXp.of_equiv (htopX ▸ Subgroup.topEquiv)
         have : Group.IsNilpotent G := hGpg.isNilpotent
@@ -996,8 +1001,8 @@ theorem alpha_subset_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
   have hN_lt : Subgroup.normalizer (Pbar : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Pbar
-      (Subgroup.normalizer_eq_top_iff.mp htop) with hbot | htopP
+    have := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Pbar with hbot | htopP
     · exact hPbar_ne hbot
     · exact hMc.1 (top_le_iff.mp (htopP ▸ hPbar_le_M))
   obtain ⟨N, hNc, hNleN⟩ := (IsCoatomic.eq_top_or_exists_le_coatom _).resolve_left hN_lt.ne

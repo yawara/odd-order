@@ -3,15 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.LinearGroupSimple
-import OddOrder.GroupTheory.ElementaryAbelianLinear
-import OddOrder.GroupTheory.CommGroupAut
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.Finiteness.Defs
 import Mathlib.FieldTheory.Finiteness
-import Mathlib.Algebra.Field.ZMod
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
-import Mathlib.LinearAlgebra.Dimension.Free
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CommGroupAut
+import OddOrder.GroupTheory.ElementaryAbelianLinear
+import OddOrder.GroupTheory.LinearGroupSimple
 
 /-!
 # Isaacs, Finite Group Theory — Problem 8C.6 (p. 257), the corrected classification
@@ -39,6 +42,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 8C.6 (書籍 p. 257):
 * 指数 `> 2` 側は `OddOrder.GroupTheory.isCyclic_and_card_of_isSimpleGroup_mulAut`
   (中心的反転 ⟹ `|Aut| = 2` ⟹ 巡回 + `φ(|A|) = 2`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

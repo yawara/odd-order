@@ -3,8 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §3 (5): the second case, wired up
@@ -34,6 +47,8 @@ and the bookkeeping that turns "the formula holds throughout the fibre of `f(ρ)
 * `Hypothesis.stepFive_secondCase_elem` — the second case: the inversion formula at
   `ρ s^{a⁻¹}`, given it on the fibre of `f(ρ)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

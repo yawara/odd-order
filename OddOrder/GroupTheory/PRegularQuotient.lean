@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularElement
+module
+
+public import OddOrder.GroupTheory.PRegularElement
 
 /-!
 # `p`-regular elements under a quotient by a normal `p`-subgroup
@@ -32,6 +34,8 @@ hypothesis is vacuous; `commute_of_isPRegular_of_le_center` is that case.
 * `OddOrder.GroupTheory.eq_of_isPRegular_of_mk_eq` — injectivity
 * `OddOrder.GroupTheory.bijOn_mk_isPRegular` — the two packaged as a bijection
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,10 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.GroupTheory.Transfer
+module
+
+public import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.GroupTheory.Transfer
 import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
 
 /-!
@@ -25,6 +26,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5B (書籍 p. 157)。
 Dietzmann の定理 (Thm 5.10) は `Dietzmann.lean` に landing 済
 (`dietzmann` / `dietzmann_setFinite`)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

@@ -3,6 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S11_NineElevenSetup
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTIWitness
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
 
 /-!
@@ -23,6 +38,8 @@ equality-configuration refutation (`S15_CaseACoherence`, which imports this file
   `PFsection9.v:1478-1484` — Hall decomposition/conjugacy in the solvable `HU₁` + coprime
   fixed-point lifting) and the cleared Mackey-norm bundle `nineElevenFourNormInputsS`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -1,6 +1,17 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S15_ComplementStructure
+import OddOrder.Peterfalvi.S15_SAndTBasic
 import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
+import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # TAIL
@@ -8,6 +19,8 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
 Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory

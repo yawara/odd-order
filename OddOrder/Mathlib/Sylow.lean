@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Sylow subgroups: `p`-elements of the normalizer
@@ -13,6 +15,8 @@ generic material relocated to a light-import leaf so downstream consumers need n
 class-sum congruence machinery (rep theory + complex analysis + integral closure).  Declarations
 keep their original `OddOrder.RepresentationTheory` namespace so existing call sites are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

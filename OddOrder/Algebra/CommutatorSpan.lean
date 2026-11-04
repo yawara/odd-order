@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Defs
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.LinearAlgebra.Quotient.Basic
+module
+
+public import Mathlib.Algebra.Algebra.Defs
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.LinearAlgebra.Quotient.Defs
+public import Mathlib.LinearAlgebra.Span.Defs
+import Mathlib.Algebra.Order.Ring.Nat
+import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Tactic.Abel -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 import OddOrder.Algebra.WordExpansion
 
 /-!
@@ -24,6 +32,8 @@ of a single commutator is again a commutator.
 * `OddOrder.pow_mem_commutatorSpan` — `t ∈ T ⟹ t ^ p ∈ T`
 * `OddOrder.pow_pow_mem_commutatorSpan` — the same for every power `p ^ m`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

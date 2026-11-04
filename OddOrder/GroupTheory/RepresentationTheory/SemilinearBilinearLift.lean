@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
@@ -32,6 +37,8 @@ hypothesis here.
 
 * `exists_bilinear_lift_of_pinned_restriction` — the reordered bilinear lift.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

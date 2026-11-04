@@ -3,9 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHomBasic
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayerCore
+import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
 import OddOrder.Peterfalvi.S15_SAndT_Setup.SwappedNuGridSupply
+import OddOrder.Peterfalvi.S15_Tau1T
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — the (13.3.b)/(13.4) dichotomy supplies
@@ -17,6 +30,8 @@ assembled θ-package `tSide_theta_package_of_not_caseB_core`, the λ-route
 `lambda_forces_T_caseB_core`, and the b-side export `T_caseB_facts_unconditional` (the
 (14.9) type-II endpoint supply, issue 9094).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 
 open OddOrder.GroupTheory

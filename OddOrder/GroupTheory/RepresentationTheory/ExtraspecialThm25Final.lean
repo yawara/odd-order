@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.Combinatorics.Matroid.Init
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 
 /-!
@@ -34,6 +39,8 @@ hypotheses below use the single map `conjAutOfNormal`; the bridge
 * `finrank_eq_sub_one_of_extraspecial` — **BG Theorem 2.5, `C_V(H)`**: if `C_V(H) = 0` then
   `h = dim V + 1` (contrapositive: `h ≠ dim V + 1 ⟹ C_V(H) ≠ 0`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreePairCoordinates
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreePairCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: branching the three coherent parameters
@@ -24,6 +27,8 @@ In each aligned branch the two copy equalities and Higman's uniqueness
 alternative are retained together, so the downstream graph construction
 does not need to repeat the parameter case split.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

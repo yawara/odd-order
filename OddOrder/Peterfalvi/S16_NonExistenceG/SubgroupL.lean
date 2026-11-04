@@ -1,5 +1,14 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
+module
+
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_CaseAContradiction
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_SAndT
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
 
 /-!
 # Peterfalvi §14: the subgroup L and the T/S case-B data
@@ -7,6 +16,8 @@ import OddOrder.Peterfalvi.S15_CaseAContradiction
 The post-(14.9) construction of `L`, the T- and S-side case-B packages, and their structural
 consequences.  The Type-II proof for `T` lives in `TTypeII`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory

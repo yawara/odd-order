@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientProductCoordinate
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientProductCoordinate
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 12: the B/C/D case split (assembly)
@@ -19,6 +22,8 @@ This first step identifies the factor square `A(α) = ambientCenterCoordinate
 (sq_ambient (fI α))` with the factor's own type-A quadratic form `α · θ(α)`
 (noncommutative branch) via the three defeq-clean square-extraction lemmas.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -73,7 +78,6 @@ def noncommFactorInclusion
     data.eQuot
 
 omit [Finite P] in
-set_option backward.isDefEq.respectTransparency false in
 /-- **Factor square identity, noncommutative branch.**  The ambient square map
 of the factor inclusion equals the factor's type-A quadratic form `α · θ(α)`. -/
 theorem noncomm_ambientSquare_eq

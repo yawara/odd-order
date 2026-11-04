@@ -3,11 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
-import OddOrder.Peterfalvi.S09_CrossOrthogonality
-import OddOrder.Peterfalvi.S12_TypeIIFrobenius
+module
+
+public import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Peterfalvi.S09_CrossOrthogonality
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
 import OddOrder.Peterfalvi.S12_CrossIsometrySetup
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
 
 /-!
 # Peterfalvi (10.7): the cross-isometry package at the canonical pair
@@ -34,6 +47,8 @@ discharged in this file** (via `typeII_tau_diff_inner_chiFam_eq_zero` and
 `typeII_R_mem_inner_chiFam_eq_zero`); the file is sorry-free.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

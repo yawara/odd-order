@@ -3,13 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-import OddOrder.GroupTheory.FreeActionOrbitCount
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+public import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.PowSubOneDvd
-import Mathlib.FieldTheory.Finite.GaloisField
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
@@ -26,6 +31,8 @@ subgroup orders must be powers of `q = 2^n`.  In particular a group of order
 `q³` admits no chain of four strict inclusions of normal invariant
 subgroups — the counting half of "`|P| = q³` iff ξ-length `3`".
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.Order.Minimal
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The `π`-residual `O^π(G)` (Isaacs Problem 1B.8(a))
@@ -28,6 +31,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 `IsPiGroup π` に置換。`IsPiGroup` の同型不変性・積・部分群への遺伝は本ファイル冒頭で補う。
 将来 `pResidual` を `oPiResidual {p}` にリファクタする余地あり (現状は両立)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

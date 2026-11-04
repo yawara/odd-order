@@ -3,7 +3,31 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §13: Theorem 13.9 (σ-disjointness) + Theorem 13.10 (`E₁` regular on `E₃`)
@@ -18,6 +42,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
 
 ともに 13.6 + 13.8 依存。`S13_Lemma138` の下流。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 
@@ -576,7 +602,7 @@ theorem exists_maximal_over_normalizer_not_conj_of_le_E3 [Finite G] (hG : IsMini
   have hNQne : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
     intro htop
     have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q with hb | ht
     · exact hQne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hQM))
   obtain ⟨Mstar, hMstarCo, hNQM⟩ :=

@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.Peterfalvi.S09_CrossOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Family-wide orthogonality for Frobenius coherence (Peterfalvi 7.10)
@@ -16,6 +23,8 @@ that coherent images from distinct Frobenius-family members are pairwise orthogo
 Textbook: Peterfalvi, Section 7, pp. 40-42.
 Coq comparison: PFsection7.v, CoherentFrobeniusPartition.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

@@ -1,4 +1,14 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 
 /-!
 # CaseBXi
@@ -6,6 +16,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (9.8.d) (γ) core — summand-complement kernel W ⊆ Ker ζ
@@ -633,7 +645,7 @@ theorem exists_chiefFactorHom_ne_one [Finite G] {M : Subgroup G}
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.1 }
   have : Nontrivial (↥data.H ⧸ chief.N) := by
-    obtain ⟨x, hxH, hxnot⟩ := SetLike.exists_of_lt chief.H0_lt_H
+    obtain ⟨x, hxH, hxnot⟩ := IsConcreteLE.exists_of_lt chief.H0_lt_H
     refine ⟨⟨QuotientGroup.mk ⟨x, hxH⟩, 1, ?_⟩⟩
     rw [ne_eq, QuotientGroup.eq_one_iff]
     intro hmem
@@ -689,7 +701,7 @@ theorem exists_cInHuHom_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hlt : commutator ↥(cInHu data chief) < ⊤ :=
     Group.IsSolvable.commutator_lt_top_of_nontrivial ↥(cInHu data chief)
   have : Nontrivial (Abelianization ↥(cInHu data chief)) := by
-    obtain ⟨x, -, hxnot⟩ := SetLike.exists_of_lt hlt
+    obtain ⟨x, -, hxnot⟩ := IsConcreteLE.exists_of_lt hlt
     exact ⟨⟨Abelianization.of x, 1, fun h => hxnot ((QuotientGroup.eq_one_iff x).mp h)⟩⟩
   have : NeZero (Monoid.exponent (Abelianization ↥(cInHu data chief))) :=
     ⟨Monoid.exponent_ne_zero_of_finite⟩

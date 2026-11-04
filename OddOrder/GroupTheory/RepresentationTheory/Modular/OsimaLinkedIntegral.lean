@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DicksonDivisibility
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Osima (3.8), the `p`-regular half: `|G|_p` divides `∑_{i ∈ A} χ_i(1) χ_i(x)`
@@ -27,6 +36,8 @@ theorem.  Since `|G|_{p'}` is invertible in `𝒪`, the coefficient is integral.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.8).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

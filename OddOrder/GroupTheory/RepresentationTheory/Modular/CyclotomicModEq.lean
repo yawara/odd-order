@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
+public import Mathlib.Data.Int.ModEq
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 
 /-!
 # Congruences modulo `p · ℤ[ω]`
@@ -41,6 +49,8 @@ Frobenius there.  Everything else is direct.
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.5 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

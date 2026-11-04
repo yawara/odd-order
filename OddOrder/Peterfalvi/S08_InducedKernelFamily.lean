@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
@@ -36,6 +41,8 @@ the kernel comparison through a genuine character — `Res_K φ` for `⊆` and `
 together with the (1.6.a) forward bridge `subsetCharacterKernel_induce_of_subgroupOf`; no use of
 [Is] Lemma 2.21 is needed.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

@@ -3,8 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverDerivedSeries
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverPowerOverlap
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
 import OddOrder.Higman.Suzuki2Groups.HigmanMaximalNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: the ξ-length-three reduction
@@ -22,6 +33,8 @@ included as data.
 This leaf then identifies the lower term with the elementary-abelian
 Frattini subgroup.  A subsequent leaf will split the two-step quotient.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

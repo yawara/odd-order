@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: the `𝒳`-relative `S`-side induction (step (3) Part B)
@@ -26,6 +37,8 @@ relative to `𝒳`: coherence of `𝒳₁ = 𝒳(S', Z)` (Part A,
   `Ind(θ ∘ q1Proj) ∈ 𝒳₁` (`exists_anchor_of_mem_XsetOf`) depends on the
   failing `ψ`, unlike the fixed degree-`d` anchor of reductions (1)(2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
@@ -426,7 +439,7 @@ theorem xsetOf_S_coherent_step [Finite G]
       (fun δ hδ z hz => hZH δ (hyp.D_le_H hδ) z hz) hZne hZodd
   -- `h5`: `|S⧸S₁| ≥ 2`
   have h5 : 2 ≤ Nat.card (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := by
-    obtain ⟨s, hsS, hsS₁⟩ := SetLike.not_le_iff_exists.mp hSnotle
+    obtain ⟨s, hsS, hsS₁⟩ := IsConcreteLE.not_le_iff_exists.mp hSnotle
     have hne : (Quotient.mk'' (⟨s, hsS⟩ : ↥hyp.S) : ↥hyp.S ⧸ S₁.subgroupOf hyp.S)
         ≠ Quotient.mk'' (1 : ↥hyp.S) := by
       intro h
@@ -473,7 +486,7 @@ theorem xsetOf_coherent_of_le_sder [Finite G]
       have hcard_le : Nat.card ↥hyp.Sder ≤ Nat.card ↥S₃' := by
         have hpos : 0 < Nat.card ↥S₃' := Nat.card_pos
         omega
-      rw [OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hle hcard_le]
+      rw [Subgroup.eq_of_le_of_card_ge hle hcard_le]
       exact hcohSder
     | succ n ih =>
       intro S₃' hle hinvH hcard
@@ -489,7 +502,7 @@ theorem xsetOf_coherent_of_le_sder [Finite G]
         have h1 : Nat.card ↥S₃' < Nat.card ↥S₁ := by
           rcases lt_or_ge (Nat.card ↥S₃') (Nat.card ↥S₁) with h | h
           · exact h
-          · exact absurd (OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hS₃S₁.le h) hS₃S₁.ne
+          · exact absurd (Subgroup.eq_of_le_of_card_ge hS₃S₁.le h) hS₃S₁.ne
         have h2 : Nat.card ↥S₁ ≤ Nat.card ↥hyp.Sder := Subgroup.card_le_of_le hS₁le
         omega
       have hcoh₁ := ih S₁ hS₁le hS₁H hcard₁
@@ -513,7 +526,7 @@ theorem xsetOf_coherent_of_le_sder [Finite G]
         rw [eq_top_iff]
         intro x _
         have hx : (x : G) ∈ Subgroup.map hyp.S.subtype (commutator ↥hyp.S) := by
-          rw [map_subtype_commutator hyp.S]
+          rw [Subgroup.map_subtype_commutator hyp.S]
           change (x : G) ∈ hyp.Sder
           rw [hSder_eq]
           exact x.2

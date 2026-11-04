@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: regular normal subgroups (Thm 8.5, Cor 8.6)
@@ -41,6 +42,8 @@ Isaacs Lem 8.1 and Lem 8.2 are already in mathlib
 `Projectivization.specialLinearGroup_is_two_pretransitive`; see
 `NonzeroVectors.lean` for Cor 8.4.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

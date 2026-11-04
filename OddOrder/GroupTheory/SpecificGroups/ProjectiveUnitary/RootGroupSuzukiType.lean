@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
-import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # The unitary root group as a Sylow subgroup and a Suzuki 2-group
@@ -29,6 +32,8 @@ Peterfalvi from Huppert, Kapitel II, Satz 10.12.  The construction proves only
 the Appendix III Suzuki `2`-group condition and the order `q³`; it does not
 assert type B, whose later use in Peterfalvi has an additional hypothesis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

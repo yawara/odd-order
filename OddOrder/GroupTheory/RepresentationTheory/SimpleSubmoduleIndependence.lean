@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.SimpleModule.Isotypic
 
 /-!
@@ -27,6 +30,8 @@ then `W i ≤ sSup {j ≠ i}`, so by `Submodule.linearEquiv_of_le_sSup` the simp
 isomorphic to one of the (simple) summands `W j` with `j ≠ i`, contradicting pairwise
 non-isomorphism. Hence the intersection is `⊥` and the family is independent.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
+module
+
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S15_SAndTGrid
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTBasic
 import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S16_PairingCoherence
 
 /-!
 # Peterfalvi (13.19, pp. 85–87): coherent images and the eta-grid
@@ -14,6 +24,8 @@ This upstream leaf contains the generic type-I coherent-image orthogonality and 
 avoidance results used on both the `L`- and `M`-sides of Section 16.  It is independent of the
 Section 16 `MHypothesis` carrier and of the downstream comparison argument.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

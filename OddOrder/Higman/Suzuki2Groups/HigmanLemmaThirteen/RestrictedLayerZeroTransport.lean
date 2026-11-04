@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: transport of the restricted zeroth layer
@@ -18,6 +21,8 @@ to the ambient zeroth layer, together with its actor equivariance.  No
 injectivity is asserted: in the intended application the left factor is killed
 and only the right factor survives in the ambient layer.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

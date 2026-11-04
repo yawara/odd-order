@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
@@ -30,6 +33,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1F の形式化
 - `exists_sylow_pair_inf_center_eq_bot` — **Problem 1F.2**。
 - `exists_faithful_orbit_of_faithful_conj` — **Problem 1F.3**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

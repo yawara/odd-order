@@ -3,10 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Index
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
-import Mathlib.Tactic.Group
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 剰余類・指数と軌道
@@ -23,13 +24,16 @@ import Mathlib.Tactic.Group
 - `doubleCoset_transitive_iff` — **Problem 8A.15**: `G` の `H`-剰余類への作用が
   2-transitive ⟺ 二重剰余類が `H` とその外のちょうど 2 つ (= `H × H` の両側作用が
   `G` 上 2 軌道)。
-- `stabilizer_subgroupOf`, `relIndex_stabilizer_eq_ncard_orbit`,
+- `relIndex_stabilizer_eq_ncard_orbit` (安定化群の `subgroupOf` は mathlib の
+  `MulAction.stabilizer_subgroupOf` を使う),
   `relIndex_stabilizer_eq_index`, `sub_one_dvd_ncard_orbit_mul_index`,
   `two_transitive_of_coprime_index` — **Problem 8A.16**: `G` が 2-transitive で
   `H ≤ G` が推移的, `[G : H]` が `n - 1` と互いに素なら `H` も 2-transitive。
   核心は `[G_α : H ⊓ G_α] = [G : H]` と相対指数の二通りの分解から出る
   `(n - 1) ∣ |Δ| · [G : H]` (`Δ` は `H ⊓ G_α`-軌道)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 
@@ -161,16 +165,10 @@ theorem doubleCoset_transitive_iff (H : Subgroup G) :
 
 section CoprimeIndex
 
-/-- 部分群 `K ≤ G` の制限作用による安定化群は, `G` の安定化群の `subgroupOf`。 -/
-lemma stabilizer_subgroupOf (K : Subgroup G) (x : Ω) :
-    (MulAction.stabilizer G x).subgroupOf K = MulAction.stabilizer ↥K x := by
-  ext k
-  exact Iff.rfl
-
 /-- **軌道の大きさは相対指数**: 部分群 `K` の下での `x` の軌道は `[K : K ⊓ G_x]` 個の点をもつ。 -/
 lemma relIndex_stabilizer_eq_ncard_orbit (K : Subgroup G) (x : Ω) :
     (MulAction.stabilizer G x).relIndex K = (MulAction.orbit ↥K x).ncard := by
-  rw [Subgroup.relIndex, stabilizer_subgroupOf, MulAction.index_stabilizer]
+  rw [Subgroup.relIndex, MulAction.stabilizer_subgroupOf, MulAction.index_stabilizer]
 
 /-- `G` も `H ≤ G` も `Ω` に推移的なら **`[G_α : H ⊓ G_α] = [G : H]`**。
 
@@ -189,7 +187,8 @@ lemma relIndex_stabilizer_eq_index [Finite Ω] [IsPretransitive G Ω] {H : Subgr
       = (H ⊓ MulAction.stabilizer G α).index := by
     rw [← Subgroup.inf_relIndex_right]
     exact Subgroup.relIndex_mul_index inf_le_right
-  rw [Subgroup.relIndex, stabilizer_subgroupOf, MulAction.index_stabilizer_of_transitive] at e1
+  rw [Subgroup.relIndex, MulAction.stabilizer_subgroupOf,
+    MulAction.index_stabilizer_of_transitive] at e1
   rw [MulAction.index_stabilizer_of_transitive] at e2
   exact Nat.eq_of_mul_eq_mul_right hn (e2.trans (e1.symm.trans (mul_comm _ _)))
 

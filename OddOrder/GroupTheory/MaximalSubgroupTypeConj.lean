@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MaximalSubgroupType
+module
+
+public import OddOrder.GroupTheory.MaximalSubgroupType
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Conjugation-invariance of the maximal-subgroup types
@@ -29,6 +34,8 @@ were `S`, then `S` would be type `I` (`isTypeI_pointwise_smul`), contradicting
   `isTISubset_pointwise_smul`, `rank_map_of_mulEquiv`, ...) phrased for the general
   pointwise `MulAut G` action; reusable across the §16 conjugacy arguments.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -379,8 +386,8 @@ theorem fitting_map_subtype_pointwise_smul (M : Subgroup G) :
             e.symm.injective)
         exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
       have h3 := Subgroup.map_mono (f := (e : ↥M →* ↥(φ • M))) h2
-      rwa [Subgroup.map_map, ← MulEquiv.coe_monoidHom_trans, MulEquiv.symm_trans_self,
-        MulEquiv.coe_monoidHom_refl, Subgroup.map_id] at h3
+      rwa [Subgroup.map_map, ← MulEquiv.toMonoidHom_trans, MulEquiv.symm_trans_self,
+        MulEquiv.toMonoidHom_refl, Subgroup.map_id] at h3
   calc (OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (φ • M).subtype
       = ((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))).map (φ • M).subtype := by
         rw [hfit]
@@ -460,7 +467,7 @@ omit [Finite G] in
 /-- The centralizer of the `φ`-image of a subgroup is the `φ`-image of the centralizer:
 `centralizer ((φ • H : Subgroup G) : Set G) = φ • centralizer (H : Set G)`.  A convenience
 repackaging of `centralizer_pointwise_smul` with `coe_pointwise_smul` for the `TypePData` fields. -/
-private theorem centralizer_coe_pointwise_smul (φ : MulAut G) (H : Subgroup G) :
+theorem centralizer_coe_pointwise_smul (φ : MulAut G) (H : Subgroup G) :
     Subgroup.centralizer ((φ • H : Subgroup G) : Set G) = φ • Subgroup.centralizer (H : Set G) := by
   rw [centralizer_pointwise_smul, coe_pointwise_smul]
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.RingTheory.Ideal.Maps
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.RingTheory.Ideal.Maps
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 import OddOrder.Mathlib.MonoidAlgebra
 
@@ -22,6 +24,8 @@ it is easier, because the basis is `G` itself instead of the class sums.
 * `OddOrder.GroupAlgebra.mem_groupAlgebraIdeal_iff_mapRingHom_eq_zero` — `I·R[G]` is the kernel
   of coefficient reduction
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

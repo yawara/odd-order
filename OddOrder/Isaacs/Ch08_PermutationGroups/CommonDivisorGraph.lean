@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
-import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
+module
+
+public import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
+public import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.SemidirectProduct
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: `m`-arrows and the subgroups `K_m` (§8D)
@@ -26,6 +29,8 @@ the common-divisor-graph theorems.
 The theorems 8.41–8.43 themselves are formalized on top of this machinery
 (Thm 8.42 first, since 8.41 and 8.43 are corollaries of it).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

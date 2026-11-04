@@ -3,10 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
 import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
 
 /-!
 # Peterfalvi Part II, Ch. IV §3, Corollary 1
@@ -40,6 +50,8 @@ This file supplies that isomorphism.
   `Hypothesis.nonempty_theoremAConclusion_psu3` — Corollary 1 in the shape Theorem A's
   conclusion takes: `O^{2′}(G)` with the standard `PSU(3, q)` action.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -125,11 +137,9 @@ theorem closure_conj_standardRootSubgroup_eq_top {m : ℕ} (hn : 1 < m) :
       = ⊤ := by
   have := standardPermGroup_isSimpleGroup hn
   rw [closure_iUnion_conj_eq_normalClosure]
-  have hnorm : (Subgroup.normalClosure
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.normalClosure
       ((standardRootSubgroup m : Subgroup ↥(standardPermGroup m)) :
-        Set ↥(standardPermGroup m))).Normal :=
-    Subgroup.normalClosure_normal
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+        Set ↥(standardPermGroup m))) with hbot | htop
   · exfalso
     have hle : (standardRootSubgroup m : Subgroup ↥(standardPermGroup m))
         ≤ Subgroup.normalClosure _ := Subgroup.le_normalClosure

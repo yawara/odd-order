@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: the ambient central extension
@@ -27,6 +37,8 @@ Every nonidentity element of the elementary-abelian `Φ(P)` is an involution.
 The same involution argument puts `Φ(P)` in the center.
 -/
 
+@[expose] public section
+
 set_option autoImplicit false
 
 namespace OddOrder.Higman.Suzuki2Groups
@@ -34,7 +46,6 @@ namespace OddOrder.Higman.Suzuki2Groups
 open scoped commutatorElement
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.Suzuki2Group
-open OddOrder.RepresentationTheory
 open OddOrder.Isaacs.Ch03
 open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 open Module

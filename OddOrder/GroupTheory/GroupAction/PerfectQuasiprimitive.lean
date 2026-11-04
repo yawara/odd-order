@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Primitive
-import Mathlib.GroupTheory.IsPerfect
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.IsPerfect
 
 /-!
 # Perfect quasiprimitive groups with a solvable point stabilizer
@@ -13,6 +15,8 @@ A nontrivial perfect group acting faithfully and quasiprimitively is simple when
 point stabilizer is solvable.  The proof sends the stabilizer onto every quotient
 by a nontrivial normal subgroup and compares solvability with perfectness.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

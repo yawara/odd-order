@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Primitive
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.4 (p. 269) — `k_m` と `m` の比較
@@ -32,6 +38,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
 - `mul_stabilizer_eq_arrowKernel` — **8D.4 (b)**。
 - `lt_relIndex_arrowKernel` — **8D.4 (c)**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

@@ -3,7 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_StructureSetup
+module
+
+public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Peterfalvi.S10_BGInterface
 import OddOrder.Peterfalvi.S10_ConjugationTransport
 
 /-!
@@ -11,6 +27,8 @@ import OddOrder.Peterfalvi.S10_ConjugationTransport
 
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleBasic` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 open OddOrder.GroupTheory
@@ -236,7 +254,7 @@ theorem normalizer_support_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           rw [hxi]; exact inv_mem hx
     obtain ⟨x0, hx0⟩ := hXne
     have hle : Subgroup.closure X ≤ M := (Subgroup.closure_le M).mpr hXM
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnormal with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.closure X) with hb | ht
     · exact hX1 x0 hx0 (Subgroup.mem_bot.mp (hb ▸ Subgroup.subset_closure hx0))
     · exact hcoatom.1 (top_le_iff.mp (ht ▸ hle))
 

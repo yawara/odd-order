@@ -1,4 +1,13 @@
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 import OddOrder.Peterfalvi.S15_CaseACoherenceT
+import OddOrder.Peterfalvi.S15_NineElevenSevenEightT
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
 /-!
 # Peterfalvi (13.3.c)-`T` — the ν-row pin machinery (coherence-generic)
@@ -36,6 +45,8 @@ The pin dichotomy itself (`coherentIndT_nuRow_pin_of_irr`, mirror of
 `sSet_coherent_indT_A` build on these; the γ-trick vanishing and the pin live downstream in
 this file's continuation (issue 2035 #41 steps 4–5).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 
@@ -611,7 +622,6 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     by_cases h1 : hyp.eta i b ∈ E <;> by_cases h2 : hyp.eta i ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h one_ne_zero
         | exact absurd h.symm one_ne_zero
   have hcol_s : ∀ b : Fin hyp.p,
@@ -622,7 +632,6 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     by_cases h1 : -hyp.eta s b ∈ E <;> by_cases h2 : -hyp.eta s ⟨0, hyp.p_prime.pos⟩ ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h (by norm_num)
   -- the isometry norm `‖c(ν_i)‖² = p`
   have hnorm : ClassFunction.inner (c.extension νrow) (c.extension νrow) = (hyp.p : ℂ) := by

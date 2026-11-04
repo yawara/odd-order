@@ -3,7 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThirteen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (14): the centre of `RΣ`
@@ -18,6 +31,8 @@ In the notation of (11) (`R` the preimage of the near-field `F`, `T = [R, s]`,
   remark) and `P`; and `Σ` centralizes `P` by definition, while `Σ ≤ W ≤ V`
   centralizes both `s` (Ch. I Prop 5) and `t` (definition of `V`), hence `st`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

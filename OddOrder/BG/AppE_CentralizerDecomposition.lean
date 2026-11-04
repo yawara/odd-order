@@ -3,15 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_CollectionFormula
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.HallCollection
-import OddOrder.GroupTheory.HallPetresco
-import OddOrder.GroupTheory.RegularPGroup
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.SubgroupInAmbient
+module
+
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG Appendix E — the 1991 Feit–Thompson regular-operator layer (E.3/E.4 opening)
@@ -22,6 +29,8 @@ regular-operator results, up to (but not including) the small-order commutator l
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

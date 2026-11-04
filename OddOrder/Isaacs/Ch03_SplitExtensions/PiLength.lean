@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # `π`-length (upper `π`-series)
@@ -30,6 +35,8 @@ Isaacs Problem 3D.1(b) (`G` の `p`-length ≤ Sylow `p`-部分群の冪零類) 
 - `piUpperSeries` — upper `π`-series。
 - `HasPiLengthLE` — `π`-length ≤ `k`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

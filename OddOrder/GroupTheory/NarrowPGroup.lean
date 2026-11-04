@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRank
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
@@ -32,6 +38,8 @@ This is a cross-cutting concept used by BG §5 (narrow `p`-groups proper) and ci
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994),
   Chapter I §1 (p.2), §5 (p.44), mmd `references/bg/local-analysis.mmd` L354, L1789.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

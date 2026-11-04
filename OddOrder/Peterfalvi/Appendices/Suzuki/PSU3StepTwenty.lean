@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (20): `α₁ = α₂`
@@ -43,6 +53,8 @@ are `ζ^{±1}`, so the two conjugators sit in the same coset of `K` outright.
 * `Hypothesis.f_eq_conj_inv_of_stepTwenty_chain` — §2's closing Proposition, second half:
   `ω² = (0,α)` and `f(ω) = (ω⁻¹)^ζ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

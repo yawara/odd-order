@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §8: Case (B) coherence (`X ∪ Y` is coherent in case (B))
@@ -26,6 +30,8 @@ central-commutator program in `S08_CoherenceCore`.  The textbook proof (mmd 04.8
 
 Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` ("session 39 cont.²").
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

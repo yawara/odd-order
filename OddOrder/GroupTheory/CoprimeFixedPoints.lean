@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.Isaacs.Ch04_Commutators.Main
+module
+
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Multiplicativity of coprime fixed points across a chief step
@@ -32,6 +38,8 @@ group-level Wielandt formula `wielandt_fixedPoint_frobenius`.
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (I-5 chief-series multiplicativity), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

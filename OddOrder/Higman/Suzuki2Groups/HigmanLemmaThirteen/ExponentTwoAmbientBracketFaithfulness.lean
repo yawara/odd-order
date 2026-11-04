@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: faithfulness of the ambient exponent-two bracket
@@ -20,6 +26,8 @@ and the denominator of the degree-one lower-central layer is trivial.
 These facts do not use the length-four or prime-support hypotheses once
 exponent two of `Φ(P)` is available.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

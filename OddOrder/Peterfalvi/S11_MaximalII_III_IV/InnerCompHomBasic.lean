@@ -1,4 +1,11 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 
 /-!
 # Peterfalvi §11 — the inner-complement homomorphism: opening layer
@@ -6,6 +13,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

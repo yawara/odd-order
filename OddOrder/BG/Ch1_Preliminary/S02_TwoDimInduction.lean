@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.LinearAlgebra.Charpoly.BaseChange
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.BG.Ch1_Preliminary.S02_FixedSubmodules
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # BG §2F — the odd two-dimensional induction machinery
@@ -17,6 +28,8 @@ lemmas are public here because the assembly layer in the parent consumes them
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise

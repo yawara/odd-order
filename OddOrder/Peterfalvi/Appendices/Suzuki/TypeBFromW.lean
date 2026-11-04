@@ -3,10 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the type-B conclusion
@@ -28,6 +40,8 @@ central-exponent facts, the transitive fixed-point-free actor data, the
 `Z(Q) = Q₀` identification, and the isomorphic split itself — for reuse by
 the cyclicity half of Lemma 5.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

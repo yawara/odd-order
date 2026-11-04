@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Transport of Frobenius groups across isomorphisms
@@ -44,6 +49,8 @@ the `|calT1| = (|V|−1)/p` count.
 * `OddOrder.Isaacs.Ch06.IsFrobeniusGroup.mapEquiv` — the same, as dot-notation on
   `IsFrobeniusGroup`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

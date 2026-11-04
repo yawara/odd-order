@@ -3,15 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import Mathlib.Analysis.Complex.Norm
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-import OddOrder.GroupTheory.RepresentationTheory.Clifford
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
-import OddOrder.Peterfalvi.S02_Notation
 
 /-!
 # Peterfalvi §3: Preliminary Results from Character Theory
@@ -34,6 +34,8 @@ results directly rather than re-exporting renamed copies.
 
 Reference note: `notes/peterfalvi/s03_preliminary_character.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S03
 

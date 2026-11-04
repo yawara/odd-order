@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutatorEquivariance
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 
 /-!
 # Higman's Lemma 13: eigenweights of middle Frattini commutators
@@ -20,6 +25,8 @@ eigenvectors to have one of the Frobenius-conjugate weights of the middle
 Frattini layer.  The middle scalar is the canonical square root
 `Frob⁻¹(ν)` of the scalar `ν` on `Φ(P)²`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RepresentationTheory.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import OddOrder.BG.Ch1_Preliminary.S02_FixedSubmodules
 import OddOrder.BG.Ch1_Preliminary.S02_TwoDimInduction
 
@@ -13,10 +19,10 @@ Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line l
 パス).
 -/
 
+@[expose] public section
+
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise
-open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
-  baseChangeRepresentation_faithful)
 
 
 /-- q = p determinant-kernel split packaged as a theorem-facing reduction. -/

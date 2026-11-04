@@ -3,6 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
 
@@ -42,6 +53,8 @@ the standard model through `Q` and `f` alone.
   reciprocal `(ρ̄/y, 1/y)` of §3 (4).
 * `exists_standardModel_fgh` — the mappings themselves, normalized at `1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

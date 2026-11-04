@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
 
 /-!
@@ -28,6 +34,8 @@ Isaacs Problem 3C.8 (nilpotent injector の共役性) の準備。冪零部分�
 - `nilPiPart_normal` — 正規な冪零部分群の `π`-部分は正規。
 - `isNilpotent_of_le` — 冪零部分群に含まれる部分群は冪零。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

@@ -3,14 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Appendix.DirectDiamond
+module
+
+public import Mathlib.GroupTheory.Frattini
 import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
-import Mathlib.GroupTheory.Frattini
-import Mathlib.GroupTheory.Index
-import Mathlib.Data.Set.Card
-import Mathlib.Order.SupIndep
-import Mathlib.Data.Finset.Lattice.Fold
-import Mathlib.Data.Finset.Max
 
 /-!
 # Isaacs, *Finite Group Theory*, Appendix — elementary subgroup facts
@@ -68,6 +64,8 @@ faithful statement therefore uses `(↑H * ↑K : Set G) = Set.univ`.
 
 See `issues/3018-isaacs-appendix-x-gaps.md`.
 -/
+
+@[expose] public section
 
 open scoped Pointwise
 

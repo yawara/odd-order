@@ -3,21 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.AppA_PStability
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-import OddOrder.BG.Ch1_Preliminary.S06_Additional
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import Mathlib.GroupTheory.IsSubnormal
-import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # S07_Theorem74
@@ -25,6 +26,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §7: The Transitivity Theorem
@@ -237,7 +240,7 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
       rw [← hX_top]
       exact hX_le
     have hA_normal : A.Normal := Subgroup.normalizer_eq_top_iff.mp hnorm_top
-    rcases hG.simple.eq_bot_or_eq_top_of_normal A hA_normal with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal A with h | h
     · exact hA.ne_bot h
     · exact hA.proper.ne h
   -- Hypothesis 7.1(2) puts `c` into `O_{π'}(X)`
@@ -333,7 +336,7 @@ theorem lt_normalizer_inf_of_pgroup_lt [Finite G] {q : ℕ} [Fact q.Prime]
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact (ne_of_lt hQP) (le_antisymm hQ_le htop)
   have hlt := hNC (Q.subgroupOf P) hsub_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   rw [← Subgroup.subgroupOf_normalizer_eq hQ_le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf hQ_le Subgroup.le_normalizer) ?_
@@ -595,7 +598,7 @@ theorem inductiveLemma [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [lt_top_iff_ne_top]
         intro htop
         have hnorm : (Q₁ ⊓ Q₂).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-        rcases hG.simple.eq_bot_or_eq_top_of_normal (Q₁ ⊓ Q₂) hnorm with hh | hh
+        rcases hG.simple.eq_bot_or_eq_top_of_normal (Q₁ ⊓ Q₂) with hh | hh
         · exact hQinf hh
         · exact (ne_of_lt hQ_proper) hh
       obtain ⟨h, hh_K, Q₃, hQ₃, hconjQ₁, hstep1, hstep2, hcard⟩ :=
@@ -869,7 +872,7 @@ private theorem not_isCyclic_of_cocyclic [Finite G] {p : ℕ} (hp2 : 2 ≤ p) {B
 theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x : G}
     (hx : x ≠ (1 : G)) : Subgroup.centralizer ({x} : Set G) < ⊤ := by
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
@@ -974,7 +977,7 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
   classical
   -- `Z(G) = 1` (nonabelian simple), so `C_G(x) < ⊤` for `x ≠ 1`.
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable

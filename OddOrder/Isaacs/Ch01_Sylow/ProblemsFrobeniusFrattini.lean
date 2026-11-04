@@ -3,12 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+public import Mathlib.GroupTheory.Frattini
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Finite.Perm
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch01_Sylow.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Frattini
-import Mathlib.GroupTheory.Perm.Cycle.Type
 
 /-!
 # Isaacs Chapter 1 — Problems §1D (Frobenius complements, Frattini, nilpotency)
@@ -20,6 +24,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 1 "Sylow Theory" の�
 (`exists_sylow_inf_card_eq`, `card_mul_card_inf` 等) は `Problems.lean` の import 経由で利用。
 方針は `Problems.lean` 冒頭と同じ (ラッパー方針)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 
@@ -38,58 +44,9 @@ theorem not_dvd_index_of_sylow_normalizer_le {p : ℕ} [Fact p.Prime] {G : Type*
   rw [hHtop, Subgroup.index_top]
   exact fun h => absurd (Nat.dvd_one.mp h) (Fact.out : p.Prime).ne_one
 
-/-- **Isaacs Problem 1D.6**. 冪零群 `G` の部分群 `H` が極大 (coatom) であることと、指数 `|G : H|`
-が素数であることは同値。
-
-`⟹`: 冪零群は正規化条件をみたす (`normalizerCondition_of_isNilpotent`) ので極大部分群は正規
-(`NormalizerCondition.normal_of_coatom`)。対応定理で `G ⧸ H` は単純群、単純かつ冪零ゆえ可換
-(mathlib instance)、可換単純群は素数位数 (`IsSimpleGroup.prime_card`)、`|G:H| = |G ⧸ H|`。
-`⟸`: 素数指数なら `H ≠ ⊤`、また `H < K` のとき `K.index ∣ H.index` (`index_dvd_of_le`) が素数ゆえ
-`K.index = 1` (`K = ⊤`) しかない。 -/
-theorem isCoatom_iff_index_prime {G : Type*} [Group G] [Finite G] [Group.IsNilpotent G]
-    (H : Subgroup G) : IsCoatom H ↔ (H.index).Prime := by
-  refine ⟨fun hco => ?_, fun hp => ?_⟩
-  · -- 極大 ⟹ 素数指数
-    have hN : H.Normal :=
-      Subgroup.normalizer_eq_top_iff.mp
-        (hco.2 _ (Group.normalizerCondition_of_isNilpotent H (lt_top_iff_ne_top.mpr hco.1)))
-    have hnt : Nontrivial (G ⧸ H) := by
-      apply Finite.one_lt_card_iff_nontrivial.mp
-      rw [← Subgroup.index_eq_card]
-      have h1 : H.index ≠ 1 := fun h => hco.1 (Subgroup.index_eq_one.mp h)
-      have h0 : H.index ≠ 0 := Subgroup.index_ne_zero_of_finite
-      omega
-    have hsimple : IsSimpleGroup (G ⧸ H) := by
-      refine ⟨fun N _ => ?_⟩
-      have hle : H ≤ N.comap (QuotientGroup.mk' H) := by
-        have h := Subgroup.ker_le_comap (QuotientGroup.mk' H) N
-        rwa [QuotientGroup.ker_mk'] at h
-      have hinj : Function.Injective (Subgroup.comap (QuotientGroup.mk' H)) :=
-        Subgroup.comap_injective (QuotientGroup.mk'_surjective H)
-      rcases hle.lt_or_eq with hlt | heq
-      · right
-        apply hinj
-        rw [Subgroup.comap_top]
-        exact hco.2 _ hlt
-      · left
-        apply hinj
-        rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
-        exact heq.symm
-    rw [Subgroup.index_eq_card]
-    exact IsSimpleGroup.prime_card
-  · -- 素数指数 ⟹ 極大
-    refine ⟨fun htop => ?_, fun K hHK => ?_⟩
-    · rw [htop, Subgroup.index_top] at hp; exact hp.ne_one rfl
-    · by_contra hKtop
-      have h1 : K.index ∣ H.index := Subgroup.index_dvd_of_le hHK.le
-      rcases (Nat.Prime.eq_one_or_self_of_dvd hp K.index h1) with h | h
-      · exact hKtop (Subgroup.index_eq_one.mp h)
-      · -- K.index = H.index, H ≤ K, 有限 ⟹ H = K, `H < K` に矛盾
-        have key : Nat.card K * H.index = Nat.card H * H.index := by
-          conv_lhs => rw [← h, Subgroup.card_mul_index K]
-          rw [Subgroup.card_mul_index H]
-        have hcard : Nat.card K = Nat.card H := Nat.eq_of_mul_eq_mul_right hp.pos key
-        exact hHK.ne (Subgroup.eq_of_le_of_card_ge hHK.le hcard.le)
+/-! **Isaacs Problem 1D.6** (冪零群で `H` が極大 (coatom) ⟺ 指数 `|G : H|` が素数) は mathlib の
+`Subgroup.isCoatom_iff_index_prime` (v4.35.0 で追加、有限性の仮定なし) がそのまま形式化して
+いるので、自前の版は削除してそれを直接使う (issue 0190、CLAUDE.md「ラッパー方針」)。 -/
 
 /-- **Isaacs Problem 1D.13**. `Z ≤ Z(G)` かつ `G ⧸ Z` が冪零ならば `G` は冪零。
 
@@ -201,7 +158,7 @@ theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : T
     exact fun h => hPltQ.ne (le_antisymm hPQ h)
   have hnorm := Group.normalizerCondition_of_isNilpotent _ hlt2
   rw [← Subgroup.subgroupOf_normalizer_eq hPQ] at hnorm
-  obtain ⟨g0, hg0mem, hg0notin⟩ := SetLike.exists_of_lt hnorm
+  obtain ⟨g0, hg0mem, hg0notin⟩ := IsConcreteLE.exists_of_lt hnorm
   set g : G := (g0 : G) with hgdef
   have hgN : g ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hg0mem
   have hgQ : g ∈ (Q : Subgroup G) := g0.2
@@ -322,7 +279,7 @@ theorem coprime_card_index_of_disjoint_conj {G : Type*} [Group G] [Finite G] {H 
       exact fun h => hPltQ.ne (le_antisymm inf_le_left h)
     have hnorm := Group.normalizerCondition_of_isNilpotent _ hlt2
     rw [← Subgroup.subgroupOf_normalizer_eq inf_le_left] at hnorm
-    obtain ⟨g0, hg0m, hg0n⟩ := SetLike.exists_of_lt hnorm
+    obtain ⟨g0, hg0m, hg0n⟩ := IsConcreteLE.exists_of_lt hnorm
     exact hg0n (Subgroup.mem_subgroupOf.mpr
       (Subgroup.mem_inf.mpr ⟨g0.2, hNle (Subgroup.mem_subgroupOf.mp hg0m)⟩))
   -- pPart(H) = |P| = |Q| = pPart(G), しかし p ∣ index で pPart(H) < pPart(G)
@@ -462,7 +419,7 @@ theorem commutator_le_frattini {G : Type*} [Group G] [Finite G] [Group.IsNilpote
   have hMnorm : M.Normal :=
     Subgroup.normalizer_eq_top_iff.mp
       (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
-  have : Fact (M.index).Prime := ⟨(isCoatom_iff_index_prime M).mp hM⟩
+  have : Fact (M.index).Prime := ⟨(Subgroup.isCoatom_iff_index_prime M).mp hM⟩
   have hcyc : IsCyclic (G ⧸ M) := isCyclic_of_prime_card (p := M.index)
     (Subgroup.index_eq_card (H := M) ▸ rfl)
   have hcomm : IsMulCommutative (G ⧸ M) :=
@@ -595,7 +552,7 @@ theorem pow_mem_frattini_of_isPGroup {P : Type*} [Group P] [Finite P] {p : ℕ} 
   have : M.Normal := Subgroup.normalizer_eq_top_iff.mp
     (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
   have hidx : M.index = p := by
-    have hp : M.index.Prime := (isCoatom_iff_index_prime M).mp hM
+    have hp : M.index.Prime := (Subgroup.isCoatom_iff_index_prime M).mp hM
     obtain ⟨n, hn⟩ := hP.exists_card_eq
     have hdvd : M.index ∣ p ^ n := hn ▸ M.index_dvd_card
     exact (Nat.prime_dvd_prime_iff_eq hp Fact.out).mp (hp.dvd_of_dvd_pow hdvd)
@@ -1066,7 +1023,7 @@ theorem disjoint_conj_of_forall_normalizer_le {G : Type*} [Group G] [Finite G] {
       exact fun hle => hlt.ne (le_antisymm hlt.le hle)
     have hgrow := lt_normalizer_of_isNilpotent_of_lt_top hlt_top
     rw [← Subgroup.subgroupOf_normalizer_eq hQ₁S] at hgrow
-    obtain ⟨y, hyN, hyQ⟩ := SetLike.exists_of_lt hgrow
+    obtain ⟨y, hyN, hyQ⟩ := IsConcreteLE.exists_of_lt hgrow
     have hynN : (y : ↥H) ∈ Subgroup.normalizer Q₁ := Subgroup.mem_subgroupOf.mp hyN
     have hynQ₁ : (y : ↥H) ∉ Q₁ := fun h => hyQ (Subgroup.mem_subgroupOf.mpr h)
     -- R := (N_{↥H}(Q₁) ⊓ S).map H.subtype は D 内の q-群で Q を真に含む

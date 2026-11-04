@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.QuadraticFrobenius
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.LinearAlgebra.BilinearMap
+module
+
+public import OddOrder.Algebra.QuadraticFrobenius
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The relative trace of `𝐅_{q²}/𝐅_q`, and correcting a bilinear form into `𝐅_q`
@@ -41,6 +51,8 @@ Frobenius, so it passes through `Tr` and `ψ` obeys the same law.
 * `exists_frobTrace_eq_one` — `Tr` is nonzero, so some `u` has `Tr u = 1`.
 * `exists_bilinear_frobFixed_of_diag` — the correction lemma.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

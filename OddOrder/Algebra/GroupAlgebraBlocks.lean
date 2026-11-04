@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.BlockIdempotent
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.Algebra.DefectGroup
+public import OddOrder.Algebra.GroupAlgebraConjugation
+import Mathlib.Data.Rat.Floor
+import Mathlib.RingTheory.FiniteLength
 import OddOrder.Algebra.AlgClosedSplitting
-import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.GroupAlgebraDefectGroup
 
 /-!
@@ -31,6 +38,8 @@ residue field of the `p`-modular system `𝕎(𝔽̄_p)`.
 * `OddOrder.GroupAlgebra.exists_modularDatum` — the splitting datum the modular theory carries,
   for *any* finite group, over an algebraically closed field
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

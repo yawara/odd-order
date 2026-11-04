@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.LinearAlgebra.Matrix.ProjectiveSpecialLinearGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.GroupTheory.Commutator.Finite
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+public import Mathlib.RingTheory.LocalRing.Basic -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problem 7A.4 — `SL(2,q)` と `PSL(2,q)` の Sylow `p`-部分群はちょうど `q+1` 個
@@ -29,6 +35,8 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylo
 
 ⚠ 標数 `p` は `|U| = q = p^n` と「指数 `(q-1)(q+1)` が `p` と互いに素」にのみ効く。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AugmentationIdeal
+module
+
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.PRegularElementCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
@@ -40,6 +48,8 @@ zero — and Cauchy supplies a `p`-singular element.
 * `OddOrder.RepresentationTheory.Modular.not_dvd_card_of_character_eq_zero_of_pSingular`
 * `OddOrder.RepresentationTheory.Modular.exists_not_isPRegular_character_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

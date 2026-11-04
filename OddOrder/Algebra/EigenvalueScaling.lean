@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Eigenspace.Basic
-import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-import Mathlib.LinearAlgebra.Dimension.Finite
+module
+
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
 # Conjugating an operator into a scalar multiple of itself shifts its eigenvalues
@@ -34,6 +34,8 @@ a vector space over an arbitrary field.
 * `map_eigenspace_of_intertwine` — the image is *exactly* the `ω⁻¹ζ`-eigenspace
 * `finrank_eigenspace_eq_of_intertwine` — the two eigenspaces have the same dimension
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

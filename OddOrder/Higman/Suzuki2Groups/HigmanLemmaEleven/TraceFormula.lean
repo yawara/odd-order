@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.PairGap
-import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Floor
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.DedekindDomain.Basic
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 
 /-!
 # Higman's Lemma 11: the trace formula
@@ -18,6 +25,8 @@ by Frobenius, and rewrites the upper-triangular square sum as
 `Tr[L/K](α * α^(2^r) * ε)`. This leaf formalizes precisely that step;
 the proper-extension contradiction using Lemma 10 remains downstream.
 -/
+@[expose] public section
+
 set_option autoImplicit false
 
 open scoped BigOperators TensorProduct

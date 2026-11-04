@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
@@ -25,6 +32,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 書籍が「deduce」と書いているのはこの合成のこと — 可解性の仮定は前半で外れる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

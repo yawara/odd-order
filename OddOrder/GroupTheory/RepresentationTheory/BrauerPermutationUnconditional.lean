@@ -3,10 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+import Mathlib.Combinatorics.Matroid.Init
+public import Mathlib.LinearAlgebra.FreeModule.PID -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 
 /-!
 # Brauer's permutation lemma, unconditional form
@@ -45,6 +50,8 @@ Two ingredients are supplied here:
 
 Reference issue: `issues/0022-peterfalvi-brauer-permutation.md`.
 -/
+
+@[expose] public section
 
 namespace Representation
 

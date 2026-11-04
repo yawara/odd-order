@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorParameterCoherence
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorParameterCoherence
 
 /-!
 # Higman Lemma 13: normalized factor-coordinate coherence
@@ -20,6 +25,8 @@ Frobenius power, then applies the arithmetic coherence theorem to their common
 kernel eigenvalue.  The inclusive theorem also rules out a mixed
 commutative/noncommutative pair because the factors are isomorphic as groups.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
@@ -11,6 +20,8 @@ import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.RepresentationTheory
@@ -624,21 +635,12 @@ theorem caseA_inertia_index_eq {data : TypesIIIIIIVSetup M} {chief : ChiefFactor
 
 end NineElevenTwoInertia
 
-/-- **`[U : K₁ ⊓ K₂] ≤ [U:K₁]·[U:K₂]`** (relative-index form of `Subgroup.index_inf_le`): the
-relative index `H.relIndex U = (H.subgroupOf U).index`, and `subgroupOf = comap` distributes over
-`⊓` (`Subgroup.comap_inf`), so the ambient `index_inf_le` in `↥U` applies.  The (9.11.2) injectivity
-`Ū ↪ (U/U₁)×(U/U₁ʷ)` in relative-index form. -/
-theorem relIndex_inf_le {G : Type*} [Group G] {K₁ K₂ U : Subgroup G} :
-    (K₁ ⊓ K₂).relIndex U ≤ K₁.relIndex U * K₂.relIndex U := by
-  simp only [Subgroup.relIndex, Subgroup.subgroupOf, Subgroup.comap_inf]
-  exact Subgroup.index_inf_le
-
 /-- **Peterfalvi (9.11.2), the bound `u ≤ a²`.**  Book (9.11.2): *"The canonical mapping from `Ū` to
 `(U/U₁)×(U/U₁ʷ)` is injective, and so `u ≤ a²`."*  Given the inertia identity `C = U₁ ⊓ U₁ʷ` (the
 *first* assertion of (9.11.2), the deep character-theoretic input: `U₁ = C_U(H₁)`, `U₁ʷ = C_U(H₂)`,
 their intersection is `C = C_U(H̄)`) and the per-summand index `[U:U₁] = [U:U₁ʷ] = a`, the relative
-index `u = [U:C]` is bounded by `[U:U₁]·[U:U₁ʷ] = a²` (`relIndex_inf_le`).  Consumed by the (9.11.5)
-polynomial bound (`nineElevenFive_refutation`'s `hua2`). -/
+index `u = [U:C]` is bounded by `[U:U₁]·[U:U₁ʷ] = a²` (`Subgroup.relIndex_inf_le`).  Consumed by
+the (9.11.5) polynomial bound (`nineElevenFive_refutation`'s `hua2`). -/
 theorem nineElevenTwo_u_le_a_sq [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
     (caseA : CliffordCaseAData chars) {K₁ K₂ : Subgroup G}
@@ -647,7 +649,8 @@ theorem nineElevenTwo_u_le_a_sq [Finite G] {M : Subgroup G} {data : TypesIIIIIIV
   have hu : (K₁ ⊓ K₂).relIndex data.U = chars.u := by
     rw [← hCinf]; exact relIndex_cSub_U_eq_u chars
   rw [← hu]
-  calc (K₁ ⊓ K₂).relIndex data.U ≤ K₁.relIndex data.U * K₂.relIndex data.U := relIndex_inf_le
+  calc (K₁ ⊓ K₂).relIndex data.U ≤ K₁.relIndex data.U * K₂.relIndex data.U :=
+        Subgroup.relIndex_inf_le
     _ = caseA.a * caseA.a := by rw [hK₁, hK₂]
 
 

@@ -3,12 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+public import Mathlib.RingTheory.DedekindDomain.Basic
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+public import Mathlib.FieldTheory.Finiteness -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A1_JpGL2p
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 2: Lem 7.3 (formal) + Thm 7.5 normal-P + action
 infra (pp. 201-208)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -78,7 +93,7 @@ noncomputable def mulAutGLTwoEquivOfBasis
 
 /-- The `ZMod p` scalar-torsion condition supplied by an elementary-abelian multiplicative group.
 -/
-private lemma additive_nsmul_eq_zero_of_isElementaryAbelian
+lemma additive_nsmul_eq_zero_of_isElementaryAbelian
     {V : Type*} [Group V] {p : ℕ}
     (hV : OddOrder.GroupTheory.IsElementaryAbelian p V) :
     ∀ x : Additive V, (p : ℕ) • x = 0 := by

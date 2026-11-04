@@ -1,4 +1,15 @@
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
 import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs §4C Thm 4.24 — faithful chain action ⇒ A nilpotent
@@ -6,6 +17,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement
 

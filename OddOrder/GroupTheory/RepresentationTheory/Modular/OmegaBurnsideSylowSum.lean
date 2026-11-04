@@ -3,6 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.PElementSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
@@ -33,6 +45,8 @@ modulo the maximal ideal (where `|Syl_p| ≡ 1`) to give `R(z) = π(Ĝ_p z)`.
 
 * `OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

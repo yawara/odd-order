@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeParameterBranching
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicGraphPreimage
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicInvariantContradiction
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge -- shake: keep (abbrevs bound by `letI` in statements are unfolded away)
 
 /-!
 # Higman's Lemma 13: contradiction in the all-isomorphic parameter branch
@@ -17,6 +24,8 @@ graph and its canonical type-A preimage.  Its bundled primitive
 eigenfamilies and ambient seed force that preimage to commute with the
 target factor, contradicting their exact Frattini intersection.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,14 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IsSubnormal
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
-import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs Chapter 2 — Problems §2A / §2B (Subnormality)
@@ -24,6 +27,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 2 "Subnormality" の�
 
 方針は Ch.1 の `Ch01_Sylow/Problems.lean` と同じ (ラッパーは書かず実証明; 教科書番号は docstring)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch02
 

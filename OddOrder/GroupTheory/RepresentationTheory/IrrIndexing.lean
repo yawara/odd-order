@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Indexing irreducible characters
@@ -19,6 +23,8 @@ statements that take an explicit `[Fintype (IrreducibleCharacter G)]`.
 
 Reference issue: `issues/0021-peterfalvi-second-orthogonality.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,10 +3,11 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S09_CrossOrthogonality
-import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
-import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 
 /-!
 # `hzeta_cross` from conjugate images (Peterfalvi (7.9), coq `disjoint_coherent_ortho`)
@@ -32,6 +33,8 @@ This mirrors coq `disjoint_coherent_ortho` (`PFsection7.v`), which reduces to
 (isometry `nu_isometry`, agreement `coherence_extension_sub_eq_of_support`, conjugate-closure of the
 Sibley induced family).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

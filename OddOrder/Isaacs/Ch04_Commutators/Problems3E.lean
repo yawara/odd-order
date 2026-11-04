@@ -3,10 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.GroupTheory.FixedSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsCyclicSylow
 
 /-!
@@ -27,6 +35,8 @@ Glauberman, Thm 3.27-3.30) は Ch.4 の交換子機構を要するため
   `N ⊴ G` が `A`-不変, `(|A|,|N|) = 1`, `A` が `N` にも `G/N` にも自明に作用するなら
   `G` に自明に作用する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

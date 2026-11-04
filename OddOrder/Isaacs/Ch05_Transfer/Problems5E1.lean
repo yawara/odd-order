@@ -3,7 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5E
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C11
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 
 /-!
 # Isaacs Problem 5E.1 (Itô) — 極小非 `p`-冪零群 (書籍 p. 175)
@@ -27,6 +44,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5E
   ゆえ `p`-冪零で `[P,S] = 1`。`H` は Sylow たちで生成される (`iSup_sylow_eq_top`) ので
   `H ≤ C_G(P)` ⟹ `H` が正規 `p`-補群になり矛盾 ⟹ `|H|` は素数冪。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 
@@ -113,7 +132,7 @@ theorem exists_normal_index_eq_prime_of_index_eq_pow [Finite G] {p : ℕ} [Fact 
   have : Mbar.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom Mbar
       (Group.normalizerCondition_of_isNilpotent (G := G ⧸ K)) hMco
-  have hMprime : Mbar.index.Prime := (Ch01.isCoatom_iff_index_prime Mbar).mp hMco
+  have hMprime : Mbar.index.Prime := (Subgroup.isCoatom_iff_index_prime Mbar).mp hMco
   have hMdvd : Mbar.index ∣ p ^ a := hcard ▸ Subgroup.index_dvd_card Mbar
   have hMp : Mbar.index = p :=
     (Nat.prime_dvd_prime_iff_eq hMprime Fact.out).mp (hMprime.dvd_of_dvd_pow hMdvd)

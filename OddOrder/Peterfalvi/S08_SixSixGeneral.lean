@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_SixFiveGeneral
-import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
-import OddOrder.Peterfalvi.S08_CoherenceCorePart2
+module
+
+public import OddOrder.Peterfalvi.S08_SixFiveGeneral
+public import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart2 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (6.6) for a general kernel: the `X`-set and its degree data
@@ -40,6 +43,8 @@ The book's proof of the coherence half (p. 32) runs on three numeric facts about
   enters, and it is what fails at `Z = [K,K]`;
 * the degree-square sum over `𝒳` (Peterfalvi's `∑ χᵢ(1)² = |L|·|L:Z| − ∑_{χ>i} χⱼ(1)²`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

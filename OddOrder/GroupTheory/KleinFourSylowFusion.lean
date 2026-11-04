@@ -3,11 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.KleinFourAutomorphism
-import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.SylowContaining
-import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # A single class of involutions for a Klein four Sylow `2`-subgroup
@@ -36,6 +40,8 @@ appeal to "`|N_G(P) : C_G(P)|` is odd".
 * `OddOrder.GroupTheory.hasNormalPComplement_of_klein_sylow_of_mem_center` — the converse reading
   used on p. 132: a *central* involution forces `N_G(P) = C_G(P)`, hence a normal `2`-complement
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

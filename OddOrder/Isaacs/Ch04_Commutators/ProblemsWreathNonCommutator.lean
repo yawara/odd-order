@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.12 (交換子でない導来部分群の元)
@@ -24,6 +30,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.12 (書籍 p. 125)�
 `⁅x,y⁆ = inl (Δ_{x.right} y.left)⁻¹ · inl (Δ_{y.right} x.left)` となること。
 (b) は (a) と Problem 4A.11 の位数 `|⁅B,T⁆| = |A|^{|H|−|H:T|}` の数え上げ。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

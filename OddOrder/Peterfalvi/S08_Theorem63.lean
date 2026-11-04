@@ -3,7 +3,12 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
 
 /-!
 # Peterfalvi (6.2)/(6.3): the coherence-break degree bound and the `≤ 4|L:K|² + 1` index bound
@@ -20,6 +25,8 @@ character-theoretic content of (6.2):
 It is the single-filter analogue of `sum_re_div_normSq_Xset_eq` (the case-(B) `X`-set difference
 sum), routing through the complex orbit count `sum_div_normSq_induce_kernelFilter_eq`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

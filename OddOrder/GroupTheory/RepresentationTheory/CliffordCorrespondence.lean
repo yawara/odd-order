@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # The Clifford correspondence (toward Isaacs 6.11)
@@ -55,6 +64,8 @@ maximal subgroup.
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, Thm 6.11.
 * Peterfalvi §3 (1.7); issue 9002 (G3), issue 9005.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

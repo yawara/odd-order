@@ -3,18 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.RingTheory.Trace.Defs
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.FieldTheory.Finite.Trace
-import Mathlib.LinearAlgebra.Basis.Defs
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.NumberTheory.Multiplicity
-import Mathlib.RingTheory.TensorProduct.Basic
-import Mathlib.RingTheory.TensorProduct.Finite
-import Mathlib.RepresentationTheory.Irreducible
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # Frobenius-conjugate coordinates for finite-field Singer models
@@ -39,6 +36,8 @@ transitive on the nonzero vectors of a second module.  The two modules must
 then have the same dimension over `𝔽₂`; this is the dimension step in Higman's
 Lemma 6.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

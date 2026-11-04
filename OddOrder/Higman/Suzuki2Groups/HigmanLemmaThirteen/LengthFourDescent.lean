@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Higman's Lemma 13: descent and the abelian length-four obstruction
@@ -23,6 +30,8 @@ ingredients used by that reduction:
 * the direct Agemo obstruction showing that an abelian finite `2`-group of
   exponent at most four cannot carry a four-step `ξ`-chain.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

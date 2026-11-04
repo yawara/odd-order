@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.FormalCommutator
+module
+
+public import OddOrder.GroupTheory.FormalCommutator
+public import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The collecting process on formal words
@@ -46,6 +51,8 @@ left one is not — exactly the situation of a transposition.)
   all levels leaves no residue, so every formal word equals the concatenation of
   one exact-support block per nonempty support, ordered by cardinality.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

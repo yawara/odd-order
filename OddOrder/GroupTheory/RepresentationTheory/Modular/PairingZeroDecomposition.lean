@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 
 /-!
 # Navarro's pairing `[·,·]⁰` in terms of the decomposition numbers
@@ -30,6 +35,8 @@ this gives Navarro's "`[χ, ψ]⁰ ≠ 0 ⟹ χ, ψ` lie in the same block", the
 
 * `OddOrder.RepresentationTheory.Modular.pairingZero_trace_eq_sum_decompositionNumber`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

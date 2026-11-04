@@ -3,10 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.RelativeTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.PRegularQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBlockBijection
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SupportOfGeneralizedDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 
@@ -37,6 +50,8 @@ Evaluating at `u = 1` is legitimate because `1` is `p`-regular, and `x * 1 = x`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (7.4), (7.5), (7.6), p. 141.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

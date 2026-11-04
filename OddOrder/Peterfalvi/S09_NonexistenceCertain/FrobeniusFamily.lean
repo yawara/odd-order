@@ -1,4 +1,8 @@
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # TAIL
@@ -6,6 +10,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
 Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 open OddOrder.GroupTheory (IsTISubset)

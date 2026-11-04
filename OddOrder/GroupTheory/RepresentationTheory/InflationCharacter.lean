@@ -3,14 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-import OddOrder.Peterfalvi.S03_PreliminaryCharacter
-import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Inflation of irreducible characters
@@ -67,6 +70,8 @@ Burnside's `Σ_{Irr (G ⧸ N)} χbar(1)² = |G ⧸ N|`.
 * [Isaacs], *Character Theory of Finite Groups*, (2.22) (inflation / characters of `G ⧸ N`).
 * Peterfalvi §6 (6.6) (degree-sum over `Z ⊆ ker`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

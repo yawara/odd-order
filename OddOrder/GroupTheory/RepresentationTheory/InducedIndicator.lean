@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 import OddOrder.GroupTheory.CosetInvariantCard
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 
 /-!
 # Inducing the indicator of a subset of a subgroup
@@ -31,6 +33,8 @@ value is then the integer `σ(y) / |P|`.
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.6 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

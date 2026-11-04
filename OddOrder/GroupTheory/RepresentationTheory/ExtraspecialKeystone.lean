@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.Commutator.Finite
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.CyclicPermEigenCount
 
 /-!
@@ -21,6 +27,8 @@ with `c_x(b ⟦1⟧) = b ⟦1⟧`
 (its image is central, hence scalar, hence fixed by conjugation); every other `σ`-orbit is free
 because `C_{P/Z}(xᵏ) = 1` (the hypothesis `hcent`).  So the abstract keystone applies verbatim.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

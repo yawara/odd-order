@@ -3,8 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S12_MaximalBasic
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
 import OddOrder.Peterfalvi.S12_TypeVCaseC
+import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
 import OddOrder.Peterfalvi.S13_Lemmas113To115
 import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 
@@ -25,6 +36,8 @@ supply facts are assembled here from the `M`-seeded order-free pair
 consume the honest (10.7) without the import cycle that gated the `S12_MaximalBasic` original
 (issue 1020); every input is axiom-clean.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

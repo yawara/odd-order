@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
 
 /-!
@@ -13,6 +23,8 @@ regular part of the shared cyclic subgroup `W`.  Peterfalvi (3.7) then gives the
 four-corner relation for its integral eta-grid projection coefficients.  This is the
 support-theoretic part of Coq `FTtype34_structure`'s `bridgeS1` calculation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

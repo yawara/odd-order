@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.OmegaSubgroup
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # Gorenstein "Finite Groups" Chapter 3 §2: p′-automorphisms of abelian p-groups
@@ -29,6 +35,8 @@ The repo's coprime-action API lives in `OddOrder.Isaacs.Ch04` (`actionCommutator
   `p′`-automorphism group of a finite abelian `p`-group acting trivially on `Ω₁` acts
   trivially everywhere.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

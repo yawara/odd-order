@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
 
 /-!
 # Isaacs §3D の演習 (書籍 p. 95)
@@ -23,6 +29,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 3D。
 
 3D.1(b) (`p`-length ≤ `P` の冪零類) と 3D.3 / 3D.4 は別 leaf。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

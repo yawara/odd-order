@@ -3,8 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.LinearAlgebra.Projectivization.Cardinality
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
@@ -18,6 +29,8 @@ This file discharges the target-group inputs to Lemma 1 when the normal
 subgroup supplied by Theorem A is `PSL(2,q)` in its standard action on the
 projective line, with `q` a power of two and `q > 2`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

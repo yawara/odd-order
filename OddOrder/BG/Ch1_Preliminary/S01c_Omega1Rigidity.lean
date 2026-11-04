@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
 import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
@@ -23,6 +29,8 @@ Both are stated for an external action `φ : A →* MulAut G`, matching the repo
 `OddOrder.Isaacs.Ch04` coprime-action / `actionCommutator` conventions. Corollary 1.12 is the
 rigidity input to BG Lemma 10.3.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S01
 

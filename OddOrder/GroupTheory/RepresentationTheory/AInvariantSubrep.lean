@@ -3,12 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.Algebra.Module.ZMod
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # `φ`-invariant subgroups as subrepresentations of `elabRepresentation`
@@ -25,6 +25,8 @@ of `H̄` corresponds (via `AddSubgroup.toZModSubmodule`/`toSubgroup'`, the same 
 used in `elabRepresentation_isIrreducible`) to a `ZMod p`-submodule, and the invariance makes it a
 subrepresentation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

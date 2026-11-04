@@ -3,15 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+module
+
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.GroupTheory.PiElementDecomposition
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 
 /-!
 # S12_HcBound
 
 Prefix-split from `OddOrder.Peterfalvi.S12_Section9Counts` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (11.8.1): the §9 counts for the §10 grid

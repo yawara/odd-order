@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI.RhoMEvaluation
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.RhoMEvaluation
+public import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.Peterfalvi.S09_CertificateDischarge
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
 # Peterfalvi (12.16) — the witness value/norm package and the final contradiction
@@ -16,6 +27,8 @@ headline consequences `pi_empty` / `typeI_frobenius` ((12.7)).
 Split from `DadeContradiction.lean` (file-size policy); the `ρ_M` machinery it consumes is in
 `RhoMEvaluation.lean`, the `ρ`-side witness bounds in `DadeContradiction.lean`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

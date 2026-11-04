@@ -1,5 +1,9 @@
-import OddOrder.FeitThompsonSetup
-import OddOrder.Peterfalvi.S13_TypeDetermination
+module
+
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.FeitThompsonSection16Core -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S12_Noncoherence -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S13_TypeDetermination -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # FeitThompsonPairProducer
@@ -11,6 +15,8 @@ the (12.17) `theorem88_caseB_holds` obligation via `exists_section16MaximalPair_
 lets the §11–§13 type-determination stay **upstream** of the capstone — the §12–16 import inversion
 fix (HUB RULING, issue 9093).  Only `FeitThompson` consumes this.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

@@ -3,11 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
-import OddOrder.Peterfalvi.S07_Subcoherent
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.Peterfalvi.S10_TypePSupportA0
-import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+module
+
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S10_TypePSupport -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S10_TypePSupportA0 -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (8.15), claim 3: Hypothesis (5.2) for the type-`P` induced family
@@ -81,6 +87,8 @@ Everything is assembled via the (5.3.a) producer `S07.irrSubcoherent` from lande
 * **§8F** instantiates it at `A = A(M) = typePACore M`, `H = M_σ`
   (`typePACore_subcoherent`) — valid for **every** type `𝒫`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

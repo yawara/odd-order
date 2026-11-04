@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.6 (Fitting の定理の写像 `θ`)
@@ -27,6 +32,8 @@ Theorem 4.34 (Fitting) の証明に現れる写像 `θ : G → G`, `θ(g) = ∏_
   Lemma 4.28 の `G = C_G(A)·⁅G, A⁆` で `g = c * x` と分解すると
   `1 = θ(g) = c^{|A|}` となり, coprime から `c = 1`, すなわち `g = x ∈ ⁅G, A⁆`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

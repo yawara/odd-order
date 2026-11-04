@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.PElementSum
+module
+
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.Mathlib.MonoidAlgebra
-import OddOrder.GroupTheory.PFactorPairCount
 
 /-!
 # `Ĝ_p · Ĝ⁰` counts the factorisations `g = x y`
@@ -24,6 +26,8 @@ Problem (6.1) then compares that count with the one taken inside `C_G(Q)`.
 * `OddOrder.GroupAlgebra.coeff_pElementSum_mul` — `(Ĝ_p · w)(g) = ∑_{x ∈ G_p} w(x⁻¹ g)`
 * `OddOrder.GroupAlgebra.coeff_pElementSum_mul_pRegularSum` — `(Ĝ_p · Ĝ⁰)(g) = |Ω(g)|`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

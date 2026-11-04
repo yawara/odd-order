@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 
 /-!
 # Ch.7 → Ch.3 forward dependency: Isaacs Thm 3.15 (converse of Hall E)
@@ -26,6 +33,8 @@ pairwise coprime. 各 `H` は帰納法の仮定で可解 — `H` の各素因子
 なお Thm 3.17 は当初ここに置く予定だったが, 教科書証明が Burnside を使わない
 ことが判明したため Ch.3 (`Theorem315.lean`) に実装した.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

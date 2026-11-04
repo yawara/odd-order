@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Summing a class function over a `p`-section
@@ -26,6 +32,8 @@ representatives avoids the class-size bookkeeping entirely.
 
 * `OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_pSection`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

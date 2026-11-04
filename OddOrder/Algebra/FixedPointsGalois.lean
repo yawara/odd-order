@@ -3,11 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Fixed
+module
+
+public import Mathlib.FieldTheory.Fixed
 import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.Algebra.CharP.Subring
-import Mathlib.Algebra.Ring.Action.End
-import Mathlib.Algebra.Ring.Action.Subobjects
 
 /-!
 # The Galois correspondence for a group of field automorphisms
@@ -37,6 +36,8 @@ the automorphism group is handed over as an abstract subgroup of `RingAut F`.
 * `OddOrder.RingAut.three_le_of_odd_orderOf` — Peterfalvi's "`|F| > 8`, since `θ`
   is of odd order" (Part II, Ch. IV §3 (3), p. 130).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RingAut
 

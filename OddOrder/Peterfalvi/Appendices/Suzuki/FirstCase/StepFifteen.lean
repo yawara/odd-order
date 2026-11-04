@@ -3,8 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenSylow
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenSylow
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.NonsplitTorus
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThirteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (15): the cyclic subgroup `L` of order `9`
@@ -21,6 +39,8 @@ that reading: by the nonsplit torus construction the Sylow `3`-subgroups of `PSL
 are cyclic of order `9`, and one of them centralizes `st`; conversely `C_G(st)` is a
 `3`-group by (13), so the intersection has order dividing `9`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

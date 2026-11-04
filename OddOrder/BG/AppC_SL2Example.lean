@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.Two
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+module
+
+public import OddOrder.BG.AppC_HypothesisB
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.BG.AppC_FinalContradiction
 
 /-!
@@ -46,6 +47,8 @@ monomorphism whose image is exactly the set the book describes.  Note also that 
 norm is `N(x) = x^(2^q - 1)`, so `U = 𝔽_{2^q}ˣ` is the *whole* multiplicative group and `H` is the
 affine group `AGL(1, 2^q)`, realised as the Borel subgroup of `SL(2, 2^q)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

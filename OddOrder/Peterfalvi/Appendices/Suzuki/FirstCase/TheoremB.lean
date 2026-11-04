@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 
@@ -24,6 +33,8 @@ The proof is the dichotomy on hypothesis (B2) (`p ∤ |G^{ab}|`):
   (`false_of_step_seventeen`), so the case is vacuous.
 -/
 
+@[expose] public section
+
 set_option autoImplicit false
 
 open scoped commutatorElement
@@ -44,7 +55,7 @@ and the distinguished involution give two such subgroups. -/
 theorem not_isSimpleGroup_of_dvd_card_abelianization
     (hB2 : fc.p ∣ Nat.card (Abelianization G)) : ¬ IsSimpleGroup G := by
   intro hsimple
-  rcases hsimple.eq_bot_or_eq_top_of_normal (commutator G) inferInstance with hbot | htop
+  rcases hsimple.eq_bot_or_eq_top_of_normal (commutator G) with hbot | htop
   · -- `G` is abelian, hence `P` is normal and therefore `⊥` or `⊤`
     have hPnormal : fc.P.Normal := by
       refine ⟨fun n hn g => ?_⟩
@@ -56,7 +67,7 @@ theorem not_isSimpleGroup_of_dvd_card_abelianization
         exact h1
       rw [show g * n * g⁻¹ = n * (g * g⁻¹) by rw [← hcomm n g]; group]
       simpa using hn
-    rcases hsimple.eq_bot_or_eq_top_of_normal fc.P hPnormal with hPbot | hPtop
+    rcases hsimple.eq_bot_or_eq_top_of_normal fc.P with hPbot | hPtop
     · have := fc.card_P
       rw [hPbot, Subgroup.card_bot] at this
       exact fc.p_prime.one_lt.ne this

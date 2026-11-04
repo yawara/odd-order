@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 
 /-!
 # Isaacs Problem 7A.1 — 単純群の冪零な極大部分群は `2`-群 (書籍 p. 209)
@@ -28,6 +36,8 @@ import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 教科書 Thm 7.1 (`Z(P)` と `J(P)` の 2 つだけを仮定する強い版) は不要で, Thm 6.23 で足りる —
 冪零な極大部分群は `P` の characteristic 部分群を**すべて**正規化するから。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -53,7 +63,7 @@ theorem exists_sylow_eq_of_maximal_pSubgroup_in_normalizer {G : Type*} [Group G]
   have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   have hlt := Group.normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup G))
     (P.subgroupOf (S : Subgroup G)) (lt_top_iff_ne_top.mpr hHne)
-  obtain ⟨x, hxnorm, hxnot⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨x, hxnorm, hxnot⟩ := IsConcreteLE.exists_of_lt hlt
   -- `x` は `P` を (G の中で) 正規化する
   have hxN : ((x : ↥(S : Subgroup G)) : G) ∈ Subgroup.normalizer P := by
     refine Subgroup.mem_normalizer_iff.mpr fun y => ?_
@@ -182,7 +192,7 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
     have hne : Subgroup.normalizer (Y : Set G) ≠ ⊤ := by
       intro htop
       have hYnormal : Y.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal Y hYnormal with hb | ht
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal Y with hb | ht
       · exact hYne hb
       · exact hM.1 (top_le_iff.mp ((ht ▸ hYP).trans hPM))
     have hnlt : ¬ M < Subgroup.normalizer (Y : Set G) := fun hlt => hne (hM.2 _ hlt)
@@ -234,7 +244,7 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
   obtain ⟨N, hNnormal, hNcompl⟩ :=
     OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer S hp2 hchar
   -- (9) 単純性からどちらの分岐でも矛盾
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N hNnormal with hb | ht
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N with hb | ht
   · have hStop : (S : Subgroup G) = ⊤ := by
       have h := hNcompl S
       rw [hb] at h

@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.LinearAlgebra.Charpoly.Basic
-import Mathlib.RingTheory.Coprime.Lemmas
 import Mathlib.RingTheory.Nakayama
 import OddOrder.Algebra.AlgClosedFractionField
 import OddOrder.Algebra.IdempotentLift
@@ -46,6 +49,8 @@ by `b` modulo `𝔪B` identifies it with `b`.
   `B ↠ B/𝔪B`
 * `OddOrder.existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed` — uniquely so
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

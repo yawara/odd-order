@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
 import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
 
 /-!
@@ -12,6 +18,8 @@ The coherent correction to a T-side Dade bridge is orthogonal to the shared eta-
 Together with the supported Dade isometry, a nonzero source pairing therefore witnesses
 that the bridge's perpendicular eta-grid residual is nonzero.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

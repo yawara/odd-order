@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
 import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
@@ -27,6 +29,8 @@ The proof realises the class `C` as a transitive `G`-conjugation set `Ω = {y //
 `OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists`) produces a `β`-fixed element of `C`, which
 lies in `Fix(β) = {1}`, forcing `C = mk 1`.  No characteristic-0 / Brauer-character input.
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch04 (glauberman_fixed_point_exists IsCompatibleMulAction)
 open OddOrder.GroupTheory.CenterClassSum

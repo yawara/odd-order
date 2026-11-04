@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Clifford
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Pointwise product of class functions; products of characters
@@ -24,6 +30,8 @@ The immediate consumer is **Gallagher's theorem** (Isaacs 6.17): for `χ ∈ Irr
 preserves the norm — hence irreducible.  This feeds the constructive-Clifford decomposition of
 `Ind_H^L θ` (Peterfalvi (1.7), the general type-I `typeI_induced_char_constituents`).
 -/
+
+@[expose] public section
 
 set_option linter.unusedFintypeInType false
 

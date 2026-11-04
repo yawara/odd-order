@@ -3,13 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.GroupTheory.FixedSubgroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310FixedPointSplit
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310GroupForm
-import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.GroupTheory.MinimalInvariantNormal
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import Mathlib.Algebra.Group.Action.End
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Theorem 3.10 for a general nilpotent `M` — the group-level Case-1 induction
@@ -55,6 +63,8 @@ a *minimal* `H`-invariant normal subgroup `N ◁ M`, which is elementary abelian
     two-step chain stabiliser BG Lemma 1.9
     (`OddOrder.BG.Ch1.S01.coprime_actsTrivially_of_normal_and_quotient`) lifts this to `M`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03g
 

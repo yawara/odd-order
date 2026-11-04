@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # BG §10 局所補題 — Lemma 10.13 (rank-2 elementary abelian structure)
@@ -13,6 +25,8 @@ PDF p.79。Lemma 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) �
 helper 群 (GL₂(p)-transvection transitivity ほか)。Prop 10.11 / Lemma 10.12 は上流
 `S10_LocalLemmasCore.lean` (粒度規約による prefix-split, issue 0063)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -1087,7 +1101,7 @@ theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
   have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hgrow := Group.normalizerCondition_of_isNilpotent (G := ↥P)
     ((Subgroup.centralizer (A : Set G) ⊓ P).subgroupOf P) hCPlt
-  obtain ⟨w, hwN, hwC⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨w, hwN, hwC⟩ := IsConcreteLE.exists_of_lt hgrow
   -- `A` is exactly the set of exponent-`p` elements of `C_P(A)`
   have hAset : ∀ g : G, g ∈ A ↔ (g ∈ Subgroup.centralizer (A : Set G) ⊓ P ∧ g ^ p = 1) := by
     intro g

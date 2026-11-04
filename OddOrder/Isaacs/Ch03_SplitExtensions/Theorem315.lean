@@ -3,16 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-import OddOrder.GroupTheory.OpResidual
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+public import OddOrder.GroupTheory.OpResidual
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Theorem315
 
 Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch03
-open SemidirectProduct
 open scoped Pointwise
 
 section /- 3C: Hall theory (pp. 83-88) -/
@@ -384,7 +393,7 @@ instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
 
 各 `Fₙ` は subtype `{S // S.Normal}` 経由で再帰中に normal instance を確保. -/
 
-private def piFittingSeriesAux (π : Set ℕ) (G : Type*) [Group G] :
+def piFittingSeriesAux (π : Set ℕ) (G : Type*) [Group G] :
     ℕ → {S : Subgroup G // S.Normal}
   | 0 => ⟨⊥, inferInstance⟩
   | n + 1 =>
@@ -1147,7 +1156,7 @@ private lemma image_subgroupOf_le_oPiCore (π : Set ℕ) {G : Type*} [Group G] [
   have h_quot_dvd : Nat.card (↥S ⧸ F'.subgroupOf S) ∣
       Nat.card (↥S ⧸ (F.subgroupOf N).subgroupOf S) := by
     apply Subgroup.card_dvd_of_surjective
-      (QuotientGroup.map ((F.subgroupOf N).subgroupOf S) (F'.subgroupOf S) (MonoidHom.id ↥S)
+      (f := QuotientGroup.map ((F.subgroupOf N).subgroupOf S) (F'.subgroupOf S) (MonoidHom.id ↥S)
         (fun x hx => by simpa using hKK' hx))
     apply QuotientGroup.map_surjective_of_surjective
     exact QuotientGroup.mk_surjective

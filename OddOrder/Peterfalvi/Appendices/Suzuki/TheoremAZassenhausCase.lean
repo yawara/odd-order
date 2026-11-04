@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
 
 /-!
 # Peterfalvi Part II, Ch. III §1: the case `V = 1`, and the induction of Theorem A
@@ -44,6 +52,8 @@ classification enters as the explicit `ZassenhausClassification` argument, not a
 The last `sorry` on this chain, the `Q₈` case of Brauer–Suzuki reached from Chapter II, was
 closed with the modular character theory of issues 0147 / 9506.  See `TheoremANonTrivialV`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_Section9Counts
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.Peterfalvi.S04_DadeIsometryBasic
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
 # Peterfalvi (8.16): the `S`-side Dade base for a Type-II maximal
@@ -24,6 +28,8 @@ lifted Dade map `typeIITau`, and the (4.7)/(8.15) support lemmas for the §9 ind
 (`typeII_sSet_member_support_subset` and its difference forms).  The `A₀(S)`-level extension
 (`typeIIDadeHypothesis0`, `typeIIHypothesis46`) lives downstream in `S12_TypeIIFrobenius`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 
@@ -95,7 +101,7 @@ theorem typeII_centralizerSupport_isTISubset [Finite G]
       hSmax.2 _ (lt_of_le_of_ne hle fun h => hne h.symm)
     have hHnormal : (maxNilpotentNormalHall S).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) hHnormal with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) with hb | ht
     · exact hFne hb
     · exact hSmax.1
         (top_le_iff.mp (ht ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le S))

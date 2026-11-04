@@ -3,6 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ_Setup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
 
 /-!
@@ -16,6 +23,8 @@ Split from `OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement` (iss
 0149, the longFile-1500 campaign); that file imports this leaf, so downstream imports
 are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

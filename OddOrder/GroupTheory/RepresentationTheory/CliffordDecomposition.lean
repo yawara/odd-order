@@ -3,10 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
-import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # The constructive Clifford decomposition (toward Peterfalvi (1.7)(c))
@@ -52,6 +65,8 @@ bookkeeping on top.
 
 * Peterfalvi §3 (1.7)(c); Isaacs 6.11/6.17/8.16.  Issue 9002.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

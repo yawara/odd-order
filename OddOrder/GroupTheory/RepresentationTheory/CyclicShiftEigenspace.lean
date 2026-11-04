@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
 
 /-!
@@ -24,6 +30,8 @@ to be exactly `1`.
 This is the per-orbit input to the pure-permutation eigenspace count yielding the keystone
 `dim E₀ = dim E_m + 1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

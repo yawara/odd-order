@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+public import OddOrder.GroupTheory.MinimalInvariantNormal -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: the Frattini layers
@@ -24,6 +35,8 @@ both assertions.  In particular, the Frattini layers used by the later
 Maschke splitting are actual normal actor-invariant subgroups rather than
 posited composition data.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

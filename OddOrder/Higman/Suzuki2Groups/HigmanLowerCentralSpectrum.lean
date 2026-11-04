@@ -3,25 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-import Mathlib.Algebra.Module.Submodule.Bilinear
-import Mathlib.Algebra.Module.ZMod
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Combinatorics.Colex
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.LinearAlgebra.Basis.Basic
-import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
-import Mathlib.LinearAlgebra.Charpoly.BaseChange
-import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
-import Mathlib.LinearAlgebra.TensorProduct.RightExactness
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RingTheory.Adjoin.PowerBasis
-import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Higman.Suzuki2Groups.HigmanSpectrumBilinear
 
 /-!
@@ -39,6 +31,8 @@ infrastructure for Higman's proof that the first two lower-central layers are
 not isomorphic under the given automorphism.
 -/
 
+
+@[expose] public section
 
 set_option autoImplicit false
 

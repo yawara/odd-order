@@ -3,15 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelianLinear
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Exponent
-import Mathlib.Data.ZMod.Units
-import Mathlib.Data.ZMod.QuotientGroup
-import Mathlib.LinearAlgebra.Basis.VectorSpace
+module
+
+public import Mathlib.GroupTheory.Exponent
+public import Mathlib.Data.Nat.Totient
+public import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.GroupTheory.IndexNormal
+import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.ElementaryAbelianLinear
 
 /-!
 # The automorphism group of a commutative group
@@ -34,6 +35,8 @@ Together: a finite abelian `A` with simple `Aut(A)` and an element of order `> 2
 * `OddOrder.GroupTheory.card_mulAut_eq_two_of_isSimpleGroup`
 * `OddOrder.GroupTheory.totient_exponent_le_card_mulAut`
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -93,7 +96,7 @@ theorem card_mulAut_eq_two_of_isSimpleGroup (hs : IsSimpleGroup (MulAut A))
     obtain ⟨a, ha⟩ := h
     exact ha (invMulAut_eq_one_iff.mp hc a)
   have hcenter : Subgroup.center (MulAut A) = ⊤ := by
-    rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.center (MulAut A)) inferInstance with hb | ht
+    rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.center (MulAut A)) with hb | ht
     · exact absurd (Subgroup.mem_bot.mp (hb ▸ invMulAut_mem_center (A := A))) hne
     · exact ht
   have : IsMulCommutative (MulAut A) := Subgroup.center_eq_top_iff.mp hcenter
@@ -512,7 +515,7 @@ theorem not_isSimpleGroup_of_card_eq_six {G : Type*} [Group G] (hG : Nat.card G 
     rw [hcardH, hG] at hmul
     omega
   have : (Subgroup.zpowers x).Normal := Subgroup.normal_of_index_eq_two hindex
-  rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
+  rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) with hb | ht
   · rw [hb, Subgroup.index_bot, hG] at hindex; omega
   · rw [ht, Subgroup.index_top] at hindex; omega
 

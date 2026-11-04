@@ -3,10 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Module
-import Mathlib.LinearAlgebra.Matrix.StdBasis
-import Mathlib.LinearAlgebra.StdBasis
-import Mathlib.LinearAlgebra.Trace
+module
+
+public import Mathlib.LinearAlgebra.Trace
 
 /-!
 # The trace of left multiplication
@@ -27,6 +26,8 @@ matrix of the principal block.
 * `OddOrder.Algebra.trace_mulLeft_algEquiv` — `tr(L_a)` is an algebra invariant
 * `OddOrder.Algebra.trace_mulLeft_pi_matrix` — `tr(L_v) = ∑_i m_i · tr(v_i)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

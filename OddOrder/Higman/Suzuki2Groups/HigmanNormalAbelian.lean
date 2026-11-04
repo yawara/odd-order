@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.Homocyclic
 
 /-!
 # Higman Lemma 2: normal abelian invariant subgroups
@@ -17,6 +25,8 @@ have both its square in the first power layer and all its commutators in the
 second power layer. The proof below replaces the original invertibility
 sentence by the Agemo--Nakayama lifting established for Lemma 1.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

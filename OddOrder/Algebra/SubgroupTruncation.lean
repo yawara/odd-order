@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.MapDomain
+module
+
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import Mathlib.Tactic.NormNum.Pow
 import OddOrder.Algebra.GroupAlgebraConjugation
 
 /-!
@@ -36,6 +44,8 @@ the two are kept apart.
 * `OddOrder.GroupAlgebra.commute_single_inclusionHom` — `H` centralises `inclusionHom H a` for
   central `a`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

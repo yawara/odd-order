@@ -1,6 +1,13 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
-import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
 import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+import OddOrder.Peterfalvi.S09_Building78C
 
 /-!
 # Peterfalvi (14.9): the T-side prime-TI anchor
@@ -9,6 +16,8 @@ Construction of the reducible prime-TI character `ν₀ = primeTIred 0` used in
 `βT0 = ν₀ - ζ`.  This is the `primeTIred ptiWT 0` of Coq `PFsection14.v`, not the
 two-dimensional §13 `nu` grid.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

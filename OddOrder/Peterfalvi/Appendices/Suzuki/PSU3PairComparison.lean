@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, steps (19)–(20): comparing two representatives
@@ -48,6 +59,8 @@ What remains of (20) is the indexed family: the sequences `(u_i), (v_i), (d_i)` 
 realized in `G`, so that (∗∗∗) can be read at `i = 1` and `i = m − 1`.  The arithmetic
 that then closes (20) is `PSU3FieldArithmetic.eq_add_of_add_char_two`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

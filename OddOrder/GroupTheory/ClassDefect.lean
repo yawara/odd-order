@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # The `p`-defect of a conjugacy class
@@ -25,6 +29,8 @@ valuation ring because the only obstruction is the `p`-part of `|K|`.
 * `OddOrder.GroupTheory.classDefect_add_factorization_conjugacyClassSize` —
   `d(K) + ν_p(|K|) = ν_p(|G|)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

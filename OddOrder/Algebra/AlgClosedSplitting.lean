@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Artinian.Ring
-import Mathlib.RingTheory.Jacobson.Semiprimary
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 
 /-!
@@ -31,6 +32,8 @@ given `k`, so it is left as a hypothesis where it is needed.
 
 * `OddOrder.exists_algHom_pi_matrix_of_isAlgClosed`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

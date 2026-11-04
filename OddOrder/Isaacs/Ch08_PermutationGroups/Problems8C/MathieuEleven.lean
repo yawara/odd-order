@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
@@ -35,6 +41,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 
 - `isSimpleGroup_of_card_eq_7920` — **Problem 8C.2** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

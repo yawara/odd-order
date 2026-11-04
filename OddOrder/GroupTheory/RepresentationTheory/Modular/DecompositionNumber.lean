@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 
@@ -29,6 +38,8 @@ with `AlgEquiv.refl` converts the map.
 * `OddOrder.RepresentationTheory.Modular.eq_of_sum_irreducibleBrauerCharacter_eq`
 * `OddOrder.RepresentationTheory.Modular.existsUnique_decomposition_trace`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

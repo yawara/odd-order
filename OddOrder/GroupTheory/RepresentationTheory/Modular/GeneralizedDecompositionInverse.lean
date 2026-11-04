@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 
 /-!
@@ -34,6 +43,8 @@ function `y ↦ χ(x⁻¹ y)` is a class function of `C_G(x)`, so it has a uniqu
   hypothesis `hdinv` of (5.13)(b)
 * `OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumberInv_eq_cartanMatrix`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

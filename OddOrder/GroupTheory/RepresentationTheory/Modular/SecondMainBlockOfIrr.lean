@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 
 /-!
@@ -22,6 +29,8 @@ This is the vanishing that makes the generalized decomposition matrix block-diag
 
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

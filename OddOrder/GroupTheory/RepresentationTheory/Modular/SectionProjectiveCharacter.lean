@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 
 /-!
@@ -47,6 +52,8 @@ definition.
 * `OddOrder.RepresentationTheory.Modular.inner_sectionProjectiveCharacter_eq` —
   `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

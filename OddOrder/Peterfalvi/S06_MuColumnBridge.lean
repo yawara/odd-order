@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters
 
 /-!
 # Peterfalvi §6: the certain-type `μ`-column induction relation, explicit form
@@ -29,6 +31,8 @@ the `W₁` reindex via the grid's `charEquiv`, and the `compHom` transport form 
 `Ind_W^S`) is the §13-spine owner's wiring step, since those are consumer-side
 indexing conventions.  See `ft_path_policy.md` §4 endpoint D.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

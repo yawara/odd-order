@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Degree-square sum of a Frobenius induced family
@@ -29,6 +36,8 @@ The fiber size is computed without any orbit machinery, via the Mackey cross inn
 
 * `card_index_mul_sum_induced_family_degree_sq` — `[G:H] · ∑_{i ≠ ind1H} θ_i(1)² = |H| − 1`.
 -/
+
+@[expose] public section
 
 set_option linter.unusedFintypeInType false
 

@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+module
+
+public import OddOrder.Peterfalvi.S15_Tau1T
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S15_CaseACoherence
 
 /-!
 # Peterfalvi §13 (pp. 75-86) — the `T`-side chosen-base (7.6) datum and distinguished index
@@ -15,6 +23,8 @@ downstream imports are unchanged) and carries the **`T`-side twin** (issue 2035 
 `Q_sharp_hypothesis76_base` (the `(T, Q^#)` chosen-base (7.6) datum) and
 `exists_muT_index_core` (the (13.8)-for-`T` distinguished index, Peterfalvi (13.3.c)-at-`T`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

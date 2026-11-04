@@ -3,6 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.Peterfalvi.S10_Theorem88CaseB
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.Peterfalvi.S09_FrobeniusCardG0LowerBound
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
 
 /-!
@@ -15,6 +30,8 @@ family (`TypeICovering`), (7.11) rules it out (`not_all_maximal_typeI`), and com
 Split from `DadeContradiction.lean` (file-size policy); consumes the (12.7) `typeI_frobenius`
 of `NormPackage.lean`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

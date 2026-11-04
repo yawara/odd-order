@@ -3,10 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.LinearAlgebra.Basis.Basic
-import Mathlib.LinearAlgebra.Dimension.Free
+module
+
+public import Mathlib.RepresentationTheory.Invariants
 
 /-!
 # Invariants of a permutation representation have dimension = number of orbits
@@ -26,6 +25,8 @@ space `Ω := orbitRel.Quotient G ι`.
 `finrank_invariants_eq_card_orbits` is the cornerstone; applying it to two bases of one space yields
 the orbit-count equality with no Teichmüller lift.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.PermutationInvariants
 

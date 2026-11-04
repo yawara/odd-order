@@ -3,8 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # `C_{S/Q₀}(P) ≠ 1` from Hilbert 90
@@ -46,6 +62,8 @@ Both are stated for an `X ⊄ W` rather than in the branch `W = 1` where Ch. III
 uses them: the twist only ever needs a single element of `X` outside `W = C_V(K)`,
 and Ch. IV §4 — the case `V ≠ W` — has those without `W` being trivial.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

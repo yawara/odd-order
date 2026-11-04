@@ -3,10 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Int.ModEq
+module
+
+public import Mathlib.Data.Int.ModEq
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.Ring.Int.Defs
+public import Mathlib.Algebra.Ring.Parity
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 import OddOrder.Algebra.BasicSetColumnShape
 import OddOrder.Algebra.HalfSumColumns
 import OddOrder.Algebra.SignRelationSolution
+import OddOrder.Algebra.SumSquaresFour
+import OddOrder.Algebra.ThreeNormColumn
 
 /-!
 # The endgame of Brauer–Suzuki, assembled — Navarro pp. 142–145
@@ -44,6 +58,8 @@ relation (10) is an identity between integers again.
 * `OddOrder.Algebra.exists_eq_of_columns` — the whole endgame
 * `OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees` — the same, from textbook inputs only
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

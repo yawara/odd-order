@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+module
+
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 
 /-!
 # Peterfalvi (1.2): vanishing of an irreducible character off trivial subgroup-centralizers
@@ -41,6 +44,8 @@ predicates `centralizerInSubgroup` / `characterKernel` /
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S03
 

@@ -3,8 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. III §1, Proposition: the three cases for `S`
@@ -67,6 +77,8 @@ The Proposition itself (`SecondCaseHypothesis.trichotomy`) is assembled in
 `WNeBot.lean`, which supplies the `W ≠ 1` clause of case (c)
 (`W_ne_bot_of_card_cube`) and therefore has to import this file.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

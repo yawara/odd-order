@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockIdempotent
+module
+
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Algebra.NormalPSubgroupTrivialAction
 import OddOrder.Algebra.PGroupOrbitSum
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # Class sums that miss `C_G(O_p(G))` are killed by every central character
@@ -32,6 +38,8 @@ This is the ingredient Navarro (4.14) needs: for `P C_G(P) ≤ H ≤ N_G(P)` the
 * `OddOrder.GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer`
 * `OddOrder.GroupAlgebra.blockCharacter_classSumCenter_eq_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

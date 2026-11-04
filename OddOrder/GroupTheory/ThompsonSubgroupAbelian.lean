@@ -3,13 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.GroupTheory.Commutator.Basic
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.Isaacs.Ch01_Sylow.Basic
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Abelian Thompson Subgroup `J_a(P)` (Gorenstein 版)
@@ -61,6 +64,8 @@ Gorenstein, *Finite Groups* (1968), Ch.8 §2 (pp. 270-271) の定義と基本補
 Thm 2.4 (Thompson)、Thm 2.5 (Thompson Replacement)、Thm 2.7 (Glauberman Replacement)、
 Lem 2.8-2.10、Thm 2.11 (**Glauberman `Z(J)`-定理**) は後続。
 -/
+
+@[expose] public section
 
 namespace Subgroup
 
@@ -624,7 +629,7 @@ theorem thompson_replacement [Finite G] {p : ℕ} [Fact p.Prime] {P A B : Subgro
   refine ⟨elementCommutator x A ⊔ (A ⊓ centralizer (elementCommutator x A : Set G)),
     thompson_mem_maxAbelianIn hA (hBP hxB) hMcomm, ?_, ?_⟩
   · -- (i) `A ∩ B < A* ∩ B`
-    rw [SetLike.lt_iff_le_and_exists]
+    rw [IsConcreteLE.lt_iff_le_and_exists]
     constructor
     · -- `A ∩ B ≤ C_A(M) ≤ A*`, かつ `≤ B`
       have hABC : A ⊓ B ≤ A ⊓ centralizer (elementCommutator x A : Set G) := by
@@ -977,13 +982,6 @@ repo 既存の `OddOrder.Isaacs.Ch04.iterCommutator B A i` そのもの. ここ�
 Lem 2.8(ii) (降下) と正規化の基本性質を与える. -/
 
 open OddOrder.Isaacs.Ch04 in
-/-- `A` は `⁅X, A⁆` を正規化する (`⁅X,A⁆ = ⁅A,X⁆` + 左因子は正規化する). -/
-theorem le_normalizer_commutator_right (X A : Subgroup G) :
-    A ≤ normalizer ((⁅X, A⁆ : Subgroup G) : Set G) := by
-  rw [commutator_comm X A]
-  exact normalizer_commutator_ge_left A X
-
-open OddOrder.Isaacs.Ch04 in
 /-- `A` は各 `[B,A;i]` を正規化する (Gorenstein Lem 2.8 の途中主張;
 `i = 0` は `B ⊴ G`, `i ≥ 1` は右因子正規化で無条件). -/
 theorem le_normalizer_iterCommutator {B : Subgroup G} (A : Subgroup G) [B.Normal]
@@ -1001,7 +999,7 @@ theorem le_normalizer_iterCommutator {B : Subgroup G} (A : Subgroup G) [B.Normal
       rwa [show a⁻¹ * (a * h * a⁻¹) * a⁻¹⁻¹ = h by group] at hconj
   | succ i =>
     rw [iterCommutator_succ]
-    exact le_normalizer_commutator_right _ A
+    exact Subgroup.normalizer_commutator_ge_right _ A
 
 open OddOrder.Isaacs.Ch04 in
 /-- **Gorenstein Lemma 2.8(ii)**: `[B,A;i+1] ≤ [B,A;i]`. -/

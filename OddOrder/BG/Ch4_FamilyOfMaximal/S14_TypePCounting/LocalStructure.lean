@@ -1,3 +1,26 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
 
 /-!
@@ -6,6 +29,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
@@ -922,7 +947,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- `K ∩ M_σ = ⊥` (`K` is a `κ(M) ⊆ σ(M)'`-group, `M_σ` a `σ(M)`-group).
     have hKMσbot : K ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ := by
       apply Disjoint.eq_bot
-      refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
+      refine Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)
       intro r hr hrK hrMσ
       have hrκ : r ∈ kappa M := hK.1 r (by
         rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
@@ -965,7 +990,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have := hN; rw [hkN1, one_mul] at this; exact this
       -- `orderOf s ∣ orderOf x'` and `orderOf s ∣ |M_σ|`, which are coprime, so `s = 1`.
       have hcop : Nat.Coprime (orderOf x') (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)) :=
-        coprime_of_forall_prime_not_dvd (fun r hr hrx' hrMσ => by
+        Nat.coprime_of_dvd (fun r hr hrx' hrMσ => by
           exact hx'sigma r (by
             rw [piSet, Set.mem_ofPred_eq, hcardclos]
             exact Nat.mem_primeFactors.mpr ⟨hr, hrx', (orderOf_pos_iff.mpr

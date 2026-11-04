@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
 
 /-!
 # Induction of class functions: Frobenius reciprocity and the projection formula
@@ -44,6 +46,8 @@ Peterfalvi `ClassFunction`/`ZIrrFourier` import closure, which this development 
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.2 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

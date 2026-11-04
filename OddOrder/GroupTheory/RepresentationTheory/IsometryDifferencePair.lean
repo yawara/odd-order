@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Basic.Complex.Basic
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
@@ -51,6 +53,8 @@ orthonormal-pair structures, up to a uniform sign.
 * Peterfalvi §5 (3.2), §6 (4.5), §7 (5.6) — re-uses the same abstraction.
 * Isaacs, *Character Theory of Finite Groups*, Ch. 2 (character orthogonality).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

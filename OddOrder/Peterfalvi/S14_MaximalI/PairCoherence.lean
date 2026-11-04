@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S07_PivotCoherence
 import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
 # Peterfalvi (12.5) without global coherence — pair coherence of equal-degree members
@@ -31,6 +40,8 @@ This leaf rebuilds the (12.5) chain in the coherence-free form of the original t
   `Rset` form (as in the original text and the (12.4) `orthogonal_character_constant_on_coset`).
 -/
 
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
@@ -50,7 +61,7 @@ private theorem sum_apply {H : Type*} [Group H] {ι : Type*} (s : Finset ι)
       rw [Finset.sum_insert hi, Finset.sum_insert hi, ClassFunction.add_apply, ih]
 
 /-- Complex conjugation of a finite sum of class functions (conjugation is additive). -/
-private theorem conj_sum {H : Type*} [Group H] {ι : Type*} (s : Finset ι)
+theorem conj_sum {H : Type*} [Group H] {ι : Type*} (s : Finset ι)
     (F : ι → ClassFunction H ℂ) : (∑ i ∈ s, F i).conj = ∑ i ∈ s, (F i).conj := by
   classical
   induction s using Finset.induction with

@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 
 /-!
 # The decomposition matrix
@@ -23,6 +31,8 @@ this is the decomposition matrix `D`.
 
 * `OddOrder.RepresentationTheory.Modular.exists_decomposition_trace`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

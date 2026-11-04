@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 
 /-!
 # Navarro (5.10): the `B`-parts inherit vanishing on a `p`-section
@@ -39,6 +46,8 @@ particular on the `p`-section of `g_p` when `g_p` and `h_p` are not conjugate.
 * `OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero` — Navarro (5.11)
 -/
 
+@[expose] public section
+
 namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory OddOrder.MatrixModule
@@ -62,9 +71,9 @@ variable {ιH : Type*} {mH : ιH → Type*} [∀ i, Fintype (mH i)] [∀ i, Deci
 variable {ιG : Type*} {nnG : ιG → Type*} [∀ i, Fintype (nnG i)] [∀ i, DecidableEq (nnG i)]
   [Finite ιG] [∀ i, Nonempty (nnG i)]
 
+set_option linter.unusedFintypeInType false in
 omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] [FaithfulSMul 𝒪 K]
   [DecidableEq (ConjClasses G)] in
-set_option linter.unusedFintypeInType false in
 open scoped Classical in
 /-- **A class function vanishing on the `p`-section of `x` has all its generalized decomposition
 sums zero.**

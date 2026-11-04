@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_PivotCoherence
-import OddOrder.Peterfalvi.S11_NineElevenBridgeBase
-import OddOrder.Peterfalvi.S11_NineElevenRFamily
-import OddOrder.Peterfalvi.S10_SubcoherentTypeP
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+module
+
+public import OddOrder.Peterfalvi.S11_NineElevenRFamily
+public import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
-import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
 import OddOrder.Peterfalvi.S11_NineElevenTIWitness
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
@@ -43,6 +45,8 @@ strictly narrower; the containment still runs the direction we need.
 Putting the bridge in the §8 file would make an §8 module import §9, reintroducing exactly the
 layering inversion that issues 1045/1046 removed.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 

@@ -3,9 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
-import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D6
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 
 /-!
 # Isaacs Problem 5E.2 — 真部分群がすべて超可解なら可解 (書籍 p. 175)
@@ -27,6 +41,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D6
   で `G` 自身が正規 `p`-補群 `K` をもつが, `p ∣ |G|` から `K ≠ ⊤`, `G` が `p`-群でないことから
   `K ≠ ⊥` — 単純性に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
@@ -19,6 +29,8 @@ subgroup supplied by Theorem A is the standard projective unitary group
 and 10.13 for the standard-action degree and simplicity; here both come from
 the concrete constructed permutation group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.CenterIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
 
@@ -34,6 +43,8 @@ the decomposition matrix of a block is not `(* 0; 0 *)`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.8), (3.9), (3.10).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

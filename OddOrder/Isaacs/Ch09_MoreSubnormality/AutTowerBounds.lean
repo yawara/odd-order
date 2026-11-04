@@ -3,11 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Data.Fintype.Perm
+import Mathlib.GroupTheory.Coset.Card
+import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.Tactic.Group
 
 /-!
@@ -28,6 +31,8 @@ Lemma 9.14 の後半は `Aut(N)` が `N ∖ {1}` に忠実に作用すること�
 
 9.13 (order bound) / 9.10 (tower theorem) 本体は Schenkman (9.21) の後の leaf.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

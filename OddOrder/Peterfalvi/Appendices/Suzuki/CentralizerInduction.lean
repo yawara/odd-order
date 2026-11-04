@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
+module
+
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 
 /-!
 # Peterfalvi Part II, Ch. I §3: Proposition 1(a)
@@ -31,6 +43,8 @@ Peterfalvi writes actions on the right.  Thus the book's point `H^{ts}` is
 represented by `s • (t • basept)` in Lean's left-action convention, where
 `s` is the distinguished involution of `Q`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

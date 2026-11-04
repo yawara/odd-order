@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Galois transport of virtual-character inner products
@@ -30,6 +35,8 @@ These are the generic halves of the T-side Galois-transport arguments of
 (11.9.a) row-projection analysis (Peterfalvi §11, issues 1024/9085) can import them without the
 S16 closure; the S16 consumers cite this shared API directly (issue 9085).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.ClassFunction
 

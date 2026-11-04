@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Structural properties of the unitary root group
@@ -22,6 +25,8 @@ These are the concrete unitary-root calculations required by **Peterfalvi,
 Part II, Chapter I §3, Proposition 1(c)** (pp. 104–106).  The coordinates
 and Weyl action come from Peterfalvi, Part II, Chapter III §3 (pp. 119–121).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

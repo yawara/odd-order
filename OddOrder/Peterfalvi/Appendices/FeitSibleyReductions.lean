@@ -3,9 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import Mathlib.GroupTheory.PGroup
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction-step machinery (pp. 146–148)
@@ -26,6 +34,8 @@ would act on the finite set `wN`, whose size `|N|` is prime to `ord δ'`
 (`IsPGroup.card_modEq_card_fixedPoints`), and `y ≠ 1` since `1 ∉ wN`,
 contradicting `D_fixedPointFree_on_Q1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
@@ -299,7 +309,7 @@ theorem d_add_one_le_card_quotient_of_le_Q1 [Finite G] {N W : Subgroup G}
     hyp.d + 1 ≤ Nat.card (↥W ⧸ N.subgroupOf W) := by
   have hdvd := hyp.d_dvd_card_quotient_sub_one_of_le_Q1 hNW hWQ1 hNinv hWinv
   have hlt : 1 < Nat.card (↥W ⧸ N.subgroupOf W) := by
-    obtain ⟨w, hwW, hwN⟩ := SetLike.not_le_iff_exists.mp hWN
+    obtain ⟨w, hwW, hwN⟩ := IsConcreteLE.not_le_iff_exists.mp hWN
     have hne : (Quotient.mk'' (⟨w, hwW⟩ : ↥W) : ↥W ⧸ N.subgroupOf W)
         ≠ Quotient.mk'' (1 : ↥W) := by
       intro h

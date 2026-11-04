@@ -3,6 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.RepresentationTheory.CyclicShiftEigenspace
 
 /-!
@@ -28,6 +39,8 @@ disjoint-support independence (`linearIndependent_of_triangular`) makes the repr
 **basis** of `E_m`.  The count is then the number of orbits contributing to `E_m`: every orbit for
 `E_0`, only the free orbits for `E_m` (`m ≠ 0`), so `dim E₀ − dim E_m = 1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

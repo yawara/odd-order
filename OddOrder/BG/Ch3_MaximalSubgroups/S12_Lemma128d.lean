@@ -3,7 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 
 /-!
 # BG §12: Lemma 12.8(d)(e)(f) and assembly
@@ -24,6 +40,8 @@ characteristic (`A = Ω₁(S)`, `S = O_p(E₂)`, `E₂ = O_{τ₂}(E₂E₃)`,
 - `S12_Lemma128` の全部品 (chain core / `sylow_eq_opiCore…` / (a)(b)(c))。
 - Proposition 10.11(d) = `S10.sigma_complement_commutator_cyclic_normal` ((e))。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -176,7 +194,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       exact hr
     exact h.E₃_hall.1 r h1
   have hE₂E₃_bot : E₂ ⊓ E₃ = ⊥ := by
-    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+    refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
     intro r hr h1 h2
     have hr2 := hE₂pi r (Nat.mem_primeFactors.mpr ⟨hr, h1, Nat.card_pos.ne'⟩)
     have hr3 := hE₃pi r (Nat.mem_primeFactors.mpr ⟨hr, h2, Nat.card_pos.ne'⟩)
@@ -549,7 +567,7 @@ theorem fittingInG_le_centralizer_opiCoreInG [Finite G] {E : Subgroup G} {π : S
               (Subgroup.commutator_le_right _ _)
         _ ≤ ⊥ := by
             refine le_of_eq (Subgroup.disjoint_of_coprime_natCard
-              (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+              (Nat.coprime_of_dvd ?_)).eq_bot
             intro r hr h1 h2
             have hr1 : r ∈ πᶜ := S10.oPiCore_isHall_of_isNilpotent (K := ↥FE) πᶜ |>.1 r
               (Nat.mem_primeFactors.mpr ⟨hr, h1, Nat.card_pos.ne'⟩)
@@ -637,7 +655,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [h4]
         exact E₃.mul_mem h2 (E₃.inv_mem hb)
     refine h1.trans (le_of_eq ?_)
-    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+    refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
     intro r hr h1' h2'
     have hr2 := hE₂hallG.1 r (Nat.mem_primeFactors.mpr ⟨hr, h1', Nat.card_pos.ne'⟩)
     have hr3 : r ∈ tau3 M := by
@@ -808,7 +826,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
         conj_smul_eq_self_of_mem_normalizer (hNS_norm_HK hn)]
     -- Proposition 10.11(d): `M ≤ N_G(⁅K,X⁆)`.
     have hE₂E₃_bot : E₂ ⊓ E₃ = ⊥ := by
-      refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+      refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
       intro r hr h1' h2'
       have hr2 := hE₂hallG.1 r (Nat.mem_primeFactors.mpr ⟨hr, h1', Nat.card_pos.ne'⟩)
       have hr3 : r ∈ tau3 M := by

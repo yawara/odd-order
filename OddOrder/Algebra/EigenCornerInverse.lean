@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
 import OddOrder.Algebra.CornerInverse
 
 /-!
@@ -25,6 +30,8 @@ legitimate here because `f_b` commutes with `h` — the argument is:
 * `OddOrder.exists_corner_inverse_eigen` — the corner inverse of `(1 - c) s`
 * `OddOrder.eq_zero_of_apply_eq_zero_of_corner_inverse` — injectivity on the module
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

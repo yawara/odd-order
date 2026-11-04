@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Lemma 3.18: series characterization of π-separability (pp. 90-91)
@@ -29,6 +35,8 @@ ambient を移しても不変なので subnormal 版 (Lemma 3.18 本体) の帰�
 `Theorem315` が π-Fitting series 版 (`Def 3.18` + subgroup/quotient 転送) を、
 `Main` の subgroup / quotient 閉包 instance が Lemma 3.18 の役割を担う.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

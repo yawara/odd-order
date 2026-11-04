@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (4.10): the four-corner Dade identity
@@ -21,6 +24,8 @@ map preserves values on `V` while both sides vanish off `V^G`, giving `β^τ = �
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

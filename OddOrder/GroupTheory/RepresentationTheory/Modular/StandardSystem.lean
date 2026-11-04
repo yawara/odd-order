@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
@@ -30,6 +35,8 @@ records the instantiation.
 * `OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq_standardSystem`
 -/
 
+@[expose] public section
+
 namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing OddOrder.GroupTheory
@@ -53,7 +60,7 @@ theorem exists_isPrimitiveRoot_pRegularExponent_standardSystem
   have : NeZero (pRegularExponent p G) := ⟨hpos.ne'⟩
   have := hasEnoughRootsOfUnity_residueField_standardSystem p
     (not_dvd_pRegularExponent (G := G) Fact.out) hpos.ne'
-  exact HasEnoughRootsOfUnity.exists_primitiveRoot _ _
+  exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot _ _
 
 /-- **Brauer's theorem over the standard system.**  Nothing is assumed beyond `G` being a finite
 group: the splitting datum, the identification of its blocks with the simple modules, and the

@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourDescent
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import OddOrder.Higman.Suzuki2Groups.HigmanMaximalNormalAbelian
 
 /-!
 # Higman's Lemma 13: descent to a proper noncommutative subgroup
@@ -23,6 +28,8 @@ The hypothesis excluding exact length four is essential.  A bare
 four-step chain can end at a coatom, in which case restriction to that
 coatom leaves only three strict steps.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

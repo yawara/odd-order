@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 
 /-!
 # A class-product identity: `χ(a) χ(b) = c · χ(1)` when `χ` is constant on `cl(a)·cl(b)`
@@ -22,6 +31,8 @@ on the centre (`centralScalar_mul`), and `Ĉ · D̂` has total coefficient mass 
 
 * `OddOrder.RepresentationTheory.Modular.character_mul_eq_of_const_on_class_product`
 -/
+
+@[expose] public section
 
 open Matrix MonoidAlgebra OddOrder.GroupTheory.CenterClassSum OddOrder.RepresentationTheory
 

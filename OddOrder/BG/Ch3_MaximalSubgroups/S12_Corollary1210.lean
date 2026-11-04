@@ -3,7 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Corollary 12.10
@@ -51,6 +71,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 - Proposition 12.4(a) = `centralizer_le_of_elemAb_rank_two`。
 - `Sylow.directProductOfNormal` + `Group.isNilpotent_of_finite_tfae` (nilpotent = Sylow 直積)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -289,7 +311,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
           rw [h4]
           exact A.mul_mem h2 (A.inv_mem hb)
       refine le_bot_iff.mp (h1.trans (le_of_eq ?_))
-      refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
+      refine (Subgroup.disjoint_of_coprime_natCard (Nat.coprime_of_dvd ?_)).eq_bot
       intro r hr_prime hr_E₃ hr_A
       have hr3 : r ∈ tau3 M := by
         apply h.E₃_hall.1 r
@@ -503,8 +525,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
             rw [htop]; exact Subgroup.mem_top g
           exact (Subgroup.mem_centralizer_iff.mp hg y rfl).symm
         have hZbot : Subgroup.center G = ⊥ := by
-          rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G)
-            inferInstance with hb | ht
+          rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with hb | ht
           · exact hb
           · exfalso
             apply hG.notSolvable

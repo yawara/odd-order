@@ -1,3 +1,10 @@
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
@@ -29,6 +36,8 @@ the `m`-lower bounds, `h11c`). Thus this engine is *ungated*: the caller (the `S
 or the `T`-side `v`-value) supplies those char inputs, which bottom out in `typeP_Galois` (issue
 9000).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

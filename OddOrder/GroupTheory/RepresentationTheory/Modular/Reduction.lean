@@ -3,10 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.LocalRing.Module
-import Mathlib.LinearAlgebra.TensorProduct.Tower
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import OddOrder.Algebra.AugmentationIdeal
+module
+
+public import OddOrder.Algebra.AugmentationIdeal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 
 /-!
@@ -35,6 +40,8 @@ decomposition-map identity is that these containments are equalities on dimensio
   `OddOrder.RepresentationTheory.Modular.trace_eq_brauerCharacter_reduction` — the same
   identity for representations
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

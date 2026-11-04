@@ -1,4 +1,36 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Conjugacy145C
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaCovers
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # KappaHallCommutator
@@ -6,6 +38,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Lemma 14.11 - Lemma 14.13 — global counting + subnormal closure
@@ -142,7 +176,7 @@ private theorem Q_le_fittingInG_of_commutator_centralizesQ [Finite G]
   have hRE : R ≤ E := (Subgroup.commutator_mono le_rfl hQE).trans (Subgroup.commutator_le_self E)
   have hNE : Q ⊔ R ≤ E := sup_le hQE hRE
   have hRnorm : E ≤ Subgroup.normalizer (R : Set G) :=
-    hRdef ▸ Ch04.subgroup_le_normalizer_commutator_self E Q
+    hRdef ▸ Subgroup.normalizer_commutator_ge_left E Q
   have hRE_comm : (⁅R, E⁆ : Subgroup G) ≤ R := Ch04.commutator_le_of_le_normalizer hRnorm
   have hC' : Q ≤ Subgroup.centralizer (R : Set G) := by
     rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
@@ -253,7 +287,7 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
     rintro rfl
     exact tau1_not_mem_derived_primeFactors hqτ1 hpM'
   have hQNK : Q ≤ Subgroup.normalizer (K : Set G) ⊓ M :=
-    le_inf (hQE.trans (hKdef ▸ Ch04.subgroup_le_normalizer_commutator_self E Q)) hQM
+    le_inf (hQE.trans (hKdef ▸ Subgroup.normalizer_commutator_ge_left E Q)) hQM
   -- Proposition 10.11(d): `K' := ⁅K, Q⁆ ≤ C_G(M_σ)`, cyclic, `M ≤ N_G(K')`.
   obtain ⟨hK'cent, hK'cyc, hMNK'⟩ :=
     sigma_complement_commutator_cyclic_normal hG hsetup.mem_maximal hKM hKσ' hqτ1.1 hQ hQNK hCQ

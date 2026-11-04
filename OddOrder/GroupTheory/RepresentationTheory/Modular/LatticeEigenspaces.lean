@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+public import OddOrder.Algebra.LagrangeInterpolationRing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
 import OddOrder.Algebra.EigenspaceDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 
 /-!
 # Eigen-decomposition over the coefficient ring of a `p`-modular system
@@ -31,6 +37,8 @@ difference is a unit.  That is exactly the hypothesis of
 * `OddOrder.RepresentationTheory.Modular.brauerCharacter_eq_sum_nthRootsFinset` — the Brauer
   character reindexed over `μ_n(𝒪)`, matching the shape of the `𝒪`-side trace
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

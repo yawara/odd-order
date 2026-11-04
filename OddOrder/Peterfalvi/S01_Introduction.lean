@@ -3,6 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
 
 /-!
 # Peterfalvi §1: Introduction
@@ -133,6 +135,8 @@ mathlib 既存 API への notation alias と若干の helper のみ.
 - §3-§8 audit: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../../notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md)
 - 3 冊間 cross-ref: [`notes/meta/phase2_cross_refs.md`](../../notes/meta/phase2_cross_refs.md)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S01
 

@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
@@ -35,6 +38,8 @@ Wielandt automorphism tower theorem (Thm 9.10) の最後の一般補題.
 `layer_le_normalizer_nilpotentResidual`, 9.8 `centralizer_genFitting_le_genFitting`)
 は 9.10 で別途使う。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

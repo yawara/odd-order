@@ -1,21 +1,17 @@
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.GroupTheory.CoprimeFixedPoints
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.AInvariantPiSubgroups
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetupBasic
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-import OddOrder.Mathlib.SchurZassenhausConj
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetupBasic
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.GroupTheory.WielandtFixedPoint
 
 /-!
 # Peterfalvi (9.1)-(9.4) — Wielandt fixed-point formula, type II-IV setup, Frobenius action
@@ -23,6 +19,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetupBasic
 Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

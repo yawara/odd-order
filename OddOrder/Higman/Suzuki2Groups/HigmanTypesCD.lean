@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.Basic
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+public import Mathlib.FieldTheory.Perfect
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # Higman's Suzuki 2-group types C and D
@@ -30,6 +34,8 @@ types `A` and `B`, the square map is built as an actual
 `QuadraticMap (ZMod 2) (F × F) F`, so `TypeCData P` and `TypeDData P` carry
 genuine group equivalences rather than proposition-valued labels.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

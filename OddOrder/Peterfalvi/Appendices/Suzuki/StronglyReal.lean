@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # Peterfalvi Part II, Ch. I §3: strongly real elements
@@ -18,6 +28,8 @@ on triples consisting of two distinct point stabilizers and an involution in
 the second.  The parity conclusion is the source's odd-dihedral conjugacy
 argument inside `N_G(⟨x⟩)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,11 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+module
+
+public import OddOrder.BG.Ch1_Preliminary.PLength
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG §3: standalone preliminaries for Theorem 3.6
@@ -30,6 +36,8 @@ could land on their own.
   (`oPiCore_compl_eq_bot_of_isPGroup_centralizer_le`, `oPiCore_eq_bot_of_subgroupOf_normal`,
   `le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03f
 

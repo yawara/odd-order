@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Dimension.Free
-import Mathlib.RepresentationTheory.Character
+module
+
+public import Mathlib.RepresentationTheory.Character
 
 /-!
 # Virtual characters over an arbitrary field
@@ -47,6 +48,8 @@ shows that this loses nothing.
 * D. Gorenstein, *Finite Groups*, §4.7 (`references/gorenstein/pages/gorenstein-p16*.png`).
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.15) (p. 28).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
 
 /-!
@@ -37,6 +45,8 @@ roots of unity, only `2` invertible) in `InvolutionDecompositionIntegral`:
 * `OddOrder.RepresentationTheory.Modular.sum_generalizedDecompositionNumber`
 * `OddOrder.RepresentationTheory.Modular.eq_generalizedDecompositionNumber`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

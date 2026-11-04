@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import Mathlib.Order.Minimal
-import Mathlib.GroupTheory.Solvable
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # The Fitting subgroup of a solvable group is self-centralizing
@@ -26,6 +26,8 @@ Its natural long-term home is next to `OddOrder.Isaacs.Ch01.fitting` itself; it 
 
 * `centralizer_fitting_le_fitting` — `C_G(F(G)) ≤ F(G)` for finite solvable `G`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

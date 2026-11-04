@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.IsExtraspecial
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.IsExtraspecial
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs Chapter 4 — Problems §4A (Commutators)
@@ -15,6 +22,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4 "Commutators" の章
 
 方針は Ch.1-Ch.3 の `Problems*.lean` と同じ (ラッパーは書かず実証明; 教科書番号は docstring)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 
@@ -257,7 +266,7 @@ private lemma commutator_zpowers_rot5A_invol2A_eq_top :
         rw [hindex, card_alternatingGroup_five]
         decide
       have : IsSimpleGroup (alternatingGroup (Fin 5)) := alternatingGroup.isSimpleGroup (by simp)
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N inferInstance with hbot | htop
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N with hbot | htop
       · rw [hbot, Subgroup.card_bot] at hcard30; omega
       · rw [htop, Subgroup.card_top, card_alternatingGroup_five] at hcard30; omega
     · omega

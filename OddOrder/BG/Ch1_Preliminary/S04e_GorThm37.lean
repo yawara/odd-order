@@ -3,12 +3,27 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
 import OddOrder.GroupTheory.CoprimeAbelianPGroup
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Gorenstein "Finite Groups" Theorem 3.7 — minimal `ψ`-invariant ⇒ special structure
@@ -45,6 +60,8 @@ Thm 2.4 `actionCommutator_eq_bot_of_omega1_le_fixedPoints`, Thm 3.5
 Maschke `exists_aInvariant_complement_in_omega1_quotient`, three-subgroups
 `commutator_commutator_le_of_rotate`.
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 

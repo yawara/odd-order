@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Projectivization.Action
+module
+
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.LinearAlgebra.Projectivization.Cardinality
-import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
@@ -28,6 +38,8 @@ combining BG Theorem 2.6(a), which makes the group abelian, with the existing
 faithful irreducible Singer mechanism.  Divisibility is the free-orbit count
 on the projective line, whose cardinality is `|F| + 1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_UnionPairBridge
-import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
+module
+
+public import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (9.11.7)–(9.11.8): the coherent-pair adjunction and the case-(a) endgame
@@ -46,6 +48,8 @@ the §9-level (9.11) chain needs them without importing this file's §11/§13 cl
 
 Reference note: `issues/closed/9083-lane-a-1007-decomp-moot-revised-frontier.md` (Phase E-final).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 

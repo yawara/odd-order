@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
 
 /-!
 # Higman's Lemma 12: normalized factor-pair relations
@@ -15,6 +20,8 @@ This file records the five oriented parameter relations produced by the
 B/C/D dispatch.  It contains only the relation type; the fixed-coordinate
 proof and the coordinate-existence wrapper live in downstream leaves.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

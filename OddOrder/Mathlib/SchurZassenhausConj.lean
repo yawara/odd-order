@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
 /-!
@@ -34,6 +36,8 @@ Strong induction on `|G|`.
 3. **Main induction**: combine (1), (2), Sylow C-theorem, and abelian SZ conjugacy
    to handle the two solvability cases.
 -/
+
+@[expose] public section
 
 open scoped Pointwise
 open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid/CommGroup is now scoped

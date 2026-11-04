@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.Solvable
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
-import Mathlib.Data.ZMod.Basic
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.5 (半直積の導来長)
@@ -32,6 +40,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.5 (書籍 p. 146)�
   `n + 1` の有限可解群が存在する (書籍後半「任意に大きい導来長の可解群」)。正則 wreath 積
   `ZMod p ≀ A` を半直積 `(A → ZMod p) ⋊ A` (`regularPermAut`) として直接構成する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 
 /-!
 # Peterfalvi Part II, Ch. II: hypothesis (B1) and first consequences
@@ -27,6 +33,8 @@ Since `t ∈ C_G(P)` is an involution, the 2-rank of `C_G(P)` is at least
 one; hypothesis (B1) is therefore recorded in the usable direction: every
 elementary abelian `2`-subgroup of `C_G(P)` has order at most `2`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

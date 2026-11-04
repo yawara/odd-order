@@ -3,8 +3,14 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
+module
+
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral
+public import OddOrder.Peterfalvi.S12_Section9Counts
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
 
 /-!
 # Peterfalvi §11 bridge to the general (6.2) index bound (the h56 routine pins)
@@ -31,6 +37,8 @@ With these, the h56 producer for `hyp : S12.Hypothesis M` needs only the **ancho
 **(5.2.d) decomposition data** (grid-backed, issue 2022) — see
 `Hypothesis.exists_source_index_le_two_psi` below for the fully-pinned form.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

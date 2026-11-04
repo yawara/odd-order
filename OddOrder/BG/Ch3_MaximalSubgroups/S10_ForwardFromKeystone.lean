@@ -3,10 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
 # BG §10 forward dependencies on the representation-theory keystone (BG Thm 3.6)
@@ -40,6 +47,8 @@ The file is kept (rather than inlined away) because ~19 downstream theorems cite
 declarations by name and the historical interface boundary documents the forward-axiom
 methodology (`notes/meta/forward_dep_policy.md`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

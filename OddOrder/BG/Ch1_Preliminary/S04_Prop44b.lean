@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import OddOrder.GroupTheory.SCN
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.Complement
-import OddOrder.GroupTheory.SCN
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.SylowNormalRelIndex
 
 /-!
@@ -57,6 +60,8 @@ Set `C = C_G(A)` and `M = N_G(A)`.
 * Gorenstein, _Finite Groups_ (1968), Theorem 7.6.5.
 * Tracking issue `issues/3012-prop44b-scn-centralizer-dprod.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

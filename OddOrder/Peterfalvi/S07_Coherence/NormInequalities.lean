@@ -1,10 +1,18 @@
-import OddOrder.Peterfalvi.S07_Coherence.DifferenceImage
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.DifferenceImage
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (5.4)-(5.6)/(6.6) 前半 — norm inequalities, ψ-decomposition, IsCoherent, degree gap
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory
 

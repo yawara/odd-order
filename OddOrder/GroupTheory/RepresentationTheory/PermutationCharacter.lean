@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # The permutation character of a transitive action
@@ -33,7 +36,7 @@ transitive Zassenhaus configuration (p. 115).
   norm is `2` in the doubly transitive case.
 -/
 
-noncomputable section
+@[expose] public noncomputable section
 
 namespace OddOrder.GroupTheory
 

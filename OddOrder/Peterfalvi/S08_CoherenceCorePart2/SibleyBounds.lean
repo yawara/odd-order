@@ -3,13 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_DegreeSums
+module
+
+public import OddOrder.Peterfalvi.S08_DegreeSums
+import Mathlib.Algebra.Order.Ring.Star
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: Sibley bounds and X-set coherence
 
 Sibley arithmetic bounds and the X-set coherence construction split under issue 0073.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

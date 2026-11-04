@@ -3,16 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
-import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.DihedralAut
 import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)
@@ -36,6 +39,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9B
 書籍の statement はページ画像 `references/isaacs/pages/isaacs-p284-297.png` /
 `isaacs-p285-298.png` で確定 (⚠ 9B.5 の `A, B ⊲⊲ G` は **subnormal**)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 
@@ -162,13 +167,6 @@ theorem card_le_card_mulAut_of_centralizer_eq_bot {K : Type*} [Group K] [Finite 
   refine Nat.card_le_card_of_injective (MulAut.conjNormal (H := A)) ?_
   rw [← MonoidHom.ker_eq_bot_iff, ker_conjNormal, h]
 
-/-- 群同型に沿った `Aut` の個数の一致 (`MulAut` の functor 性は mathlib に無いので自前)。 -/
-theorem card_mulAut_congr {H K : Type*} [Group H] [Group K] (e : H ≃* K) :
-    Nat.card (MulAut H) = Nat.card (MulAut K) :=
-  Nat.card_congr
-    ⟨fun φ => e.symm.trans (φ.trans e), fun ψ => e.trans (ψ.trans e.symm),
-      fun φ => MulEquiv.ext fun x => by simp, fun ψ => MulEquiv.ext fun x => by simp⟩
-
 /-- `G` の `G₃ = Aut(Aut(G))` での像は `Inn(G)` の `autTowerStep G 1` による像。 -/
 theorem range_autTowerEmb_two.{u} (G : Type u) [Group G] :
     (autTowerEmb G 0 2).range = (innAut G).map (autTowerStep G 1) := by
@@ -227,7 +225,7 @@ theorem isCompleteGroup_autTowerType_one_of_normal_range.{u} {G : Type u} [Group
     calc Nat.card (autTowerType G 2)
         ≤ Nat.card (MulAut ↥((autTowerEmb G 0 2).range)) :=
           card_le_card_mulAut_of_centralizer_eq_bot hCA
-      _ = Nat.card (MulAut G) := (card_mulAut_congr hAG).symm
+      _ = Nat.card (MulAut G) := (Nat.card_congr (MulAut.congr hAG).toEquiv).symm
   have hBcard : Nat.card ↥((autTowerStep G 1).range) = Nat.card (autTowerType G 1) :=
     (Nat.card_congr (MonoidHom.ofInjective (autTowerStep_injective hZ 1)).toEquiv).symm
   have hBtop : ((autTowerStep G 1).range : Subgroup (autTowerType G 2)) = ⊤ := by

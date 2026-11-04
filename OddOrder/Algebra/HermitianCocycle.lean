@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.QuadraticTraceCorrection
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.AnisotropicNormForm
 
 /-!
@@ -35,6 +44,8 @@ written `star`.
   as an `F`-valued bilinear map, with diagonal the norm
   (`hermitianCocycle_diag`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

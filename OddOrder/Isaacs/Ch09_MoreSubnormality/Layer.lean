@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
+import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Isaacs Ch. 9 — §9A: the layer E(G) と Theorem 9.7 (pp. 274-275)
@@ -30,6 +33,8 @@ semisimple と結論する。`↥E ⧸ center ↥E` の semisimple 族を、各 
   `Z(H) = H ∩ Z(E)` の帰結。
 - generate: component が `E` を生成 ⇒ 像が `⊤` を生成。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_MaximalIII_IV
-import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
-import OddOrder.Peterfalvi.S07_PivotCoherence
+module
+
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.Peterfalvi.S13_Lemmas113To115
 
 /-!
 # Peterfalvi Section 13: kernel bounds for the core structure ((11.6))
@@ -18,6 +21,8 @@ to control `M''`. It proves the complement-elimination and second-derived bounds
 by `S13_CoreStructure`, while the later centralization and elementary-abelian conclusions
 remain in that module.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 

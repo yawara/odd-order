@@ -1,6 +1,11 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
-import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
+import OddOrder.Peterfalvi.S15_SSetMemberRFamily
 
 /-!
 # Peterfalvi (13.3.c) — the `μ`-column pin machinery (coherence-generic)
@@ -37,6 +42,8 @@ file.  ⚠ The pin target is the **global-sign disjunction** (Coq `typeP_TIred_c
 `PFsection13.v:338`): the clean pin for an *arbitrary* coherence is false — for `p = 3` the
 column-swapped sign flip is an equally valid inhabitant (issue 2035 更新 #16/#17).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 
@@ -395,7 +402,6 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
     by_cases h1 : hyp.eta a j ∈ E <;> by_cases h2 : hyp.eta ⟨0, hyp.q_prime.pos⟩ j ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h one_ne_zero
         | exact absurd h.symm one_ne_zero
   have hrow_k : ∀ a : Fin hyp.q,
@@ -406,7 +412,6 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
     by_cases h1 : -hyp.eta a k ∈ E <;> by_cases h2 : -hyp.eta ⟨0, hyp.q_prime.pos⟩ k ∈ E <;>
       simp only [h1, h2, ite_eq_left, ite_false] at h ⊢ <;>
       first
-        | exact Iff.rfl
         | exact absurd h (by norm_num)
   -- the isometry norm `‖c(μ_j)‖² = q`
   have hnorm : ClassFunction.inner (c.extension μcol) (c.extension μcol) = (hyp.q : ℂ) := by

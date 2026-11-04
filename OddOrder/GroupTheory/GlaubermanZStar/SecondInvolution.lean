@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.Reduction
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiGeneral
+import OddOrder.GroupTheory.IsolatedInvolution
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
@@ -31,6 +40,8 @@ The "in particular" of Step 5 — `u ∈ Z(D)` for every `2`-subgroup `D` contai
 * `OddOrder.GroupTheory.mem_center_of_isPGroup` — `u` is central in every `2`-subgroup it meets
 * `OddOrder.GroupTheory.exists_involution_ne_of_notMem_center` — Step 5
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03 OddOrder.Isaacs.Ch06
 

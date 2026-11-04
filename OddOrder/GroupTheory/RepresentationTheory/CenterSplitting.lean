@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.Algebra.Central.Matrix
 import Mathlib.RepresentationTheory.Maschke
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 
 /-!
 # Transporting the centre along an algebra isomorphism
@@ -19,6 +22,8 @@ of centres, `Z(A) ≃ₐ[R] Z(B)`.
 `AlgEquiv.map_mem_center` (in `CenterOrbitCount`) already gives that `e` carries the centre *into*
 the centre; here we package the two-sided statement as an `AlgEquiv`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterSplitting
 

@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # Discharging the hypotheses of Navarro (5.2)
@@ -33,6 +42,8 @@ straight from the block structure of `K[H]`, not from a commutant argument.
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_algebraMap_irreducibleBrauerCharacter`
 * `OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_one_of_decompositionMatrix_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

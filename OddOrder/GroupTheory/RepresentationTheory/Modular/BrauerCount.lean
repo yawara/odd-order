@@ -3,11 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Artinian.Ring
-import Mathlib.RingTheory.Ideal.Quotient.Operations
-import Mathlib.RingTheory.Jacobson.Semiprimary
+module
+
+public import OddOrder.Algebra.BlockIdempotent
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.GroupTheory.PRegularElement
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
@@ -44,6 +45,8 @@ algebras over `k`.
   as a surjection of `kG` with kernel `J(kG)`, which is the form the module classification of
   `Algebra/PiMatrixSimpleModules` consumes
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

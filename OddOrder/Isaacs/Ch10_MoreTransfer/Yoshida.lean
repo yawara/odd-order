@@ -3,8 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.MackeyTransfer
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.GroupTheory.TransferTransitivity
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
-import OddOrder.GroupTheory.MackeyTransfer
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 
 /-!
 # Isaacs §10A — Yoshida's theorem (pp. 295-296, 303-304)
@@ -29,6 +40,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 10, §10A の中核:
    `R ≤ Q := xMx⁻¹ ⊓ P`、`|S : Q| ≤ p` から `Φ(S) ≤ Q`、よって
    `W(n) ∉ R·Φ(S)` — Theorem 10.9 が `C_p ≀ C_p ↞ P` を与える。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 
@@ -63,7 +76,7 @@ lemma exists_minimal_orderOf_notMem {N₀ : Type*} [Group N₀] [Finite N₀]
   classical
   let : Fintype N₀ := Fintype.ofFinite N₀
   have hne : (Finset.univ.filter (fun n : N₀ => n ∉ M)).Nonempty := by
-    obtain ⟨n, -, hn⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hM)
+    obtain ⟨n, -, hn⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hM)
     exact ⟨n, by simp [hn]⟩
   obtain ⟨n, hn_mem, hn_min⟩ :=
     Finset.exists_min_image _ orderOf hne
@@ -199,26 +212,6 @@ lemma mem_normalizer_of_sylow_le_conj (P : Sylow p G) {x : G}
   rw [mem_conjSubgroup, inv_inv] at h6
   exact h6.symm
 
-/-- A subgroup of prime index is a coatom of the subgroup lattice. -/
-private lemma isCoatom_of_index_prime'' {H₀ : Type*} [Group H₀] {Q : Subgroup H₀}
-    (hidx : Q.index = p) : IsCoatom Q := by
-  have hp_prime : p.Prime := hp.out
-  constructor
-  · intro htop
-    rw [htop, Subgroup.index_top] at hidx
-    exact hp_prime.one_lt.ne' hidx.symm
-  · intro X hQX
-    have hmul := Subgroup.relIndex_mul_index hQX.le
-    rw [hidx] at hmul
-    rcases hp_prime.eq_one_or_self_of_dvd X.index (Dvd.intro_left _ hmul) with h1 | hXp
-    · exact Subgroup.index_eq_one.mp h1
-    · exfalso
-      have hrel : Q.relIndex X = 1 := by
-        rw [hXp] at hmul
-        exact Nat.eq_of_mul_eq_mul_right hp_prime.pos
-          (by rw [one_mul]; exact hmul)
-      exact hQX.not_ge (Subgroup.relIndex_eq_one.mp hrel)
-
 /-- **Yoshida, main reduction step**: if the Mackey factor at a representative
 `x ∉ N = N_G(P)` lies outside the image of `M` (where `M ⊴ N` has index `p` and
 `n ∈ P ∖ M` has minimal order), then the `S₀ = (xNx⁻¹ ⊓ P)`-transfer of `n`
@@ -348,7 +341,7 @@ private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
         rcases (Nat.Prime.eq_one_or_self_of_dvd hp.out _ hker_idx) with h11 | h11
         · rw [Subgroup.index_eq_one.mp h11]
           exact le_top
-        · exact frattini_le_coatom (isCoatom_of_index_prime'' h11)
+        · exact frattini_le_coatom (Subgroup.isCoatom_of_index_prime (h11 ▸ hp.out))
       -- membership in the kernel means the conjugate lies in M
       rw [Subgroup.map_le_iff_le_comap]
       intro s hsΦ

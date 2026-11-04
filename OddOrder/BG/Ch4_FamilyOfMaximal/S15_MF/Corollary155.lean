@@ -1,4 +1,24 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.MsigmaNilpotent
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Assembly
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 
 /-!
 # TAIL
@@ -6,6 +26,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Assembly
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103
 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
@@ -313,7 +335,7 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     rw [lt_top_iff_ne_top]
     intro htop
     have hQnorm : Q.Normal := by rw [← Subgroup.normalizer_eq_top_iff]; exact htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Q hQnorm with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q with h | h
     · exact hQne h
     · have hGpg : IsPGroup q G := (h ▸ hQpg : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
         (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective

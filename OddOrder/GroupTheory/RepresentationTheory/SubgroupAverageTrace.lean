@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.RepresentationTheory.Character
+module
+
+public import Mathlib.RepresentationTheory.Character
 
 /-!
 # The average of a character over a subgroup
@@ -27,6 +28,8 @@ averaging over `P` turns `Φ_φ(1)` into `|P|` times an integer.
 
 * `OddOrder.RepresentationTheory.exists_sum_character_subgroup`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

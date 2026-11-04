@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 
 /-!
 # The trivial character inside the basic set of Navarro (7.4)
@@ -35,6 +40,8 @@ from "a relation supported on `Irr(B_0)` and vanishing at `j₀`" into the shape
 * `OddOrder.RepresentationTheory.Modular.eq_ite_of_sum_principalBasicSet_eq_one` — Navarro's
   `d^x_{00} = 1`, `d^x_{0j} = 0` (`j ≠ 0`)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

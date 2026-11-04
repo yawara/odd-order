@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CaseACoherence
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
-import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
-import OddOrder.Peterfalvi.S15_Tau1T
+module
+
+public import OddOrder.Peterfalvi.S15_CaseACoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.TISubsetCounting
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — τ₁-supply engines and the character-degree core
@@ -31,6 +37,8 @@ engines on the irreducibly-induced family and the λ-free `CharacterDegreeCore` 
 The (13.3.b)/(13.4) dichotomy layer (`LambdaWitness`/`ThetaWitness`, the θ-package, and the
 `T_caseB_facts` chain) stays downstream in `S15_CharacterDegreeSupply.lean`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 
 open OddOrder.GroupTheory

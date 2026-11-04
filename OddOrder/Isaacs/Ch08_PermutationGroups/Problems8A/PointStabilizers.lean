@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
 
@@ -31,6 +37,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
 - `isPretransitive_of_normal_of_two_transitive` — **Problem 8A.9**: 2-transitive な `G` の
   非自明に作用する正規部分群は推移的。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

@@ -3,7 +3,34 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Lemma 12.11 — τ₂ の `M* ∈ ℳ(N_G(A))` への移送
@@ -27,6 +54,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 `τ₁`-数なので互いに素、よって `H₁ ⊔ H₂ = K₀` (`Ch03.sup_eq_top_of_coprime_index`)
 — これが `E₁₂_hall` field を満たす鍵。`E₃` は独立な Hall `τ₃`-部分群。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 
@@ -144,7 +173,7 @@ theorem exists_subgroupESetup [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `H₁ ⊔ H₂ = K₀` via coprime indices (`τ₂`-number vs `τ₁`-number).
   have hsupH : H₁ ⊔ H₂ = (⊤ : Subgroup ↥K₀) := by
     apply Ch03.sup_eq_top_of_coprime_index
-    apply coprime_of_forall_prime_not_dvd
+    apply Nat.coprime_of_dvd
     intro r hr_prime hr1 hr2
     have hπK : ∀ s : ℕ, s.Prime → s ∣ Nat.card ↥K₀ → s ∈ tau1 M ∪ tau2 M := by
       intro s hs_prime hs_dvd

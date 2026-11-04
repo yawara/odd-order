@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 
 /-!
 # The `K`-orbits of `S#` in the case `orderOf (st) = 5`
@@ -28,6 +37,8 @@ This file sets up that counting: the index type `Fin 3 ⊕ K#`, the family
 * `Hypothesis.orbitRepVal` — the book's family of representatives.
 * `Hypothesis.card_orbitReprIndex_mul_card_K_succ` — the counting identity.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

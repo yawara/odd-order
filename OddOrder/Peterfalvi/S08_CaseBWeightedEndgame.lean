@@ -3,8 +3,14 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBEnumeration
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
+import OddOrder.Peterfalvi.S08_CoherenceCorePart2.SibleyBounds
 
 /-!
 # Peterfalvi §6.8.3 — case-(B) norm-weighted endgame
@@ -28,6 +34,8 @@ The final `S08_CoherenceTheorems` c2-math-B dispatch — which *constructs* the 
 seed (`coherentXunionYset_caseB_of_glued`) and thereby requires the §6 certain-type structure-theory
 input `hXanchored` — is **not** in this leaf; the endgame here takes that seed as a hypothesis.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

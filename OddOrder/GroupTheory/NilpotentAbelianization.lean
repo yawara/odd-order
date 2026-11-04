@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Nilpotent groups with cyclic abelianization are cyclic
@@ -29,6 +30,8 @@ central series stabilizes at `γ₂` and nilpotency forces `γ₂ = ⊥`.
 * `OddOrder.GroupTheory.isCyclic_of_isNilpotent_of_ker_le_commutator`: the application form —
   a nilpotent `G` with a hom `f : G →* C` to a cyclic group with `ker f ≤ G'` is cyclic.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

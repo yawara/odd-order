@@ -3,16 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Ring.Equiv
-import Mathlib.Algebra.Ring.Aut
-import Mathlib.Algebra.Group.End
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.Algebra.Ring.AddAut
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.Perfect
-import Mathlib.LinearAlgebra.QuadraticForm.Basic
-import Mathlib.Algebra.CharP.Two
-import Mathlib.Algebra.CharP.Algebra
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import OddOrder.Algebra.QuadraticMapCoordinates
 
 /-!
@@ -53,6 +47,8 @@ The concrete (9.7.b) wiring — the base-point normalization of the Galois-field
 `caseB_exists_galoisField_repr`, the twist identity from `W̄₂ = C_{H̄}(W₁)`, and the additive
 generation from irreducibility — lives on the S11 side (issue 1043).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 
@@ -307,7 +303,7 @@ finite fields). -/
 
 /-- Coercion of `𝔽_p`-linear endomaps to bare functions, as an `F`-linear map
 (`F` acts on the codomain). -/
-private def coeFnLinear : (F →ₗ[ZMod p] F) →ₗ[F] (F → F) where
+def coeFnLinear : (F →ₗ[ZMod p] F) →ₗ[F] (F → F) where
   toFun g := ⇑g
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
@@ -371,7 +367,7 @@ noncomputable def algAutMulBilin (σ τ : F ≃ₐ[ZMod p] F) :
 
 /-- Coercion of `𝔽_p`-bilinear maps to bare two-variable functions, as an
 `F`-linear map. -/
-private def coeFnBilin :
+def coeFnBilin :
     (F →ₗ[ZMod p] F →ₗ[ZMod p] F) →ₗ[F] (F × F → F) where
   toFun g := fun xy => g xy.1 xy.2
   map_add' _ _ := rfl
@@ -449,7 +445,7 @@ private theorem constr_smul_toLinearMap [Finite F] {ι : Type*}
 Lemma 2(b) family — proved from Dedekind independence of the pair
 characters entirely on the function-space side (`of_comp`), never
 touching the doubly-nested hom space. -/
-private theorem linearIndependent_bilinPi [Finite F] {ι : Type*}
+theorem linearIndependent_bilinPi [Finite F] {ι : Type*}
     (b : Module.Basis ι (ZMod p) F) :
     LinearIndependent F
       (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>

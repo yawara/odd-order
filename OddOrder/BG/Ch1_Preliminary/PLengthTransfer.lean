@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.PLength
+module
+
+public import OddOrder.BG.Ch1_Preliminary.PLength
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG Lemma 1.21 — `p`-length one の移送補題 (foundation)
@@ -19,6 +24,8 @@ Bender–Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 19
 残: 移送補題 (a) 部分群単調性 / (b) normal `p'` 商 / (c) normal `p` 商 / (d) `⟨p-elts⟩` 特徴づけ /
 (e) `H∩N=1` 商。プラン `notes/bg/s03_thm36_plan.md`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1
 

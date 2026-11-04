@@ -3,18 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
 
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
 import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §9: Corollaries 9.2, 9.3 and Lemma 9.4 (centralizer & rank criteria)
@@ -22,6 +28,8 @@ import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
 **スコープ**: Bender–Glauberman §9, Cor 9.2 (mmd L2541) / Cor 9.3 (L2545) / Lem 9.4 (L2555)。
 Thm 9.1 から `𝒰` のメンバーシップを中心化群・rank 条件へ広げる系。`S09_Theorem91` を import。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S09
 
@@ -801,7 +809,7 @@ theorem centralizer_lt_top_of_mem_scn3Global [Finite G]
     Subgroup.centralizer (A : Set G) < ⊤ := by
   classical
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable

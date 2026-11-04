@@ -3,25 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-import Mathlib.Algebra.Module.Submodule.Bilinear
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.Combinatorics.Colex
-import Mathlib.FieldTheory.Finite.Basic
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+public import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
+public import Mathlib.RingTheory.Adjoin.PowerBasis
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import Mathlib.LinearAlgebra.Charpoly.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.LinearAlgebra.Basis.Basic
-import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
 import Mathlib.LinearAlgebra.Charpoly.BaseChange
 import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
-import Mathlib.LinearAlgebra.TensorProduct.RightExactness
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RingTheory.Adjoin.PowerBasis
-import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 /-!
 # Higman — lower central spectrum: the bilinear-map layer
@@ -31,10 +24,11 @@ imports this leaf, so downstream imports are unchanged.
 -/
 
 
+@[expose] public section
+
 set_option autoImplicit false
 
 open Module Polynomial
-open OddOrder.RepresentationTheory
 open scoped BigOperators TensorProduct IsMulCommutative Fin.NatCast
 
 namespace OddOrder.Higman.Suzuki2Groups

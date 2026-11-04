@@ -3,7 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppB_PuigB3B4
+public import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppB_Thm62
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_SCN3Map
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # TAIL
@@ -11,6 +26,8 @@ import OddOrder.BG.Ch2_Uniqueness.S08_SCN3Map
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S08
 open OddOrder.GroupTheory
@@ -767,7 +784,7 @@ theorem lt_inf_normalizer_of_isPGroup_lt [Finite G]
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact (ne_of_lt hKL) (le_antisymm hK_le htop)
   have hlt := hNC (K.subgroupOf L) hsub_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   rw [← Subgroup.subgroupOf_normalizer_eq hK_le, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   refine lt_of_le_of_ne (le_inf hK_le Subgroup.le_normalizer) ?_

@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import Mathlib.LinearAlgebra.Trace
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+public import Mathlib.LinearAlgebra.Trace
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Block decomposition of `End V` (BG Prop 2.4(c)/(g))
@@ -16,6 +22,8 @@ eigenspaces `E_m`, via the block decomposition `End V = ⊕_{i,t} Hom(Vᵢ, Vₜ
 First building block: the reconstruction `∑ᵢ (component i of v) = v` for the internal
 eigenspace decomposition `V = ⊕ᵢ Vᵢ` of Prop 2.4(a).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 
 /-!
@@ -23,6 +29,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 ⭐ この論法は `P` の同型類 (`C₈` / `C₄×C₂` / `C₂³`) を場合分けしない。`S` が自明な場合も
 「不動点全体 = `P` が自明」となって同じ合同式で潰れる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 
@@ -46,7 +54,7 @@ theorem seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight
   have h8G : (8 : ℕ) ∣ Nat.card G := hcard ▸ hPdvd
   -- `G` は非可換単純ゆえ `G' = ⊤`
   have hcomm : _root_.commutator G = ⊤ := by
-    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) inferInstance with
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) with
       hbot | htop
     · exfalso
       have hab : ∀ x y : G, x * y = y * x := by

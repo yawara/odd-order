@@ -1,3 +1,14 @@
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S10_StructureSetup
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 
 /-!
@@ -6,6 +17,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

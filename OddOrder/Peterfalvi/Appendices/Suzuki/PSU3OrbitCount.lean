@@ -3,11 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FieldArithmetic
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
-import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FieldArithmetic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.GroupTheory.RankOneBNPair
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
 /-!
 # Peterfalvi Part II, Ch. IV §2: the orbit count of step (8)
@@ -39,6 +48,8 @@ book's `τ` — is in `PSU3FieldArithmetic`, which this file imports.
 The squeeze that turns those bounds into equalities (`card_fiber_eq_of_card_eq`) is a
 general counting lemma and lives in `PSU3FieldArithmetic` alongside the rest.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
@@ -28,6 +36,8 @@ then moves it to `B_0(C_G(x)/N)`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (5.8), (6.?), (7.6), p. 141.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

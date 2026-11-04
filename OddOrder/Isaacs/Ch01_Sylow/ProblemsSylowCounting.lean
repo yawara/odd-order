@@ -3,9 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+public import Mathlib.GroupTheory.Sylow
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 
 /-!
 # Isaacs Problems 1E (pp. 37–38) — Sylow 計数の道具立てと 1E.1–1E.5
@@ -52,6 +62,8 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
 - `mul_comm_of_card_eq_prime_sq` / `le_normalizer_of_card_eq_prime_sq` — 位数 `p²` の
   部分群は可換で, その部分群を正規化する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 
@@ -357,7 +369,8 @@ theorem card_sylow_ne_one_of_simple {G : Type*} [Group G] [Finite G] [IsSimpleGr
     (h2 : Nat.card ↥(P : Subgroup G) ≠ Nat.card G) : Nat.card (Sylow q G) ≠ 1 := by
   intro hone
   have : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hone).1
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal _ (Sylow.normal_of_subsingleton P) with h | h
+  have := Sylow.normal_of_subsingleton P
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (P : Subgroup G) with h | h
   · rw [h, Subgroup.card_bot] at h1; exact h1 rfl
   · rw [h, Subgroup.card_top] at h2; exact h2 rfl
 
@@ -492,7 +505,7 @@ theorem not_isSimpleGroup_of_card_eq_threeonefive {G : Type*} [Group G] [Finite 
     norm_num at he
     have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, hG])
     have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
-    rcases hsimple.eq_bot_or_eq_top_of_normal _ hDnorm with h1 | h1
+    rcases hsimple.eq_bot_or_eq_top_of_normal D with h1 | h1
     · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
     · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
 
@@ -620,8 +633,8 @@ theorem not_isSimpleGroup_of_card_eq_onefourfour {G : Type*} [Group G] [Finite G
     exact hindex_absurd 2 (by rw [he]) (by norm_num) (by norm_num)
   · -- `|N| = 144`: `D ⊴ G`
     have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, hG])
-    rcases hsimple.eq_bot_or_eq_top_of_normal _
-      (Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)) with h1 | h1
+    have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
+    rcases hsimple.eq_bot_or_eq_top_of_normal D with h1 | h1
     · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
     · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
 
@@ -649,7 +662,7 @@ theorem exists_injective_hom_alternating_of_simple {G : Type*} [Group G] [Finite
     (Equiv.permCongrHom e).toMonoidHom.comp (MulAction.toPermHom G (G ⧸ H)) with hφ
   -- `φ` は単射 (核は `core_G(H)`, 単純性と `n > 1` から `⊥`)
   have hkerφ : φ.ker = ⊥ := by
-    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal φ.ker inferInstance with h | h
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal φ.ker with h | h
     · exact h
     · exfalso
       have htop : (MulAction.toPermHom G (G ⧸ H)).ker = ⊤ := by
@@ -668,7 +681,7 @@ theorem exists_injective_hom_alternating_of_simple {G : Type*} [Group G] [Finite
   have hmem : ∀ g : G, φ g ∈ alternatingGroup (Fin n) := by
     set ψ : G →* ℤˣ := (Equiv.Perm.sign).comp φ
     have hkerψ : ψ.ker = ⊤ := by
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal ψ.ker inferInstance with h | h
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal ψ.ker with h | h
       · exfalso
         have hle := Nat.card_le_card_of_injective ψ ((MonoidHom.ker_eq_bot_iff ψ).mp h)
         rw [Nat.card_eq_fintype_card (α := ℤˣ), Fintype.card_units_int] at hle
@@ -802,7 +815,7 @@ theorem two_mul_card_ne_card_alternating_of_simple {G : Type*} [Group G] [Finite
     have h2 : Nat.card G * f.range.index = Nat.card G * 2 := by rw [hmul, ← heq]; ring
     exact Nat.eq_of_mul_eq_mul_left hpos h2
   have : f.range.Normal := Subgroup.normal_of_index_eq_two hidx2
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal f.range inferInstance with h | h
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal f.range with h | h
   · rw [h, Subgroup.card_bot] at hrange; omega
   · rw [h, Subgroup.index_top] at hidx2; omega
 

@@ -3,10 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
-import OddOrder.GroupTheory.TransferTransitivity
+module
+
+public import OddOrder.GroupTheory.TransferTransitivity
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Frattini
+public import Mathlib.GroupTheory.RegularWreathProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs §10A — transfer evaluation at prime index and wreath criteria (pp. 300-302)
@@ -48,6 +58,8 @@ Isaacs の「pretransfer `V` mod `M'`」は mathlib の transfer 準同型
   軌道は単一 (`minimalPeriod = p`)、代表元による共役差は `M`-共役に直せて
   `ϕ` で消える。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 

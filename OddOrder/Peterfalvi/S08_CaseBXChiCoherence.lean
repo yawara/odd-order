@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBXunionY
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBXunionY
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import OddOrder.Peterfalvi.S08_CaseBAssembly.BranchBundles -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §8: case-(B) the textbook `X`-coherence on the certain-type columns
@@ -34,6 +39,8 @@ isometry of `τ`), `hXzirr` (`X_χ ∈ ℤ[Irr G]`) — **all of which are `T = 
 
 Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` (session 48 cont.⁴).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

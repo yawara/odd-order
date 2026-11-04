@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
 import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
@@ -38,6 +44,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 **書籍の場合 `F = 𝔽₄₃`**: `exists_odd_order_nonabelian_frobenius_complement`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -406,7 +414,7 @@ theorem isFrobeniusAction_grpA [Finite F] (hα : orderOf α = 7) (hε : orderOf 
   have key : ∀ c i : ℕ, Nat.Coprime 7 c → α ^ (c * i) = 1 → α ^ i = 1 := by
     intro c i hc h
     have h7 : (7 : ℕ) ∣ c * i := hα ▸ orderOf_dvd_of_pow_eq_one h
-    obtain ⟨t, rfl⟩ := hc.dvd_of_dvd_mul_left (by rwa [mul_comm] at h7)
+    obtain ⟨t, rfl⟩ := hc.dvd_of_dvd_mul_left h7
     rw [pow_mul, hα7, one_pow]
   -- 正規形 `X = aⁱ bʲ` と `j = 3m + r`
   obtain ⟨i, j, hij⟩ := exists_pow_mul_pow_of_mem_grpA hα hε x.2

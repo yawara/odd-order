@@ -1,4 +1,28 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151 -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.WitnessPGroup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
 # BG §16 — Proposition 16.1 forward bridges: the shared type data
@@ -10,6 +34,8 @@ through `isTypeF_derivedInG_of_isTypeP2` and the conditional
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent imports
 this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
@@ -110,7 +136,7 @@ theorem normalizer_eq_self_of_subgroupOf_normal_of_ne_bot [Finite G]
   · exact le_of_eq heq.symm
   · have hnorm : H.Normal :=
       Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal H with hbot | htop
     · exact absurd hbot hHne
     · exact absurd (top_le_iff.mp (htop ▸ hHle)) (mem_maximalSubgroups.mp hM).1
 

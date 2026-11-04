@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.Ring
+module
+
+public import Aesop.BuiltinRules
+public import Mathlib.Algebra.Field.Defs
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Higman Lemma 13: cancellation of commutator supports
@@ -20,6 +24,8 @@ coefficients.  The second cancels two equations in three coefficients
 while ensuring that the first two coefficients do not both vanish.
 The later group-theoretic layer supplies the commutator coordinates.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

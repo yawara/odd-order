@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.FrobeniusCyclicModule
+module
+
+public import OddOrder.Algebra.FrobeniusCyclicModule
+public import OddOrder.BG.AppC_Problem1Trace
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
 import OddOrder.BG.AppC_Problem1SameCoset
 
 /-!
@@ -39,6 +44,8 @@ Mathematical record: `notes/bg/appC_problem1_pair_composition.md` (issue 0180). 
 "closure theorem depending on the projective ratio `S'/S`" that the fourth ChatGPT consultation
 left open (`notes/bg/appC_problem1_chatgpt_answer_b1.md` §III.2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

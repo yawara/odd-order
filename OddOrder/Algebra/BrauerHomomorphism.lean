@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import OddOrder.Algebra.GroupAlgebraConjugation
+module
+
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import Mathlib.GroupTheory.PGroup
 import OddOrder.Algebra.PGroupOrbitSum
 
 /-!
@@ -39,6 +40,8 @@ on `P`-conjugation orbits, and the orbits that are not singletons have size divi
 * `OddOrder.GroupAlgebra.coeff_brauerProj` — 係数での記述 (`MonoidAlgebra` は v4.32 で
   `Finsupp` の別名でなく `coeff` フィールドを持つ構造体になった)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

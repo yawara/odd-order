@@ -3,17 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Conj
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.LinearAlgebra.Matrix.Permutation
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Permutation
+public import OddOrder.GroupTheory.RepresentationTheory.IsReal
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.IsReal
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # Brauer's permutation lemma
@@ -60,6 +58,8 @@ taken as explicit hypotheses here.
   irreducibles".
 * Peterfalvi §6 (4.5.b) — same usage at higher level.
 -/
+
+@[expose] public section
 
 namespace ConjClasses
 

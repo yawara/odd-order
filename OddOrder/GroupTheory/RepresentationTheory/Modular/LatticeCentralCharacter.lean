@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.LinearAlgebra.FreeModule.Basic
+public import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.TensorProduct.Basis
-import Mathlib.RingTheory.TensorProduct.Basic
 
 /-!
 # Scalars descend along base change on a free module
@@ -34,6 +38,8 @@ of `ℚ_p`, so it misses `ζ_p` and is in general not a splitting field (issue 9
 * `OddOrder.RepresentationTheory.Modular.exists_baseChange_smul_of_mem_center` — Schur
 * `OddOrder.RepresentationTheory.Modular.centralCharacter` — `ω : Z(A) →ₐ[𝒪] 𝒪`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 
@@ -172,7 +178,7 @@ theorem eq_centralScalar {z : Subalgebra.center 𝒪 A} {c : 𝒪}
   smul_id_injective (h ▸ apply_center_eq_centralScalar_smul K φ hEnd z)
 
 omit [Module.Free 𝒪 L] [Nontrivial L] in
-private theorem smul_id_mul_smul_id (c₁ c₂ : 𝒪) :
+theorem smul_id_mul_smul_id (c₁ c₂ : 𝒪) :
     (c₁ • LinearMap.id : Module.End 𝒪 L) * (c₂ • LinearMap.id) = (c₁ * c₂) • LinearMap.id := by
   ext x; simp [Module.End.mul_apply, smul_smul, mul_comm]
 

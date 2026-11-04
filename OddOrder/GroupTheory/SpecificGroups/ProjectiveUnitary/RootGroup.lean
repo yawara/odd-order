@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
-import Mathlib.GroupTheory.PGroup
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # The Hermitian root group and unital for `PSU(3,q)`
@@ -29,6 +32,8 @@ This is shared infrastructure for **Peterfalvi, Part II, Chapter I §3,
 Lemma 1 and Proposition 1(c)** (pp. 104–106).  Peterfalvi cites Huppert,
 Kapitel II, Satz 10.12 (p. 242), for the standard unitary action.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,14 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.PRank
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG §11: Exceptional Maximal Subgroups
@@ -53,6 +63,8 @@ Theorem 11.7 本体は単一定理 leaf `S11_MsigmaANormal.lean` (本ファイ�
   Proposition 1.6(d) (mmd L2997-L3021). It should not be hidden behind
   BG Theorem 4.16, §5 narrow hypotheses, or Peterfalvi assumptions.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S11
 
@@ -408,7 +420,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `Z(G) = 1` (simple nonabelian) — used for `C_G(X) < ⊤`.
   have hZbot : Subgroup.center G = ⊥ := by
     have : IsSimpleGroup G := hG.simple
-    refine (Subgroup.Normal.eq_bot_or_eq_top Subgroup.instNormalCenter).resolve_right
+    refine (Subgroup.Normal.eq_bot_or_eq_top (Subgroup.center G)).resolve_right
       (fun htop => ?_)
     exact hG.notSolvable (Group.isSolvable_of_comm (fun a b =>
       (Subgroup.mem_center_iff.mp (htop ▸ Subgroup.mem_top a) b).symm))
@@ -714,7 +726,7 @@ theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
   by_cases hMsbot : S10.Msigma M = ⊥
   · rw [hMsbot]; infer_instance
   -- BG: take `g ∈ N_G(P) − N_M(P)` (here it suffices that `g ∈ N_G(P)` and `g ∉ M`).
-  obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+  obtain ⟨g, hgN, hgM⟩ := IsConcreteLE.not_le_iff_exists.mp h.normalizer_P_not_le
   have hgP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer hgN
   -- `A₀^g`, contained in `P ⊆ M` since `g` normalizes `P`.
   set Ag : Subgroup G := MulAut.conj g • A₀ with hAg_def
@@ -935,7 +947,7 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
       intro x hx y hy
       have hc := hab.is_comm.comm (⟨x, hx⟩ : ↥P) ⟨y, hy⟩
       simpa using congrArg Subtype.val hc
-    obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+    obtain ⟨g, hgN, hgM⟩ := IsConcreteLE.not_le_iff_exists.mp h.normalizer_P_not_le
     -- `q ∈ σ(M)` via `M_σ ≠ ⊥`.
     have hMσne : S10.Msigma M ≠ ⊥ := S10.Msigma_ne_bot hG h.mem_maximal
     have : Nontrivial ↥(S10.Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
@@ -1181,7 +1193,7 @@ theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [← map_pow, hz, map_one]
   refine ⟨ha_eq, ?_⟩
   -- (b)
-  obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+  obtain ⟨g, hgN, hgM⟩ := IsConcreteLE.not_le_iff_exists.mp h.normalizer_P_not_le
   have hgA : MulAut.conj g • A = A := by
     rw [ha_eq]
     exact conj_smul_eq_self_of_mem_normalizer

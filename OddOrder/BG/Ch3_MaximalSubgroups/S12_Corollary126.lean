@@ -3,7 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Corollary 12.6 — `A ⊴ E` and centralizer control
@@ -19,6 +32,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
   `A` に入る (`Ω₁(P) = A` = `omega1_eq_of_tau2` 経由)。
 - `centralizer_le_E_of_tau2` (**12.6(b)**): `C_G(A) ≤ E`, `N_M(A) = E`, `N_G(A) ⊄ M`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

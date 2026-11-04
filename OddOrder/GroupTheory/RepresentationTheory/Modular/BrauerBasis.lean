@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
-import Mathlib.RingTheory.Localization.Integer
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
@@ -37,6 +42,8 @@ in `IBr(H)` — the coefficients being the generalized decomposition numbers `d^
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_map` — a vanishing left kernel is
   inherited by a field extension
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

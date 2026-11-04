@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.6 (p. 269) — 素数の subdegree
@@ -29,6 +37,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
 - `not_dvd_sq_card_stabilizer_of_prime_subdegree` — **8D.6 前半**。
 - `not_dvd_sq_ncard_suborbit_of_prime_subdegree` — **8D.6 後半**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

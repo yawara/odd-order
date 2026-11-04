@@ -3,10 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Subalgebra.Operations
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.Index
+import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
 import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Relative traces of a `G`-algebra
@@ -49,6 +55,8 @@ The `Fintype` instance on `↥H ⧸ K.subgroupOf H` is produced inside the defin
 into a statement.  Consequently every lemma about the defining sum is proved by transporting
 along `sum_smul_eq_relTrace`, whose left-hand side ranges over an *arbitrary* index type.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GAlgebra
 

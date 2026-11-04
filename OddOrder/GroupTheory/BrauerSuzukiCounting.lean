@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
-import OddOrder.GroupTheory.BrauerSuzukiCharacter
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Brauer–Suzuki: counting involution pairs (Gorenstein Ch. 12, towards Lemma 1.8)
@@ -23,6 +32,8 @@ directly.  The involutions of `G` form the single conjugacy class `K = mk z`
 * `classSumCoeff K K Cs = 0` whenever `Cs` has even order, because the product of two
   involutions has odd order (`odd_orderOf_mul_of_involution`).
 -/
+
+@[expose] public section
 
 open OddOrder.RepresentationTheory
 

@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBCoherence2
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §8: Case (B) endgame — `S` is coherent (the (6.8.3) extension)
@@ -31,6 +35,8 @@ FPF bound `(2|W₁|+1)² ≤ |H:Z|` instead of `2|W₁| ≤ |Z|−1`.
 
 Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` ("session 43 cont.²⁵+").
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

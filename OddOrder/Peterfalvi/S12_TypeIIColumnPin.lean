@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_TypeIIFrobenius
+module
+
+public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
+import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
 
 /-!
 # Peterfalvi (5.8) for the type-II `S`-side column: the `ν^{τ₂}` pin
@@ -35,6 +40,8 @@ The route (frontier note `notes/peterfalvi/s10_7_derived_frobenius.md`, update¹
    grid of `ν^{τ₂}` (from step 1) plus the `V`-vanishing (step 2), `‖ν^{τ₂}‖² = w₁` and
    Parseval into the full-column dichotomy.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeBSquareEigenNonzero
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeBEigenfamilyCrossCommutator
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
 
 /-!
 # Higman's Lemma 13: the cross commutator of two restricted type-B factors
@@ -18,6 +25,8 @@ ambient right-factor eigenfamilies.  Their span and eigenvalue laws, together
 with the square nondegeneracy of the second family, give the cross-commutator
 inclusion in the ambient square Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

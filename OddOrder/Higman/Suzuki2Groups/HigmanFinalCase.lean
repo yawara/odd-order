@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
 import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman Lemma 3: final case split
@@ -17,6 +26,8 @@ This file implements the final square identity and case split used to bound
 the exponent of the normal abelian subgroup. The subgroup denoted
 `A^(2-2η)` in the source is the range of `twoSubTwoMap`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -787,7 +798,7 @@ theorem NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq
       exact Subgroup.map_subtype_le (Agemo A 2 1)
         (square_mem_agemo_one_of_frattini_map_eq
           hP hcover.le hAcomm hΦ v.2)
-    obtain ⟨uP, huC, huA⟩ := SetLike.exists_of_lt hcover.lt
+    obtain ⟨uP, huC, huA⟩ := IsConcreteLE.exists_of_lt hcover.lt
     let u : C := ⟨uP, huC⟩
     have hu : (u : P) ∉ A := by simpa [u] using huA
     let z : A := ⟨(u : P) ^ 2, hsq u hu⟩

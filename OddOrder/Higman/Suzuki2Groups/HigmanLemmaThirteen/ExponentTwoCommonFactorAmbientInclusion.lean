@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
 
 /-!
 # Higman Lemma 13: faithful inclusion of a pairwise factor into the ambient layer
@@ -22,6 +25,8 @@ map does not identify distinct field coordinates.  This is the first
 cross-join compatibility needed to compare one actual factor in two pairwise
 joins.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

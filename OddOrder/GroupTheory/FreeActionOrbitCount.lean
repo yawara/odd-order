@@ -3,13 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.GroupAction.Basic
-import Mathlib.GroupTheory.Index
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Data.Set.Card
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.GroupTheory.GroupAction.Defs
 import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.GroupTheory.Index
 
 /-!
 # Free-action orbit count
@@ -30,6 +31,8 @@ the "defect sum" is `∑ω (d − sω) = d·#orbits − n = d − 1`.  Every *pr
 < 2d`, forcing at most one proper orbit — which must then have `d − sω = d − 1`, i.e. exactly one
 orbit of size `1`, all others of size `d`.
 -/
+
+@[expose] public section
 
 open MulAction
 

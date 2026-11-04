@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.OddOrderInvolution
+import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 
 /-!
 # Peterfalvi Part II, Ch. I §3: the centralizer quotient hypothesis
@@ -17,6 +27,8 @@ faithful quotient action. This file constructs the actual quotient action,
 transports all of (A1), proves (A2), and transports the elementary abelian
 four-subgroup required by (A3). No abstract quotient carrier is posited.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -436,7 +448,7 @@ theorem natCard_centralizer_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
       rw [← hyp.normalCore_H_eq_bot]
       exact hXcore
     exact hX (eq_bot_iff.mpr hXbot)
-  obtain ⟨g, -, hgL⟩ := SetLike.exists_of_lt hLlt
+  obtain ⟨g, -, hgL⟩ := IsConcreteLE.exists_of_lt hLlt
   exact Finite.card_subtype_lt hgL
 
 /-- **Peterfalvi Part II, Ch. I §3 Prop 1(c)** — the faithful quotient is

@@ -1,7 +1,10 @@
+module
+
+public import OddOrder.FeitThompsonSetup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.FeitThompsonNuGrid
-import OddOrder.Peterfalvi.S13_TypeDetermination
-import OddOrder.FeitThompsonPairProducer
-import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+public import OddOrder.Peterfalvi.S10_TypePSupportA0 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Feit–Thompson Section 16 character data
@@ -10,6 +13,8 @@ Peterfalvi §§3–13 (pp. 5–68): the genuine Dade σ-integral on `W`,
 the aligned `omega`/`mu` character grid, and the API consumed by the
 canonical `Section16CharacterData` producer.
 -/
+@[expose] public section
+
 namespace OddOrder
 open OddOrder.BG
 open OddOrder.GroupTheory

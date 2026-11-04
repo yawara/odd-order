@@ -3,10 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.CyclicGenerated
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.DihedralStructure
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
+module -- shake: keep-all
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.CyclicGenerated
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.DihedralStructure
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8B (pp. 248–249)

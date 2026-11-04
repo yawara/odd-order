@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_SigmaIsometry
+module
+
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S05_GridTrichotomy
 
 /-!
@@ -19,6 +23,8 @@ The companion `sigmaCoeff_eq_zero_of_sigmaNC_lt` (`S05_SigmaIsometry`) is the `N
 corollary (the part used by (3.9.a)); this file supplies the full `NC(ψ) < 2w₁` trichotomy needed by
 the §6 certain-type analysis (Peterfalvi (4.8)).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05.TICyclicHypothesis
 

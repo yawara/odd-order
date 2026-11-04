@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.TISubsetCounting
 
 /-!
@@ -11,6 +18,8 @@ import OddOrder.GroupTheory.TISubsetCounting
 
 Inertia, induced irreducibility, and coherent degree-one families split under issue 0073.
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §08 Coherence Core — Part 2/3 (first `SibleyDadeHypothesis` block)

@@ -3,8 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TamelyImbedded
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TamelyImbedded
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
 
 /-! # BG Theorem II (Tii): the system of supporting subgroups for `A(M)`
 
@@ -38,6 +54,8 @@ The book states Theorem II for `X = A(M)` **or** `X = A₀(M)`; both are covered
 escaping set `D` is the same for the two choices (`escapingSharpSet_a0Set_eq_aSet`) and clause
 `(c)` is proved at the level of `\widehat{M_σ}`, which contains both.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FittingSelfCentralizing
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
 
@@ -27,6 +33,8 @@ Frobenius 群であり Frobenius 核は `F(G)`。証明は `F(G)` が可換に�
 (`Z(F(G)) ≠ 1` の元の中心化群が可換) と, 可解群での自己中心化性 `C_G(F(G)) ⊆ F(G)`
 (P. Hall) を Thm 6.7 に流し込む。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

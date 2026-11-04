@@ -1,4 +1,21 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 
 /-!
 # MsigmaNilpotent
@@ -6,6 +23,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103
 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Corollary 15.5 helpers (§14-independent) + Theorem 15.2 assembly
@@ -382,7 +401,7 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
   have hAO : A ⊓ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) = ⊥ := by
     apply Disjoint.eq_bot
     refine Subgroup.disjoint_of_coprime_natCard
-      (coprime_of_forall_prime_not_dvd (fun r hr hrA hrO => ?_))
+      (Nat.coprime_of_dvd (fun r hr hrA hrO => ?_))
     have hrq : r = q := by
       have hπA : Subgroup.IsPiSubgroup ({q} : Set ℕ) A :=
         Subgroup.isPiSubgroup_of_isPGroup_of_mem hA rfl
@@ -524,7 +543,7 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
       rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
       rw [← hc, show c = 1 from Subtype.ext hmem, map_one]
     · -- `ψ.range ≠ ⊥`: the image of an `x ∈ (D ⊔ Q₁) ∖ Q₀` is nontrivial.
-      obtain ⟨x, hxDQ1, hxQ0⟩ := SetLike.exists_of_lt hQ0lt
+      obtain ⟨x, hxDQ1, hxQ0⟩ := IsConcreteLE.exists_of_lt hQ0lt
       intro hbot
       refine hxQ0 ((hψ1 ⟨x, hxDQ1⟩).mp ?_)
       have hmem : ψ ⟨x, hxDQ1⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
@@ -639,7 +658,7 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
       have hmem : (c : G) ∈ N ⊓ K1 := ⟨hcN, c.2⟩
       rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
       rw [← hc, show c = 1 from Subtype.ext hmem, map_one]
-    · obtain ⟨x, hxN, hxQ0⟩ := SetLike.exists_of_lt hQ0lt
+    · obtain ⟨x, hxN, hxQ0⟩ := IsConcreteLE.exists_of_lt hQ0lt
       intro hbot
       refine hxQ0 ((hψ1 ⟨x, hxN⟩).mp ?_)
       have hmem : ψ ⟨x, hxN⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
@@ -1291,7 +1310,7 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
   have hQnM : (Q.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
   -- `Nontrivial Q̄` (`Q₀ < Q`).
-  obtain ⟨x0, hx0Q, hx0Q0⟩ := (SetLike.lt_iff_le_and_exists.mp hQ0Q).2
+  obtain ⟨x0, hx0Q, hx0Q0⟩ := (IsConcreteLE.lt_iff_le_and_exists.mp hQ0Q).2
   have hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
     refine ⟨QuotientGroup.mk ⟨x0, hx0Q⟩, 1, ?_⟩
     rw [Ne, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]

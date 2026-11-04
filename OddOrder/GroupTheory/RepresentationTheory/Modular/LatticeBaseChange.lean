@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.TensorProduct.Basis
-import Mathlib.RingTheory.TensorProduct.Basic
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Logic.Equiv.PartialEquiv
+import Mathlib.Tactic.Continuity.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
@@ -36,6 +43,8 @@ irreducible lives on `V`.
 * `OddOrder.RepresentationTheory.Modular.exists_smul_id_of_commute_baseChange` — **absolute
   irreducibility of a Wedderburn component**, in the form `BlockOfLattice` asks for
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

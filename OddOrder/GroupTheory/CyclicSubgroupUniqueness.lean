@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
@@ -26,6 +29,8 @@ cannot import `BG`, which is what forced the deduplication (hub ruling, issue 91
 
 * `OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq` -- equal cardinality implies equality.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

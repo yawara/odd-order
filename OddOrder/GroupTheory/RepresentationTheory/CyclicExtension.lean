@@ -3,10 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RepresentationTheory.Character
-import Mathlib.RepresentationTheory.Irreducible
-import OddOrder.GroupTheory.RepresentationTheory.Inertia
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
 
 /-!
 # Extension of an invariant irreducible representation along a cyclic quotient
@@ -58,6 +58,8 @@ Fix `g : K` whose image generates `K/H`, and let `ρ` afford `M`.
 * I. M. Isaacs, *Character Theory of Finite Groups*, Theorem 11.22 (the `ℂ` specialization,
   in `CyclicCharacterExtension.lean`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

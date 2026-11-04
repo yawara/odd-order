@@ -3,6 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.Algebra.QuadraticFrobenius
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.QuadraticTraceCorrection
 
 /-!
@@ -51,6 +62,8 @@ machinery is needed:
   computations use the `E`-scalar multiplication that a mere `F`-linear change of
   variable would not respect.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

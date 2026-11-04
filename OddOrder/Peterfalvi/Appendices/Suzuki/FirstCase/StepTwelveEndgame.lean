@@ -3,6 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
 
 /-!
@@ -15,6 +27,8 @@ The `s`-inverted complement `T₁ ≤ R₁` (order `p²`, all of whose nonidenti
 elements are strongly real), the identification `N_G(R₁) = N_G(R)`, and the
 final Hall–Wielandt/transfer contradiction with hypothesis (B2).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -584,7 +598,7 @@ theorem mem_of_forall_conj_mul_inv_mem_sInvertedT
     have h6 : fc.p ≤ 1 :=
       Nat.le_of_mul_le_mul_left h5 (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
     omega
-  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := SetLike.not_le_iff_exists.mp hnle
+  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
   -- its class has order `p` and generates the normal Sylow of `N/R`.
   have hx₁NR : x₁ ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
     hR₁le hx₁R₁
@@ -783,7 +797,7 @@ private theorem exists_quotient_generator
     have h6 : fc.p ≤ 1 :=
       Nat.le_of_mul_le_mul_left h5 (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
     omega
-  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := SetLike.not_le_iff_exists.mp hnle
+  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
   have hx₁NR : x₁ ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
     hR₁le hx₁R₁
   have hξ1 : QuotientGroup.mk' ((fc.invImageF model).subgroupOf

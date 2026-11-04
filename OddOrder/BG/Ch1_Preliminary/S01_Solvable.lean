@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.SubgroupInAmbient
+import Mathlib.Algebra.Order.Star.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # BG §1 tail — §1D-§1G (Thm 1.11-1.13, Lem 1.14-1.16, Thm 1.17-1.20, Lem 1.21-1.22)
@@ -11,6 +20,8 @@ import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
 Prefix-split from the former monolithic `S01_Solvable` (issue 0103 第 2 パス); §1C now
 lives in `S01_BurnsideOperator` (issue 0149).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S01
 open OddOrder.Isaacs.Ch01

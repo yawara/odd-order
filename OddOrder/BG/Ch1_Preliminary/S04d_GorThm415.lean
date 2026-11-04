@@ -3,12 +3,19 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
+module
+
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
@@ -32,6 +39,8 @@ import OddOrder.GroupTheory.FrattiniPGroup
   counterexample + Lem 4.12 / 4.13 / 3.9(i) / 3.12).
 * **PART 3** (`Ω₁(A) = D`): rank squeeze (`dₙ(P)` 最大性 + Lem 1.3.4).
 -/
+
+@[expose] public section
 
 open scoped commutatorElement Pointwise
 
@@ -937,7 +946,7 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
   have hDbar_normal : Dbar.Normal :=
     Subgroup.Normal.map hD_normal q (QuotientGroup.mk'_surjective H)
   have hDbar_ne : Dbar ≠ ⊥ := by
-    obtain ⟨d, hdD, hdH⟩ := SetLike.exists_of_lt hHD_lt
+    obtain ⟨d, hdD, hdH⟩ := IsConcreteLE.exists_of_lt hHD_lt
     intro hbot
     apply hdH
     have : q d ∈ Dbar := Subgroup.mem_map_of_mem q hdD

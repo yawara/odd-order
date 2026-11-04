@@ -3,8 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
 
 /-!
 # Isaacs Problem 3C.8 — nilpotent injector の共役性
@@ -30,6 +37,8 @@ problem) ので証明は自前で、Mann の構造定理の経路を採る。
 
 - `exists_conj_of_isNilpotentInjector` — **Problem 3C.8**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

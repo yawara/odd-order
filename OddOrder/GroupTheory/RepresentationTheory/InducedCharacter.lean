@@ -3,15 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Units.Equiv
-import Mathlib.Algebra.GroupWithZero.Invertible
-import Mathlib.Data.Fintype.Card
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
-import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+module
+
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.GroupTheory.RepresentationTheory.IsReal
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Classical induction sums for class functions
@@ -40,7 +39,7 @@ unscaled form is useful before choosing coefficients where `|H|` is invertible.
 
 -/
 
-noncomputable section
+@[expose] public noncomputable section
 
 namespace OddOrder.RepresentationTheory
 

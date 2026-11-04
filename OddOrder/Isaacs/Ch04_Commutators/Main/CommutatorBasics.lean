@@ -1,14 +1,9 @@
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Solvable
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Mathlib.SemidirectProduct
-import OddOrder.Mathlib.Subgroup
-import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+module
+
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs §4A — Thm 4.7/4.8: maximal class p-群, Ω_r (pp. 113-122)
@@ -18,6 +13,8 @@ Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (direct
 §4A 前半 (identities + Lem 4.5/4.6) は `CommutatorIdentities.lean` へ prefix-split 済 (issue 0122)。
 -/
 
+
+@[expose] public section
 
 /-!
 # OddOrder.Isaacs.Ch04 — Commutators
@@ -373,7 +370,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
         have h_lcs_km1_le_A : (⊤ : Subgroup P).lowerCentralSeries (k - 1) ≤ A :=
           h_lcs_km1_le_G'.trans hG'_le_A
         -- ∃ x ∈ lcs P (k-1), x ∉ Z
-        rw [SetLike.not_le_iff_exists] at h_lcs_km1_nle_Z
+        rw [IsConcreteLE.not_le_iff_exists] at h_lcs_km1_nle_Z
         obtain ⟨x, hx_in, hx_notZ⟩ := h_lcs_km1_nle_Z
         -- x ∈ A but x ∉ Z = A ⊓ Z(P), so x ∉ Z(P) (since x ∈ A)
         have hx_in_A : x ∈ A := h_lcs_km1_le_A hx_in

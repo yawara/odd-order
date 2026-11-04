@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.Projection
-import Mathlib.LinearAlgebra.Quotient.Basic
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 import Mathlib.Tactic.NoncommRing
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
 
 /-!
@@ -30,6 +32,8 @@ Higman's proof:
 The later homomorphism, kernel, and exponent-at-most-four arguments of
 Higman Lemma 3 are not claimed here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

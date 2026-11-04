@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.GroupTheory.PrimeComplementResidual
 
 /-!
@@ -40,6 +42,8 @@ Lemma 9.17 で `Soc(Ḡ)` に入る」と進むが, 本ファイルは **`IsSemi
 ⚠ mmd 抽出 (L5081) は 9.17 の仮定を `S ◁ G` と誤抽出しているが, PDF 原文 (p. 281) は
 `S ◁◁ G` (subnormal). 本ファイルは PDF に従う (9.18 も同様).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
 
 /-!
 # Isaacs FGT Ch.7 — Theorem 7.1 Step 4: the Sylow subgroup is maximal (pp. 218–219)
@@ -13,6 +19,8 @@ This leaf continues the minimal-counterexample proof of Thompson's normal
 `O_{p'}(G)`, and Hall–Higman then forces every proper overgroup of a Sylow
 `p`-subgroup to equal that Sylow subgroup.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

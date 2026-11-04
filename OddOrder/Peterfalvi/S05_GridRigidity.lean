@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_GridTrichotomy
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_GridTrichotomy
 
 /-!
 # Peterfalvi (3.8): abstract norm-`2` rigidity for an orthonormal `ZIrr` grid family
@@ -46,6 +52,8 @@ that arises when the grid index `ι × κ` is unified against an opaque `Idx`.
 Reference: issue 9076 (piece 4a).  The `σ`-image instance is `S05_SigmaTrichotomy`'s `chiFam`
 endgame; the `η`-grid instance is the (13.18) consumer.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

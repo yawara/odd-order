@@ -3,7 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppD_CNGroups.Basic
+public import OddOrder.GroupTheory.SubgroupInAmbient
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Focal
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 
 /-!
 # BG Appendix D, Lemmas D.1 and D.2
@@ -25,6 +38,8 @@ and `N` is a 3-step group with respect to `p`.
 ⚠ Minimal simplicity is essential in both: see the module docstring of
 `OddOrder.BG.AppD_CNGroups.Basic` for the two counterexamples among general odd CN-groups.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppD
 

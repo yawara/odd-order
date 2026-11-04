@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
@@ -39,6 +48,8 @@ Every remaining input is section data:
   under §4's standing data, `Theorem A`'s conclusion holds for `G` acting on `Ω`, with
   `L = O^{2′}(G)` carrying the standard `PSU(3, q)` model.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,10 +3,14 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
-import OddOrder.Peterfalvi.S09_FrobeniusEstimate
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
+public import OddOrder.Peterfalvi.S09_FrobeniusEstimate -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The conjugate family index for a Frobenius member (Peterfalvi (7.9))
@@ -20,6 +24,8 @@ The distinguished `ζ = ζ_0 = Ind_K^L (θ_0)`; its complex conjugate `ζ̄ = In
 some index `j₁`.  That `j₁ ≠ ind1H` because `ζ̄ ≠ Ind 1_K` (else `θ_0` would be trivial,
 contradicting `ind1H ≠ 0` via `inj`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

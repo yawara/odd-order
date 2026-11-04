@@ -3,6 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.Peterfalvi.S10_ConjugationTransport
 import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 
 /-!
@@ -20,6 +37,8 @@ Relocated here from `S15_SAndT_Setup/SubcoherenceInputs.lean` (issue 1044): thes
 about `A(M)`, not `S`/`T`-specific ones, and the type-uniform (8.18) chain in
 `S10_MinimalSimpleStructure.lean` consumes them upstream of §15.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

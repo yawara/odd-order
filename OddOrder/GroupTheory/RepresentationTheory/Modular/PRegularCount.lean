@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import OddOrder.Algebra.CommutatorSpan
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.LinearAlgebra.Dimension.Constructions
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 
@@ -32,6 +44,8 @@ halves of Brauer's count of the irreducible modular representations; the other h
 * `OddOrder.RepresentationTheory.Modular.basisPRegularQuotient`
 * `OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

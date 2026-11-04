@@ -3,11 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+public import Mathlib.RingTheory.Norm.Defs
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.FieldTheory.Finite.Extension
+import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.NormNum.GCD
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
-import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 
 /-!
 # The nonsplit torus of `SL(2, F)`
@@ -25,6 +28,8 @@ The nonsplit torus is what makes the Sylow subgroups of `PSL(2, 2ⁿ)` for odd p
 dividing `q + 1` cyclic, which is the input Peterfalvi uses in Part II, Ch. II, (15)
 (`L = C_G(st) ∩ ⟨Q₀, K, t⟩` is cyclic of order `9` inside `PSL(2, 8)`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

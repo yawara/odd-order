@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: factor ranges in the Frattini quotient
@@ -20,6 +23,8 @@ underlying the image of the corresponding actual subgroup in `P ⧸ Φ(P)`.
 The first result is stated for the raw `factorInclusion` API.  The second
 specializes it to a factor produced in a restricted pairwise join.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

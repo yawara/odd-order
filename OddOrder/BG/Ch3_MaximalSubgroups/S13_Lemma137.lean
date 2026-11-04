@@ -3,9 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
 import OddOrder.GroupTheory.CoprimeConjugacy
-import OddOrder.Mathlib.Subgroup
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # BG §13: Lemma 13.7 (`E₁E₃` prime on `M_σ`) + prime-action helpers
@@ -18,6 +35,8 @@ import OddOrder.Mathlib.Subgroup
 に prime 作用）とその支持補題群（prime-action ⟹ trivial centralizer 等）。13.6 非依存。
 S13 frontier の prefix-split（active leaf = `S13_PrimeActionTransition`）。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 
@@ -488,7 +507,7 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNRne : Subgroup.normalizer (R : Set G) ≠ ⊤ := by
     intro htop
     have : R.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with hb | ht
+    rcases hG.simple.eq_bot_or_eq_top_of_normal R with hb | ht
     · exact hRne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hRM))
   obtain ⟨Mstar, hMstarCo, hNRM⟩ :=

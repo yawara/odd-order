@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
 
 /-!
@@ -17,6 +21,8 @@ submodules onto the span of its supported generator values.  Applied to two
 type-B Frobenius eigenfamilies and the middle Frattini commutator, Higman's
 weight calculation restricts that support to the diagonal.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

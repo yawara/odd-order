@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Projection
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.RepresentationTheory.Character
+module
+
+public import Mathlib.RepresentationTheory.Character
 
 /-!
 # Character values at involutions are rational integers
@@ -37,6 +37,8 @@ are ordinary characters of `C_G(t)`, so on the `p`-regular classes both are `ℕ
 * `OddOrder.RepresentationTheory.exists_intCast_character_of_mul_self_eq_one`
 * `OddOrder.RepresentationTheory.character_involution_mul_eq` — `χ(t y) = 2 χ_{V₊}(y) − χ(y)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

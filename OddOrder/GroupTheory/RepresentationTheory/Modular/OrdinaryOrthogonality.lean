@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Character
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.WittVector.IsPoly
 
 /-!
 # Orthogonality of the ordinary irreducible characters over the splitting field
@@ -43,6 +51,8 @@ algebraic closedness argument appears anywhere below:
   block
 * `OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv` — first orthogonality
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

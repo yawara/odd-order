@@ -3,11 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Solvable
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Ch.4 → Ch.2 forward dependencies
@@ -49,6 +53,8 @@ import OddOrder.Isaacs.Ch02_Subnormality.Main
 - [`notes/isaacs/ch04_commutators.md`](../../../notes/isaacs/ch04_commutators.md):
   §4A-§4B 補助補題の inventory.
 -/
+
+@[expose] public section
 
 open scoped commutatorElement Pointwise
 

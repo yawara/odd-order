@@ -3,10 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 
 /-!
 # Peterfalvi Part II, Ch. I §3: applying induction to the centralizer quotient
@@ -27,6 +37,8 @@ No simplicity or permutation-degree input is stored in the conclusion
 carrier: those facts are derived from the concrete standard models by the
 three existing Lemma 1 endpoints.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

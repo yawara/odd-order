@@ -3,10 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
 import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.GroupTheory.Index
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: subdegrees (Thm 8.37, 8.38, Lem 8.39)
@@ -36,6 +37,8 @@ point of the suborbit of `β` is reached by a `Δ`-arrow from the suborbit of
 `t ≤ |orbit β| ≤ |orbit γ| · |Δ(α)| ≤ s · |Δ(α)|`.
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch08
 
 open MulAction
@@ -47,7 +50,7 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω]
 section ReachIn
 
 /-- Reachability in exactly `n` steps of a relation. -/
-private def reachIn (r : Ω → Ω → Prop) (α : Ω) : ℕ → Ω → Prop
+def reachIn (r : Ω → Ω → Prop) (α : Ω) : ℕ → Ω → Prop
   | 0, γ => γ = α
   | (n + 1), γ => ∃ c, reachIn r α n c ∧ r c γ
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_IntegralSigma
-import OddOrder.Peterfalvi.S05_OmegaGrid
+module
+
+public import OddOrder.Peterfalvi.S05_IntegralSigma
+public import OddOrder.Peterfalvi.S05_OmegaGrid
 
 /-!
 # Peterfalvi §5: the `ω^σ`-grid (the σ-image of the ω-grid)
@@ -32,6 +34,8 @@ supplied by §3–9 character theory.  The remaining `CharacterParameters` field
 signature gap.  They belong to the §12 analysis owner, not to signature
 pre-staging.  Pure §5 character theory — **not** gated on the §10–16 structure.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

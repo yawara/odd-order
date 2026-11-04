@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 6A.9 の準備 — TI 仮説の下での `X` の構造 (書籍 p. 186)
@@ -21,6 +26,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
   (`x = g a g⁻¹` と共役なら `u := g⁻¹ t g` が `a` を反転するので `u ∈ N_G(⟨a⟩) ≤ A`,
   つまり `t ∈ A ⊓ A^g` で TI から `g ∈ A`, これは `x ∈ A` を与えて矛盾。)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

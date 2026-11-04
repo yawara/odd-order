@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
 import OddOrder.GroupTheory.FittingHeredity
 import OddOrder.GroupTheory.NormalHallHeredity
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG §6: Theorem 6.4 — coprime engine and the centralizing-conjugator step
@@ -124,6 +133,8 @@ BG p. 50 の場合 1 は, `y ∈ L` と `z ∈ N` を取って `H^{yz} = H` と�
 よって結論 (`yz` が `H` を中心化する) は正しく, 証明は `H ∩ L` を `H ∩ N` に読み替えれば
 そのまま通る。この訂正版が `mem_centralizer_of_mem_normalizer_of_commutator_le`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

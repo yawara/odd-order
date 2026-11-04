@@ -3,17 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
-import OddOrder.BG.Ch2_Uniqueness.Setup
+
+public import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.GroupTheory.NarrowPGroup
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §9: Theorem 9.1 (noncyclic uniqueness via Hall–Higman)
@@ -31,6 +39,8 @@ Sylow-promotion / Eq(9.5)+STEP5-7 の各 helper を含む。
 の contrapositive helper (Lemma 9.5 で使用) もここに置き、cross-file 用に public 化。
 -/
 
+@[expose] public section
+
 namespace OddOrder.BG.Ch2.S09
 
 open OddOrder.GroupTheory
@@ -43,7 +53,7 @@ variable {G : Type*} [Group G]
 theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x : G}
     (hx : x ≠ (1 : G)) : Subgroup.centralizer ({x} : Set G) < ⊤ := by
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
@@ -231,8 +241,7 @@ theorem normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot [Finite G]
     intro hNtop
     have hOq_normal : (opiCoreInG ({q} : Set ℕ) M).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M)
-        inferInstance with hOqbot | hOqtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M) with hOqbot | hOqtop
     · exact hOqne hOqbot
     · have htop_le_M : ⊤ ≤ M := by
         rw [← hOqtop]
@@ -255,8 +264,7 @@ private theorem normalizer_opiCoreInG_le_maximal_of_ne_bot [Finite G]
     intro hNtop
     have hO_normal : (opiCoreInG π M).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG π M)
-        inferInstance with hObot | hOtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG π M) with hObot | hOtop
     · exact hOne hObot
     · have htop_le_M : ⊤ ≤ M := by
         rw [← hOtop]

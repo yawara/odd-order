@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_PivotCoherence
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The union-pair coherent extension and the projection budget
@@ -33,6 +39,8 @@ That put them out of reach of the §9-level (9.11) chain, which is stated on
 neither statement mentions §9 or §13 data, the fix is to layer them where the rest of the
 coherence toolkit lives (namespace `S07`); §13 and the §15 mirrors cite them unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

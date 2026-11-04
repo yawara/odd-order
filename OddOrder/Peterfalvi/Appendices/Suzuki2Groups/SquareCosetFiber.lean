@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the square fiber of a summand
@@ -24,6 +29,8 @@ This is the source counting `|{x ∈ X | x² = s}| = (q² − q)/(q − 1) = q`:
 fiber of the square map over a fixed involution `s` is a single `Q₀`-coset,
 supplied here through the unique-fiber corollary.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -144,7 +151,7 @@ theorem bijOn_cosetSquare
       rw [hbot, Subgroup.card_bot] at hXcard
       omega
     obtain ⟨q₁, hq₁X, hq₁bot⟩ :=
-      SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hXnontrivial)
+      IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hXnontrivial)
     have hq₁1 : q₁ ≠ 1 := by
       intro h1
       exact hq₁bot (by rw [h1]; exact Subgroup.one_mem ⊥)

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
+module
+
+public import Mathlib.GroupTheory.PGroup
 
 /-!
 # Orbit counting for `p`-groups in characteristic `p`
@@ -20,6 +22,8 @@ This is the additive refinement of `IsPGroup.card_modEq_card_fixedPoints` (which
 
 * `OddOrder.sum_eq_sum_fixedPoints`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

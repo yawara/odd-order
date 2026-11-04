@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 
 /-!
 # Transport lemmas for induced class functions
@@ -23,6 +27,8 @@ where they supported the Peterfalvi (6.8.2.3) assembly; shared here so that
 `GroupTheory/RepresentationTheory/**` consumers (Isaacs 6.11 Clifford correspondence,
 issue 9002) can cite them without importing the Peterfalvi tree.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

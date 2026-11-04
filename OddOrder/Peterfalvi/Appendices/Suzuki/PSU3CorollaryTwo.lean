@@ -3,11 +3,28 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3BarOrbit
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3ModelTwistOdd
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §3, Corollary 2, from a single base pair
@@ -53,6 +70,8 @@ because inversion fixes the quotient coordinate (`quotient_inv_eq`) while `μ(1,
   pair comes from §2's closing Proposition (`exists_f_eq_conj_inv`), so nothing of §2 is
   owed.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

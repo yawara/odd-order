@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeSupport
-import OddOrder.Peterfalvi.S06_CertainTypeStructure
+module
+
+public import OddOrder.Peterfalvi.S06_CertainHypothesis46
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.Peterfalvi.S05_GridTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeStructure
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 
 /-!
 # Peterfalvi (4.8): equal-degree certain-type differences are σ-isometric
@@ -39,6 +45,8 @@ Remaining (steps 5-8, the `(3.8)` trichotomy endgame): `ψ := (μ_{ij} − μ_{i
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 33").
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 
@@ -197,13 +205,12 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
             = ((h.columnFamily χ₂').sign : ℂ) + (Nat.card h.W1 : ℂ) * (b : ℂ) := by
       rw [← ha, ← hb]; exact hdeg
     exact_mod_cast hC
-  -- Case split on the two signs.  Diagonal cases are reflexive; off-diagonal cases give
-  -- `w₁ ∣ 2`, contradicting `w₁ ≥ 3`.
+  -- Case split on the two signs.  Diagonal cases are closed by the `rw` (it tries `rfl`);
+  -- off-diagonal cases give `w₁ ∣ 2`, contradicting `w₁ ≥ 3`.
   rcases (h.columnFamily χ₂).sign_eq with hd | hd <;>
     rcases (h.columnFamily χ₂').sign_eq with hd' | hd' <;>
     rw [hd, hd'] at hZ ⊢ <;>
     first
-    | rfl
     | (exfalso
        have hdvd : (Nat.card h.W1 : ℤ) ∣ 2 := ⟨b - a, by linear_combination hZ⟩
        have hle := Int.le_of_dvd (by norm_num) hdvd

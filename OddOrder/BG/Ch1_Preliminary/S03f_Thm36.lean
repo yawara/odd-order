@@ -3,19 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
-import OddOrder.BG.Ch1_Preliminary.S03f_Endgame
-import OddOrder.BG.Ch1_Preliminary.S03f_R0Action
-import OddOrder.BG.Ch1_Preliminary.S03f_ComplementK
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+module
+
+public import OddOrder.GroupTheory.ZGroup
+public import OddOrder.BG.Ch1_Preliminary.PLength
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.ZGroup
+import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.BG.Ch1_Preliminary.S03f_ComplementK
+import OddOrder.BG.Ch1_Preliminary.S03f_Endgame
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S03f_R0Action
+import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 
 /-!
@@ -81,6 +88,8 @@ Lemma 3.1/3.3 (`S03`/`S03b`), Gorenstein 5.3.7 (`S04e`), Prop 1.3/1.4/1.5/1.6/1.
 `notes/bg/s03_thm36_plan.md`.
 -/
 
+@[expose] public section
+
 namespace OddOrder.BG.Ch1.S03f
 
 open scoped commutatorElement Pointwise IsMulCommutative
@@ -141,7 +150,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       -- `S ≤ N_G(⁅H,R⁆)`: `⁅H,R⁆` self-normalizes, `R` normalizes `⁅R,H⁆ = ⁅H,R⁆` (Isaacs Lem 4.1).
       have hSnorm : S ≤ Subgroup.normalizer (⁅H, R⁆ : Subgroup G) :=
         sup_le Subgroup.le_normalizer
-          (Subgroup.commutator_comm R H ▸ subgroup_le_normalizer_commutator_self R H)
+          (Subgroup.commutator_comm R H ▸ Subgroup.normalizer_commutator_ge_left R H)
       have hH'normal : ((⁅H, R⁆ : Subgroup G).subgroupOf S).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hSnorm
       -- card transport: `|⁅H,R⁆.subgroupOf S| = |⁅H,R⁆|`, `|R.subgroupOf S| = |R|`.
@@ -628,8 +637,8 @@ private theorem thm36_aux : ∀ (n : ℕ)
       -- `S₂ ≤ N_G(WG)` (Isaacs Lemma 4.1 on both factors) and `WG ≤ HX`
       have hS₂_le_NWG : S₂ ≤ Subgroup.normalizer (WG : Set G) := by
         rw [hS₂def, hWGdef]
-        exact sup_le (subgroup_le_normalizer_commutator_self HX R₀)
-          (subgroup_le_normalizer_commutator_self_right HX R₀)
+        exact sup_le (Subgroup.normalizer_commutator_ge_left HX R₀)
+          (Subgroup.normalizer_commutator_ge_right HX R₀)
       have hWG_le_HX : WG ≤ HX := by
         rw [hWGdef, Subgroup.commutator_le]
         intro g₁ hg₁ g₂ hg₂
@@ -910,7 +919,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           (mem_normalizer_map_subtype_of_isAInvariant hP_inv (hR₀R hg))
       have hPinv : (P.map H.subtype : Subgroup G) ≤ Subgroup.normalizer
           ((⁅KG, (P.map H.subtype : Subgroup G)⁆ : Subgroup G) : Set G) :=
-        subgroup_le_normalizer_commutator_self_right KG (P.map H.subtype)
+        Subgroup.normalizer_commutator_ge_right KG (P.map H.subtype)
       have hbot := h322' _ hle hne24 hR₀inv hPinv
       rw [h16bKP] at hbot
       exact h313G hbot

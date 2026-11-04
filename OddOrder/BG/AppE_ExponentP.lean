@@ -3,7 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppE_CentralizerDecomposition
+import Mathlib.Algebra.Group.Pointwise.Set.Card
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_CollectionFormula
 import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG Appendix E, Theorem E.3, Step 3: `Ω₁(R)` has exponent `p`
@@ -30,6 +46,8 @@ equal because `C_R(R₀) = R₀ × R₁` with `R₀` of order `p`, and the centr
 one that is visibly `A`-invariant (`R₀` is `A`-invariant, hence so is its centralizer) —
 `R₁` on its own carries no invariance hypothesis in the setup.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 
@@ -267,7 +285,7 @@ theorem RegularOperatorSetup.eq_omega_of_omegaInG_normalizer_eq [Finite R]
   have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hTtop : T.subgroupOf P = ⊤ := by
     by_contra hne
-    obtain ⟨x, hxN, hxT⟩ := SetLike.exists_of_lt
+    obtain ⟨x, hxN, hxT⟩ := IsConcreteLE.exists_of_lt
       (OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top
         (H := T.subgroupOf P) (lt_of_le_of_ne le_top hne))
     rw [← Subgroup.subgroupOf_normalizer_eq hTP] at hxN

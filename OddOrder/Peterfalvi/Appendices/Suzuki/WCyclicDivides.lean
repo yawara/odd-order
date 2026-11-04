@@ -3,9 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
+import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: cyclicity of `W` and `|W| ∣ q + 1`
@@ -24,6 +36,8 @@ two-dimensional theorem then gives cyclicity of `W` and `|W| ∣ q + 1`.  For
 `W = 1` both conclusions are trivial, so Lemma 5's first two claims hold
 unconditionally.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -63,7 +77,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
     rw [hone]
     exact one_dvd _
   · -- pick a nonidentity element of `W` and build the Lemma 5 setup
-    obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
+    obtain ⟨w, hwW, hwbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
     have hw1 : w ≠ 1 := fun h =>
       hwbot (h ▸ Subgroup.one_mem ⊥)
     obtain ⟨s⟩ := hyp.lemmaFiveSetup_of_orderThree_of_mem_W hwW hw1 hst hQsuz
@@ -365,7 +379,7 @@ theorem lemmaFive_of_orderThree
   obtain ⟨hcyc, hdvd⟩ := hyp.isCyclic_W_and_card_dvd_of_orderThree hst hQsuz
     hm hQ0card hcardQ inductionHypothesis
   refine ⟨hcyc, hdvd, fun hWne => ?_⟩
-  obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
+  obtain ⟨w, hwW, hwbot⟩ := IsConcreteLE.exists_of_lt (bot_lt_iff_ne_bot.mpr hWne)
   exact hyp.isTypeB_Q_of_orderThree_of_mem_W hwW
     (fun h => hwbot (h ▸ Subgroup.one_mem ⊥)) hst hQsuz hm hQ0card hcardQ
     inductionHypothesis

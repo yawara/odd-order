@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D3
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 
 /-!
 # Isaacs Problem 5D.5 — `A^p(G) ∩ P = P'` から Tate 抜きで正規 `p`-補群 (書籍 p. 170)
@@ -23,6 +31,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D3
 `P' ⊆ Φ(P)` から `P` が `K` を正規化する」は 5C.13 の最終段と**完全に同じ論法**なので,
 そのエンジンを共有した。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

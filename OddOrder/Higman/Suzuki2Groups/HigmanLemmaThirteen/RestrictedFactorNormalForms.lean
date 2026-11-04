@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 
@@ -17,6 +25,8 @@ in Higman's Frobenius half-range normalization.  The coordinate flip changes
 only the quotient coordinate, so the common generator, the transported
 `Φ(P)²` kernel coordinate, and the primitive scalar stay fixed.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

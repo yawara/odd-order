@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
+public import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+import Mathlib.Data.Rat.Floor
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
 import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
-import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
 import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
 
 /-!
@@ -35,6 +39,8 @@ The two completed engines it stitches together are:
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (NEXT — carrier-level, items 1–2), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.WielandtKernelFPF
 
@@ -283,7 +289,6 @@ section KernelFPF
 open Module Representation
 open OddOrder.GroupTheory.CenterModuleDecomp (centerProj isInternal_centerProj map_range_centerProj)
 open OddOrder.GroupTheory.CenterSplitting (exists_center_algEquiv_pi)
-open OddOrder.GroupTheory.WielandtCounting (finrank_eq_card_mul_finrank_invariants_of_free)
 
 variable {k : Type*} [Field k] [IsAlgClosed k]
 variable {L : Type*} [Group L] [Finite L] {W : Type*} [AddCommGroup W] [Module k W]

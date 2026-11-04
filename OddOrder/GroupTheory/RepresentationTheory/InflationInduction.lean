@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Sylow
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Inflation ∘ induction: the P-inflation norm bridge
@@ -31,6 +37,8 @@ These package the "(1.6.b)" identification Peterfalvi uses in (13.18.a,b): toget
 `norm_induce_one_frobenius` on the Frobenius quotient `S̄`, they give
 `‖Ind_{PW₁}^S 1‖² = (u−1)/q + 1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

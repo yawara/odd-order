@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Subgroup.Centralizer
+module
+
+public import Mathlib.GroupTheory.PGroup
 
 /-!
 # A `p`-subgroup sees a conjugacy class only through its centraliser
@@ -22,6 +23,8 @@ the principal block is `λ_{B_0}(K̂) = |K|·1`, while the induced character of 
 
 * `OddOrder.RepresentationTheory.Modular.card_conjClass_modEq_card_centralizer`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

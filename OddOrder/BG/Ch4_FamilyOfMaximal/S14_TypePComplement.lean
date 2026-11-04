@@ -1,8 +1,18 @@
 /-
 Copyright (c) 2026 OddOrder contributors. All rights reserved.
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+public import OddOrder.GroupTheory.MaxNilpotentNormalHall
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
 import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
@@ -18,6 +28,8 @@ invariant Schur–Zassenhaus complement
 
 This discharges the U-side of the `Section16TypePStructure` producer (issue 7005 piece 2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S14
 

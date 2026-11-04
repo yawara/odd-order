@@ -3,8 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
-import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Peterfalvi Part II, Ch. I §3: conjugacy inside `V`
@@ -20,6 +30,8 @@ applies the canonical projection `D = K ⋊ V → V`.
 Peterfalvi uses right actions.  With Lean's left-action convention the
 centralizing correction is multiplied on the left.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

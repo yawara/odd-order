@@ -3,25 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.Frattini
+module
+
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.Solvable
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Mathlib.Subgroup
-import OddOrder.Mathlib.SchurZassenhausConj
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
-import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Basic
 
 Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # OddOrder.Isaacs.Ch03 — Split Extensions
@@ -56,7 +57,6 @@ Thm 3.4 は Ch.1 Thm 1.37 Brodkey に依存 (Ch.1 §1F = `Ch01_Sylow/Main.lean` 
 
 namespace OddOrder.Isaacs.Ch03
 
-open SemidirectProduct
 open scoped Pointwise
 
 

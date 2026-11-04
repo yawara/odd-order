@@ -1,5 +1,8 @@
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
-import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+module
+
+public import OddOrder.Peterfalvi.S12_Prop109
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Peterfalvi.S13_Orthogonality
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
 
@@ -19,6 +22,8 @@ member-pinned duplicates (`exists_charParameters_full_for_member`,
 were removed in issue 1040 — their statements are subsumed by
 `S12.Hypothesis.exists_charParameters_full_of_zeta` and the S13 theorem.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

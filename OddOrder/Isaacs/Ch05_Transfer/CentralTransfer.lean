@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import Mathlib.GroupTheory.Focal
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Abelianization.Defs
 import Mathlib.GroupTheory.Schreier
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs §5A-5B — Central transfer: Thm 5.3 / Cor 5.4 / Schur / Cor 5.9
@@ -20,6 +22,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5 "Transfer",
 章全体の overview・mathlib 対応表は `Basic.lean` 冒頭を参照。
 Thm 5.10 (Dietzmann) は `Dietzmann.lean`。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup/Monoid now scoped

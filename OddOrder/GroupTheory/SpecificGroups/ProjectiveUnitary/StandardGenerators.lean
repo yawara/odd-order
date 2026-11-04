@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
-import Mathlib.GroupTheory.Perm.Option
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Standard root, torus, and Weyl generators for `PSU(3,q)`
@@ -32,6 +33,8 @@ The formulas are from Peterfalvi, Part II, Chapter III §3 (pp. 119–121) and
 Chapter IV §3. They provide the concrete group-action target needed for
 Part II, Chapter I §3, Lemma 1 and Proposition 1(c) (pp. 104–106).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -261,7 +264,7 @@ theorem torusScaleHom_injective (n : ℕ) : Function.Injective (torusScaleHom n)
 
 namespace Unital
 
-private def optionPermHom (α : Type*) : Equiv.Perm α →* Equiv.Perm (Option α) where
+def optionPermHom (α : Type*) : Equiv.Perm α →* Equiv.Perm (Option α) where
   toFun := Equiv.optionCongr
   map_one' := Equiv.optionCongr_one
   map_mul' e f := by

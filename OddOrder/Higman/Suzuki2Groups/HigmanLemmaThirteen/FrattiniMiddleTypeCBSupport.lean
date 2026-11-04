@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman's Lemma 13: type-C/B support in the middle Frattini layer
@@ -17,6 +22,8 @@ canonical type-B weight `Frob⁻¹(nu) ^ (2 ^ j)`.  A nonzero middle bracket has
 output weight `Frob⁻¹(nu) ^ (2 ^ k)`.  Squaring and cyclically shifting all
 Frobenius indices reduces this equation to Higman's type-C support pinning.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

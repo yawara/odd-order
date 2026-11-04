@@ -3,8 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+module
+
+public import Mathlib.Algebra.Ring.Aut
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 
 /-!
 # `K` as the multiplicative group of a field, with the twist coming from `V`
@@ -38,6 +49,8 @@ needs in order to run Hilbert 90 on a `K`-orbit — see
   `Q₀ ≅ F`, `K ≅ F^×` of the standing identification of Ch. III §3, p. 120, and
   unlike `exists_field_realization_K` it asks for no element of `V` at all.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

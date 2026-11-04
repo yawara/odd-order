@@ -3,8 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.SemiDihedral
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.InvolutionRecognition
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Lemma615
+import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
 
 /-!
 # OddOrder.Isaacs.Ch06 — Frobenius Actions
@@ -55,6 +68,8 @@ Import chain: FrobeniusActionTI -> FrobeniusGroup -> DQSDRecognition -> Lemma615
 * `Lemma615` — Lem 6.15 characteristic elementary-abelian p^2
 * `Main` (this file) — Lem 6.15 dispatch, Thm 6.12 congruence, Thm 6.11 route
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

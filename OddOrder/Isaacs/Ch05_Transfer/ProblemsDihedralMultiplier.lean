@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Dihedral
-import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 5A.6 — 二面体群の Schur 乗数は位数 2
@@ -42,6 +48,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 5A.6 (書籍 p. 153)�
 ⚠ 回転部分群の巡回性は mathlib の `Subgroup.zpowers` 用 `IsCyclic` instance がそのまま効く
 (`inferInstance`) ので, 本ファイルでは補題を立てない。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 

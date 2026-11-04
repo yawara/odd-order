@@ -1,4 +1,10 @@
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.MuGridConstruction
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.MuGridConstruction
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S06_CertainTypeStructure
 
 /-!
 # Peterfalvi (10.2)-(10.4) — character parameters and coherent extension
@@ -8,6 +14,8 @@ issue 0103).  構成側 (`mu`-グリッド・`columnFamily` の次数と符号) 
 `MuGridConstruction.lean` へ prefix-split 済 (module 名は不変ゆえ下流の import は無変更)。
 本ファイルは内積理論と coherent extension を扱う。
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

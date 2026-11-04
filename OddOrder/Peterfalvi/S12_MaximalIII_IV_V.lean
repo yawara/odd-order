@@ -3,15 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_Props109To1011
+module
+
+public import OddOrder.Peterfalvi.S10_Theorem88CaseB
+public import OddOrder.Peterfalvi.S12_HcBound
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
 import OddOrder.Peterfalvi.S12_MaximalTypesSetup
-import OddOrder.Peterfalvi.S10_Theorem88CaseB
+import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory

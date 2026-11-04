@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.OddOrderInvolution
-import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Feit–Sibley — endgame: setup layer
@@ -13,6 +22,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

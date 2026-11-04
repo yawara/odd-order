@@ -3,9 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+module
+
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
 import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 
 /-!
 # Higman's Lemma 6: the triple-bracket contradiction
@@ -14,6 +20,8 @@ This file assembles the lower-central square formula, pair-weight spectrum,
 triple-bracket fiber elimination, and the full-span contradiction from
 G. Higman, *Suzuki 2-groups*, Lemma 6, pp. 85--86.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

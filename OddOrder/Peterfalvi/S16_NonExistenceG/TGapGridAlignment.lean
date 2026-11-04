@@ -1,4 +1,11 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapNonorthogonality
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapNonorthogonality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_GridRigidity
+import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi §11.8: T-side grid enumeration alignment
@@ -8,6 +15,8 @@ abstract S15 omega/eta grid.  It begins with the full character-grid
 equivalence; the subsequent factorwise layer separates it into the transposed
 zero-preserving row and column equivalences required by (11.8).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockConnected
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPrincipalBlock
 
@@ -28,6 +36,8 @@ splittings share the index set `ι`, that being Navarro's `IBr(Ḡ) = IBr(G)`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (7.6), Problem (3.4).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

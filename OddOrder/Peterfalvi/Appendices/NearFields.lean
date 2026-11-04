@@ -3,17 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki
-import OddOrder.Peterfalvi.Appendices.SemilinearField
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Peterfalvi.Appendices.NearFieldClass
-import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
-import OddOrder.GroupTheory.SolvableTwoTransitive
-import OddOrder.GroupTheory.BrauerSuzuki
+module
+
+public import OddOrder.Peterfalvi.Appendices.NearFieldClass
 -- Re-export Proposition 1 (split out to `RankOneAffineModel.lean` for the file-length limit) so
 -- downstream importers of `NearFields` still see `RankOneHypothesis` / `rankOne_affine_nearField`.
-import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.FieldTheory.Fixed
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RepresentationTheory.Submodule
+import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.Henselian -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.RelativeTrace
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Peterfalvi Appendix II: On Near-Fields
@@ -87,6 +97,8 @@ theory was built from the ground up following Navarro 1998 Ch. 1–7
 (`OddOrder/GroupTheory/RepresentationTheory/Modular/`, issues 0147 / 9506) and the statement closed
 on 2026-08-07.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 

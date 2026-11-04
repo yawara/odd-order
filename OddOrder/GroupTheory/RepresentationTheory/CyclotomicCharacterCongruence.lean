@@ -3,13 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+public import Mathlib.NumberTheory.Cyclotomic.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import Mathlib.RingTheory.Norm.Transitivity
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import Mathlib.RingTheory.RootsOfUnity.Lemmas
+import OddOrder.Algebra.AlgInt
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Peterfalvi (1.10): cyclotomic congruences of character values
@@ -28,6 +33,8 @@ The number-theoretic core is a norm computation: `N_{L/ℚ}(ζ - 1) = p`
 (`IsPrimitiveRoot.norm_sub_one_of_prime_ne_two'`), `N(n) = n^{[L:ℚ]} = n^{p-1}`, and
 `N(a) ∈ ℤ` (the norm of an algebraic integer), so `n^{p-1} = p · N(a)` and `p ∣ n`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 13: the canonical ambient family of a restricted factor
@@ -16,6 +20,8 @@ an existentially packaged family.  Its actor eigenvalue law and its span of all
 ambient ground classes from the restricted subgroup can therefore be combined
 definitionally with the square-bracket calculation for the same family.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

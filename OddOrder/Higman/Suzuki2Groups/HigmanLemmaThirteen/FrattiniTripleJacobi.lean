@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleCommutators
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleCommutators
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: Jacobi in the common Frattini-square layer
@@ -16,6 +19,8 @@ middle commutator vanishes, Jacobi swaps the last two entries.  Applying
 the same-factor vanishing theorem gives Higman's swap relation for either
 restricted length-three factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

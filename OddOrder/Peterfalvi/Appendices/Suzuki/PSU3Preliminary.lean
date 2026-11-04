@@ -3,12 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+public import OddOrder.GroupTheory.RankOneBNPair
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
@@ -58,6 +64,8 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
   `Hypothesis.exists_mem_K_mem_W_mul` — the group-theoretic half of step (8)'s
   translation, including `D = K W` under `V = W`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

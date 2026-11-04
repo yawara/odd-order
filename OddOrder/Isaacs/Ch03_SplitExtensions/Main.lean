@@ -3,19 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.CrossedHomomorphism
-import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
-import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.Mathlib.Subgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch03
-open SemidirectProduct
 open scoped Pointwise
 
 section /- 3D: π-separable + Hall-Higman (pp. 89-95) -/

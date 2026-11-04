@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Index
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import Mathlib.GroupTheory.Coset.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # A set closed under right translation by a subgroup has divisible cardinality
@@ -29,6 +33,8 @@ induced function `ψ*(y) = σ(y) / |P|` is an integer.
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.6 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

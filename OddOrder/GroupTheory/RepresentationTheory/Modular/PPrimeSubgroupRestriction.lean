@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
@@ -44,6 +54,8 @@ exponent precisely for this.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.12), (3.16).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

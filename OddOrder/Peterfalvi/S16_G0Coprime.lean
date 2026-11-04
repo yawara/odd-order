@@ -3,11 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT
-import OddOrder.BG.AppC_LemmaC3_FixedPointFree
-import OddOrder.Peterfalvi.S16_CoreLemmas
-import OddOrder.GroupTheory.ConjClassSet
+module
+
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.CoprimeConjugacy
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # Peterfalvi (14.11.3), support half: generic elements have order prime to `pq`
@@ -36,6 +43,8 @@ Coq correspondent: `PFsection14.coprime_typeP_Galois_core` (its proof is the sam
 `Sylow_Jsub` + `cent1_normedTI` + `mem_sdprod` + `Frobenius_cent1_ker` /
 `partition_cent_rcoset` + `regPUW1`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

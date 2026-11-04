@@ -1,6 +1,15 @@
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+public import OddOrder.GroupTheory.MaximalSubgroupType
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
-import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 
 /-!
 # Peterfalvi §14 — witness Sylow cyclic: opening layer
@@ -8,6 +17,8 @@ import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
@@ -311,8 +322,8 @@ theorem exists_mem_centralizer_inf_not_le_commutator
   obtain ⟨a, ha_ne, hnle⟩ :=
     exists_ne_one_actionFixedBy_not_le_commutator φ hCop hSolv hNC hKtop
   -- Translate the abstract conclusion to ambient subgroups.
-  obtain ⟨n, hn_fix, hn_out⟩ := SetLike.not_le_iff_exists.mp hnle
-  refine ⟨(a : G), a.2, fun h => ha_ne (Subtype.ext h), SetLike.not_le_iff_exists.mpr
+  obtain ⟨n, hn_fix, hn_out⟩ := IsConcreteLE.not_le_iff_exists.mp hnle
+  refine ⟨(a : G), a.2, fun h => ha_ne (Subtype.ext h), IsConcreteLE.not_le_iff_exists.mpr
     ⟨(n : G), ?_, ?_⟩⟩
   · -- `n ∈ C_G(a) ⊓ K`: `a` conjugates `n` to itself, and `n ∈ K`.
     rw [Ch06.mem_actionFixedBy] at hn_fix

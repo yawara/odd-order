@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
 /-!
 # BG §2F — fixed submodules and quotients: the main layer
@@ -16,10 +22,10 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+@[expose] public section
+
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise
-open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
-  baseChangeRepresentation_faithful)
 
 
 private theorem mem_fixedOnSubmoduleAndQuotientSubgroup

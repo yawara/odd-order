@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import Mathlib.RepresentationTheory.Invariants
 import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 
 /-!
@@ -19,6 +22,8 @@ This file builds the ingredients:
 * the action of `MulAut G` on `ConjClasses G` by `α • C = ConjClasses.map α C`;
 * (to follow) the induced representation on `Z(k[G])` and the cornerstone application.
 -/
+
+@[expose] public section
 
 open scoped MonoidAlgebra
 open Module MulAction

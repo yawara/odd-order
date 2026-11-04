@@ -1,3 +1,15 @@
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
+import OddOrder.Peterfalvi.S09_Building78C
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
@@ -7,6 +19,8 @@ import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 prefix-split 済 (module 名は不変ゆえ下流の import は無変更)。
 本ファイルは (12.4) の coherence pin 以降を扱う。
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

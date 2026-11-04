@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.GroupTheory.OpResidual
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Maximal nilpotent normal Hall subgroups
@@ -19,6 +23,8 @@ same maximal nilpotent-normal-Hall property is part of the later BG Section 15
 analysis, so downstream files should use the definition for statements and cite
 that later result for proofs.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -51,7 +57,7 @@ theorem map_subgroupMap_subgroupOf (ψ : MulAut G) (N M' : Subgroup G) :
     (N.subgroupOf M').map (ψ.subgroupMap M' : ↥M' →* ↥(M'.map (ψ : G →* G))) =
       (N.map (ψ : G →* G)).subgroupOf (M'.map (ψ : G →* G)) := by
   ext x
-  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MonoidHom.coe_coe]
+  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MonoidHom.coe_ofClass]
   constructor
   · rintro ⟨y, hyN, rfl⟩
     exact ⟨↑y, hyN, rfl⟩

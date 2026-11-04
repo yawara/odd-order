@@ -1,4 +1,12 @@
-import OddOrder.Peterfalvi.S15_CaseASylowCenter
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Data.ZMod.Units
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Peterfalvi (14.6) — the order of `Ω₁(Z(R))` in case A
@@ -13,6 +21,8 @@ forces its order to be `r` or `r²`, as in Peterfalvi (14.6).
 
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

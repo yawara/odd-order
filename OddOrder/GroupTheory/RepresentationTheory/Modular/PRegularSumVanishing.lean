@@ -3,6 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
@@ -27,6 +36,8 @@ character.  Since `χ(1)` is a positive integer and `K` has characteristic zero,
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_blockOfIrr_pRegularSum_eq_zero` —
   `λ_B(Ĝ⁰) = 0` for `B ≠ B_0`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

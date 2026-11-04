@@ -1,6 +1,18 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Algebra.BigOperators.ModEq
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S11_CaseAOddPartBound
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
-import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Peterfalvi (13.11)-(13.15) — order and divisor determination
@@ -8,6 +20,8 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

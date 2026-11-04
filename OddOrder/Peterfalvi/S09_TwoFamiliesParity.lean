@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 import OddOrder.Peterfalvi.S09_ParityPrimitive
 
 /-!
@@ -36,6 +40,8 @@ conjugation identities) and the Frobenius layer's `hypothesis78_delta_isReal`.
 
 - `OddOrder.Peterfalvi.S09.Hypothesis79.delta_even`: **Peterfalvi (7.9), parity step**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

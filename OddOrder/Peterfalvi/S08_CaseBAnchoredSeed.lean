@@ -3,10 +3,15 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBAssembly
-import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
-import OddOrder.Peterfalvi.S08_CaseBEnumeration
-import OddOrder.Peterfalvi.S08_CaseBSeedSetup
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+public import OddOrder.Peterfalvi.S08_CaseBEnumeration
+public import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+public import OddOrder.Peterfalvi.S08_CaseBSeedSetup -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §6.8.2 case-(B) — per-column anchored seed (`hXanchored`)
@@ -36,6 +41,8 @@ therefore the per-`θ` central-character data:
   `0 < constituentWeight` (so `θ` is a positive-weight constituent of `φ_θ`).
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

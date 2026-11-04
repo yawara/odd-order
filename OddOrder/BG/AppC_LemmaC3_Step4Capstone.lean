@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_LemmaC3_NormalForms
+module
+
+public import OddOrder.BG.AppC_LemmaC3_NormalForms
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: relations (C.9), (C.10) and the capstone
@@ -23,6 +28,8 @@ output on the norm-one group -- and hence the generator relation `N(2a − 1) = 
 
 Migrated from `OddOrder.Peterfalvi.S16_CoreSetup` (issue 0151).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

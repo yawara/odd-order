@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.IsExtraspecial
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.RepresentationTheory.Maschke
 import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import Mathlib.RepresentationTheory.Character
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Conjugate characters of the constituents of a restriction (toward BG Prop 2.2(a)'s `hconj`)
@@ -34,6 +36,8 @@ replaces a from-scratch formalisation of Gorenstein 5.5.4.
 * `repEquiv` — `ρ g` packaged as a `k`-linear automorphism of `V`.
 * `character_subRep_conj` — the conjugate character identity `χ_{(ρ g)(W)}(h) = χ_W(g⁻¹ h g)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

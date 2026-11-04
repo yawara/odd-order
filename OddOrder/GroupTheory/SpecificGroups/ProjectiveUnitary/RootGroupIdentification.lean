@@ -3,6 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Algebra.QuadraticFrobenius
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.AnisotropicNormForm
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupTwistedCoordinates
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
@@ -37,6 +47,8 @@ This file supplies the bridge.  Three facts combine:
   isomorphism.
 * `ProjectiveUnitary.nonempty_mulEquiv_rootGroup_of_anisotropic` — the bridge.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

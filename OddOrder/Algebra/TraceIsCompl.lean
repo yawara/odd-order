@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.LinearAlgebra.Trace
 import Mathlib.Algebra.DirectSum.LinearMap
 
 /-!
@@ -18,6 +21,8 @@ subspace and a quotient (which is what the modular side is forced to do).
 
 * `OddOrder.trace_eq_add_trace_restrict_of_isCompl`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

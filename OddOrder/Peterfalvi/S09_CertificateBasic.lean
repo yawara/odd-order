@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+module
+
+public import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Peterfalvi §9 — certificate discharge: opening layer
@@ -11,6 +17,8 @@ import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09.Cert
 open OddOrder.RepresentationTheory

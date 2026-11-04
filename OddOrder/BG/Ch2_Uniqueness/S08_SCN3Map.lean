@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppA_PStability
 import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # BG §8 — `SCN₃` and the Fitting subgroup of a maximal subgroup (scn3_map layer)
@@ -15,6 +27,8 @@ Sylow normalizer transport, and the `O_{π'}(C(A))`-vanishing facts, for the cas
 Split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (issue 0149); that file
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S08
 open OddOrder.GroupTheory
@@ -101,7 +115,7 @@ theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hPH_not_le htop
   have hlt := hNC (SH.subgroupOf (PH : Subgroup G)) hSH_subOf_lt_top
-  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨t, ht_norm, ht_not⟩ := IsConcreteLE.exists_of_lt hlt
   rw [← Subgroup.subgroupOf_normalizer_eq hSH_le_PH, Subgroup.mem_subgroupOf] at ht_norm
   rw [Subgroup.mem_subgroupOf] at ht_not
   set tG : G := (t : G) with htG_def

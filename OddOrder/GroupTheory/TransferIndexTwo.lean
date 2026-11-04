@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import Mathlib.GroupTheory.Abelianization.Defs
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import Mathlib.GroupTheory.Abelianization.Defs
 
 /-!
 # Transfer for a normal subgroup of index two
@@ -21,6 +23,8 @@ a trivial transfer says — and `|P|` is odd, then `P ≤ ⁅N, N⁆`, so the ab
 
 See issue 9503.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

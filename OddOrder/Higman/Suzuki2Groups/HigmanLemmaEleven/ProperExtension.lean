@@ -3,12 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
-import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
-import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
-import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
-import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
+public import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import Mathlib.FieldTheory.Finite.Trace
+import Mathlib.RingTheory.DedekindDomain.Basic
 import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 11: excluding a proper field extension
@@ -21,6 +25,8 @@ xi-length-two structure makes the actual first-layer square map nonzero away
 from zero, while Lemma 10 supplies a nonzero trace-zero coordinate in every
 proper odd-degree field extension.  Therefore the relative degree is one.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -133,7 +139,7 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
     frattini_ne_top_of_nontrivial
   have hPhi_lt_top : frattini P < (⊤ : Subgroup P) :=
     lt_of_le_of_ne le_top hPhi_ne_top
-  obtain ⟨x0, -, hx0Phi⟩ := SetLike.exists_of_lt hPhi_lt_top
+  obtain ⟨x0, -, hx0Phi⟩ := IsConcreteLE.exists_of_lt hPhi_lt_top
   let q0 : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
   have hqx0 : q0 x0 ≠ 1 := by
     intro hx
@@ -433,7 +439,7 @@ theorem lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
     frattini_ne_top_of_nontrivial
   have hPhi_lt_top : frattini P < (⊤ : Subgroup P) :=
     lt_of_le_of_ne le_top hPhi_ne_top
-  obtain ⟨x, -, hxPhi⟩ := SetLike.exists_of_lt hPhi_lt_top
+  obtain ⟨x, -, hxPhi⟩ := IsConcreteLE.exists_of_lt hPhi_lt_top
   let q : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
   have hqx : q x ≠ 1 := by
     intro hx

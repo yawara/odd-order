@@ -3,7 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
+import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG §5: Narrow `p`-Groups — Theorem 5.5
@@ -16,6 +32,8 @@ import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
 (Thm 5.3/Cor 5.4) ← `S05_NarrowAutomorphisms` (Thm 5.5) ← `S05_NarrowPGroups`
 (Thm 5.6/5.7 + Thm 4.20(c); module 名は下流 import 不変のため leaf が保持)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S05
 

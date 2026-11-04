@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.InvolutionRecognition
+module
+
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs FGT Ch.6 — Theorem 6.12, the enlargement steps (pp. 192-193)
@@ -18,10 +24,10 @@ longFile-1500 campaign); `DQSDRecognition` imports this leaf, so downstream impo
 are unchanged.
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch06
 
-
-open OddOrder.GroupTheory
 
 
 /-! ### The first enlargement step in Theorem 6.12 -/

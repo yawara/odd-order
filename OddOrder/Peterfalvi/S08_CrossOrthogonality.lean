@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBCoherence2
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
 
 /-!
 # Peterfalvi (5.2.e)/(5.3.b): reducible-column vs irreducible-break cross-orthogonality
@@ -46,6 +50,8 @@ applications supplying their own anchor
 - `OddOrder.Peterfalvi.S08.dadeOfDiff_imageSet_orthogonal_certainTypeR_of_vanishOnV`:
   the same with the two families swapped (conjugate symmetry).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

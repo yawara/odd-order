@@ -1,4 +1,13 @@
+module
+
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
+import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
 import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
+import OddOrder.Peterfalvi.S15_CaseASylowCenter
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # Peterfalvi (14.6) — the final contradiction in case A
@@ -14,6 +23,8 @@ that producer is being relayered under issue 0116.
 
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

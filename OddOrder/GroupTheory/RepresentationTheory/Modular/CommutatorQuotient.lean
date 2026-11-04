@@ -3,10 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Pi
-import Mathlib.LinearAlgebra.Dimension.Constructions
+module
+
+public import Mathlib.LinearAlgebra.Pi
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.Quotient.Defs
+import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.LinearAlgebra.Dimension.OrzechProperty
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 
 /-!
 # `kG ⧸ [kG, kG]` is graded by conjugacy classes
@@ -25,6 +29,8 @@ This is the "ordinary" half of Brauer's count; the modular half replaces `T` by
 
 * `OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorSubmodule`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 
@@ -101,10 +107,10 @@ theorem span_range_mkQ_out_eq_top :
   obtain ⟨x, rfl⟩ := (commutatorSubmodule k G).mkQ_surjective q
   exact mkQ_mem_span_range_out x
 
-omit [DecidableEq (ConjClasses G)] in
 -- `[Fintype G]` does not appear in the statement but the proof needs it: the class-coefficient
 -- functionals that give the lower bound are sums over `G`.
 set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] in
 /-- **`kG ⧸ [kG, kG]` has dimension the number of conjugacy classes of `G`.** -/
 theorem finrank_quotient_commutatorSubmodule :
     Module.finrank k (MonoidAlgebra k G ⧸ commutatorSubmodule k G)
@@ -125,9 +131,9 @@ theorem finrank_quotient_commutatorSubmodule :
     have := LinearMap.finrank_le_finrank_of_surjective hsurj
     simpa [Nat.card_eq_fintype_card, Module.finrank_pi] using this
 
-omit [DecidableEq (ConjClasses G)] in
 -- `[Fintype G]` is used through `finrank_quotient_commutatorSubmodule`.
 set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] in
 /-- **The class representatives are a basis of `kG ⧸ [kG, kG]`.**  They span
 (`span_range_mkQ_out_eq_top`) and there are `dim` of them
 (`finrank_quotient_commutatorSubmodule`), so they are independent. -/

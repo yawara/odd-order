@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
@@ -38,6 +43,8 @@ BG corrected Prop E.4 / (E.23) の追加仮説 `hdc` は 2-step 形
 
 将来の maximal class p-群 API (`IsExceptional` 述語等) はこの leaf に置く。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

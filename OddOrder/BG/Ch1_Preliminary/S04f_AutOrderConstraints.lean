@@ -2,12 +2,21 @@
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.GroupTheory.Perm.Cycle.Type
-import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
-import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
+module
+
+public import OddOrder.GroupTheory.SCN
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-import OddOrder.GroupTheory.CentralProduct
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # BG §4E — automorphism-order constraints (Lemmas 4.13 and 4.14)
@@ -15,6 +24,8 @@ import OddOrder.GroupTheory.CentralProduct
 Split from `OddOrder.BG.Ch1_Preliminary.S04f_Omega1` (issue 0149); that file imports
 this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 

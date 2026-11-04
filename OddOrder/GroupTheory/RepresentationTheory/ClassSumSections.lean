@@ -3,33 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.RepresentationTheory.Character
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.Algebra.Group.Conj
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.GroupAction.Quotient
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
-import OddOrder.GroupTheory.TISubset
-import OddOrder.Algebra.AlgInt
-import OddOrder.GroupTheory.FreeActionOrbitCount
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.ConjClassSet
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.ConjClassCardinality
-import OddOrder.Mathlib.Sylow
-import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-import Mathlib.RingTheory.Finiteness.Basic
-import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RingTheory.Localization.FractionRing
-import Mathlib.RingTheory.Polynomial.RationalRoot
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Class sums — indexing, structure coefficients, and the pair action
@@ -44,13 +29,14 @@ imports this leaf, so downstream imports are unchanged.
 -/
 
 
+@[expose] public section
+
 namespace OddOrder.RepresentationTheory
 
 open scoped MonoidAlgebra
 -- 類和の中核 (定義・係数・中心性) は `ClassSumCore` に一般係数環版で 1 本化されている。
 open OddOrder.GroupTheory.CenterClassSum
 open Module (finrank)
-open Representation
 
 variable {G : Type*} [Group G]
 

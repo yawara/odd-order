@@ -3,11 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.GroupTheory.PRegularElement
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import Mathlib.Algebra.DirectSum.LinearMap
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
 import OddOrder.Algebra.EigenspaceDecomposition
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
 # Brauer characters
@@ -42,6 +53,8 @@ genuine lift of the Brauer-trace, not an unrelated formula.
 * `residue_brauerCharacter` — reduction is the ordinary trace
 * `brauerCharacter_quotient_add_subrepresentation` — additivity in short exact sequences
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

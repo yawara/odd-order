@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
-import OddOrder.GroupTheory.SylowTransport
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.GroupTheory.SylowTransport
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the Suzuki centralizer root group
@@ -35,6 +44,8 @@ pair transport, where the structure equation retains both elements.
 T. Peterfalvi, *Character Theory for the Odd Order Theorem*, Part II,
 Chapter I section 3, Proposition 1(c), pp. 105--106.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

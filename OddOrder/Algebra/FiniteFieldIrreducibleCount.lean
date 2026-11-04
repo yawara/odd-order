@@ -3,10 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.Perfect
-import Mathlib.FieldTheory.Separable
-import Mathlib.RingTheory.AdjoinRoot
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
 # Counting monic irreducible polynomials over a prime field
@@ -31,6 +30,8 @@ irreducible polynomials of degree `r`", which would need a `Fintype` structure o
 `(ZMod p)[X]`.  This is the form the consumer needs (BG Appendix C Remark (IV), issue 0179):
 there the family is indexed by the points of an affine space that fail to have norm one.
 -/
+
+@[expose] public section
 
 namespace OddOrder.FiniteFieldCount
 

@@ -3,33 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+public import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.RepresentationTheory.Character
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.Algebra.Group.Conj
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.GroupAction.Quotient
-import OddOrder.GroupTheory.TISubset
-import OddOrder.Algebra.AlgInt
-import OddOrder.GroupTheory.FreeActionOrbitCount
-import OddOrder.GroupTheory.ConjClassSet
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.ConjClassCardinality
-import OddOrder.Mathlib.Sylow
-import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-import Mathlib.RingTheory.Finiteness.Basic
-import Mathlib.LinearAlgebra.Eigenspace.Charpoly
 import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RingTheory.Localization.FractionRing
-import Mathlib.RingTheory.Polynomial.RationalRoot
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+import OddOrder.GroupTheory.ConjClassCardinality
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Mathlib.Sylow
 
 /-!
 # ClassSumCongruence
@@ -37,6 +24,8 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
 Prefix-split from `OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # The class-sum algebra and central characters

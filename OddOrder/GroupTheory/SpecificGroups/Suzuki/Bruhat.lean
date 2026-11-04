@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 
 /-!
 # Bruhat decomposition of the standard Suzuki permutation group
@@ -20,6 +22,8 @@ simplicity target assumes `0 < m` (hence `q = 2^(2m+1) ≥ 8`), excluding the
 degenerate order-20 case at `m = 0`.  The Bruhat result here is the set-theoretic
 cover `B ∪ B w B`, not the stronger unique `adtb` canonical form on p. 98.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,4 +1,10 @@
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+module
+
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 
 /-!
 # Isaacs §4D — the Baer trick, construction layer (Lem 4.37, pp. 141-144)
@@ -12,6 +18,8 @@ Split from `OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick` (issue 0149, the
 longFile-1500 campaign); `BaerTrick` imports this leaf, so downstream imports are
 unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement

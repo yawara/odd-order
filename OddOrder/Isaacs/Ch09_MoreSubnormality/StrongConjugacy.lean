@@ -3,12 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.IsSubnormal
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+module
+
+public import Mathlib.GroupTheory.IsSubnormal
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # Isaacs Ch. 9 — §9D: strong conjugacy, `X^{(G)}`, Lem 9.29 / 9.30 (pp. 289-291)
@@ -44,6 +45,8 @@ Lemma 9.29(a) の証明は書籍では `|G|` の帰納だが、ここでも 9.31
 **`Subgroup.IsSubnormal` の構造帰納**を使う (`Ch09_MoreSubnormality/SylowSubnormal.lean`
 と同じ手口)。降りる先の normal 段は「`g ∈ K` なら `g • S = S`」だけなので自明になる。
 -/
+
+@[expose] public section
 
 universe u
 

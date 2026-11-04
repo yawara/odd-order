@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # Centers of the type-B/C/D models have exponent two
@@ -21,6 +24,8 @@ coordinate, and every element of the kernel copy has order at most two.
 Transported through `equivModel`, any group of type B, C, or D has a center
 of exponent two — the fact behind "`Z(Q) = Q₀`" in Peterfalvi's Lemma I.3.5.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

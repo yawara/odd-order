@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Group.Pointwise.Set.Basic
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Order.Interval.Set.Basic
-import Mathlib.Data.Set.Function
 import Mathlib.Tactic.Group
 
 /-!
@@ -37,6 +40,8 @@ products (`Subgroup.mul_inf_assoc`) rather than with `sup_inf_assoc_of_le`.
 
 See `issues/3018-isaacs-appendix-x-gaps.md`.
 -/
+
+@[expose] public section
 
 open scoped Pointwise
 

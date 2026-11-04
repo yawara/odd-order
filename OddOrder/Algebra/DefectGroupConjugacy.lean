@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.DefectGroup
+module
+
+public import OddOrder.Algebra.DefectGroup
+import Mathlib.Data.Rat.Floor
+import Mathlib.RingTheory.Nilpotent.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import OddOrder.Algebra.MackeyFormula
 import OddOrder.Algebra.Rosenberg
 
@@ -28,6 +33,8 @@ trace ideals are permuted by conjugation — forces equality.
 * `OddOrder.GAlgebra.exists_conj_eq_of_isDefectGroup_of_commute` — the form to use when `A^G` is
   commutative, where "non-unit in the corner" means "nilpotent".
 -/
+
+@[expose] public section
 
 namespace OddOrder.GAlgebra
 

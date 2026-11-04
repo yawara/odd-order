@@ -3,15 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.GroupTheory.ThreeStepGroup
-import OddOrder.GroupTheory.SubgroupInAmbient
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.FittingSelfCentralizing
 import OddOrder.GroupTheory.NilpotentCoprimeCommute
-import OddOrder.GroupTheory.FixedPointFreeConjugation
-import OddOrder.GroupTheory.SylowCovering
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # CN-group structure — Gorenstein Lemma 1.2 and Theorem 1.5 Steps 2-3
@@ -23,6 +24,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

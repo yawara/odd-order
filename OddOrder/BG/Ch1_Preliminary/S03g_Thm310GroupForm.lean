@@ -3,9 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310FixedPointSplit
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 
 /-!
 # BG Theorem 3.10 for elementary abelian `M`, GROUP form (issue 3011, piece 2)
@@ -36,6 +43,8 @@ uses that `M` (hence `C_M(R)`) is elementary abelian, so a cyclic `C_M(R)` has o
 The fixed-point-free conjugation hypothesis `hFrob` the module leaves need is supplied by
 `IsFrobeniusGroup.conj_frobenius`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03g
 

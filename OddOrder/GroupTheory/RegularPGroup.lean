@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Combinatorics.Matroid.Init
 import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.HallPetresco
-import OddOrder.GroupTheory.OmegaSubgroup
 
 /-!
 # `p`-groups of class less than `p`
@@ -33,6 +38,8 @@ The supporting reductions, all generic: the class bound passes to subgroups
 (`torsionOf`, `torsionOf_normal`); and a two-generator group with one generator
 inside a normal subgroup `N` has `G' ≤ N` (`commutator_le_of_closure_pair`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

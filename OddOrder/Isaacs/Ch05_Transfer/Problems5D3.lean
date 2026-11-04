@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D4
+module
+
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs Problem 5D.3(a) — 単純群の極大 `p`-部分群は Sylow (書籍 pp. 169-170)
@@ -25,6 +32,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D4
 (c) (`P` の冪零類 ≥ 3) は **Problem 5C.6 (weak closure)** に依存するので、hub レーンの
 `OddOrder/GroupTheory/WeaklyClosed.lean` (issue 9503) が landing してから着手する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 
@@ -52,14 +61,14 @@ theorem exists_sylow_coe_eq_of_isCoatom_of_isPGroup [Finite G] [IsSimpleGroup G]
     exact fun hle => hlt.ne (le_antisymm hlt.le hle)
   have hgrow := Ch01.lt_normalizer_of_isNilpotent_of_lt_top hlt_top
   rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
-  obtain ⟨y, hyN, hyP⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨y, hyN, hyP⟩ := IsConcreteLE.exists_of_lt hgrow
   have hyN' : (y : G) ∈ Subgroup.normalizer (P : Set G) := Subgroup.mem_subgroupOf.mp hyN
   have hyP' : (y : G) ∉ P := fun h => hyP (Subgroup.mem_subgroupOf.mpr h)
   have hPltN : P < Subgroup.normalizer (P : Set G) :=
     lt_of_le_of_ne Subgroup.le_normalizer fun heq => hyP' (heq ▸ hyN')
   have hPnormal : P.Normal :=
     Subgroup.normalizer_eq_top_iff.mp (hmax.2 _ hPltN)
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal P hPnormal with hbot | htop
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal P with hbot | htop
   · -- `P = ⊥` ⟹ `S = ⊤` ⟹ `G` は `p`-群 ⟹ 単純性で可換 ⟹ 矛盾
     have hStop : (S : Subgroup G) = ⊤ := hmax.2 _ (hbot ▸ hlt)
     have hGp : IsPGroup p G := by
@@ -68,7 +77,7 @@ theorem exists_sylow_coe_eq_of_isCoatom_of_isPGroup [Finite G] [IsSimpleGroup G]
       exact hSp.of_equiv Subgroup.topEquiv
     have hcenter : Nontrivial ↥(Subgroup.center G) := hGp.center_nontrivial
     have hZtop : Subgroup.center G = ⊤ := by
-      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
       · rw [h] at hcenter
         obtain ⟨a, b, hab⟩ := hcenter.exists_pair_ne
         exact absurd (Subtype.ext

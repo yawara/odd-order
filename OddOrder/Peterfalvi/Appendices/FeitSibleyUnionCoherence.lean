@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgame
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgame
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Appendix IV: the (6) union coherence assembly (p. 148)
@@ -32,6 +38,8 @@ valued, and every member has a supported difference to the common anchor `η₁`
 (`η` for `η ∈ Y`; `χ − a_χ·a·η₁ = (χ − a_χ·χ₁) + a_χ·(χ₁ − a·η₁)` for `χ ∈ X`)
 on which `W` matches `τ` — exactly the input of `isCoherent_of_memberAssignment`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.GroupTheory.Subgroup.Centralizer
+module
+
+public import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.Tactic.Group
 
 /-!
@@ -55,6 +56,8 @@ mathlib (v4.34.1 で再確認) で TI-subset 概念は **完全不在**:
 `OddOrder.GroupTheory` namespace で保持し, naming/API を mathlib 互換に
 保ちながら開発する (CLAUDE.md no-mathlib-wrapper policy).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

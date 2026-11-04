@@ -3,13 +3,32 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+public import OddOrder.GroupTheory.ChiefFactor
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
 import OddOrder.BG.Ch2_Uniqueness.S09_ChiefSeriesStabilizer
+import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S09_Lemma95` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch2.S09
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
@@ -629,7 +648,7 @@ private theorem normalizer_isUniquelyMaximal_and_le_maximal_of_rank_three_fittin
     rw [lt_top_iff_ne_top]
     intro hN0top
     have : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 with hP0bot | hP0top
     · exact hP0ne hP0bot
     · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
         rw [← hP0top]
@@ -889,7 +908,7 @@ private theorem normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normal
     rw [lt_top_iff_ne_top]
     intro hN0top
     have : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 with hP0bot | hP0top
     · exact hP0ne hP0bot
     · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
         rw [← hP0top]
@@ -950,7 +969,7 @@ private theorem commutator_normalizer_ne_bot_of_isSylow [Finite G]
     exact h
   obtain ⟨N, hNnorm, hNcompl⟩ :=
     OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer P hNC
-  rcases hG.simple.eq_bot_or_eq_top_of_normal N hNnorm with hNbot | hNtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal N with hNbot | hNtop
   · -- `N = ⊥` ⇒ `P = ⊤` ⇒ `G` is a `p`-group ⇒ solvable, contradicting `hG`.
     have hPtop : (P : Subgroup G) = ⊤ :=
       Subgroup.isComplement'_bot_left.mp (hNbot ▸ hNcompl P)
@@ -1293,7 +1312,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨x, hxW, hx1, hxnotM⟩ := hfirst
   -- `Z(G) = ⊥`, hence `C_G(x) < ⊤`
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
@@ -1340,7 +1359,7 @@ theorem centralizer_lt_top_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
     Subgroup.centralizer (K : Set G) < ⊤ := by
   classical
   have hZbot : Subgroup.center G = ⊥ := by
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) with h | h
     · exact h
     · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable

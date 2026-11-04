@@ -3,11 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Data.Nat.ModEq
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Subgroup.Centralizer
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.Group
 
 /-!
@@ -40,6 +38,8 @@ exponent `k`, produced by the Chinese remainder theorem, simultaneously fixes
 
 Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -284,7 +284,7 @@ theorem mem_centralizer_of_coset_conj_eq
 /-- The `H`-conjugates of the coset `C_H(g) g`, packaged as the image of
 `(c, x) ↦ x⁻¹ (c g) x` (`c ∈ C_H(g)`, `x ∈ H`).  This is the set `K = Hg` of
 the textbook proof of (2.1). -/
-private def cosetConjImage (g : G) (H : Subgroup G) : Set G :=
+def cosetConjImage (g : G) (H : Subgroup G) : Set G :=
   Set.range fun p : ↥(H ⊓ Subgroup.centralizer ({g} : Set G)) × ↥H =>
     (p.2 : G)⁻¹ * ((p.1 : G) * g) * (p.2 : G)
 

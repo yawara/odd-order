@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S08_YsetInner
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 import OddOrder.Peterfalvi.S15_BridgeCharacter
+public import OddOrder.Peterfalvi.S16_GridExpansion -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §9/§13 — the (5.2.d) member `R`-families for the honest `S`-instance §9 family
@@ -32,6 +40,8 @@ This is the `S`-instance §9 route-B analogue of the M-instance `caseB_sOf_membe
 upstream).  The coherence assembly consuming these `R`-families (`sSet_coherent_dade_caseB` …
 `coherent_H0Cprime_S`) lives in `S15_CaseBReducibleCoherence`, which imports this file.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

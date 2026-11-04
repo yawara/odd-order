@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Blocks under `G ↠ G/N`: the central characters correspond
@@ -40,6 +46,8 @@ sum `K̂_g` maps to `[C_{Ḡ}(ḡ) : im C_G(g)] · K̂_ḡ` and that index can b
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (7.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

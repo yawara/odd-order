@@ -3,12 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Matrix.Block
-import Mathlib.LinearAlgebra.Matrix.IsDiag
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Block
+public import Mathlib.LinearAlgebra.Matrix.IsDiag
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 import Mathlib.Algebra.Group.Pi.Units
-import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Isaacs Problem 7A.3 — `GL(n,q)` の Borel 部分群と `N_G(P)` (書籍 p. 209)
@@ -31,6 +32,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 ⚠ `q` が素数冪であることも `P` が Sylow `p`-部分群であることも使わない — 主張は
 **任意の体 `F`** 上で成立する (`|F| = q` は Sylow としての解釈にのみ効く)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

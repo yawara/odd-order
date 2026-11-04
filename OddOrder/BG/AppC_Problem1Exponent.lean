@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_Problem1SameCoset
+module
+
+public import OddOrder.BG.AppC_Problem1
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_Problem1Lattice
 
 /-!
 # BG Appendix C, Problem 1: extracting the exponent from the witness
@@ -15,6 +20,8 @@ provides an exponent `e` with `g·w·g⁻¹ = wᵉ` on `σ(U)` — and `e` can b
 representative handles the sign part of `𝔽ˣ` by CRT).  This is the standing shape (`hexp`,
 `hcube`, `he`) in which the entire Problem 1 development consumes the witness
 (`notes/bg/appC_problem1_resolution.md` §1). -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

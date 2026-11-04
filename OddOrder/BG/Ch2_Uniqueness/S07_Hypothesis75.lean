@@ -3,8 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.GroupTheory.SolvablePrimeIndex
-import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # S07_Hypothesis75
@@ -12,6 +24,8 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2
 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch2.S07
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
@@ -59,7 +73,7 @@ private theorem tp_reduction [Finite G] (hG : IsMinimalSimpleOdd G) {A P : Subgr
   obtain ⟨Bbar, hABbar, hBbarlt, hBbarnorm⟩ := exists_normal_lt_top_of_isSubnormal hAsub hA'lt
   have := hBbarnorm
   have hnt : Nontrivial (↥P ⧸ Bbar) := by
-    obtain ⟨x, _, hx⟩ := SetLike.exists_of_lt hBbarlt
+    obtain ⟨x, _, hx⟩ := IsConcreteLE.exists_of_lt hBbarlt
     exact ⟨QuotientGroup.mk x, 1, by rw [Ne, QuotientGroup.eq_one_iff]; exact hx⟩
   obtain ⟨Nbar, hNbarnorm, hNbarprime⟩ :=
     OddOrder.GroupTheory.exists_normal_index_prime_of_isSolvable hnt
@@ -414,7 +428,7 @@ private theorem tp_c_main [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G
     rw [lt_top_iff_ne_top]
     intro htop
     have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q with h | h
     · exact hQne h
     · exact (ne_of_lt hQlt) h
   set NQ : Subgroup G := Subgroup.normalizer Q with hNQ
@@ -664,7 +678,7 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
     rw [lt_top_iff_ne_top]
     intro htop
     have : A.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal A inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal A with h | h
     · exact hAne h
     · exact (ne_of_lt hA.proper) h
   have hKsupP_lt : K ⊔ P < ⊤ := lt_of_le_of_lt (sup_le hKnA hPnA) hNA_lt
@@ -887,7 +901,7 @@ private theorem tp_d [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
     rw [hNP_def, lt_top_iff_ne_top]
     intro htop
     have : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal P inferInstance with h | h
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P with h | h
     · exact hPne h
     · exact (ne_of_lt hPlt) h
   have hNP_solv : Group.IsSolvable ↥NP := hG.isSolvable_of_lt_top NP hNP_lt

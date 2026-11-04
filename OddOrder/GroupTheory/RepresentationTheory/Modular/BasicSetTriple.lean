@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The basic set of Navarro (7.4) has exactly three members
@@ -37,6 +42,8 @@ naming the three members, which no other file does.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (7.2), (7.4), p. 141.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

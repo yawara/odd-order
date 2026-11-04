@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CentralCharacter
-import OddOrder.Algebra.SubgroupSum
+module
+
+public import OddOrder.Algebra.CentralCharacter
+public import OddOrder.Algebra.SubgroupSum
 import OddOrder.Algebra.TraceMulLeft
 
 /-!
@@ -30,6 +32,8 @@ No rank-of-an-idempotent theory is needed — only the two trace computations.
 * `OddOrder.GroupAlgebra.sum_sq_centralScalar_subgroupSum` — `∑_i m_i² ω_i(N̂) = |G|`
 * `OddOrder.GroupAlgebra.card_mul_sum_sq_eq_card` — `|N| · ∑_{ω_i(N̂) ≠ 0} m_i² = |G|`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

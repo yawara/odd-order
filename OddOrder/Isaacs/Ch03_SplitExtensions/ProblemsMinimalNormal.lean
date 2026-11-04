@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
@@ -42,6 +48,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.4 の形式化
 - `exists_isComplement'_of_isMinimalNormal_centralizer_eq` — **Problem 3C.4 (分裂)**。
 - `isComplement'_conj_of_isMinimalNormal_centralizer_eq` — **Problem 3C.4 (補元の共役性)**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

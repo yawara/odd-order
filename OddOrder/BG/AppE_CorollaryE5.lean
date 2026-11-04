@@ -3,7 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppE_CentralizerDecomposition
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.BG.AppE_PropE4
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
 /-!
@@ -32,6 +51,8 @@ This leaf assembles the corollary in stages (issue 3028):
   instantiation for `(O_p(M), K₁, E)`, `(ii) ∧ hdc ⟹ (i)` via Theorem E.3 and the
   corrected Proposition E.4 (`AppE_PropE4.lean`), and the `(E.33)`/`(E.34)` counting.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

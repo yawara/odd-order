@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+module
+
+public import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S08_CoherenceWeighted
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11.1) at `T` — the (5.6) pair-bound world (pp. 87–91)
@@ -29,6 +38,8 @@ All statements thread the ν-grid supply `pins` and the reconciled type-`P` datu
 (`Tdata`/`hU`/`hW1`/`hW2`) exactly as `sSet_memberRFamily_T` does; the `S`-side statements
 carry no such parameters because the μ-grid there is carrier-supplied.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian
+module
+
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+public import OddOrder.GroupTheory.FrattiniPGroup -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+public import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman Lemma 7: the cover power overlap
@@ -22,6 +31,8 @@ composition factors, and then combines it with the second-layer Agemo bridge
 and the spectral contradiction to prove Lemma 7.
 -/
 
+@[expose] public section
+
 set_option autoImplicit false
 
 namespace OddOrder.Higman.Suzuki2Groups
@@ -37,13 +48,13 @@ variable {P X : Type*} [Group P] [Group X]
 
 /-- Canonical-group version of `A/A²`, used internally so that subgroup
 actions retain the inherited `Group A` instance. -/
-private abbrev AgemoZeroQuotientRaw (A : Type*) [Group A] :=
+abbrev AgemoZeroQuotientRaw (A : Type*) [Group A] :=
   ↥(Agemo A 2 0) ⧸
     (Agemo A 2 1).subgroupOf (Agemo A 2 0)
 
 /-- The first Agemo quotient embeds in the ambient quotient by the image of
 `A²`. -/
-private def agemoZeroQuotientToAmbientHom
+def agemoZeroQuotientToAmbientHom
     {A : Subgroup P} [A.Normal] :
     AgemoZeroQuotientRaw A →*
       P ⧸ (Agemo A 2 1).map A.subtype := by
@@ -64,7 +75,7 @@ private def agemoZeroQuotientToAmbientHom
       QuotientGroup.mk' ((Agemo A 2 1).map A.subtype) ((a : A) : P) :=
   rfl
 
-private theorem agemoZeroQuotientToAmbientHom_injective
+theorem agemoZeroQuotientToAmbientHom_injective
     {A : Subgroup P} [A.Normal] :
     Function.Injective
       (agemoZeroQuotientToAmbientHom (P := P) (A := A)) := by
@@ -88,7 +99,7 @@ private theorem agemoZeroQuotientToAmbientHom_injective
 
 /-- A square in `C`, regarded as an element of the zeroth Agemo term of
 `A = Phi(C)`. -/
-private def coverSquareRepresentative
+def coverSquareRepresentative
     [Finite P] (hP : IsPGroup 2 P)
     {A C : Subgroup P}
     (hPhi : NormalInvariantCover.ambientFrattini C = A)
@@ -102,7 +113,7 @@ private def coverSquareRepresentative
     rw [agemo_zero_eq_top]
     exact Subgroup.mem_top _⟩
 
-@[simp] private theorem coverSquareRepresentative_val
+@[simp] theorem coverSquareRepresentative_val
     [Finite P] (hP : IsPGroup 2 P)
     {A C : Subgroup P}
     (hPhi : NormalInvariantCover.ambientFrattini C = A)
@@ -114,7 +125,7 @@ private def coverSquareRepresentative
 /-- Raw square homomorphism, before packaging the commutative structure of
 `A`.  The assumption `C' ≤ A²` is exactly what makes squaring multiplicative
 modulo `A²`. -/
-private def coverSquareToAgemoZeroHomRaw
+def coverSquareToAgemoZeroHomRaw
     [Finite P] (hP : IsPGroup 2 P)
     {A C : Subgroup P} [A.Normal]
     (hPhi : NormalInvariantCover.ambientFrattini C = A)
@@ -157,7 +168,7 @@ private def coverSquareToAgemoZeroHomRaw
       _ = pi ((x : P) ^ 2) * pi ((y : P) ^ 2) := by
         rw [map_pow, map_pow]
 
-@[simp] private theorem coverSquareToAgemoZeroHomRaw_apply
+@[simp] theorem coverSquareToAgemoZeroHomRaw_apply
     [Finite P] (hP : IsPGroup 2 P)
     {A C : Subgroup P} [A.Normal]
     (hPhi : NormalInvariantCover.ambientFrattini C = A)
@@ -241,7 +252,7 @@ private theorem coverSquareToAgemoZeroHomRaw_surjective
       congrArg (fun t : P => pi t) hza
 
 /-- Raw descended square map on the actual first lower-central layer. -/
-private def lowerCentralLayerZeroToAgemoZeroHomRaw
+def lowerCentralLayerZeroToAgemoZeroHomRaw
     [Finite P] (hP : IsPGroup 2 P)
     {act : X →* MulAut P} {A C : Subgroup P} [A.Normal]
     (h : NormalInvariantCover act A C)
@@ -503,7 +514,7 @@ noncomputable def lowerCentralLayerZeroToAgemoZeroLinearMap
           hP h hAcomm hPhi hderived v.toMul) := by
   rfl
 
-private theorem lowerCentralLayerZeroToAgemoZeroLinearMap_surjective
+theorem lowerCentralLayerZeroToAgemoZeroLinearMap_surjective
     [Finite P] (hP : IsPGroup 2 P)
     {act : X →* MulAut P} {A C : Subgroup P}
     (h : NormalInvariantCover act A C)
@@ -578,7 +589,7 @@ theorem lowerCentralLayerZeroToAgemoZeroLinearMap_equivariant
 
 /-- A nontrivial finite abelian 2-group has a nontrivial first power
 factor. -/
-private theorem agemoZeroQuotient_nontrivial_of_ne_bot
+theorem agemoZeroQuotient_nontrivial_of_ne_bot
     [Finite P] (hP : IsPGroup 2 P)
     {A : Subgroup P} (hAcomm : IsMulCommutative A)
     (hAne : A ≠ ⊥) :

@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+import OddOrder.Peterfalvi.S09_FrobeniusParity
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Frobenius-family good-index estimate (Peterfalvi 7.8.c, 7.10)
@@ -25,6 +31,8 @@ proof therefore extracts its sign, applies the already proved irreducible
 Textbook: Peterfalvi, Section 7, pp. 40-43, equations (7.8.c) and (7.10).
 Coq comparison: `PFsection7.v`, proof of `CoherentFrobeniusPartition`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

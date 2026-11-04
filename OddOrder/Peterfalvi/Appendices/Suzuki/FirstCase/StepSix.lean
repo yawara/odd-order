@@ -3,9 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
-import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
+module
+
+public import Mathlib.Algebra.Ring.Aut
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Henselian
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
+import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 
 /-!
 # Peterfalvi Part II, Ch. II, step (6): the arithmetic lemma
@@ -30,6 +44,8 @@ This leaf formalizes that lemma as `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_
 The lemma is consumed by step (6) (`|F| = f^a = 2^b + 1`) and step (8)
 (`|C_F(w)| = f^a = 2^b + 1`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

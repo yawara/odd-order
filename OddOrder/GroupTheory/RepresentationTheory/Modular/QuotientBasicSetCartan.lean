@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.Algebra.RelativeTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
 
 /-!
@@ -27,6 +34,8 @@ single change-of-basis matrix `U` is meaningful on both sides.
 
 * `OddOrder.RepresentationTheory.Modular.sum_intBasicSetMatrix_mul_cartanMatrix_quotientPi`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,11 +3,31 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeen
-import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-import OddOrder.GroupTheory.TransferIndexTwo
-import OddOrder.GroupTheory.WeaklyClosed
+module
+
+public import OddOrder.GroupTheory.WeaklyClosed
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteen
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.HallWielandt
+import OddOrder.GroupTheory.TransferIndexTwo
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteenLV
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenWeakClosure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSixteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (17): control of the `3`-transfer
@@ -29,6 +49,8 @@ odd order forces `R₂ ≤ ⁅N, N⁆`, i.e. `3 ∤ |N^{ab}|`.
 
 See issue 9503.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

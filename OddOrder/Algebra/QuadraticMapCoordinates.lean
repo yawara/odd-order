@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.QuadraticForm.Basic
-import Mathlib.LinearAlgebra.Basis.Defs
-import Mathlib.Data.ZMod.Basic
+module
+
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
 /-!
 # Coordinates of quadratic maps over `𝔽₂`
@@ -29,6 +29,8 @@ Main declarations:
 * `coordEquiv` — the coordinate `S`-linear equivalence
   `QuadraticMap (ZMod 2) V W ≃ₗ[S] ({p : ι × ι // p.1 ≤ p.2} → W)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -55,13 +57,13 @@ noncomputable def coordMulCoord (i j : ι) (w : W) :
     coordMulCoord b i j w v = (b.coord i v * b.coord j v) • w :=
   rfl
 
-private theorem coordMulCoord_add (i j : ι) (w w' : W) :
+theorem coordMulCoord_add (i j : ι) (w w' : W) :
     coordMulCoord b i j (w + w') =
       coordMulCoord b i j w + coordMulCoord b i j w' := by
   ext v
   simp [smul_add]
 
-private theorem coordMulCoord_smul (i j : ι) (s : S) (w : W) :
+theorem coordMulCoord_smul (i j : ι) (s : S) (w : W) :
     coordMulCoord b i j (s • w) = s • coordMulCoord b i j w := by
   ext v
   simp only [coordMulCoord_apply, smul_apply]
@@ -182,7 +184,7 @@ private theorem coord_basis (i l : ι) :
   · rw [ite_eq_left h.symm, ite_eq_left h]
   · rw [ite_eq_right (fun hh => h hh.symm), ite_eq_right h]
 
-private theorem ofCoords_basis_value (u : {p : ι × ι // p.1 ≤ p.2} → W)
+theorem ofCoords_basis_value (u : {p : ι × ι // p.1 ≤ p.2} → W)
     (l : ι) :
     ofCoords (S := S) b u (b l) = u ⟨(l, l), le_refl l⟩ := by
   change (∑ p : {p : ι × ι // p.1 ≤ p.2},
@@ -200,7 +202,7 @@ private theorem ofCoords_basis_value (u : {p : ι × ι // p.1 ≤ p.2} → W)
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-private theorem polar_ofCoords_basis (u : {p : ι × ι // p.1 ≤ p.2} → W)
+theorem polar_ofCoords_basis (u : {p : ι × ι // p.1 ≤ p.2} → W)
     {l m : ι} (hlm : l < m) :
     polar (⇑(ofCoords (S := S) b u)) (b l) (b m) =
       u ⟨(l, m), le_of_lt hlm⟩ := by

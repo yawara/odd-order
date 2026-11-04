@@ -3,17 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.GroupTheory.CardSupInf
-import OddOrder.GroupTheory.ThreeStepGroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.FittingSelfCentralizing
-import OddOrder.GroupTheory.NilpotentCoprimeCommute
-import OddOrder.GroupTheory.FixedPointFreeConjugation
-import OddOrder.GroupTheory.SylowCovering
+module
+
+public import OddOrder.GroupTheory.ThreeStepGroup
+import Mathlib.CategoryTheory.Category.Init
 import OddOrder.GroupTheory.CNGroupFrobeniusSteps
+import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.GroupTheory.FixedPointFreeConjugation
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.GroupTheory.SylowCovering
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
 # CN-groups: Lemma 1.2, Theorem 1.5 and Corollary 1.6 (Gorenstein, Ch. 12 §1)
@@ -55,6 +56,8 @@ this general-purpose leaf free of a dependency on `OddOrder.BG`.  `O_p` is spell
 `OddOrder.GroupTheory.ThreeStepGroup`.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

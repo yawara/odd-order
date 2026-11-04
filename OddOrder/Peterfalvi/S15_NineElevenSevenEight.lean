@@ -3,6 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_UnionPairBridge
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
 import OddOrder.Peterfalvi.S15_NineElevenSteps
 
 /-!
@@ -19,6 +30,8 @@ produces a norm-`1` bridge target `Γ`, and the union-pair extension
 contradicting the no-pair clause.  Consumed by the (9.11.6) norm bound
 `nineElevenNormBoundS` (`S15_CaseACoherence`, which imports this file).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

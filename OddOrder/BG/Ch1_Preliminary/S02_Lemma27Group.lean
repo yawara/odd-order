@@ -3,9 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.GroupTheory.CommGroupAut
-import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
 
 /-!
@@ -40,6 +51,8 @@ No mathematics is reproved here: the rendering uses the existing bridges
 
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §2.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 

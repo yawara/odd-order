@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
-import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
+module
+
+public import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
+public import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
+public import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The rank-one hypothesis from a degree-`p` action of order `p(p-1)`
@@ -24,6 +32,8 @@ Step (12) of the first case of the theorem of Suzuki applies this to
 `N_G(R)/R` acting on the set `𝒜` of the `p` subgroups of order `p` of `R`
 not contained in `T`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 

@@ -3,11 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.Data.ZMod.Basic
 
 /-!
 # The action of the linear automorphism group on the non-zero vectors
@@ -40,6 +40,8 @@ apply to any field the caller has already identified with `𝔽₂`.
   turn `LinearMap.commutator_transvection` into perfectness of the linear group in
   dimension `≥ 3`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -145,7 +147,7 @@ theorem exists_mem_ker_ne_zero_ne [FiniteDimensional K V] (h : V →ₗ[K] K) {w
     · rw [finrank_span_singleton hw0]
   have hlt : (Submodule.span K {w}) < LinearMap.ker h :=
     Submodule.lt_of_le_of_finrank_lt_finrank hspan (by omega)
-  obtain ⟨v, hvker, hvspan⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨v, hvker, hvspan⟩ := IsConcreteLE.exists_of_lt hlt
   refine ⟨v, hvker, ?_, ?_⟩
   · rintro rfl
     exact hvspan (Submodule.zero_mem _)

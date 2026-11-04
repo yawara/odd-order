@@ -3,13 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Minpoly.IsConjRoot
-import Mathlib.FieldTheory.Galois.Basic
-import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+module
+
+public import Mathlib.Analysis.Complex.Norm
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Algebra.CharP.IntermediateField
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.RootsOfUnity.Complex
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 
 /-!
 # Algebraic integers fixed by all Galois automorphisms are rational integers
@@ -42,6 +47,8 @@ integer, is a rational integer.
 * I. M. Isaacs, *Character Theory of Finite Groups*, Lemma 3.14.
 * T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000), (13.9.b).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

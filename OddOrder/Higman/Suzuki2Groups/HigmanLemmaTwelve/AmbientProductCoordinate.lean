@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 12: the ambient `F × F` coordinate on `P / Φ(P)`
@@ -24,6 +28,8 @@ coordinate `eQuot : Additive (G ⧸ N) ≃ₗ F` with the ambient inclusion
 Both Higman branches (commutative `A(n, 1)` and noncommutative `A(n, θ)`) supply
 this data.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -303,7 +309,6 @@ end AmbientProduct
 
 section AmbientExtension
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Bridge `P / Φ(P) ≃* L₀`: the zeroth lower-central layer is the Frattini
 quotient once the layer kernel is identified with `Φ(P)`. -/
 def frattiniQuotientEquivLayerZero

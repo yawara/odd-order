@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Basic
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Algebra.Group.Action.Pretransitive
+public import Mathlib.GroupTheory.GroupAction.Defs
 import Mathlib.Data.Set.Card
-import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.GroupAction.Basic
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: orbitals (Lem 8.34)
@@ -26,6 +30,8 @@ Lemma 8.34, in four statements:
 * `card_orbit_eq_card_mul_card_orbitalAt` — `|Δ| = |Ω| · |Δ(α)|` for a
   transitive action on a finite set (the book's `|Δ(α)| = |Δ|/|Ω|`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

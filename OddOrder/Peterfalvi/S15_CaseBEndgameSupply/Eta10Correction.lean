@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+module
+
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
+import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
 
 /-!
 # Peterfalvi §13 (pp. 81–83) — the `T`-side `η₁₀` correction supply
@@ -13,6 +21,8 @@ assumed to induce irreducibly.  Following the completed argument in `PFsection13
 different reducible `ν`-row whose `τ₁T`-image is orthogonal to `η₁₀`: row `2` in the clean
 branch and row `1` in the exceptional three-row flip branch.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,7 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppE_CentralizerDecomposition
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.AppE_BetaSupply
+import OddOrder.BG.AppE_EigenvalueCombinatorics
+import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.AppE_SemidirectFrattini
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # BG Proposition E.4, corrected: `C_S(Z₂(S))` is abelian of index `p`
@@ -50,6 +65,8 @@ inputs from the proved pieces:
 Throughout, `S' = H₁` (BG `(E.7)`, here `commutator_eq_and_card_quotient`) converts
 between the mod-`S'` eigenvalue statements on `S/S'` and the mod-`H₁` chain statements.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 
@@ -191,7 +208,7 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
     have hlt : p ^ 1 < p ^ 4 := Nat.pow_lt_pow_right hyp.p_prime.one_lt (by omega)
     rw [pow_one] at hlt
     omega
-  obtain ⟨w, hwmem, hw1⟩ := SetLike.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS3 h0live)
+  obtain ⟨w, hwmem, hw1⟩ := IsConcreteLE.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS3 h0live)
   rw [OddOrder.Isaacs.Ch04.iterCommutator_zero] at hwmem
   -- `r₀`, the eigenvalue of `α` on the top section `H₀/H₁`.
   obtain ⟨r₀, hr₀q, hr₀⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS3 hSinvA h0live ha

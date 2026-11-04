@@ -3,7 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppD_CNGroups.Basic
+module
+
+public import OddOrder.BG.AppD_CNGroups.Basic
+public import OddOrder.BG.AppB_PuigB3B4
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.GroupTheory.ThreeStepGroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppB_Thm62
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.GroupTheory.CNGroupStructure
 
@@ -39,6 +52,8 @@ the repair is short: Theorem 6.2 applied to `M` and its Sylow subgroup `S = P �
 therefore `N_P(S) ≤ P ∩ M = S`; a `p`-subgroup that is self-normalizing in `P` is `P`, so
 `S = P` after all.  Everything BG writes is then correct as written.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppD
 

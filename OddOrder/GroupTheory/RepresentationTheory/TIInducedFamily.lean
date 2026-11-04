@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Signed irreducible families induced from a TI-subset
@@ -24,6 +28,8 @@ This is the family-extraction step of the Coq `primeTIirr_spec` route
 and `(3.9.a)` `V`-value identification then yield the prime-TI value identity `prTIirr_id`
 (Peterfalvi (4.3.c)).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

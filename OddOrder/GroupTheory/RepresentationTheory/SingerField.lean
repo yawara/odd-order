@@ -3,16 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.SimpleModule.Basic
-import Mathlib.RingTheory.Ideal.Quotient.Operations
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Algebra.GroupWithZero.Units.Fintype
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.Data.Nat.GCD.Basic
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.Data.Nat.Prime.Factorial
 import Mathlib.RepresentationTheory.Maschke
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import OddOrder.GroupTheory.PrimitivePrimeDivisor
 
 /-!
@@ -42,6 +37,8 @@ realized inside the multiplicative group `GF(p^q)ˣ`.
 * `OddOrder.RepresentationTheory.nonempty_singerFieldData` — the existence theorem.
 * `OddOrder.RepresentationTheory.SingerFieldData.card_K_eq` — `|K| = |M|`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

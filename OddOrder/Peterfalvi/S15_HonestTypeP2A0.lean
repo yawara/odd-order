@@ -3,11 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup
-import OddOrder.Peterfalvi.S10_TypePSupportA0
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
-import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
-import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+module
+
+public import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
+public import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S10_TypePSupportA0 -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 
 /-!
 # Peterfalvi (8.10)/(8.15): the honest type-`P₂` `A₀`-support `A₀(S) = A(S) ∪ V^S`
@@ -39,6 +42,8 @@ facts.  The Dade hypothesis (8.15) for this support — assembled through the `�
 generic (`centralizer_typePV_le_M`, `coprime_FT_signalizer_centralizerIn_typePV`,
 `conjClassSetIn_typePV_isConj_conj_in_M`) — is the next step (issue 9076 piece 4c).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,8 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
@@ -23,6 +33,8 @@ term is a nonzero bilinear map), the Frobenius support extraction per case,
 the shear normalization (case `θ = φ ≠ 1`), the `ε` conditions from
 anisotropy, and the endpoint engines.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.Algebra.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
 
 /-!
@@ -31,6 +39,8 @@ hypotheses from a `2`-modular system over `𝓞_ℂ_[2]` (issue 9506).
   column of values at the involution
 * `OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_columns`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

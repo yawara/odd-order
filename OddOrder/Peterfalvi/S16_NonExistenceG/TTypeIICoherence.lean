@@ -1,6 +1,13 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionRigidity
-import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
+module
+
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
 import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
+public import OddOrder.Peterfalvi.S09_Building78C -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (14.9): T-side coherence and eta orthogonality
@@ -9,6 +16,8 @@ The type-III `calT1` coherence construction and its eta-grid orthogonality theor
 This upstream leaf is shared by the eta-projection residual and the final T-side
 Type-II estimate.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

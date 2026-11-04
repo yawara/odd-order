@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Idempotents
+module
+
+public import Mathlib.RingTheory.Idempotents
+public import Mathlib.Data.Matrix.Basis
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import OddOrder.Algebra.PiSimpleModule
-import OddOrder.Algebra.MatrixCommutator
 
 /-!
 # Lifting the matrix units
@@ -24,6 +27,8 @@ Cartan matrix.
 * `OddOrder.completeOrthogonalIdempotents_matrixUnit`
 * `OddOrder.exists_completeOrthogonalIdempotents_lift`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

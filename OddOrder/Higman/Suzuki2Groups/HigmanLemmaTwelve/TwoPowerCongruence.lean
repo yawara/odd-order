@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Combinatorics.Colex
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic.LinearCombination
@@ -32,6 +35,8 @@ setting.  Over `ZMod (2 ^ n - 1)`:
 The workhorse mathlib input is `geomSum_injective`, the injectivity of
 `S ↦ ∑ i ∈ S, 2 ^ i` on all of `Finset ℕ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

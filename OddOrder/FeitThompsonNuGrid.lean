@@ -1,5 +1,9 @@
-import OddOrder.FeitThompsonSetup
-import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+module
+
+public import OddOrder.FeitThompsonSetup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S06_MuColumnBridge
 
 /-!
 # Peterfalvi certain-Type-T ν-grid
@@ -8,6 +12,8 @@ This file constructs the canonical T-side grid used in Peterfalvi (4.3)--(4.9) a
 It mirrors the S-side `muS` supply from the certain-type hypothesis on the partner maximal
 subgroup, keeping the producer below the final Section 16 assembly.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 
@@ -95,7 +101,7 @@ theorem colT_finNeg (i : Fin tp.q) :
     (mp.certainTypeS hG).w1CharEquiv_finNeg (eqQ hG mp tp i)]
   ext w
   simp only [Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.one_comp,
-    MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_comp, MonoidHom.coe_coe, Subgroup.coe_subtype,
+    MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_comp, MonoidHom.coe_ofClass, Subgroup.coe_subtype,
     Function.comp_apply, MonoidHom.mul_apply,
     MonoidHom.one_apply, mul_one, MonoidHom.inv_apply, Units.val_inv_eq_inv_val]
   exact Units.val_inv_eq_inv_val _

@@ -3,7 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # Reducing the centre of a group algebra
@@ -29,6 +33,8 @@ they produce `λ` as a ring homomorphism.
 * `OddOrder.GroupTheory.CenterClassSum.apply_eq_of_mapRingHom_eq` — the value is lift-independent
 * `OddOrder.GroupTheory.CenterClassSum.reducedCentralCharacter` — `λ : Z(k'G) →+* k'`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterClassSum
 

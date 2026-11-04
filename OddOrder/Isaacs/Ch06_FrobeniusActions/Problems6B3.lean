@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 6B.3 — Thm 6.21 の coprime 仮定は落とせない (書籍 p. 195)
@@ -24,6 +30,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 * `(b,c) ≠ (0,0)` なら固定点は `b z = 0 ∧ c z = 0` すなわち **`z = 0`**。したがって
   すべての `C_N(a)` (`a ≠ 1`) が超平面 `{z = 0}` に含まれ, 生成しても `N` にならない。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

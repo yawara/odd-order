@@ -3,9 +3,28 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+public import OddOrder.GroupTheory.CentralProduct
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §10 β-radical spine — Core (Thm 10.6 / Cor 10.7 / Lem 10.8)
@@ -22,6 +41,8 @@ mmd `references/bg/local-analysis.mmd` L2779-2826。
 GroupTheory の public 同名 subgroup-normalizer 版との衝突回避) /
 `isUniquelyMaximal_of_le_of_lt_top` (旧 `isUniquelyMaximal_of_le`, 定義は Global 側)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 
@@ -150,7 +171,7 @@ private theorem exists_sigma_maximal_of_sylow [Finite G] (hG : IsMinimalSimpleOd
     rw [lt_top_iff_ne_top]
     intro htop
     have hPnormal : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPnormal with hbot | htop'
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) with hbot | htop'
     · exact hPne hbot
     · have hsolv : Group.IsSolvable ↥(P : Subgroup G) := by
         have := (P.isPGroup').isNilpotent; infer_instance

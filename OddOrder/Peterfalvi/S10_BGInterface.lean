@@ -3,9 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
 
 /-!
 # Peterfalvi §10 ↔ BG §16 interface (shared-notation consumption layer)
@@ -32,6 +41,8 @@ structure directly.  That structure is now proved, so what those wirings still l
 the citeable bridge, not an unproved upstream.  See
 `notes/peterfalvi/s10_13_maximal_structure.md` §5.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10Interface
 

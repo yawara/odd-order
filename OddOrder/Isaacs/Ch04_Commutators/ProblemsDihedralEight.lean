@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Dihedral
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathNonCommutator
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathNonCommutator
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.12(c) の `H = D₈` の場合
@@ -22,6 +28,8 @@ Problem 4A.12(b) の不等式が成り立つ (`sum_lt_of_three_lt_card_dihedralF
 のいずれかに含まれるので, 極大なものはこの 3 つしかない。`ZMod 4` の算術
 (`2k = 0 ↔ k = 0 ∨ k = 2` 等) は `decide` で片付く。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

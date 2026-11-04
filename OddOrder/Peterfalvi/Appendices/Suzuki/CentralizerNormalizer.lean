@@ -3,8 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.OddOrderInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # Peterfalvi Part II, Ch. I §3: Proposition 1(b)
@@ -29,6 +38,8 @@ the inverse element to recover the source order `N_K(X) N_V(X)`.
 
 The proposition standing assumption `X ≠ 1` is not needed for part (b).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

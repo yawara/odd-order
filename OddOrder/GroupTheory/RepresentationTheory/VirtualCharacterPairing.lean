@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
 
 /-!
 # The character pairing and its integrality on virtual characters
@@ -33,6 +35,8 @@ equipping every elementary subgroup with a Wedderburn splitting.
 
 * D. Gorenstein, *Finite Groups*, §4.7 (`references/gorenstein/pages/gorenstein-p16*.png`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

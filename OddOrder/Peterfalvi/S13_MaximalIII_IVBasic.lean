@@ -3,17 +3,28 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.Peterfalvi.S13_SixTwoBridge
+module
+
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
-import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Prop109
+import OddOrder.Peterfalvi.S13_SixTwoBridge
 
 /-!
 # S13_MaximalIII_IVBasic
 
 Prefix-split from `OddOrder.Peterfalvi.S13_MaximalIII_IV` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi Section 13: Maximal Subgroups of Types III and IV
@@ -454,7 +465,7 @@ theorem H_not_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (hyp.H0_lt_H.le.trans (hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)))).mpr
       hyp.chief.H0_normalized_by_M
-  obtain ⟨h, hhH, hhH0⟩ := SetLike.exists_of_lt hyp.H0_lt_H
+  obtain ⟨h, hhH, hhH0⟩ := IsConcreteLE.exists_of_lt hyp.H0_lt_H
   have hhM : h ∈ M :=
     hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _) hhH
   have hH0le : hyp.chief.H0 ≤ M :=
@@ -616,7 +627,7 @@ theorem trace_ne_top_of_lt_derived {M : Subgroup G} {H1 : Subgroup G}
     (h : H1 < derivedInG M) :
     ((H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤ := by
   intro htop
-  obtain ⟨x, hxM', hxH1⟩ := SetLike.exists_of_lt h
+  obtain ⟨x, hxM', hxH1⟩ := IsConcreteLE.exists_of_lt h
   have hxM : x ∈ M := Subgroup.map_subtype_le _ hxM'
   have hmem : (⟨⟨x, hxM⟩, Subgroup.mem_subgroupOf.mpr hxM'⟩ :
       ↥((derivedInG M).subgroupOf M)) ∈

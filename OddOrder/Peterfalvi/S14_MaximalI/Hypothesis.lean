@@ -1,19 +1,24 @@
-import OddOrder.Peterfalvi.S13_MaximalIII_IV
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.Peterfalvi.S09_CertificateDischarge
-import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeConjugacy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
-import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
-import OddOrder.Algebra.GaloisRationalInteger
-import Mathlib.RepresentationTheory.Irreducible
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S09_Building78C
 
 /-!
 # Peterfalvi (12.1)-(12.2.b) — type-I hypothesis, Dade domain, R(χ) families
 
 Split from the former monolithic `OddOrder.Peterfalvi.S14_MaximalI` (directory split, issue 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

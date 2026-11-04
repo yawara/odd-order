@@ -3,7 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Polynomial sequences in a filtered group
@@ -59,6 +65,8 @@ that any polynomial-sequence treatment of Hall's formula would need.
 * `mulFwdDiffList_pow_mul_pow_mem` — consequently the `k`-fold difference lies
   in `γ_k` (the book's indexing; mathlib's `lowerCentralSeries (k - 1)`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

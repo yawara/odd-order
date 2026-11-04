@@ -3,8 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C10
 
 /-!
 # Isaacs Problem 5C.11 — `H ⊆ Z(N_G(H))` なる Hall 部分群 (p. 164)
@@ -35,6 +41,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C10
 ⭐ 書籍の hint の 2 段 (「`N_G(P) < G` なら `P` は `N_G(P)` の中心」「`P ⊴ G` かつ `N_G(Q) < G`
 なら `P` は `N_G(Q)` の中心」) は、この形の帰納法では**同じ 1 本の補題**に融合する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

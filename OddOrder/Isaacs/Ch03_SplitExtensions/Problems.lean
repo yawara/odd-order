@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSemidihedral
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)
@@ -16,6 +23,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3 "Split Extensions" �
 
 方針は Ch.1/Ch.2 の `Problems.lean` と同じ (ラッパーは書かず実証明; 教科書番号は docstring)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

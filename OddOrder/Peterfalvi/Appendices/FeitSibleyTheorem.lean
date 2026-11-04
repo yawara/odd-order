@@ -3,7 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley Theorem — supporting layer (pp. 145–150)
@@ -22,6 +32,8 @@ issue 0149).  The statements live in the `Hypothesis` namespace of
 `OddOrder.Peterfalvi.Appendices.FeitSibley` and extend the structure API of
 that file.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

@@ -3,8 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Perm.Cycle.Type
+module
+
+public import Mathlib.GroupTheory.PGroup
 import OddOrder.GroupTheory.PiElementDecomposition
 
 /-!
@@ -19,6 +20,8 @@ classification, Peterfalvi’s Appendix III restatement, and concrete groups
 whose root subgroups are Suzuki 2-groups.  The paper-specific classification
 proof lives under `OddOrder.Higman.Suzuki2Groups`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.Suzuki2Group
 

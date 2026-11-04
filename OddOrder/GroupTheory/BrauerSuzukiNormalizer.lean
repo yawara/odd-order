@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiSetup
 import Mathlib.GroupTheory.Transfer
-import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.SylowNormalRelIndex
 
 /-!
@@ -26,6 +28,8 @@ This file develops the proof along the book's lines:
 The Burnside normal `2`-complement `H` of `C` and the assembly `N = SH`, `C = XH`
 follow in the sequel.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

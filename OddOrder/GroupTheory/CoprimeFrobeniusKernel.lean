@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.End
+module
+
+public import Mathlib.Algebra.Group.End
+public import Mathlib.Algebra.Group.Subgroup.Defs
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.Group
 
@@ -25,6 +28,8 @@ and is trivial modulo `N` (`h⁻¹ * α h ∈ N` for all `h`) satisfies `α^k h 
 This file holds only the elementary stability lemmas; the full corollary (i) assembles them with the
 chief-series / BG 3.3 machinery in `OddOrder.GroupTheory.CoprimeAction`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CoprimeFrobeniusKernel
 

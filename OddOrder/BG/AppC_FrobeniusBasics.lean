@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_HypothesisB
+module
+
+public import OddOrder.BG.AppC_HypothesisB
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # BG Appendix C: basic facts about `H = P ⋊ U` and its prime-field line
@@ -15,6 +18,8 @@ These were previously stated only through the Peterfalvi Section 16 hypothesis (
 `fieldNormalizer*` lemmas); nothing in them depends on that configuration, so they belong here
 with the rest of the `(p, q)`-level Appendix C material (issue 0151).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

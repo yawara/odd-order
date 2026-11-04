@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_FurtherResults
+module
+
+public import OddOrder.BG.AppE_FurtherResults
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.ZMod.Units
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 
 /-!
 # BG Appendix E, Theorem E.3: the regular-operator eigenvalue count
@@ -32,6 +43,8 @@ through the tightness of the counting; the kernel argument needs no counting at 
 sharpened `Ch1.S05.index_centralizer_le_card_of_commutator_mem` remains a genuine
 improvement to that lemma, but is not needed here.)
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 
@@ -887,7 +900,7 @@ theorem RegularOperatorSetup.card_le_pow_card_A {R B : Type*} [Group R] [Group B
     push_cast
     exact hrall _ hvR₀
   -- BG's `w ∈ H₀ − H₁`
-  obtain ⟨w, hwmem, hw1⟩ := SetLike.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS h0live)
+  obtain ⟨w, hwmem, hw1⟩ := IsConcreteLE.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS h0live)
   rw [OddOrder.Isaacs.Ch04.iterCommutator_zero] at hwmem
   -- `r₀`, the eigenvalue on the top section
   obtain ⟨r₀, hr₀q, hr₀⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS hSinv h0live ha

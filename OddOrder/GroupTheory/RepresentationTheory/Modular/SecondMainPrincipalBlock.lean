@@ -3,9 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
@@ -39,6 +50,8 @@ character value is `1`.
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_ne_principal`
 * `OddOrder.RepresentationTheory.Modular.character_mul_eq_generalizedDecompositionNumber`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

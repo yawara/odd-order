@@ -1,24 +1,30 @@
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthTwoTypeAClassification
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientProductCoordinate
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelation
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+module -- shake: keep-all
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthTwoTypeAClassification
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientProductCoordinate
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelation
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc

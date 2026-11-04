@@ -3,8 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith.Frontend
 import Mathlib.Tactic.LinearCombination
-import OddOrder.Algebra.ThreeNormColumn
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Reading off the columns `D^t_j` — Navarro p. 143
@@ -35,6 +43,8 @@ exchanging `(i, δ_1)` with `(j, δ_2)`.
 * `OddOrder.Algebra.sign_relation_six` — (6), once `D^y_0` vanishes at `j`
 * `OddOrder.Algebra.exists_sign_relations` — (6) and (7) after the notation is chosen
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

@@ -1,5 +1,11 @@
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35Prelim
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 
 /-!
 # BG Theorem 3.10(a): module-level core
@@ -20,6 +26,8 @@ where the free permutation comes from the Frobenius hypothesis.
 * `prime_card_of_freeBlock_cond3` — `|R|` prime from a free block action + the prime-action
 condition.
 -/
+
+@[expose] public section
 
 open Module LinearMap
 

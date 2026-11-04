@@ -3,7 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourIntrinsic
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourIntrinsic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 
 /-!
 # Ch. IV §4, steps (2) and (3) on `U/Z(U)` and back in `G`
@@ -23,6 +31,8 @@ hypothesis and then reads its conclusion back into `G`, which is step (3).
   standing hypothesis on `U/Z(U)`.
 * `Hypothesis.exists_f_eq_conj_inv_residual` — step (3): `f(ω) = ω^{-ζ}` in `G`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

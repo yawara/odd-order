@@ -3,8 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
 import OddOrder.Higman.Suzuki2Groups.ExponentFour
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Peterfalvi.Appendices.Huppert
+import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
+import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
 
 /-!
 # Peterfalvi Part II, Ch. II, step (5): supporting identifications
@@ -28,6 +46,8 @@ identifications on which its proof (and the later steps) rest:
 Everything consuming the near-field model depends on step (2)(b)
 through `exists_affineNearFieldModel`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

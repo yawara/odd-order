@@ -3,9 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch05_Transfer.Basic
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
 # Isaacs Problems 6A.6 / 6A.7 / 6A.11 — Lemma 6.5 の仮説 (TI 条件) の演習 (書籍 pp. 185-186)
@@ -52,6 +57,8 @@ Lemma 6.5 の仮説は **TI 条件** `A ⊓ A^g = 1` (`g ∉ A`) であり, そ�
   Sylow C (`exists_mem_smul_sylow_eq`) で `k ∈ A` があって `k • P = g⁻¹ • P`,
   つまり `g k ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -248,7 +255,7 @@ theorem TI_of_normalizer_le [Finite G] {A : Subgroup G}
       exact fun h => hlt.ne (le_antisymm hPS h)
     have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
     rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
-    obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+    obtain ⟨y0, hy0mem, hy0notin⟩ := IsConcreteLE.exists_of_lt hgrow
     have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
     have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
     have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)
@@ -404,7 +411,7 @@ theorem exists_sylow_coe_eq_of_maximal_pGroup_of_TI [Finite G] {A : Subgroup G}
     exact fun h => hlt.ne (le_antisymm hPS h)
   have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
   rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
-  obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+  obtain ⟨y0, hy0mem, hy0notin⟩ := IsConcreteLE.exists_of_lt hgrow
   have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
   have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
   have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)
@@ -488,11 +495,6 @@ theorem eq_top_of_forall_sylow_le {H : Type*} [Group H] [Finite H] {K : Subgroup
   rw [h2, Nat.Prime.pow_dvd_iff_le_factorization hp Nat.card_pos.ne'] at h3
   omega
 
-/-- `↥A` の交換子群を `G` へ押し出すと `⁅A, A⁆`。 -/
-theorem map_commutator_subtype (A : Subgroup G) :
-    (commutator ↥A).map A.subtype = ⁅A, A⁆ := by
-  rw [commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map, A.range_subtype]
-
 /-- **Isaacs Problem 6A.10(b) の後半** (p. 186): TI 仮説の下で `G' ⊓ A ≤ A'`。
 
 **証明**: `H := G' ⊓ A` の各 Sylow `p`-部分群 `Q` を取る。`Q ≤ A` なので `Q` を含む `↥A` の
@@ -559,7 +561,7 @@ theorem commutator_inf_le_commutator_self_of_TI [Finite G] {A : Subgroup G}
     obtain ⟨z, hz, hzq⟩ := hqfoc
     rw [← Subgroup.commutator_inf_eq_focalSubgroup S] at hz
     change (q : G) ∈ ⁅A, A⁆
-    rw [← hzq, ← map_commutator_subtype A]
+    rw [← hzq, ← Subgroup.map_subtype_commutator A]
     exact ⟨z, hz.1, rfl⟩
   intro x hx
   have hmem : (⟨x, hx⟩ : ↥(commutator G ⊓ A)) ∈ (⁅A, A⁆).subgroupOf (commutator G ⊓ A) := by

@@ -3,9 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 
 /-!
@@ -37,6 +48,8 @@ arbitrary subgroup with that carrier.
 * `Hypothesis.theoremAConclusion_of_orderFiveCarrier_subgroup` — the
   conclusion of Theorem A.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -189,7 +202,7 @@ theorem theoremAConclusion_of_orderFiveCarrier_subgroup (hV : hyp.V ≠ ⊥)
     have := hyp.Q_le_of_orderFiveCarrier hG₀ hyp.distinguishedInvolution_mem_Q
     rwa [hb, Subgroup.mem_bot] at this
   refine hyp.theoremAConclusion_of_not_simple (fun hsimple => ?_) ind
-  rcases hsimple.eq_bot_or_eq_top_of_normal G₀ hnorm with h | h
+  rcases hsimple.eq_bot_or_eq_top_of_normal G₀ with h | h
   · exact hbot h
   · exact hne h
 

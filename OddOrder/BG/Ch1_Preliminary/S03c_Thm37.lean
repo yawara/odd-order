@@ -3,15 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+module
+
+public import OddOrder.GroupTheory.ChiefFactor
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
-import OddOrder.GroupTheory.ChiefFactor
-import Mathlib.GroupTheory.GroupAction.ConjAct
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG §3D: toward Theorem 3.7 (Frobenius kernel nilpotency)
@@ -24,6 +31,8 @@ BG の「K̄ ⊆ O_q(Ḡ) acts trivially」を回避): 有限群の正規 `q`-�
 minimal-normal `q`-部分群 `V` を中心化する。`q`-群 `K ⊔ V` 内で非自明正規部分群 `V` が
 中心と交わること (`exists_mem_center_of_normal_ne_bot`) を使う。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03c
 

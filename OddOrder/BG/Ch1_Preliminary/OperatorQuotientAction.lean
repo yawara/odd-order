@@ -3,8 +3,13 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # BG §4 I-1b — Prop 1.6(b) の R-内部 (actionCommutator) 形
@@ -43,6 +48,8 @@ complement bridge は `notes/bg/s04_n4_maschke_bridge_design.md` を参照。
 **ANTI-SCAFFOLD**: 既存 Γ 形 `iterCommutator_inl_inr_two_eq_one` から genuine に導く
 (制限作用 `toMulAutHom` も Ch04 既存の本物の構成、`sorry` instance ではない)。
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 

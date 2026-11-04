@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+module
+
+public import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi §8: nilpotent descent and Y-set inner products
@@ -16,6 +21,8 @@ factored into `CharacterBreaks` under issue 0073.
 
 Reference note: `notes/peterfalvi/s08_coherence_theorems.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

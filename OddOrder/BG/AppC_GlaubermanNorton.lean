@@ -3,10 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.BG.AppC_AffineLineCondition
+public import OddOrder.BG.AppC_NormSetBasic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
 import Mathlib.FieldTheory.Finite.Extension
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Ideal.Quotient.HasFiniteQuotients.Basic
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Algebra.FiniteFieldIrreducibleCount
 import OddOrder.BG.AppC_LemmaC2
-import OddOrder.BG.AppC_AffineLineCondition
+import OddOrder.BG.AppC_NormSet
 
 /-!
 # BG Appendix C, Remark (IV): the Glauberman–Norton sharpening `p ≤ 3`
@@ -59,6 +70,8 @@ needs — `q ≠ 2 ∨ p = 2` — and derives BG's condition-(A) form as a corol
 - `le_three_of_conditionA_of_normSetE_eq_inv` — **BG Appendix C, Remark (IV)** in the form BG
   states on p. 149: condition (A) and `E = E⁻¹` give `p ≤ 3`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

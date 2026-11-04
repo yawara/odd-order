@@ -3,7 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: nonzero mixed commutators
@@ -23,6 +28,8 @@ central coordinate `0` squares to the nonidentity central element with
 coordinate `1`.  Actor transitivity transports this root to any prescribed
 ambient involution while invariance keeps it inside the chosen factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,9 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Isolated involutions: Navarro (7.8)
@@ -36,6 +36,8 @@ conjugate is exactly `c·u`, so `u` and the `G`-conjugate `c·u` of `u` both lie
 * `OddOrder.GroupTheory.odd_orderOf_commutator_of_forall_conj_eq` — the substantial direction
 * `OddOrder.GroupTheory.forall_conj_eq_iff_forall_odd_orderOf_commutator` — Navarro (7.8)
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 

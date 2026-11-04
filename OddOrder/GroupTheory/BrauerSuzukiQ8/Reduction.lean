@@ -3,15 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.QuaternionTwoFacts
+public import OddOrder.Isaacs.Ch05_Transfer.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.Algebra.Group.Action.Pointwise.Finset
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.CentralSylowComplement
-import OddOrder.GroupTheory.QuaternionTwoFacts
-import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.GroupTheory.SylowContaining
 import OddOrder.Mathlib.QuotientGroup
-import Mathlib.Algebra.Group.Action.Pointwise.Finset
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the group-theoretic reduction (Navarro p. 139)
@@ -32,6 +39,8 @@ is `BrauerSuzukiQ8/CharacterCore.lean`.
 * `OddOrder.GroupTheory.card_sylow_quotient_centralizer` — its Sylow `2`-subgroups have order `4`
 -/
 
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

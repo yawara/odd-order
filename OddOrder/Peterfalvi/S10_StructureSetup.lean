@@ -3,14 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S04_DadeIsometry
-import OddOrder.Peterfalvi.S09_NonexistenceCertain
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroup
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
@@ -18,6 +31,8 @@ import OddOrder.Peterfalvi.S10_BGInterface
 
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleBasic` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # S10_MinimalSimpleBasic

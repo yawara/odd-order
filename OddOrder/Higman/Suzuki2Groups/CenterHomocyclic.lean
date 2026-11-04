@@ -3,7 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+module
+
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.Homocyclic
 import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 
 /-!
@@ -19,6 +26,8 @@ the center homocyclic and classifies all of its actor-invariant subgroups as
 Agemo layers. This is the first hard input toward the reverse inclusion in
 Peterfalvi Appendix III theorem (a), `Z(P) ≤ Q₀`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

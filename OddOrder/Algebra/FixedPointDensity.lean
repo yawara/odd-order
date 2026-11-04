@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.GroupTheory.Index
-import Mathlib.Algebra.Ring.Equiv
 
 /-!
 # An endomorphism fixing more than half the points is the identity
@@ -32,6 +35,8 @@ For the book's situation — `|F| = q` and three exceptional points — the hypo
   `2 |S| < |A|` is the identity.
 * `RingEquiv.eq_refl_of_fixes_compl` — the same for a ring automorphism.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

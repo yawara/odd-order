@@ -3,11 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
 
 /-!
 # Higman Lemma 12: case-dispatch normalizations
@@ -29,6 +32,8 @@ Frobenius exponent of a noncommutative factor may be assumed to lie in
   admits coordinates (itself or its flip) whose `θ` is `Frob^r` with
   `0 < r`, `2r ≤ n`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # The standard Borel subgroup of the Suzuki permutation group
@@ -22,6 +24,8 @@ this gives the unique normal form and the exact subgroup order.
 This is shared infrastructure for the Suzuki target in **Peterfalvi, Part II,
 Chapter I, Theorem A** (pp. 97-98).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

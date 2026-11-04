@@ -3,8 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeConjugation
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 
 /-!
 # Peterfalvi (4.9)(b): coherence of the certain-type characters
@@ -38,6 +42,8 @@ later sections from this map together with `certainType_omega_sum_isometry` (4.9
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

@@ -3,6 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
@@ -51,6 +59,8 @@ engines — they are used inside the §3 development, where solvability is alrea
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §3.
 * Isaacs, _Finite Group Theory_ (AMS GSM 92, 2008), Theorem 6.24 (Thompson).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03
 

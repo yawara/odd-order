@@ -3,7 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
 import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Complement / maximal-subgroup structure for Peterfalvi §13 (13.17.c)/(13.19.c1)
@@ -13,6 +24,8 @@ the intersection structure `E ∩ Q = W₁` / `E ⊄ Q` / `|E| = pq`, the type-I
 over-normalizer Frobenius data, the `E ∩ P` dichotomy, `E ≤ PW₁`, the `P ⋊ W₁`
 structure, and the structural dichotomy `|M : M_F| ∈ {p, pq}`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

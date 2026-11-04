@@ -3,8 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.SetLike.Fintype
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 import OddOrder.GroupTheory.QuaternionRecognition
-import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
 
 /-!
 # Isaacs §3F の演習 (書籍 pp. 110-111)
@@ -27,6 +37,8 @@ mathlib の `QuaternionGroup M` (位数 `4M`) が同じ群なので, `Q_n = Quat
   `⟨a 1⟩`, `⟨xa 0⟩`, `⟨xa 1⟩` のちょうど 3 個) と
   `quaternionTwo_exists_mulAut_map_zpowers` (`Aut(Q_8)` が推移的)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

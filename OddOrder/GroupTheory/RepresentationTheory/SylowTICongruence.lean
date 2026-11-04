@@ -3,6 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.ConjClassCardinality
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
@@ -33,6 +39,8 @@ The conclusion is the `[ALGMOD |P|]` congruence of character values; consumers u
 from the decomposition `Res_Z ψ = a·ρ_Z + b·1_Z`), using that a rational algebraic integer
 is an integer (`OddOrder.RepresentationTheory.isIntegral_rat_imp_int`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

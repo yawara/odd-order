@@ -3,7 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 
 /-!
@@ -37,6 +46,8 @@ over the `p`-regular classes.
 * `OddOrder.RepresentationTheory.Modular.sum_cartanMatrix_mul_pairingZero` — `([μ,φ]⁰)` inverts
   the Cartan matrix
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

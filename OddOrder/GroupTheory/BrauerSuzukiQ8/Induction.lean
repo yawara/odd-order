@@ -3,7 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.RelativeTrace
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.BrauerSuzukiQ8.CharacterCore
+import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the induction on `|G|` and the final statements
@@ -18,6 +30,8 @@ The reduction of `BrauerSuzukiQ8/Reduction.lean` and the character-theoretic cor
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 -/
 
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

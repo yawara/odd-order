@@ -3,10 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BrauerDefect
-import OddOrder.Algebra.ClassSum
+module
+
+public import OddOrder.Algebra.ClassSum
+public import OddOrder.Algebra.BrauerHomomorphism
+public import OddOrder.Algebra.DefectGroup
+import Mathlib.GroupTheory.Sylow
+import Mathlib.RingTheory.Nilpotent.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
+import OddOrder.Algebra.MackeyFormula
+import OddOrder.Algebra.Rosenberg
 
 /-!
 # `Br_D` does not kill a block idempotent with defect group `D`
@@ -35,6 +43,8 @@ The proof runs entirely in the class-sum basis of `Z(k[G])`:
 * `OddOrder.GroupAlgebra.exists_isPGroup_le_centralizer_classSum_mem`
 * `OddOrder.GroupAlgebra.brauerProj_ne_zero_of_isDefectGroup`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

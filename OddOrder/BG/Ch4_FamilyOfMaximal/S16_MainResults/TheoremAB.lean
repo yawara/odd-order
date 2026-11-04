@@ -1,4 +1,21 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 
 /-!
 # BG §16 — Theorems A and B, the component layer
@@ -9,6 +26,8 @@ the TI-subset statement, tameness) and the `κ`/`σ`-complement bridging lemmas.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
@@ -191,7 +210,7 @@ private theorem normalizer_eq_self_of_maximal_B5 [Finite G]
   have hlt : M < Subgroup.normalizer (M : Set G) :=
     lt_of_le_of_ne Subgroup.le_normalizer (fun heq => hle heq.ge)
   have hnormal : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
-  rcases hG.simple.eq_bot_or_eq_top_of_normal M hnormal with hb | ht
+  rcases hG.simple.eq_bot_or_eq_top_of_normal M with hb | ht
   · exact hG.ne_bot_of_isCoatom hco hb
   · exact hco.1 ht
 

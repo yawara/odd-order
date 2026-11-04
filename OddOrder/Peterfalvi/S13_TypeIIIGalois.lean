@@ -3,9 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_Orthogonality
-import OddOrder.Peterfalvi.S12_Props109To1011
+module
+
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
 # Peterfalvi (11.9): the row-`0` projection — Galois constancy layer
@@ -32,6 +36,8 @@ the punctured row `0` and column `0`** (Peterfalvi's (3.9.b) step `a_{i0} = a_{1
 The downstream (11.9.a) analysis (separability + Bessel + the integer case split) and the
 (11.9.c) type-III determination consume this layer.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

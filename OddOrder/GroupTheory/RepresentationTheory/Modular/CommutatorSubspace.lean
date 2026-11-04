@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Module
 import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Algebra.Group.ConjFinite
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.Tactic.Group
 import Mathlib.Tactic.NoncommRing
 
@@ -26,6 +27,8 @@ conjugacy classes.
   summing the coefficients over a conjugacy class kills `T`; these functionals are what
   separate the classes in the quotient
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

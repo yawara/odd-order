@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
 import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 
 /-!
@@ -24,6 +29,8 @@ Together with the already-landed cross orthogonality `hypothesis79_zetaImage_cro
 this closes the (7.9) chain; the conclusion is the `hbeta_ne` input of the good-index
 estimates in the (7.10) `card_G0_lower_bound` assembly (issue 0044).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 
