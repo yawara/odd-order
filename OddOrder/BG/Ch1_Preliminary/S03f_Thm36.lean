@@ -3,19 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
-import OddOrder.BG.Ch1_Preliminary.S03f_Endgame
-import OddOrder.BG.Ch1_Preliminary.S03f_R0Action
-import OddOrder.BG.Ch1_Preliminary.S03f_ComplementK
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.ZGroup
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+public import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
+public import OddOrder.BG.Ch1_Preliminary.S03f_Endgame
+public import OddOrder.BG.Ch1_Preliminary.S03f_R0Action
+public import OddOrder.BG.Ch1_Preliminary.S03f_ComplementK
+public import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.GroupTheory.ZGroup
 
 
 /-!
@@ -80,6 +82,8 @@ Lemma 3.1/3.3 (`S03`/`S03b`), Gorenstein 5.3.7 (`S04e`), Prop 1.3/1.4/1.5/1.6/1.
 **状態 (2026-06-10)**: ✅ **COMPLETE** — Phase A–F すべて sorry-free.  詳細経緯 =
 `notes/bg/s03_thm36_plan.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03f
 

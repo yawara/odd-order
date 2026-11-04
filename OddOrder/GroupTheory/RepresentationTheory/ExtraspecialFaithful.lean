@@ -3,12 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Character
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.Algebra.Group.Commutator
-import Mathlib.GroupTheory.Commutator.Basic
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.IsExtraspecial
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.Algebra.Group.Commutator
+public import Mathlib.GroupTheory.Commutator.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import OddOrder.GroupTheory.IsExtraspecial
+public import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Faithful representations of extraspecial `p`-groups (BG §2 Thm 2.5 / Gor 5.5.5)
@@ -38,6 +41,8 @@ out over a *general* algebraically closed field (no `ℂ`/`star`): mathlib's
 * **BG Thm 2.5** uses Gor 5.5.5 as `dim M = dim V = pⁿ`, then `dim E(P) = q²`
   (BG (2.11)).  See `notes/bg/s03_extraspecial_blocker.md` for the full chain.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

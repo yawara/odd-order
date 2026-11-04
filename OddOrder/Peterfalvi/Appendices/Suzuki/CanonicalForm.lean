@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 
 /-!
 # Peterfalvi Part II, Ch. I §1: the canonical form (Prop 4)
@@ -22,6 +24,8 @@ Proposition 4 of Ch. I §1:
 Part (c) (the quotient `G/𝒩(G)` again satisfies (A1)) is deferred to a
 later leaf.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

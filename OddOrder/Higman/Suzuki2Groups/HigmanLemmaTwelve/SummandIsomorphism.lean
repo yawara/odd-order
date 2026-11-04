@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 
 /-!
 # Isomorphic summands force Frobenius-conjugate eigenvalues
@@ -17,6 +19,8 @@ between two irreducible summands with Singer eigenvalues `λ`, `μ` makes the
 eigenvalues Frobenius-conjugate — the arithmetic obstruction ruling out
 isomorphic summands in the type-C and type-D groups.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

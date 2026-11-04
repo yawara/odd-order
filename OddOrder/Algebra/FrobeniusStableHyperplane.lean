@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.Trace
-import OddOrder.Algebra.PaleySpanning
-import OddOrder.Algebra.RelationLattice
+module
+
+public import Mathlib.FieldTheory.Finite.Trace
+public import OddOrder.Algebra.PaleySpanning
+public import OddOrder.Algebra.RelationLattice
 
 /-!
 # The kernel of the trace is the only Frobenius-stable hyperplane
@@ -40,6 +42,8 @@ codimension at least two.
 * `ker_eq_ker_trace_of_frobenius_stable` — the uniqueness statement above.
 * `frobeniusStableHyperplane_unique` — the same, phrased for subspaces.
 -/
+
+@[expose] public section
 
 namespace OddOrder.FrobeniusStable
 

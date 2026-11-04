@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.EigenCornerInverse
-import OddOrder.Algebra.EigenTraceVanishing
-import OddOrder.Algebra.GroupAlgebraIdeal
-import OddOrder.Algebra.SubgroupTruncation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
+module
+
+public import OddOrder.Algebra.EigenCornerInverse
+public import OddOrder.Algebra.EigenTraceVanishing
+public import OddOrder.Algebra.GroupAlgebraIdeal
+public import OddOrder.Algebra.SubgroupTruncation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
 
 /-!
 # Navarro (5.7): `χ(f_b h) = 0`
@@ -31,6 +33,8 @@ are exactly the four conclusions of (5.6), so the last step towards (5.2) is to 
 
 * `OddOrder.RepresentationTheory.Modular.trace_blockIdempotent_mul_eq_zero` — Navarro (5.7)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

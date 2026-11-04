@@ -1,7 +1,9 @@
-import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S13_Orthogonality
-import OddOrder.Peterfalvi.S06_MuColumnBridge
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
+module
+
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S13_Orthogonality
+public import OddOrder.Peterfalvi.S06_MuColumnBridge
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
 
 /-!
 # S13_Section16PairData
@@ -15,6 +17,8 @@ importing `FeitThompsonSetup` (whose `AppC_FinalContradiction` import pulls the 
 capstone).  This cuts the §12–16 import inversion back-edge `GridTranspose → FeitThompsonSetup`.
 HUB RULING, issue 9093.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

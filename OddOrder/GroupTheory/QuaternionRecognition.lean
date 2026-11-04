@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Tactic.Group
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Tactic.Group
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.Positivity
+public import Mathlib.Tactic.Ring
 
 /-!
 # 一般化四元数群の認識 (recognition)
@@ -23,6 +25,8 @@ import Mathlib.Tactic.Ring
 Ch.3 → Ch.6 の import は逆向きなので, 純粋に一般の群論であるこの部分だけを
 共有 leaf へ引き上げた (`private` をファイル跨ぎで使わない方針にも合致)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

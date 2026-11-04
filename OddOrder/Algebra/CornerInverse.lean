@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Nilpotent.Basic
-import OddOrder.Algebra.JacobsonCentralSubring
+module
+
+public import Mathlib.RingTheory.Nilpotent.Basic
+public import OddOrder.Algebra.JacobsonCentralSubring
 
 /-!
 # Inverting in a corner — Navarro (5.4)
@@ -36,6 +38,8 @@ the radical.
 * `OddOrder.exists_corner_inverse_of_isNilpotent` — the characteristic-`p` variant
 * `OddOrder.exists_corner_inverse_of_approx` — an approximate corner inverse can be corrected
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

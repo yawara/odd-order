@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Index
 
 /-!
 # Peterfalvi Part II, Ch. I §1: Proposition 5 (`V = C_D(s)`, `W = C_D(H∩I)`)
@@ -25,6 +27,8 @@ valid pair `(sᵛ, rᵛ)`, hence `sᵛ = s`).  Equality then follows by counting
 `|H∩I| = |sᴰ| = |D:C_D(s)|` (orbit–stabilizer for `D` acting on `s` by
 conjugation, `sᴰ = H∩I`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

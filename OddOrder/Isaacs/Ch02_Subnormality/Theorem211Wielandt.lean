@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
 
 /-!
 # Theorem211Wielandt
 
 Prefix-split from `OddOrder.Isaacs.Ch02_Subnormality.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 open OddOrder.Isaacs.Ch01
 
 namespace OddOrder.Isaacs.Ch02

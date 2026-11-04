@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # Peterfalvi (13.15), case-(b) order determination
@@ -29,6 +31,8 @@ the `m`-lower bounds, `h11c`). Thus this engine is *ungated*: the caller (the `S
 or the `T`-side `v`-value) supplies those char inputs, which bottom out in `typeP_Galois` (issue
 9000).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Dihedral
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Isaacs Chapter 2 — Problems §2B: involution と二面体群 (p. 57)
@@ -46,6 +48,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2B のうち 
 ⚠ 本ファイルは §2B の involution / 二面体群まわりの問題を集めた leaf だが、2B.6 だけは
 Sylow の局所判定 (involution とは無関係) — §2B の残り 1 問なのでここに置いている。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch02
 

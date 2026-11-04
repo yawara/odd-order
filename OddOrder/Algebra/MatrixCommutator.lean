@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Matrix.Basis
-import Mathlib.LinearAlgebra.Matrix.Trace
-import OddOrder.Algebra.CommutatorSpan
+module
+
+public import Mathlib.Data.Matrix.Basis
+public import Mathlib.LinearAlgebra.Matrix.Trace
+public import OddOrder.Algebra.CommutatorSpan
 
 /-!
 # The commutator span of a matrix algebra is the trace-zero subspace
@@ -29,6 +31,8 @@ out of the first: modulo commutators, `M` *is* the scalar `tr M` (in one diagona
 * `OddOrder.mem_commutatorSpan_matrix_iff`
 * `OddOrder.trace_pow_prime`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 
 /-!
 # Isomorphic central-quotient summands force Frobenius-conjugate eigenvalues
@@ -24,6 +26,8 @@ layer denominator equals `Z`, each packaged factor inclusion
 (`FactorInclusionData.incl`) then lands bijectively on the corresponding
 summand, and the equivariant isomorphism transports along these coordinates.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # Brauer–Suzuki theorem — statement layer and the cyclic case
@@ -29,6 +31,8 @@ and lives in sibling leaves.
 The odd core `O_{2'}(G)` is `oPiCore {p | p ≠ 2} G`
 (`OddOrder.Isaacs.Ch03.oPiCore`, the largest normal `π`-subgroup).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

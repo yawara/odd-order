@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
-import OddOrder.GroupTheory.SylowTransport
-import OddOrder.GroupTheory.CentralCommutatorPower
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+public import OddOrder.GroupTheory.SylowTransport
+public import OddOrder.GroupTheory.CentralCommutatorPower
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
 
 /-!
 # `Z(F)` has odd order in the `PSU(3, ℓ)` branch
@@ -32,6 +34,8 @@ This is what lets the Ch. III §1 Proposition lift a statement about
 * `CentralizerPSUData.exists_mem_residual_commute_Q0` — the lift step: a
   preimage in `F` of the torus element centralizes `C_{Q₀}(X)` outright.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

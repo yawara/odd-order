@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.FrattiniPGroup
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # Gorenstein "Finite Groups" Lemma 4.14 — the engine of `dₙ(P) ≤ 2 ⇒ d(P) ≤ 2`
@@ -32,6 +34,8 @@ import OddOrder.GroupTheory.FrattiniPGroup
   counterexample + Lem 4.12 / 4.13 / 3.9(i) / 3.12).
 * **PART 3** (`Ω₁(A) = D`): rank squeeze (`dₙ(P)` 最大性 + Lem 1.3.4).
 -/
+
+@[expose] public section
 
 open scoped commutatorElement Pointwise
 

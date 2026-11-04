@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Units
-import Mathlib.GroupTheory.Perm.Cycle.Type
-import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
+module
+
+public import Mathlib.Data.ZMod.Units
+public import Mathlib.GroupTheory.Perm.Cycle.Type
+public import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
 
 /-!
 # Isaacs Problem 7A.6 — 一般四元数群の自己同型群の奇素因数
@@ -29,6 +31,8 @@ mathlib の `QuaternionGroup n` は位数 `4n` なので, 一般四元数群は 
 したがって `m = 1` (`|Q| = 8`) で, `Q₈` については既存の
 `card_dvd_three_of_odd_mulAutQuaternion` (奇位数部分群の位数は `3` を割る) から `p = 3`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

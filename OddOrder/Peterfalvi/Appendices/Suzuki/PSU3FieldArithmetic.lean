@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.QuadraticFrobenius
+module
+
+public import OddOrder.Algebra.QuadraticFrobenius
 
 /-!
 # Arithmetic of `E/F` for the characterization of `PSU(3,q)`
@@ -29,6 +31,8 @@ automorphism `θ` of odd order.
 The group-theoretic side of §2 - the orbit counts of steps (8) and (9) - is in
 `PSU3OrbitCount`, which imports this file.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

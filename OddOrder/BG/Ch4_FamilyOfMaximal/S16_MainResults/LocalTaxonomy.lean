@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
 
 /-!
 # BG §16 — Proposition 16.1: the local taxonomy predicates
@@ -9,6 +11,8 @@ the Theorem I/II output file.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory

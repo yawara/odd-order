@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.DoubleCoset
-import Mathlib.GroupTheory.GroupAction.Quotient
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.DoubleCoset
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)
@@ -26,6 +28,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 1 "Sylow Theory"
   場合は **仮定変換の橋渡し補題**を書く (意味のあるラッパー例外)。
 - それ以外は実証明。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

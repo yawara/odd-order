@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Artinian.Ring
-import Mathlib.RingTheory.Idempotents
-import Mathlib.RingTheory.Nilpotent.Basic
+module
+
+public import Mathlib.RingTheory.Artinian.Ring
+public import Mathlib.RingTheory.Idempotents
+public import Mathlib.RingTheory.Nilpotent.Basic
 
 /-!
 # Rosenberg's lemma
@@ -36,6 +38,8 @@ Artinian ring.  This is how the hypothesis is discharged for the block idempoten
   idempotent.
 * `OddOrder.exists_pow_eq_pow_mul` — the stabilisation input, over an Artinian ring.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

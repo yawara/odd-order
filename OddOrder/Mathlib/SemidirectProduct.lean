@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Nilpotent
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Generic helpers for `SemidirectProduct`
@@ -18,6 +20,8 @@ mathlib `SemidirectProduct` モジュールに対する補足 (v4.34.1 でも未
   Isaacs Lem 4.32 (P p-group acts on G p-group ⇒ [G,P] < G + C_G(P) > 1) で
   `Γ = G ⋊ P` が p-group ⇒ 冪零という議論の核.
 -/
+
+@[expose] public section
 
 /-- **半直積の Finite instance**. `SemidirectProduct.equivProd` 経由. -/
 instance SemidirectProduct.finite {N G : Type*} [Group N] [Group G] [Finite N] [Finite G]

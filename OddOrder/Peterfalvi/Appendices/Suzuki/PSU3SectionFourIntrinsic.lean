@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RankOneBNPairRigidity
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+module
+
+public import OddOrder.GroupTheory.RankOneBNPairRigidity
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Ch. IV §4, step (2): the *intrinsic* standing hypothesis on `U/Z(U)`
@@ -66,6 +68,8 @@ setup lives on its image in `G` (`residualImage`).
   no reference to `t`.  This is how step (2) moves `1 ≠ w ∈ W` between the intrinsic and
   the transported standing hypotheses on `U/Z(U)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.ProperExtension
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.ProperExtension
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 
 /-!
 # Higman's Lemma 11: the type-A conclusion
@@ -18,6 +20,8 @@ quotient coordinates for a central group extension.  It also absorbs the
 nonzero scalar in Higman's square formula into the kernel coordinate and
 feeds the resulting square map to Peterfalvi's concrete type-A model.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -419,7 +423,7 @@ noncomputable def lowerCentralTermZeroEquivAmbient
 set_option backward.isDefEq.respectTransparency false in
 /-- Under the square-layer identity, the ambient first lower-central term
 maps to the kernel defining the zeroth lower-central layer. -/
-private theorem lowerCentralTerm_one_map_zeroEquiv_symm
+theorem lowerCentralTerm_one_map_zeroEquiv_symm
     (P : Type uP) [Group P]
     (hK0 : lowerCentralLayerKernel P 0 =
       (lowerCentralTerm P 1).subgroupOf (lowerCentralTerm P 0)) :

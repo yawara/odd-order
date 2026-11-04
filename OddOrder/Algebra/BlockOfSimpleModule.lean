@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CentralCharacter
+module
+
+public import OddOrder.Algebra.CentralCharacter
 
 /-!
 # The block of a simple module, read off its central scalar
@@ -26,6 +28,8 @@ The hypothesis is phrased with `algebraMap k A c` rather than `c • m` on purpo
 
 * `OddOrder.MatrixModule.exists_eq_centralCharacterAlg_of_forall_smul_eq`
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

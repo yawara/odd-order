@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 
 /-!
 # BG §12: Corollary 12.10
@@ -51,6 +53,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 - Proposition 12.4(a) = `centralizer_le_of_elemAb_rank_two`。
 - `Sylow.directProductOfNormal` + `Group.isNilpotent_of_finite_tfae` (nilpotent = Sylow 直積)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

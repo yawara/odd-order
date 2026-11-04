@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
+module
+
+public import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 
 /-!
 # Isaacs Problem 8C.2 (p. 256) — 次数 11, 位数 7920 の置換群は単純
@@ -35,6 +37,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 
 - `isSimpleGroup_of_card_eq_7920` — **Problem 8C.2** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

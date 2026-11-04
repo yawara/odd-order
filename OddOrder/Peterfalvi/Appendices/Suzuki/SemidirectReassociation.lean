@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 
 /-!
 # Peterfalvi Part II, Chapter I §2 — reassociating the semilinear product
@@ -12,6 +14,8 @@ This file supplies the group-theoretic reassociation used in Proposition 3 (p. 1
 an action by `T ⋊ V` turns `E ⋊ (T ⋊ V)` into `(E ⋊ T) ⋊ V`, and compatible
 coordinate equivalences transport the result to `𝓛(F, A)`.
 -/
+
+@[expose] public section
 
 namespace SemidirectProduct
 

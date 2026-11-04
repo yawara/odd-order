@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 
 /-!
 # Peterfalvi Part II, Ch. I §3: the centralizer quotient hypothesis
@@ -17,6 +19,8 @@ faithful quotient action. This file constructs the actual quotient action,
 transports all of (A1), proves (A2), and transports the elementary abelian
 four-subgroup required by (A3). No abstract quotient carrier is posited.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

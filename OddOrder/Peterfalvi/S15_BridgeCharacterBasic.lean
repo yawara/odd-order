@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_ComplementStructure
+module
+
+public import OddOrder.Peterfalvi.S15_ComplementStructure
 
 /-!
 # Peterfalvi §15 — the bridge character: opening layer
@@ -11,6 +13,8 @@ import OddOrder.Peterfalvi.S15_ComplementStructure
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory

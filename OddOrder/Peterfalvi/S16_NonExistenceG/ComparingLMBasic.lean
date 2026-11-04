@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 
 /-!
 # Peterfalvi §16 — comparing L and M: opening layer
@@ -7,6 +9,8 @@ import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory

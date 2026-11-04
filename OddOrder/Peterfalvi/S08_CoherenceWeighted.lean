@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.Peterfalvi.S08_RetargetReducible
-import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import OddOrder.Peterfalvi.S08_RetargetReducible
+public import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
 
 /-!
 # Peterfalvi §5/§8: the norm-weighted (5.6) coherence-break engine
@@ -37,6 +39,8 @@ This file develops that weighted engine additively (the unweighted version is pr
 
 Plan of record: `notes/peterfalvi/s56_reweighting_plan.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+module
+
+public import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 
 /-!
 # Peterfalvi (2.5)/(3.2)/(3.5): the generic σ-agreement and transpose bridge
@@ -36,6 +38,8 @@ The `TICyclicHypothesis`-generic layer of the (8.8)/(10.7) grid transpose
   swap, a full `hyp₁`-grid column is a full `hyp₂`-grid row at the two-level
   `subgroupOf`-transported index (value-level transports, no `Eq.rec`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

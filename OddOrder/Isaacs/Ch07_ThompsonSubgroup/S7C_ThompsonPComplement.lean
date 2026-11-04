@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 
 /-!
 # Isaacs FGT Ch.7 — §7C Thompson normal p-complement (pp. 215–219)
@@ -11,6 +13,8 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 This leaf contains the quotient identifications and the minimum-counterexample
 assembly for Thompson's normal `p`-complement theorem (Isaacs Theorem 7.1).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

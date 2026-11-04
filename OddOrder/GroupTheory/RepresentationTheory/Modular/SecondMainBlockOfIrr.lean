@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 
 /-!
 # Navarro (5.8) for the ordinary irreducibles
@@ -22,6 +24,8 @@ This is the vanishing that makes the generalized decomposition matrix block-diag
 
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

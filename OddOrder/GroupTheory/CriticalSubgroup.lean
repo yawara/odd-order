@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Critical subgroups (Gorenstein Thm 5.3.11 / 5.3.13)
@@ -56,6 +58,8 @@ predicate `IsCritical : Subgroup G → Prop` を採用 (mathlib 互換, no-wrapp
 Gorenstein の (i) は `C/Z(C)` elementary abelian も含むが, それは (i-a)+commutator
 から導出可能なので def には入れず補題で与える.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

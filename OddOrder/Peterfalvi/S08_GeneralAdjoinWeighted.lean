@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_GeneralAdjoin
-import OddOrder.Peterfalvi.S07_RetargetScaled
+module
+
+public import OddOrder.Peterfalvi.S08_GeneralAdjoin
+public import OddOrder.Peterfalvi.S07_RetargetScaled
 
 /-!
 # Peterfalvi (5.6): the **norm-weighted** coherence adjoin for an arbitrary isometry `τ`
@@ -48,6 +50,8 @@ on `ℤ[𝒮]` — see `mem_zSupportedSpan_univ_iff`), so every existing consume
 
 See issue 0154.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

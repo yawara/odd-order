@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the conjugate summand split
@@ -24,6 +26,8 @@ coprime fixed-point lifting would produce an `ω`-fixed representative outside
 isomorphism `ω` itself forms an `IsomorphicOrderQModuleSplit`, the input of
 the type-B recognition of Appendix III, Theorem (e).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

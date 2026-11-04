@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_TypeIIIGalois
-import OddOrder.Peterfalvi.S13_TypeDetermination
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.GroupTheory.NilpotentAbelianization
+module
+
+public import OddOrder.Peterfalvi.S13_TypeIIIGalois
+public import OddOrder.Peterfalvi.S13_TypeDetermination
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+public import OddOrder.GroupTheory.NilpotentAbelianization
 
 /-!
 # Peterfalvi (11.9.c) — the non-Galois `u = a` pin
@@ -45,6 +47,8 @@ This is the keystone of the (11.9.c) non-Galois exclusion: downstream, `u = a` c
 `q ∣ u − 1` (`card_uActionHom_range_modEq_one`) and `a ∣ p − 1` into `q ≤ p − 2 < p`,
 contradicting (11.9.b) `p < q` — so case (9.7.b) (Galois) holds and `U` is cyclic.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

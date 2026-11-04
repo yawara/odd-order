@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import OddOrder.GroupTheory.CardSupInf
-import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+public import OddOrder.GroupTheory.CardSupInf
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
 
 /-!
 # Peterfalvi Part II, Ch. III: the subgroup `QK`
@@ -30,6 +32,8 @@ The book states the stronger `H/QK ≅ V`; only the odd order of the quotient (f
 solvability, via Feit–Thompson) and its non-triviality are used downstream, and
 both are cheaper than the isomorphism.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

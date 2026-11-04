@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 
 /-!
 # The decomposition matrix is block diagonal
@@ -32,6 +34,8 @@ equality of blocks.
   the reduction of an absolutely irreducible lattice by `λ_χ`
 * `OddOrder.RepresentationTheory.Modular.blockOfIrr_eq_of_decompositionMatrix_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

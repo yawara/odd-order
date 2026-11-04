@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_SigmaIsometry
-import OddOrder.Peterfalvi.S06_DadeIsometryCertain
-import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
-import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+module
+
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §6 (4.3.b): the certain-type characters
@@ -29,6 +31,8 @@ the image into a signed irreducible-difference family
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

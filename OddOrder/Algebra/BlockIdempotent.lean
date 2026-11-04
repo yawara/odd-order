@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Idempotents
-import OddOrder.Algebra.CentralCharacter
-import OddOrder.Algebra.SeparatingSubalgebra
+module
+
+public import Mathlib.RingTheory.Idempotents
+public import OddOrder.Algebra.CentralCharacter
+public import OddOrder.Algebra.SeparatingSubalgebra
 
 /-!
 # Block idempotents
@@ -31,6 +33,8 @@ idempotent** `e_B`.
 * `OddOrder.MatrixModule.blockRingEquiv` — `A` is the product of its blocks
 * `OddOrder.MatrixModule.existsUnique_block_smul_eq_self`
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

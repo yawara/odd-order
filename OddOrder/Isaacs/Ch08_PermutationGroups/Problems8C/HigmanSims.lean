@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 /-!
 # Isaacs Problem 8C.4 (p. 257) — 次数 100, 点安定化群が単純で軌道長 22, 77
@@ -32,6 +34,8 @@ Mathieu 群 `M₂₂` に同型。
 - `isPreprimitive_of_orbits_eq` — **8C.4** 前半 (原始性)。
 - `isSimpleGroup_of_orbits_eq` — **8C.4** 後半 (単純性)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

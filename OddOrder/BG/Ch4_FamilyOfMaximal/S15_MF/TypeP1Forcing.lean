@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
 
 /-!
 # BG §15 — Theorem 15.2, the type-`P1` forcing layer
@@ -9,6 +11,8 @@ The §14-gated conditional helpers through `isTypeP1_of_mf_ne_msigma` and
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory

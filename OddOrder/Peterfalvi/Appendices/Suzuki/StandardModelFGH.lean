@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
-import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
 
 /-!
 # The mappings `f`, `g`, `h` of the standard `PSU(3, q)` model
@@ -42,6 +44,8 @@ the standard model through `Q` and `f` alone.
   reciprocal `(ρ̄/y, 1/y)` of §3 (4).
 * `exists_standardModel_fgh` — the mappings themselves, normalized at `1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

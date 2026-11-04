@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
 
 /-!
 # Peterfalvi (11.9)(a): T-side eta-grid coefficient relations
@@ -13,6 +15,8 @@ regular part of the shared cyclic subgroup `W`.  Peterfalvi (3.7) then gives the
 four-corner relation for its integral eta-grid projection coefficients.  This is the
 support-theoretic part of Coq `FTtype34_structure`'s `bridgeS1` calculation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

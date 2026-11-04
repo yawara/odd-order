@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.Index
-import Mathlib.LinearAlgebra.Dimension.Constructions
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.Tactic.Group
+public import Mathlib.GroupTheory.Index
+public import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # The induced representation, as `H`-equivariant functions
@@ -51,6 +53,8 @@ the `Representation` structure clean.
   `[G : H]` coordinates each a copy of `W`; this is what makes `Module.finrank` (and hence
   the Brauer character) of the induced module accessible
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

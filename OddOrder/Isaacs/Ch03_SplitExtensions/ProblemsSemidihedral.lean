@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.Tactic.Group
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Algebra.Group.End
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Tactic.LinearCombination
-import Mathlib.Data.ZMod.QuotientGroup
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.RingTheory.ZMod.UnitsCyclic
-import Mathlib.FieldTheory.Finite.GaloisField
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.Tactic.Group
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Algebra.Group.End
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Tactic.LinearCombination
+public import Mathlib.Data.ZMod.QuotientGroup
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.RingTheory.ZMod.UnitsCyclic
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Isaacs Chapter 3 — Problems §3A: semidihedral 群と一般化四元数群 (3A.1, 3A.2)
@@ -25,6 +27,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3 "Split Extensions" �
 ⚠ 分割の理由: `Problems.lean` が 1,500 行の上限に近づいたため、先頭の semidihedral /
 一般化四元数クラスタを sibling leaf へ prefix-split した (module 名不変ゆえ下流無影響)。
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch03
 
 section /- Problems 3A: Split extensions (pp. 74-75) -/

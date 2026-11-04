@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Appendix III: uniqueness of the invariant two-summand split
@@ -28,6 +30,8 @@ This is the uniqueness half of the equivalence (e): an
 same invariant normal subgroup to be `K`-equivariantly isomorphic, which the
 type-B recognition consumes on the canonical eigencoordinate split.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

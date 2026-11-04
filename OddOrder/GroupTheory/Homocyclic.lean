@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FiniteAbelian.Basic
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.OmegaSubgroup
+module
+
+public import Mathlib.GroupTheory.FiniteAbelian.Basic
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.GroupTheory.OmegaSubgroup
 
 /-!
 # Homocyclic finite abelian 2-groups
@@ -19,6 +21,8 @@ power filtration, the finite abelian decomposition cannot contain cyclic
 factors of different orders.  The main theorem below makes this argument
 explicit using the `Agemo` filtration.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

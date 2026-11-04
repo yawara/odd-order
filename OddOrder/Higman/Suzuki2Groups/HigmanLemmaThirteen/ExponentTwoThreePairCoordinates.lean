@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFullPreimageGeometry
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFullPreimageGeometry
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
 
 /-!
 # Higman's Lemma 13: simultaneous coordinates on the three factor pairs
@@ -27,6 +29,8 @@ parameters attached to each actual ambient factor.  Consequently the three
 pair relations live on one coherent triple of parameters, and Higman's
 cyclic list check forces at least two of them to coincide.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

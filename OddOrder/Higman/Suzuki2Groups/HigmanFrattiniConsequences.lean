@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+module
+
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
 /-!
 # Higman Lemma 3: Frattini consequences
@@ -16,6 +18,8 @@ This file proves the immediate consequences of Phi(C) = Phi(A): mixed
 commutators lie in A squared, squares from C lie in A squared, and the
 commutator estimate propagates from A squared to A to the fourth power.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

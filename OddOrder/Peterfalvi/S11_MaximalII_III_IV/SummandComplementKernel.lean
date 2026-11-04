@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
 
 /-!
 # TAIL
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

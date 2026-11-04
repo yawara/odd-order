@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Henselian
-import Mathlib.Algebra.Polynomial.Identities
-import Mathlib.RingTheory.RootsOfUnity.Basic
+module
+
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.Algebra.Polynomial.Identities
+public import Mathlib.RingTheory.RootsOfUnity.Basic
+public import Mathlib.Algebra.EuclideanDomain.Field
 
 /-!
 # Lifting roots of unity along the residue map of a Henselian local ring
@@ -29,6 +32,8 @@ eigenvalues of a `p`-regular element from characteristic `p` back to characteris
 * `OddOrder.RepresentationTheory.Modular.exists_pow_eq_one_residue_eq` — existence of lifts
 * `OddOrder.RepresentationTheory.Modular.rootsOfUnityEquivResidue` — the isomorphism
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
 
 /-!
 # ChiefFactorCore
@@ -7,6 +9,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData` (2000-line limit, issue
 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (9.5)-(9.7) — Clifford-theory data over the chief factor

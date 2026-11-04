@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
 # Odd Frobenius complements: prime-order subgroups are normal (Huppert V.8.18 b)
@@ -44,6 +46,8 @@ Let `A` be a finite Frobenius complement of odd order.
    `r ∤ |N|` both centralize `N` and lie over the unique order-`r` subgroup of the cyclic
    `A ⧸ N`.  A unique subgroup of its order is characteristic, hence normal.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
 
 /-!
 # Peterfalvi (9.8)-(9.10) — character counts in the two Clifford cases
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
 Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

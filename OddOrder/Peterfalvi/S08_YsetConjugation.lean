@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_YsetConjugation.InducedFamilies
+module
+
+public import OddOrder.Peterfalvi.S08_YsetConjugation.InducedFamilies
 
 /-!
 # Peterfalvi §8: filtration and Y-set conjugation
 
 The `S(A)`, `X`, and `Y` filtration API and the Y-set conjugation/coherence construction.
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §08 Coherence Core — Part 2/3 (first `SibleyDadeHypothesis` block)

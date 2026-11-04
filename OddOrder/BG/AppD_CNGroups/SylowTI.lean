@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
+module
+
+public import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
 
 /-!
 # BG Appendix D, Lemmas D.1 and D.2
@@ -25,6 +27,8 @@ and `N` is a 3-step group with respect to `p`.
 ⚠ Minimal simplicity is essential in both: see the module docstring of
 `OddOrder.BG.AppD_CNGroups.Basic` for the two counterexamples among general odd CN-groups.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppD
 

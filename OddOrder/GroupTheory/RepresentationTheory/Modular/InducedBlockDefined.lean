@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 
 /-!
 # `b^G` is defined when `P C_G(P) ≤ H ≤ N_G(P)` — Navarro (4.14)
@@ -35,6 +37,8 @@ Assembling them gives the algebra homomorphism `λ_b ∘ Br_P` and hence the blo
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_inducedBlockOfNormalizer` —
   `λ_{b^G}(K̂) = λ_b(Br_P(K̂))`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

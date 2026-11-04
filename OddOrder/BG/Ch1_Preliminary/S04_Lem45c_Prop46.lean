@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SubgroupInAmbient
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+module
+
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # BG §4B: Lemma 4.5(c) and Proposition 4.6 (normal `E_{p²}` inside a noncyclic normal subgroup)
@@ -68,6 +70,8 @@ is elementary abelian.
   `OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient`.
 * Issue 3013.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 

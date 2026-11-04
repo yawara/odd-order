@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.Algebra.Group.Subgroup.Pointwise
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # Isaacs Problem 3C.7 (書籍 p. 91) — Carter 部分群の定義と基本性質
@@ -31,6 +33,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.7 の形式化
 `Subgroup.normalizer_le_normalizer_sup_normal` として既にあるので, ここでは重複させない
 (ラッパー方針)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

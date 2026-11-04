@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Idempotents
-import Mathlib.Algebra.DirectSum.Module
+module
+
+public import Mathlib.RingTheory.Idempotents
+public import Mathlib.Algebra.DirectSum.Module
 
 /-!
 # Internal direct sum from a complete orthogonal family of idempotent endomorphisms
@@ -21,6 +23,8 @@ For Peterfalvi (9.1)'s kernel-FPF count (†), the module `W = [V,U]` decomposes
 images under the algebra map `asAlgebraHom ρ` (which is a ring hom, so preserves the structure by
 `CompleteOrthogonalIdempotents.map`) are the projections.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.IdempotentDirectSum
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_HonestTypeP2A0
-import OddOrder.Peterfalvi.S16_GridExpansion
+module
+
+public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+public import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (5.3.b) / (14.9), `S`-side coherent images are orthogonal to the shared `η`-grid
@@ -48,6 +50,8 @@ engine therefore needs an `A(S)`-supported coherence of `Ind_S^G` — the (13.3)
 `cprimeSharpS_subset_supportA : (C')^# ⊆ A(S)`), the remaining upstream step; this file supplies
 the downstream orthogonality engine it feeds.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

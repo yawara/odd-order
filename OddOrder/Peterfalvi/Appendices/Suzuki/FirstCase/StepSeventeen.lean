@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenWeakClosure
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenWeakClosure
 
 /-!
 # Peterfalvi Part II, Ch. II, step (17): the final contradiction
@@ -17,6 +19,8 @@ This file shows that `R₂⟨s⟩` nevertheless has a quotient of order `3` — 
 `|W| = 9` and the `|W| = 3` case — and assembles the contradiction, parameterised by
 the transfer-control input (issue 9503).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

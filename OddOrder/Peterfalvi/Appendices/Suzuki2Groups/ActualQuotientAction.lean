@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Appendix III: the actual `K`-action on `Q / Q₀`
@@ -20,6 +22,8 @@ fixed-point lifting therefore makes the induced action on `Q / Q₀`
 fixed-point-free.  Consequently, every invariant subgroup of order `|Q₀|`
 is transitive on its nonidentity elements and simple as a `K`-group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

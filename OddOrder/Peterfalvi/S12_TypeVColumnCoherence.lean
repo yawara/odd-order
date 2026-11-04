@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
-import OddOrder.Peterfalvi.S12_Props109To1011
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+public import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
 # Peterfalvi (10.10.3)–(10.10.4): type-V case (c) — column characters and the coherence glue
@@ -24,6 +26,8 @@ coherent-extension glue `(μ_j − d·ζ)^τ = δ·(μ_0 − ζ)^τ + ∑_i α_{
 The `p³` structural inputs of (10.10.2) (the `S₁`-count, `W₂ = H′ = M″`, the degree pin
 `d = p`, the `hstruct` dichotomy) live downstream in `S12_TypeVCaseC`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+module
+
+public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
 
 /-!
 # S04_InduceConjFinset
 
 Prefix-split from `OddOrder.Peterfalvi.S04_DadeIsometry` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S04
 open OddOrder.RepresentationTheory
 open scoped Pointwise

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
 
 /-!
 # Higman's Lemma 13: equivariance of the middle Frattini commutator
@@ -16,6 +18,8 @@ The natural map from the first lower-central layer to
 middle Frattini commutator intertwines the induced action on both outer
 variables with the actual quotient action on the middle layer.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

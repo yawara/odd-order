@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SemilinearFixedPoint
-import OddOrder.GroupTheory.FreeActionOrbitCount
-import Mathlib.GroupTheory.PGroup
+module
+
+public import OddOrder.Algebra.SemilinearFixedPoint
+public import OddOrder.GroupTheory.FreeActionOrbitCount
+public import Mathlib.GroupTheory.PGroup
 
 /-!
 # A fixed point on a free orbit, from Hilbert 90
@@ -38,6 +40,8 @@ Ch. III §1, p. 117 — see `Peterfalvi/Appendices/Suzuki/StructureOfH/WNeBot.le
 * `OddOrder.GroupTheory.exists_ne_one_fixed_of_free_orbit_semilinear` — the fixed
   point.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

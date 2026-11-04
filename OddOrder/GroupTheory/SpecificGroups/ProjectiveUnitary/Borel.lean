@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # The standard Borel subgroup of the projective unitary permutation group
@@ -24,6 +26,8 @@ subgroup order.
 This supplies standard unitary-group structure used in **Peterfalvi, Part II,
 Chapter I §3, Lemma 1** (pp. 100-107).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

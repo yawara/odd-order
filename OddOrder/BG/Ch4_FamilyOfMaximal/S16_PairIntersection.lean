@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 
 /-!
 # BG §16: the type-`P` dual pair intersection `S ∩ T = W`
@@ -37,6 +39,8 @@ All prerequisites (Proposition 14.2(b1)/(f), Theorem 13.9) are formalized in
 `S14_TypePCounting`; this file only cites them.  The partner data is supplied in
 the *canonical* shape that `typeP_duality`'s `∃!` conclusion exposes.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

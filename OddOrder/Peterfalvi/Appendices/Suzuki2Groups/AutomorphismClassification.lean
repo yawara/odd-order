@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Finite.GaloisField
-import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+module
+
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Peterfalvi Appendix III, Proposition 2: automorphisms of `B(n, 1)`
@@ -46,6 +48,8 @@ that `σ` commutes with the conjugation (the Galois group of a finite field
 is cyclic) and restricts to the fixed field `F` (normality) — and lifts it
 to an automorphism by Lemma 1(c).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

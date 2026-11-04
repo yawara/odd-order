@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
-import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 
 /-!
 # The converse of the third main theorem, with all of Külshammer's side conditions discharged
@@ -38,6 +40,8 @@ block-idempotent families; `hroot`/`hroot'` supply the roots of unity, in the sh
 
 * `OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

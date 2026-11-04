@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
-import OddOrder.Algebra.FixedPointsGalois
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+public import OddOrder.Algebra.FixedPointsGalois
 
 /-!
 # `C_V(C_{Q₀}(P)) = PW` — the theorem of Galois in the semilinear model
@@ -34,6 +36,8 @@ is in when it invokes this.
   `|Q₀| = |C_{Q₀}(X)| ^ |X|` for `X ≤ V` with `X ⊓ W = 1`;
   `Hypothesis.natCard_Q0_eq_pow_of_W_eq_bot` is the `W = 1` case.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

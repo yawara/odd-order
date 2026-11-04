@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCore
-import OddOrder.Peterfalvi.S07_CoherenceGalois
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCore
+public import OddOrder.Peterfalvi.S07_CoherenceGalois
 
 /-!
 # Peterfalvi §8 case-(B): central congruence and coefficient bounds
@@ -27,6 +29,8 @@ central-commutator program in `S08_CoherenceCore`.  The textbook proof (mmd 04.8
 
 Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` ("session 39 cont.²").
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

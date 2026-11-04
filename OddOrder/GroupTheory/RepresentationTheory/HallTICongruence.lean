@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-import OddOrder.GroupTheory.TISubset
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+public import OddOrder.GroupTheory.TISubset
 
 /-!
 # The `(6.7)` central-character congruence for a normal Hall TI-subgroup
@@ -35,6 +37,8 @@ Only two ingredients are Sylow-specific in the original:
 `fixedPointFree_classPair_hall` is the reusable crux; the assembly
 `peterfalvi_67_hall` mirrors `peterfalvi_67` with `P ↝ Q`, `N_G(P) ↝ H`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

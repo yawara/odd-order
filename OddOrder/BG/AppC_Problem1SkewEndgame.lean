@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_Problem1SkewCalculus
-import OddOrder.BG.AppC_Problem1Exponent
+module
+
+public import OddOrder.BG.AppC_Problem1SkewCalculus
+public import OddOrder.BG.AppC_Problem1Exponent
 
 /-!
 # BG Appendix C, Problem 1: the endgame — the κ-conspiracy refuted
@@ -20,6 +22,8 @@ closed loop has vanishing weight — *conspiracy*) is walked through the populat
 
 Mathematical record: `notes/bg/appC_problem1_resolution.md` §4–§5 (issues 0180/0181).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

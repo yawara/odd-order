@@ -3,12 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.15 characteristic elementary-abelian p^2 (odd + p=2
 cases) (pp. 193-197)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

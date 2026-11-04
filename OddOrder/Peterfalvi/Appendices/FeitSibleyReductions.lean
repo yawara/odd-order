@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
-import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import Mathlib.GroupTheory.PGroup
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+public import Mathlib.GroupTheory.PGroup
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction-step machinery (pp. 146–148)
@@ -26,6 +28,8 @@ would act on the finite set `wN`, whose size `|N|` is prime to `ord δ'`
 (`IsPGroup.card_modEq_card_fixedPoints`), and `y ≠ 1` since `1 ∉ wN`,
 contradicting `D_fixedPointFree_on_Q1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

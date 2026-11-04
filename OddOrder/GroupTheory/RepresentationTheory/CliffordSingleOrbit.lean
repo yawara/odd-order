@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
-import OddOrder.GroupTheory.RepresentationTheory.Clifford
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Clifford's theorem: the constituents of a restriction form a single conjugation orbit
@@ -26,6 +28,8 @@ characters this says their characters lie in one orbit of the conjugation action
   (`ρ` irreducible), there is `g : G` with `χ_{N'}(h) = χ_N(g⁻¹ h g)`: the constituent characters
   form a single conjugation orbit (module-level Clifford single-orbit).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

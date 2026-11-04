@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import OddOrder.GroupTheory.PiElementDecomposition
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
+module
+
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.GroupTheory.PiElementDecomposition
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
 # Elements killed by the order of a cyclic normal subgroup of a `Z`-group
@@ -36,6 +38,8 @@ need to identify `P ∩ W`.  The reduction from `g` to its `p`-components is the
 * `OddOrder.GroupTheory.mem_of_isPGroup_of_orderOf_dvd` — the `p`-element case.
 * `OddOrder.GroupTheory.mem_of_pow_card_eq_one_of_isZGroup` — the statement above.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

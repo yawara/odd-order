@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.GroupTheory.IsSubnormal
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.Order.Minimal
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.GroupTheory.IsSubnormal
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.Order.Minimal
 
 /-!
 # The `p`-residual `O^p(G)` (Isaacs Ch. 9 §9C 準備)
@@ -28,6 +30,8 @@ Lemma 9.26 で使う). 「`G/N` が `p`-群となる正規部分群 `N` の交�
 `G ⧸ N` の群構造は `N.Normal` を要するので, 述語は `∃ _ : N.Normal, IsPGroup p (G⧸N)`
 の形で書く (匿名仮説がインスタンス解決に載る).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

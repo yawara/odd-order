@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockIdempotent
-import OddOrder.Algebra.CornerInverse
+module
+
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.CornerInverse
 
 /-!
 # Inverting in the corner of a block — the characteristic-`p` half of Navarro (5.5)
@@ -25,6 +27,8 @@ block idempotents.
 
 * `OddOrder.MatrixModule.exists_corner_inverse_of_blockCharacter_eq_one`
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

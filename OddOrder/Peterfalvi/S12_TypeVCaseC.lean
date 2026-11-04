@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
+module
+
+public import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
 
 /-!
 # Peterfalvi (10.10.2): the type-V case-(c) structural package
@@ -18,6 +20,8 @@ identification `W₂ = H′ = M″`, the degree pin `d = p`, and the `hstruct` d
 `φ ∈ S₁ ∨ φ = μ_j`.  These are the inputs `typeV_forces_coherence_v2` feeds to the
 (10.10.3)/(10.10.4) engine of the upstream module.
 -/
+
+@[expose] public section
 
 /-! ### (10.10.2): the case-(c) structural package — `p³` character theory
 

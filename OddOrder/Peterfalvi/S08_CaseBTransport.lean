@@ -3,15 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-import OddOrder.Peterfalvi.S08_CaseBCoherence
-import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+public import OddOrder.Peterfalvi.S08_CaseBCoherence
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 
 /-!
 # S08_CaseBTransport
 
 Prefix-split from `OddOrder.Peterfalvi.S08_CaseBCoherence2` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §8: Case (B) coherence — the `τ₂` assembly

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_BridgeCoherent
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
+module
+
+public import OddOrder.Peterfalvi.S07_BridgeCoherent
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
 
 /-!
 # Peterfalvi (5.6) / Isaacs 7.14: the general mixed-degree coherence adjoin
@@ -39,6 +41,8 @@ This file builds the general degree-bound adjoin that
 `Appendices/FeitSibley.coherent_adjoin_of_degree_bound` (Peterfalvi Appendix IV, Lemma 1(a)) needs.
 See issue 1049.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

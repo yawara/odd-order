@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.TISubset
-import OddOrder.GroupTheory.ConjClassSet
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.Index
-import Mathlib.Algebra.BigOperators.GroupWithZero.Action
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+module
+
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.GroupTheory.ConjClassSet
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.Index
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Conjugation-invariant sums over the saturation of a TI-subset
@@ -38,6 +40,8 @@ Peterfalvi §13 consumes: the Parseval splits (13.10.1)/(13.10.2) turn
 * Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
   (13.10) — "Since `H^#` is a TI-subset of `G` with normalizer `S`".
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

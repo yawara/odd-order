@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+module
+
+public import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
 
 /-!
 # Peterfalvi (9.11.1)–(9.11.4) — step lemmas of the `S`-instance caseA campaign
@@ -23,6 +25,8 @@ equality-configuration refutation (`S15_CaseACoherence`, which imports this file
   `PFsection9.v:1478-1484` — Hall decomposition/conjugacy in the solvable `HU₁` + coprime
   fixed-point lifting) and the cleared Mackey-norm bundle `nineElevenFourNormInputsS`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

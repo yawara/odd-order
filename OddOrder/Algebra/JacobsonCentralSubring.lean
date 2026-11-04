@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
-import Mathlib.RingTheory.Nakayama
-import Mathlib.RingTheory.Finiteness.Basic
+module
+
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import Mathlib.RingTheory.Nakayama
+public import Mathlib.RingTheory.Finiteness.Basic
 
 /-!
 # The radical of a central subring over which the ring is finite
@@ -33,6 +35,8 @@ This is the first of the lemmas Navarro uses for Brauer's second main theorem: (
 * `OddOrder.algebraMap_mem_ringJacobson`
 * `OddOrder.algebraMap_maximalIdeal_mem_ringJacobson` — the local case, `𝔪·A ⊆ J(A)`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

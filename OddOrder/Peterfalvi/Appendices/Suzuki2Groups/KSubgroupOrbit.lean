@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.FreeActionOrbitCount
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+module
+
+public import OddOrder.GroupTheory.FreeActionOrbitCount
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Peterfalvi Appendix III: the free orbit of K-subgroups
@@ -24,6 +26,8 @@ fiber has `2`-power cardinality would not suffice for an arbitrary odd-order
 permutation; the invariant normal coset is the essential group-theoretic
 input.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

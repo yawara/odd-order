@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic
-import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic
+public import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
 
 /-!
 # S02_FixedSubmodules
@@ -12,6 +14,8 @@ import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise

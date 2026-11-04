@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch01_Sylow.Basic
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs, Finite Group Theory — Problem 9D.4: Kegel 予想の極小反例 (p. 294)
@@ -30,6 +32,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 9D.4 (書籍 p. 294):
 * `IsKegelMinimalCounterexample.sup_eq_top` — skeleton 2: 非自明な正規部分群 `N` は
   `S` と合わせて `G` 全体を生成する (`SN = G`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

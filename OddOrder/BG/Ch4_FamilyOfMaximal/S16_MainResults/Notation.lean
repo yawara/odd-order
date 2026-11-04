@@ -1,10 +1,12 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.AInvariantComplement
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
+public import OddOrder.GroupTheory.MaximalSubgroupType
+public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+public import OddOrder.GroupTheory.CoprimeAction
+public import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
 # Notation
@@ -12,6 +14,8 @@ import OddOrder.GroupTheory.AInvariantComplement
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Theorem E notation + Theorems A--E

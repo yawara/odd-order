@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
+public import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Isaacs Problem 6B.8 — Taussky-Todd (書籍 p. 196)
@@ -25,6 +28,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
 排除)。帰納法本体と主定理 `tausskyTodd` の組み立ては
 [`Problems6B8Induction.lean`](Problems6B8Induction.lean) にある。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

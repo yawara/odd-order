@@ -1,11 +1,15 @@
-import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
-import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
 
 /-!
 # Peterfalvi (12.6)-(12.7) — type-I Frobenius structure
 
 Split from the former monolithic `OddOrder.Peterfalvi.S14_MaximalI` (directory split, issue 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory

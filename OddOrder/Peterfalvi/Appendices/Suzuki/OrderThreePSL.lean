@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.DoubleCoset
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+module
+
+public import Mathlib.GroupTheory.DoubleCoset
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # Peterfalvi Part II, Ch. I §3: the order-three rank-one subgroup
@@ -25,6 +27,8 @@ it cannot include `1 in Q0`, since `t * 1 * t = 1` belongs to the small
 cell.  The source computation proves `t Q0# t subset Q0 K t Q0`; below we
 state both that sharp version and the unit-inclusive union version.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

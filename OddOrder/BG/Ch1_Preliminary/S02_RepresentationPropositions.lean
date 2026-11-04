@@ -3,26 +3,28 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RepresentationTheory.Submodule
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Sylow
-import Mathlib.LinearAlgebra.Charpoly.BaseChange
-import Mathlib.LinearAlgebra.Determinant
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.TensorProduct.Finiteness
-import Mathlib.LinearAlgebra.TensorProduct.Tower
-import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch05_Transfer.Main
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RepresentationTheory.Maschke
+public import Mathlib.RepresentationTheory.Submodule
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.LinearAlgebra.Charpoly.BaseChange
+public import Mathlib.LinearAlgebra.Determinant
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.TensorProduct.Finiteness
+public import Mathlib.LinearAlgebra.TensorProduct.Tower
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §2A-§2E — the basic representation propositions (Prop 2.1-2.4, Thm 2.5)
@@ -35,6 +37,8 @@ Split from `OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic` (issue 0149, t
 longFile-1500 campaign); that file imports this leaf, so downstream imports are
 unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 

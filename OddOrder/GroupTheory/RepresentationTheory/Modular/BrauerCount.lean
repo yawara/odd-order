@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Artinian.Ring
-import Mathlib.RingTheory.Ideal.Quotient.Operations
-import Mathlib.RingTheory.Jacobson.Semiprimary
-import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-import OddOrder.Algebra.BlockIdempotent
-import OddOrder.Algebra.SplitSemisimpleCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
+module
+
+public import Mathlib.RingTheory.Artinian.Ring
+public import Mathlib.RingTheory.Ideal.Quotient.Operations
+public import Mathlib.RingTheory.Jacobson.Semiprimary
+public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.SplitSemisimpleCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
 /-!
 # Brauer's count: as many blocks as `p`-regular classes
@@ -44,6 +46,8 @@ algebras over `k`.
   as a surjection of `kG` with kernel `J(kG)`, which is the form the module classification of
   `Algebra/PiMatrixSimpleModules` consumes
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

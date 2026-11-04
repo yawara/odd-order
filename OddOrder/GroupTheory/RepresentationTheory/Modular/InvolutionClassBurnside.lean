@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
-import OddOrder.GroupTheory.UniqueInvolutionSylow
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
+public import OddOrder.GroupTheory.UniqueInvolutionSylow
 
 /-!
 # Navarro p. 144: the Burnside step at the class of an involution
@@ -50,6 +52,8 @@ the basic-set columns of the "analysis at `t`" consume.
 * `OddOrder.RepresentationTheory.Modular`
   `.sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero` — (9) against a basic-set column
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

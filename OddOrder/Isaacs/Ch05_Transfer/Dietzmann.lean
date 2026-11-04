@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Algebra.Group.Submonoid.Membership
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Basic.Finite.Prod
-import Mathlib.Data.Set.Finite.Basic
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Algebra.Group.Submonoid.Membership
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.Basic.Finite.Prod
+public import Mathlib.Data.Set.Finite.Basic
+public import Mathlib.Tactic.Group
 
 /-!
 # Isaacs Thm 5.10: Dietzmann's theorem (p. 159)
@@ -55,6 +57,8 @@ of Isaacs §5B at book strength.
 - `OddOrder.Isaacs.Ch05.dietzmann_setFinite`: **Isaacs Thm 5.10**, `Set.Finite` form.
 - `OddOrder.Isaacs.Ch05.dietzmann`: **Isaacs Thm 5.10**, `Finite`-subtype form.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

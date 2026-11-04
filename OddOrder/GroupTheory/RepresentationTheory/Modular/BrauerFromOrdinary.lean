@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
 # Every irreducible Brauer character is a combination of the ordinary ones
@@ -28,6 +30,8 @@ proper and is not proved here.)
 
 * `OddOrder.RepresentationTheory.Modular.sum_ordinaryCombination_eq_irreducibleBrauerCharacter`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

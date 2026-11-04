@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCCSupport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCCSupport
 
 /-!
 # Higman's Lemma 13: the type-C/C middle-commutator axes
@@ -17,6 +19,8 @@ Higman.  In the first case it lies on the canonical middle eigenline at
 `i + 1`; in the second it lies on the eigenline at `j + 1`.  All index
 identities are read modulo `n`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

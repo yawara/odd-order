@@ -1,13 +1,15 @@
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.ZGroup
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+public import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
+public import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.GroupTheory.ZGroup
 
 /-!
 # BG §3: Theorem 3.6 — the (3.29)–(3.38) endgame
@@ -35,6 +37,8 @@ Split from `S03f_Thm36.lean` (issue 0149, the longFile-1500 campaign): the segme
 IH-free, so the induction lives entirely in `S03f_Thm36.thm36_aux`, which ends by invoking
 `endgame_contradiction`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03f
 

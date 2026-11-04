@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
 
 /-!
 # Isometry105
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
 Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (10.5)-(10.6) — Dade-isometry calculations

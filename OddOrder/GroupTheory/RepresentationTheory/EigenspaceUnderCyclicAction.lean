@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Dimension.Finrank
-import Mathlib.LinearAlgebra.Eigenspace.Basic
-import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
-import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.Algebra.DirectSum.Module
-import Mathlib.Algebra.Polynomial.RingDivision
-import Mathlib.FieldTheory.KummerExtension
-import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+module
+
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
+public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.Algebra.DirectSum.Module
+public import Mathlib.Algebra.Polynomial.RingDivision
+public import Mathlib.FieldTheory.KummerExtension
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 /-!
 # Eigenspaces under a Cyclic Action
@@ -29,6 +31,8 @@ the direct-sum and block-matrix parts of Prop 2.4 can be stated cleanly.  It
 also records a finite-sum consequence of the independence of eigenspaces:
 each fixed-eigenvalue fiber of a zero sum of eigenvectors is itself zero.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 
@@ -88,7 +92,7 @@ open scoped Function
 
 variable {F V : Type*} [Field F] [AddCommGroup V] [Module F V]
 
-private abbrev glInvEnd (g : LinearMap.GeneralLinearGroup F V) :
+abbrev glInvEnd (g : LinearMap.GeneralLinearGroup F V) :
     Module.End F V :=
   g.toLinearEquiv.symm
 

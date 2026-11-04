@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_SigmaIsometry
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+public import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Peterfalvi §5: the (3.2) σ-isometry as an integral character map
@@ -28,6 +30,8 @@ A ℂ-linear map is automatically ℤ-linear, so the bridge is
 Depends only on the `TICyclicHypothesis` for `W` (pure §5 character theory) — it
 is **not** gated on the §10–16 maximal-subgroup structure.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

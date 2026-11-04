@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Dimension.Finrank
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.Data.ZMod.Basic
+module
+
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # GL(2,p) transvection: transitivity on lines (BG Lemma 10.13(c) core)
@@ -30,6 +32,8 @@ The group-level wiring (`A` elementary abelian rank 2 ↔ `Additive A` a 2-dim `
 `MulAut.conj x` ↔ `φ`) is supplied where Lemma 10.13(c) is assembled (which additionally needs
 Cor 10.7(b)).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

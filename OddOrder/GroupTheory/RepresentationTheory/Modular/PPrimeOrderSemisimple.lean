@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Maschke
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+module
+
+public import Mathlib.RepresentationTheory.Maschke
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 
 /-!
 # `k[Q]` is split semisimple when `p ∤ |Q|`
@@ -32,6 +34,8 @@ Cartan matrix of a `p'`-group to be the identity.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.12) (p. 25).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

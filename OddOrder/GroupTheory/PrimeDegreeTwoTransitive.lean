@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.RingTheory.Int.Basic
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.RingTheory.Int.Basic
 
 /-!
 # Degree-`p` faithful transitive actions of order `p(p-1)` are two-transitive
@@ -23,6 +25,8 @@ This is used to reconstruct the rank-one (two-transitive) hypothesis for
 `N_G(R)/R` acting on the set `𝒜` of order-`p` subgroups in step (12) of
 Peterfalvi, Part II, Ch. II (the first case of the theorem of Suzuki).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_NormThree
+module
+
+public import OddOrder.Peterfalvi.S05_NormThree
 
 /-!
 # Peterfalvi §5 — norm-`3` virtual characters and the signed-triple-grid statement
@@ -14,6 +16,8 @@ characters orthogonal to `1_G` and the grid combinatorics they satisfy.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 open OddOrder.RepresentationTheory

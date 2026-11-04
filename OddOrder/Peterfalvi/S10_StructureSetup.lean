@@ -3,21 +3,25 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S04_DadeIsometry
-import OddOrder.Peterfalvi.S09_NonexistenceCertain
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
-import OddOrder.Peterfalvi.S10_BGInterface
+module
+
+public import OddOrder.Peterfalvi.S04_DadeIsometry
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain
+public import OddOrder.GroupTheory.MaximalSubgroupType
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+public import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
 # S10_StructureSetup
 
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleBasic` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # S10_MinimalSimpleBasic

@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
 
 /-!
 # Peterfalvi (5.6.3)/(5.6.2)/(5.5) — the coherence-union extension `τ₂` and its images
@@ -9,6 +11,8 @@ running images to `R(χ)`.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory

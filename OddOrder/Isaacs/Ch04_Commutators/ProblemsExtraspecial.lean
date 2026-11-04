@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Problems
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Problems
+public import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.5 (extraspecial `p`-群の構造)
@@ -27,6 +30,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.5 (書籍 pp. 123-1
 ⚠ (a) は書籍の `xy ≠ yx` でなく `x ∉ Z(P)` を仮定 (同値だが一般形)、(d) の `Z(V) = Z(P)` も
 `P > U` を使わずに成り立つ (書籍の仮定は後半の extraspecial 性のみで要る)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

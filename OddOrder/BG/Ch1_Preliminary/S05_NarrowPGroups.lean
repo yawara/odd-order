@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
 
 /-!
 # BG §5: Narrow `p`-Groups
@@ -51,6 +53,8 @@ Thm 4.18 ✅ (`S04.solvable_structure_of_pRank_le_two`, S04g)。
 (Thm 5.3/Cor 5.4) ← `S05_NarrowAutomorphisms` (Thm 5.5) ← `S05_NarrowPGroups`
 (Thm 5.6/5.7 + Thm 4.20(c); module 名は下流 import 不変のため leaf が保持)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S05
 

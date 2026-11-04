@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
-import OddOrder.GroupTheory.PrimeComplementResidual
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+public import OddOrder.GroupTheory.PrimeComplementResidual
 
 /-!
 # Peterfalvi Part II, Chapter I §3, Lemma 1 — the induction base
@@ -19,6 +21,8 @@ that `|Ω| - 1` is a power of two. Proposition 1(c) then makes `Q` a Sylow
 closure with `O^{2′}(G)`. Simplicity of the normal subgroup `L` finishes the
 two equalities in Peterfalvi's statement.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

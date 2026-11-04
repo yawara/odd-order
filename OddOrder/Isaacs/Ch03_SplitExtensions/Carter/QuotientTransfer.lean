@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # Carter 部分群 (Isaacs 3C.7) — 商群への往復
@@ -28,6 +30,8 @@ import Mathlib.GroupTheory.QuotientGroup.Basic
 - `exists_conj_of_map_mk'_conj` — 商での共役を `G` へ引き戻す。
 - `card_quotient_lt` — `N ≠ ⊥` なら `|G/N| < |G|` (帰納の測度)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

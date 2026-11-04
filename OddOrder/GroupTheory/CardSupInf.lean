@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.QuotientGroup.Finite
-import Mathlib.GroupTheory.Index
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.GroupTheory.QuotientGroup.Finite
+public import Mathlib.GroupTheory.Index
+public import Mathlib.Tactic.Ring
 
 /-!
 # 第二同型定理の位数式
@@ -23,6 +25,8 @@ import Mathlib.Tactic.Ring
 `OddOrder/Isaacs/Ch06_FrobeniusActions/OddComplement.lean` の `private` 版 2 つ
 (`private` なので衝突しない) と `Ch03_SplitExtensions/Problems3B.lean` のインライン 2 か所。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

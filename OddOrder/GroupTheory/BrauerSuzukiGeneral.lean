@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.BrauerSuzuki
-import OddOrder.GroupTheory.BrauerSuzukiEndgame
-import OddOrder.GroupTheory.BrauerSuzukiQ8
+module
+
+public import OddOrder.GroupTheory.BrauerSuzuki
+public import OddOrder.GroupTheory.BrauerSuzukiEndgame
+public import OddOrder.GroupTheory.BrauerSuzukiQ8
 
 /-!
 # Brauer–Suzuki: the theorem for an arbitrary generalized quaternion Sylow `2`-subgroup
@@ -37,6 +39,8 @@ form the theorem actually has, and that proof now just applies it.
   core `O(G)`, the supremum of the normal subgroups of odd order
 * `OddOrder.GroupTheory.brauerSuzuki_mk_mem_center_oddCore` — the theorem in that notation
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

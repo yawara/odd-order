@@ -3,612 +3,614 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Lean.Elab.Command
-import Lean.Util.CollectAxioms
-import OddOrder.Algebra.PowSubOneDvd
-import OddOrder.Algebra.AlgInt
-import OddOrder.Algebra.RootsOfUnitySum
-import OddOrder.Algebra.SubgroupSum
-import OddOrder.Algebra.GaloisRationalInteger
-import OddOrder.Algebra.FixedPointsGalois
-import OddOrder.Algebra.QuadraticFrobenius
-import OddOrder.Algebra.FrobeniusExponentPairs
-import OddOrder.Algebra.QuadraticTraceCorrection
-import OddOrder.GroupTheory.MaschkeComplement
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
-import OddOrder.Algebra.SemilinearFixedPoint
-import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
-import OddOrder.GroupTheory.BrauerSuzuki
-import OddOrder.GroupTheory.HallWielandt
-import OddOrder.GroupTheory.TransferIndexTwo
-import OddOrder.GroupTheory.WeaklyClosed
-import OddOrder.GroupTheory.BrauerSuzukiSetup
-import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-import OddOrder.GroupTheory.RankOneBNPair
-import OddOrder.GroupTheory.Transvection
-import OddOrder.GroupTheory.NonzeroVectorAction
-import OddOrder.GroupTheory.ElementaryAbelianLinear
-import OddOrder.GroupTheory.LinearGroupSimple
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAutSimple
-import OddOrder.Isaacs.Ch08_PermutationGroups.SymmetricNormalSubgroups
-import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
-import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
-import OddOrder.GroupTheory.ZGroupNormalCyclic
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
-import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremAZassenhausCase
-import OddOrder.GroupTheory.BrauerSuzukiNormalizer
-import OddOrder.GroupTheory.BrauerSuzukiTISubset
-import OddOrder.GroupTheory.BrauerSuzukiCharacter
-import OddOrder.GroupTheory.UniqueInvolutionSylow
-import OddOrder.GroupTheory.BrauerSuzukiInvolutions
-import OddOrder.GroupTheory.BrauerSuzukiCounting
-import OddOrder.GroupTheory.BrauerSuzukiEndgame
-import OddOrder.GroupTheory.BrauerSuzukiGeneral
-import OddOrder.GroupTheory.IsolatedInvolution
-import OddOrder.GroupTheory.GlaubermanZStar.Main
-import OddOrder.GroupTheory.ChermakDelgado
-import OddOrder.GroupTheory.CoprimeFixedPoints
-import OddOrder.Mathlib.QuotientGroup
-import OddOrder.GroupTheory.FittingHeredity
-import OddOrder.GroupTheory.NormalHallHeredity
-import OddOrder.GroupTheory.MinimalInvariantNormal
-import OddOrder.GroupTheory.PrimeComplementResidual
-import OddOrder.GroupTheory.SylowTransport
-import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
-import OddOrder.GroupTheory.WielandtAssembly
-import OddOrder.GroupTheory.WielandtPerFactorDischarge
-import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
-import OddOrder.GroupTheory.RepresentationTheory.SingerReducibility
-import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
-import OddOrder.GroupTheory.RepresentationTheory.FongSwan
-import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
-import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.GroupTheory.PiElementDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
-import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
-import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
-import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
-import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
-import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
-import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
-import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
-import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
-import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
-import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
-import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
-import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetInduction
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
-import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
-import OddOrder.GroupTheory.RepresentationTheory.Clifford
-import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
-import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
-import OddOrder.GroupTheory.NilpotentAbelianization
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
-import OddOrder.Isaacs.Ch04_Commutators.Mann
-import OddOrder.Isaacs.Ch05_Transfer.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7C
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
-import OddOrder.Isaacs.Ch09_MoreSubnormality.KegelMinimalCounterexample
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
-import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
-import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
-import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
-import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
-import OddOrder.Isaacs.Ch10_MoreTransfer.Main
-import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
-import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
-import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
-import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.PRegularQuotient
-import OddOrder.GroupTheory.CosetInvariantCard
-import OddOrder.GroupTheory.PRegularCosetSubgroup
-import OddOrder.GroupTheory.PRegularProjection
-import OddOrder.GroupTheory.PRegularElementCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
-import OddOrder.Algebra.EigenspaceDecomposition
-import OddOrder.Algebra.LagrangeInterpolationRing
-import OddOrder.Algebra.WordExpansion
-import OddOrder.Algebra.CommutatorSpan
-import OddOrder.Algebra.MatrixCommutator
-import OddOrder.Algebra.CommutatorSpanHom
-import OddOrder.Algebra.MatrixNaturalModule
-import OddOrder.Algebra.ModuleAlongSurjection
-import OddOrder.Algebra.BlockIdempotent
-import OddOrder.Algebra.DefectGroupConjugacy
-import OddOrder.Algebra.DefectNumber
-import OddOrder.Algebra.GroupAlgebraDefectGroup
-import OddOrder.Algebra.GroupAlgebraBlocks
-import OddOrder.Algebra.BrauerKernel
-import OddOrder.Algebra.BrauerDefect
-import OddOrder.Algebra.BrauerFirstMain
-import OddOrder.Algebra.CentralIdempotentModule
-import OddOrder.Algebra.PrimitiveIdempotent
-import OddOrder.Algebra.CentralCharacter
-import OddOrder.Algebra.BlockOfSimpleModule
-import OddOrder.Algebra.SeparatingSubalgebra
-import OddOrder.Algebra.PiMatrixSimpleModules
-import OddOrder.Algebra.PiSimpleModule
-import OddOrder.Algebra.SplitSemisimpleCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
-import OddOrder.Algebra.CentralCharacterBlock
-import OddOrder.Algebra.ClassSumOffCentralizer
-import OddOrder.Algebra.JacobsonCentralSubring
-import OddOrder.Algebra.CornerInverse
-import OddOrder.Algebra.EigenCornerInverse
-import OddOrder.Algebra.EigenTraceVanishing
-import OddOrder.Algebra.GroupAlgebraIdeal
-import OddOrder.Algebra.BlockCornerInverse
-import OddOrder.Algebra.BlockCornerLift
-import OddOrder.Algebra.TraceIsCompl
-import OddOrder.Algebra.AdicCompletePi
-import OddOrder.Algebra.CyclotomicAdjoin
-import OddOrder.Algebra.IdempotentLift
-import OddOrder.Algebra.CenterGroupAlgebraHenselian
-import OddOrder.Algebra.CenterIdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryLatticeCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
-import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
-import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
-import OddOrder.Algebra.SubgroupSumBlockAction
-import OddOrder.Algebra.TraceMulLeft
-import OddOrder.GroupTheory.SylowContaining
-import OddOrder.GroupTheory.SylowCosetPairs
-import OddOrder.GroupTheory.ClassDefect
-import OddOrder.GroupTheory.PFactorPairCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
-import OddOrder.Algebra.PElementSum
-import OddOrder.Algebra.PElementSumCount
-import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
-import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
-import OddOrder.Algebra.BlockPartitionedMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
-import OddOrder.GroupTheory.KleinFourAutomorphism
-import OddOrder.GroupTheory.KleinFourSylowFusion
-import OddOrder.GroupTheory.KleinFourNormalComplement
-import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
-import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
-import OddOrder.GroupTheory.CentralSylowComplement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
-import OddOrder.Algebra.SumSquaresFour
-import OddOrder.Algebra.ThreeNormColumn
-import OddOrder.Algebra.HalfSumColumns
-import OddOrder.Algebra.SignRelationSolution
-import OddOrder.Algebra.BasicSetColumnShape
-import OddOrder.Algebra.BrauerSuzukiEndgame
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
-import OddOrder.Algebra.SubgroupSumWedderburn
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockDefect
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
-import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
-import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.BG.Ch1_Preliminary.S02_Lemma27Group
-import OddOrder.BG.Ch1_Preliminary.S03_WithoutSolvableKernel
-import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
-import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
-import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
-import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-import OddOrder.BG.Ch1_Preliminary.S04g_Cor419
-import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
-import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
-import OddOrder.BG.Ch1_Preliminary.S06_Thm61
-import OddOrder.BG.Ch1_Preliminary.S06_Thm64
-import OddOrder.BG.Ch1_Preliminary.S06_Thm64Case2
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Nilpotent
-import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
-import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
-import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
-import OddOrder.GroupTheory.HallCollection
-import OddOrder.GroupTheory.CNGroupStructure
-import OddOrder.BG.AppE_FurtherResults
-import OddOrder.BG.AppE_RegularOperator
-import OddOrder.BG.AppE_ExponentP
-import OddOrder.BG.AppE_SemidirectFrattini
-import OddOrder.BG.AppE_AbelianCentralizer
-import OddOrder.BG.AppE_FiliformCounterexample
-import OddOrder.BG.AppE_FiliformRefutation
-import OddOrder.BG.AppE_PropE4
-import OddOrder.BG.AppE_E5Counting
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
-import OddOrder.BG.AppA_PStability
-import OddOrder.BG.AppB_Puig
-import OddOrder.BG.AppB_PuigB3B4
-import OddOrder.BG.AppB_Thm62
-import OddOrder.Peterfalvi.S03_PreliminaryCharacter
-import OddOrder.Peterfalvi.S03b_Vanishing
-import OddOrder.Peterfalvi.S04_DadeIsometry
-import OddOrder.Peterfalvi.S05_TICyclic
-import OddOrder.Peterfalvi.S05_SigmaIsometry
-import OddOrder.Peterfalvi.S05_IntegralSigma
-import OddOrder.Peterfalvi.S05_OmegaGrid
-import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
-import OddOrder.Peterfalvi.S06_CertainTypeSupport
-import OddOrder.Peterfalvi.S06_CertainTypeStructure
-import OddOrder.Peterfalvi.S06_CertainTypeIsometry
-import OddOrder.Peterfalvi.S06_CertainTypeConjugation
-import OddOrder.Peterfalvi.S06_MuColumnBridge
-import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
-import OddOrder.Peterfalvi.S13_ColumnFamilyBridge
-import OddOrder.Peterfalvi.S06_CertainTypeColumnUniqueness
-import OddOrder.Peterfalvi.S07_Coherence
-import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
-import OddOrder.Peterfalvi.S07_CoherenceGalois
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
-import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
-import OddOrder.Peterfalvi.S08_SixFiveGeneral
-import OddOrder.Peterfalvi.S08_SixSixGeneral
-import OddOrder.Peterfalvi.S13_SixTwoImageData
-import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S09_NonexistenceCertain
-import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
-import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
-import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
-import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
-import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
-import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
-import OddOrder.Peterfalvi.S09_TwoFamiliesParity
-import OddOrder.Peterfalvi.S09_FrobeniusParity
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
-import OddOrder.Peterfalvi.S10_SubcoherentTypeP
-import OddOrder.Peterfalvi.S11_NineElevenSubcoherentBridge
-import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
-import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
-import OddOrder.Peterfalvi.S11_ImprimitiveUBound
-import OddOrder.Peterfalvi.S11_GaloisFieldModel
-import OddOrder.Peterfalvi.S12_Noncoherence
-import OddOrder.Peterfalvi.S12_TypeVCaseC
-import OddOrder.Peterfalvi.S13_TypeIIIGalois
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S15_Tau1T
-import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply
-import OddOrder.FeitThompson
-import OddOrder.BG.AppC_NormSet
-import OddOrder.BG.AppC_SL2Example
-import OddOrder.BG.AppC_FrobeniusClassSum
-import OddOrder.BG.AppC_LemmaC2
-import OddOrder.BG.AppC_GlaubermanNorton
-import OddOrder.Algebra.FrobeniusStableHyperplane
-import OddOrder.Algebra.InverseClosedSubgroup
-import OddOrder.Algebra.PaleySpanning
-import OddOrder.Algebra.RelationLattice
-import OddOrder.Algebra.PowerMonomialIndependence
-import OddOrder.BG.AppC_Problem1
-import OddOrder.BG.AppC_Problem1Lattice
-import OddOrder.BG.AppC_Problem1Trace
-import OddOrder.BG.AppC_Problem1SameCoset
-import OddOrder.BG.AppC_Problem1PairComposition
-import OddOrder.BG.AppC_Problem1SkewCalculus
-import OddOrder.BG.AppC_Problem1Exponent
-import OddOrder.BG.AppC_Problem1SkewEndgame
-import OddOrder.BG.AppD_CNGroups
-import OddOrder.Peterfalvi.Appendices.SemilinearField
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenSemidirect
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
-import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
-import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
-import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
-import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
-import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
-import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
-import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-import OddOrder.Peterfalvi.Appendices.NearFields
-import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
-import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
-import OddOrder.GroupTheory.FixedPointFreeOrderThree
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
-import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+module
+
+public import Lean.Elab.Command
+public import Lean.Util.CollectAxioms
+public import OddOrder.Algebra.PowSubOneDvd
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.Algebra.RootsOfUnitySum
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.Algebra.GaloisRationalInteger
+public import OddOrder.Algebra.FixedPointsGalois
+public import OddOrder.Algebra.QuadraticFrobenius
+public import OddOrder.Algebra.FrobeniusExponentPairs
+public import OddOrder.Algebra.QuadraticTraceCorrection
+public import OddOrder.GroupTheory.MaschkeComplement
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
+public import OddOrder.Algebra.SemilinearFixedPoint
+public import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
+public import OddOrder.GroupTheory.BrauerSuzuki
+public import OddOrder.GroupTheory.HallWielandt
+public import OddOrder.GroupTheory.TransferIndexTwo
+public import OddOrder.GroupTheory.WeaklyClosed
+public import OddOrder.GroupTheory.BrauerSuzukiSetup
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.GroupTheory.Transvection
+public import OddOrder.GroupTheory.NonzeroVectorAction
+public import OddOrder.GroupTheory.ElementaryAbelianLinear
+public import OddOrder.GroupTheory.LinearGroupSimple
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAutSimple
+public import OddOrder.Isaacs.Ch08_PermutationGroups.SymmetricNormalSubgroups
+public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
+public import OddOrder.GroupTheory.ZGroupNormalCyclic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
+public import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremAZassenhausCase
+public import OddOrder.GroupTheory.BrauerSuzukiNormalizer
+public import OddOrder.GroupTheory.BrauerSuzukiTISubset
+public import OddOrder.GroupTheory.BrauerSuzukiCharacter
+public import OddOrder.GroupTheory.UniqueInvolutionSylow
+public import OddOrder.GroupTheory.BrauerSuzukiInvolutions
+public import OddOrder.GroupTheory.BrauerSuzukiCounting
+public import OddOrder.GroupTheory.BrauerSuzukiEndgame
+public import OddOrder.GroupTheory.BrauerSuzukiGeneral
+public import OddOrder.GroupTheory.IsolatedInvolution
+public import OddOrder.GroupTheory.GlaubermanZStar.Main
+public import OddOrder.GroupTheory.ChermakDelgado
+public import OddOrder.GroupTheory.CoprimeFixedPoints
+public import OddOrder.Mathlib.QuotientGroup
+public import OddOrder.GroupTheory.FittingHeredity
+public import OddOrder.GroupTheory.NormalHallHeredity
+public import OddOrder.GroupTheory.MinimalInvariantNormal
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.GroupTheory.SylowTransport
+public import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
+public import OddOrder.GroupTheory.WielandtAssembly
+public import OddOrder.GroupTheory.WielandtPerFactorDischarge
+public import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+public import OddOrder.GroupTheory.RepresentationTheory.SingerReducibility
+public import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
+public import OddOrder.GroupTheory.RepresentationTheory.FongSwan
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
+public import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
+public import OddOrder.GroupTheory.WielandtFixedPoint
+public import OddOrder.GroupTheory.PiElementDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+public import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
+public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
+public import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
+public import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+public import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
+public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
+public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetInduction
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+public import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
+public import OddOrder.GroupTheory.NilpotentAbelianization
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
+public import OddOrder.Isaacs.Ch04_Commutators.Mann
+public import OddOrder.Isaacs.Ch05_Transfer.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7C
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.KegelMinimalCounterexample
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Main
+public import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.PRegularQuotient
+public import OddOrder.GroupTheory.CosetInvariantCard
+public import OddOrder.GroupTheory.PRegularCosetSubgroup
+public import OddOrder.GroupTheory.PRegularProjection
+public import OddOrder.GroupTheory.PRegularElementCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
+public import OddOrder.Algebra.EigenspaceDecomposition
+public import OddOrder.Algebra.LagrangeInterpolationRing
+public import OddOrder.Algebra.WordExpansion
+public import OddOrder.Algebra.CommutatorSpan
+public import OddOrder.Algebra.MatrixCommutator
+public import OddOrder.Algebra.CommutatorSpanHom
+public import OddOrder.Algebra.MatrixNaturalModule
+public import OddOrder.Algebra.ModuleAlongSurjection
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.DefectGroupConjugacy
+public import OddOrder.Algebra.DefectNumber
+public import OddOrder.Algebra.GroupAlgebraDefectGroup
+public import OddOrder.Algebra.GroupAlgebraBlocks
+public import OddOrder.Algebra.BrauerKernel
+public import OddOrder.Algebra.BrauerDefect
+public import OddOrder.Algebra.BrauerFirstMain
+public import OddOrder.Algebra.CentralIdempotentModule
+public import OddOrder.Algebra.PrimitiveIdempotent
+public import OddOrder.Algebra.CentralCharacter
+public import OddOrder.Algebra.BlockOfSimpleModule
+public import OddOrder.Algebra.SeparatingSubalgebra
+public import OddOrder.Algebra.PiMatrixSimpleModules
+public import OddOrder.Algebra.PiSimpleModule
+public import OddOrder.Algebra.SplitSemisimpleCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
+public import OddOrder.Algebra.CentralCharacterBlock
+public import OddOrder.Algebra.ClassSumOffCentralizer
+public import OddOrder.Algebra.JacobsonCentralSubring
+public import OddOrder.Algebra.CornerInverse
+public import OddOrder.Algebra.EigenCornerInverse
+public import OddOrder.Algebra.EigenTraceVanishing
+public import OddOrder.Algebra.GroupAlgebraIdeal
+public import OddOrder.Algebra.BlockCornerInverse
+public import OddOrder.Algebra.BlockCornerLift
+public import OddOrder.Algebra.TraceIsCompl
+public import OddOrder.Algebra.AdicCompletePi
+public import OddOrder.Algebra.CyclotomicAdjoin
+public import OddOrder.Algebra.IdempotentLift
+public import OddOrder.Algebra.CenterGroupAlgebraHenselian
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryLatticeCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
+public import OddOrder.Algebra.SubgroupSumBlockAction
+public import OddOrder.Algebra.TraceMulLeft
+public import OddOrder.GroupTheory.SylowContaining
+public import OddOrder.GroupTheory.SylowCosetPairs
+public import OddOrder.GroupTheory.ClassDefect
+public import OddOrder.GroupTheory.PFactorPairCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.Algebra.PElementSumCount
+public import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
+public import OddOrder.Algebra.BlockPartitionedMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
+public import OddOrder.GroupTheory.KleinFourAutomorphism
+public import OddOrder.GroupTheory.KleinFourSylowFusion
+public import OddOrder.GroupTheory.KleinFourNormalComplement
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
+public import OddOrder.GroupTheory.CentralSylowComplement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
+public import OddOrder.Algebra.SumSquaresFour
+public import OddOrder.Algebra.ThreeNormColumn
+public import OddOrder.Algebra.HalfSumColumns
+public import OddOrder.Algebra.SignRelationSolution
+public import OddOrder.Algebra.BasicSetColumnShape
+public import OddOrder.Algebra.BrauerSuzukiEndgame
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
+public import OddOrder.Algebra.SubgroupSumWedderburn
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockDefect
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
+public import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.BG.Ch1_Preliminary.S02_Lemma27Group
+public import OddOrder.BG.Ch1_Preliminary.S03_WithoutSolvableKernel
+public import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
+public import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
+public import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
+public import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+public import OddOrder.BG.Ch1_Preliminary.S04g_Cor419
+public import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
+public import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
+public import OddOrder.BG.Ch1_Preliminary.S06_Thm61
+public import OddOrder.BG.Ch1_Preliminary.S06_Thm64
+public import OddOrder.BG.Ch1_Preliminary.S06_Thm64Case2
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Nilpotent
+public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+public import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
+public import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+public import OddOrder.GroupTheory.HallCollection
+public import OddOrder.GroupTheory.CNGroupStructure
+public import OddOrder.BG.AppE_FurtherResults
+public import OddOrder.BG.AppE_RegularOperator
+public import OddOrder.BG.AppE_ExponentP
+public import OddOrder.BG.AppE_SemidirectFrattini
+public import OddOrder.BG.AppE_AbelianCentralizer
+public import OddOrder.BG.AppE_FiliformCounterexample
+public import OddOrder.BG.AppE_FiliformRefutation
+public import OddOrder.BG.AppE_PropE4
+public import OddOrder.BG.AppE_E5Counting
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
+public import OddOrder.BG.AppA_PStability
+public import OddOrder.BG.AppB_Puig
+public import OddOrder.BG.AppB_PuigB3B4
+public import OddOrder.BG.AppB_Thm62
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+public import OddOrder.Peterfalvi.S03b_Vanishing
+public import OddOrder.Peterfalvi.S04_DadeIsometry
+public import OddOrder.Peterfalvi.S05_TICyclic
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+public import OddOrder.Peterfalvi.S05_IntegralSigma
+public import OddOrder.Peterfalvi.S05_OmegaGrid
+public import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
+public import OddOrder.Peterfalvi.S06_CertainTypeSupport
+public import OddOrder.Peterfalvi.S06_CertainTypeStructure
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+public import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+public import OddOrder.Peterfalvi.S06_MuColumnBridge
+public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
+public import OddOrder.Peterfalvi.S13_ColumnFamilyBridge
+public import OddOrder.Peterfalvi.S06_CertainTypeColumnUniqueness
+public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
+public import OddOrder.Peterfalvi.S07_CoherenceGalois
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+public import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral
+public import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
+public import OddOrder.Peterfalvi.S08_SixFiveGeneral
+public import OddOrder.Peterfalvi.S08_SixSixGeneral
+public import OddOrder.Peterfalvi.S13_SixTwoImageData
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain
+public import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
+public import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
+public import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
+public import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
+public import OddOrder.Peterfalvi.S09_TwoFamiliesParity
+public import OddOrder.Peterfalvi.S09_FrobeniusParity
+public import OddOrder.Peterfalvi.S10_CoherenceWiring
+public import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+public import OddOrder.Peterfalvi.S10_SubcoherentTypeP
+public import OddOrder.Peterfalvi.S11_NineElevenSubcoherentBridge
+public import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
+public import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+public import OddOrder.Peterfalvi.S11_GaloisFieldModel
+public import OddOrder.Peterfalvi.S12_Noncoherence
+public import OddOrder.Peterfalvi.S12_TypeVCaseC
+public import OddOrder.Peterfalvi.S13_TypeIIIGalois
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+public import OddOrder.Peterfalvi.S15_Tau1T
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply
+public import OddOrder.FeitThompson
+public import OddOrder.BG.AppC_NormSet
+public import OddOrder.BG.AppC_SL2Example
+public import OddOrder.BG.AppC_FrobeniusClassSum
+public import OddOrder.BG.AppC_LemmaC2
+public import OddOrder.BG.AppC_GlaubermanNorton
+public import OddOrder.Algebra.FrobeniusStableHyperplane
+public import OddOrder.Algebra.InverseClosedSubgroup
+public import OddOrder.Algebra.PaleySpanning
+public import OddOrder.Algebra.RelationLattice
+public import OddOrder.Algebra.PowerMonomialIndependence
+public import OddOrder.BG.AppC_Problem1
+public import OddOrder.BG.AppC_Problem1Lattice
+public import OddOrder.BG.AppC_Problem1Trace
+public import OddOrder.BG.AppC_Problem1SameCoset
+public import OddOrder.BG.AppC_Problem1PairComposition
+public import OddOrder.BG.AppC_Problem1SkewCalculus
+public import OddOrder.BG.AppC_Problem1Exponent
+public import OddOrder.BG.AppC_Problem1SkewEndgame
+public import OddOrder.BG.AppD_CNGroups
+public import OddOrder.Peterfalvi.Appendices.SemilinearField
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenSemidirect
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+public import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+public import OddOrder.Peterfalvi.Appendices.NearFields
+public import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+public import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+public import OddOrder.GroupTheory.FixedPointFreeOrderThree
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
+public import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 -- lean-eval 提出候補の登録 (issue 0050, 2026-07-22)
-import OddOrder.Isaacs.Ch01_Sylow.Basic
-import OddOrder.Isaacs.Ch08_PermutationGroups.PCycleJordan
-import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.TransferTransitivity
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.GlaubermanReplacement
-import OddOrder.GroupTheory.GlaubermanZJ
-import OddOrder.GroupTheory.SolvableTwoTransitive
-import OddOrder.Algebra.AlgClosedIdempotentLift
-import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
-import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
-import OddOrder.Peterfalvi.S03_InductionRestriction
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.PCycleJordan
+public import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.TransferTransitivity
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import OddOrder.GroupTheory.GlaubermanReplacement
+public import OddOrder.GroupTheory.GlaubermanZJ
+public import OddOrder.GroupTheory.SolvableTwoTransitive
+public import OddOrder.Algebra.AlgClosedIdempotentLift
+public import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
+public import OddOrder.Peterfalvi.S03_InductionRestriction
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -645,6 +647,8 @@ elaboration が失敗し, `lake build` も失敗する.
 Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
+@[expose] public section
+
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
 set_option linter.style.longFile 21500
 set_option linter.style.longLine false
@@ -654,10 +658,10 @@ open Lean Elab Command
 namespace OddOrder.AxiomsCheck
 
 /-- Lean / mathlib 標準の公理. -/
-def allowedStandard : List Name := [``propext, ``Classical.choice, ``Quot.sound]
+meta def allowedStandard : List Name := [``propext, ``Classical.choice, ``Quot.sound]
 
 /-- 名前 `n` が許可された公理であるかどうかを判定. -/
-def isAllowed (n : Name) : Bool :=
+meta def isAllowed (n : Name) : Bool :=
   allowedStandard.contains n
 
 end OddOrder.AxiomsCheck

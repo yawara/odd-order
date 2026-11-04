@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Peterfalvi Appendix III: Higman's two-summand conclusions
@@ -26,6 +28,8 @@ The inverse images of the two summands in `P` are constructed below.  Their
 surjective homomorphism.  Thus these conclusions are not separately posited
 fields.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

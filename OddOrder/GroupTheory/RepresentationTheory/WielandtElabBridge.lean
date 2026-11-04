@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
-import Mathlib.FieldTheory.Finiteness
+module
+
+public import OddOrder.GroupTheory.CoprimeAction
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
+public import Mathlib.FieldTheory.Finiteness
 
 /-!
 # Peterfalvi (9.1): the elementary-abelian chief-factor bridge
@@ -30,6 +32,8 @@ This file supplies the bridge (parametrised by an abstract `ZMod p`-module struc
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (lane-h pickup), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.IsMetacyclic
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.GroupTheory.IsMetacyclic
 
 /-!
 # BG §4 — Theorem 4.12(a) (Huppert)
@@ -51,6 +53,8 @@ Because we assume `[R, A] = R` outright (`actionCommutator φ = ⊤`), the textb
 * BG §4, Theorem 4.12(a). Huppert, _Endliche Gruppen I_ (1967), Satz III.13.5.
 * Design notes: `notes/bg/s04_thm412_design_2026_05_30.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04b
 

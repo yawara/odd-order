@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CyclicShiftEigenspace
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicShiftEigenspace
 
 /-!
 # Eigenspace count for a monomial permutation operator (orbit assembly of BG (2.11))
@@ -28,6 +30,8 @@ disjoint-support independence (`linearIndependent_of_triangular`) makes the repr
 **basis** of `E_m`.  The count is then the number of orbits contributing to `E_m`: every orbit for
 `E_0`, only the free orbits for `E_m` (`m ≠ 0`), so `dim E₀ − dim E_m = 1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

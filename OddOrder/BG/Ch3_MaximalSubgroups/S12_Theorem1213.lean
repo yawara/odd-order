@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 
 /-!
 # BG §12: Theorem 12.13 — every nonabelian `p`-subgroup of `G` lies in `𝒰`
@@ -23,6 +25,8 @@ order `p`。`Q/Z` の `K = C_{M_α}(Z)` 上の作用 + Proposition 1.16 + Propos
 `N_M(Z) ⊆ M*`、`ℳ(N_G(Z)) ≠ {M}`、`M_α ≠ 1`。最後に Proposition 12.4(b) で `A₀, A₀* ∈ ℰ¹(A)−{Z}`
 が `M ∩ M*`(⊇ `Q`)内で非共役となり、`Q` の構造に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

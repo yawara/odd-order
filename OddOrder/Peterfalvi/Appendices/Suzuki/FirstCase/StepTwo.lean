@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
-import OddOrder.Peterfalvi.Appendices.NearFields
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+public import OddOrder.Peterfalvi.Appendices.NearFields
 
 /-!
 # Peterfalvi Part II, Ch. II, step (2): the rank-one centralizer quotient
@@ -19,6 +21,8 @@ and (A2).  Under (B1) the quotient has 2-rank one — a four-subgroup of the
 quotient would lift along the odd kernel to a four-subgroup of `C_G(P)` —
 so Appendix II, Proposition 1 applies to `L/N`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

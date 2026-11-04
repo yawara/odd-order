@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgameCore
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgameCore
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: `λ = 1` and the trace relation
@@ -84,6 +86,8 @@ membership facts it needs on the model:
 * `Hypothesis.SectionFourSetup.exists_stepThree_data` — that output, produced from the
   section's standing data (steps (1)–(3) plumbed together).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

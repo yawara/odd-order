@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeBSquareEigenNonzero
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeCBEigenfamilyCrossCommutator
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeBSquareEigenNonzero
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeCBEigenfamilyCrossCommutator
 
 /-!
 # Higman's Lemma 13: the cross commutator of restricted type-C/B factors
@@ -19,6 +21,8 @@ source equation is supplied by the coordinate data itself.  The type-B
 family's square nondegeneracy then gives the cross-commutator inclusion in
 the ambient square Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

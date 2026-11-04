@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # The canonical decomposition of `t x t` for `x ∈ Q ∖ {1}`
@@ -38,6 +40,8 @@ Conjugating by `a ∈ K` — which `t` inverts — turns the decomposition of
   `f` of the book.
 * `Hypothesis.tConjTriple_conj` — the identity (1).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

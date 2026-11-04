@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-import OddOrder.GroupTheory.TransferInvariantTransversal
-import OddOrder.GroupTheory.TransferTransitivity
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
+module
+
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+public import OddOrder.GroupTheory.TransferInvariantTransversal
+public import OddOrder.GroupTheory.TransferTransitivity
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
 
 /-!
 # Peterfalvi Part II, Ch. II, step (12): the transfer contradiction
@@ -24,6 +26,8 @@ the Hall–Wielandt strengthening via Yoshida).  Hypothesis (B2)
 `T₁` — absurd.  Consequently `(Nat.card G).factorization p ≠ 3` under the
 standing hypotheses of the first case.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
 
 /-!
 # Higman Lemma 3: a chosen commuting idempotent family on `A / A²`
@@ -23,6 +25,8 @@ This file formalizes the following part of the argument on p. 84:
 Actor covariance, the kernel of this homomorphism, and the final
 exponent-at-most-four conclusion of Higman's Lemma 3 are not claimed here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

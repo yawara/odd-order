@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Valuation.ValuationRing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
+module
+
+public import Mathlib.RingTheory.Valuation.ValuationRing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 
 /-!
 # The irreducible Brauer characters are linearly independent
@@ -30,6 +32,8 @@ denominators, which is not recorded here.
 * `OddOrder.RepresentationTheory.Modular.exists_dvd_forall_of_valuationRing`
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

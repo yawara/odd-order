@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
 
 /-!
 # Higman's Lemma 12: inclusive classification of xi-length-two groups
@@ -17,6 +19,8 @@ noncommutative group classified in Lemma 11. This leaf combines those two
 honest branches into a classification theorem which does not depend on a
 larger ambient xi-length-three group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

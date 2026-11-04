@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # Huppert II Satz 3.2 (Galois–Burnside): 2-transitive 群の可解正規核
@@ -29,6 +31,8 @@ regular 性 (transitive + `stabilizer ⊓ F = ⊥`) から consumer 側で標準
    `F`-軌道の各点 `n • ω` も `x • (n • ω) = n • (x • ω) = n • ω` で固定するので
    `x = 1`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

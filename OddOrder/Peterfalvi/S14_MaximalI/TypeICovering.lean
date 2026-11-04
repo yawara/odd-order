@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
 
 /-!
 # Peterfalvi (12.17) + the (8.8) case-(b) dichotomy
@@ -15,6 +17,8 @@ family (`TypeICovering`), (7.11) rules it out (`not_all_maximal_typeI`), and com
 Split from `DadeContradiction.lean` (file-size policy); consumes the (12.7) `typeI_frobenius`
 of `NormPackage.lean`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

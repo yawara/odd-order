@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AlgClosedIdempotentLift
-import OddOrder.Algebra.CenterIdempotentLift
+module
+
+public import OddOrder.Algebra.AlgClosedIdempotentLift
+public import OddOrder.Algebra.CenterIdempotentLift
 
 /-!
 # Block idempotents over a coefficient ring that splits the ordinary side
@@ -27,6 +29,8 @@ carry the block theory.
 * `OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed` — the same, phrased for
   the reduction `Z(𝒪G) → Z(FG)`, as the block theory consumes it
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

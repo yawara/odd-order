@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.GroupWithZero.Action.Defs
-import Mathlib.Algebra.GroupWithZero.Units.Basic
-import Mathlib.Algebra.Group.Action.Basic
-import Mathlib.Algebra.Group.Action.End
-import Mathlib.Algebra.GroupWithZero.Action.End
-import Mathlib.Algebra.Group.TypeTags.Basic
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.Perm.Basic
-import Mathlib.Tactic.Abel
-import OddOrder.Peterfalvi.Appendices.NearFieldClass
+module
+
+public import Mathlib.Algebra.GroupWithZero.Action.Defs
+public import Mathlib.Algebra.GroupWithZero.Units.Basic
+public import Mathlib.Algebra.Group.Action.Basic
+public import Mathlib.Algebra.Group.Action.End
+public import Mathlib.Algebra.GroupWithZero.Action.End
+public import Mathlib.Algebra.Group.TypeTags.Basic
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.Perm.Basic
+public import Mathlib.Tactic.Abel
+public import OddOrder.Peterfalvi.Appendices.NearFieldClass
 
 /-!
 # Near-field from a sharply transitive additive action
@@ -37,6 +39,8 @@ Then `(A, +, *)` is a near-field (`NearField`):
 The construction is packaged through `SharplyTransitiveData`.  This is the elementary core of the
 affine near-field model (`AffineNearFieldModel`) of Appendix II, Proposition 1.
 -/
+
+@[expose] public section
 
 open OddOrder.Peterfalvi.Appendices.NearFields (NearField)
 

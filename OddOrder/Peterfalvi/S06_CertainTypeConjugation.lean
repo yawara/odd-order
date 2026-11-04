@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 
 /-!
 # Peterfalvi (4.9)(a): conjugation of the certain-type characters
@@ -29,6 +31,8 @@ This file develops the conjugation foundation:
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 35").
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

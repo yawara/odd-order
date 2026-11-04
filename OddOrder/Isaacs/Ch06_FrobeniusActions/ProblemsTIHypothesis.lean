@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch05_Transfer.Basic
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
 # Isaacs Problems 6A.6 / 6A.7 / 6A.11 — Lemma 6.5 の仮説 (TI 条件) の演習 (書籍 pp. 185-186)
@@ -52,6 +54,8 @@ Lemma 6.5 の仮説は **TI 条件** `A ⊓ A^g = 1` (`g ∉ A`) であり, そ�
   Sylow C (`exists_mem_smul_sylow_eq`) で `k ∈ A` があって `k • P = g⁻¹ • P`,
   つまり `g k ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

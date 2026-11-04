@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
-import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
-import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+public import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Peterfalvi Appendix IV: the (8) conclusion (p. 150)
@@ -26,6 +28,8 @@ the `IrreducibleCharacter H` filter and applying the (6.8.1) identity
 `sumNonInflatedDegreeMulChar_of_mem` gives the off-identity value `-|H ⧸ Z|` — the
 `(8)` input showing `Res_H e'₁` is constant on `Z^#`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

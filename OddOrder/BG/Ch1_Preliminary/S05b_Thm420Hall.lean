@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 
 /-!
 # BG Theorem 4.20(c) — descending Hall radicals
@@ -30,6 +32,8 @@ normal Hall `τ∪{p}`」は、`π := {q | p < q}` / `π := {q | p ≤ q}` (ど�
 (`N.index` は `p`-冪で `π` を避ける) であることから `O_π(X)` 自身と一致する
 (`≤` は正規 `π`-部分群の `O_π` 吸収、`≥` は Hall 位数の整除)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S05
 

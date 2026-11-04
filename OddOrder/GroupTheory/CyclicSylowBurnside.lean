@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # 巡回 Sylow 部分群と Burnside の正規 `p`-補群定理
@@ -25,6 +27,8 @@ mathlib 版とは独立 (どちらも他方の特殊化ではない)。
 用途: Isaacs Problem 5C.7 (`|G| = 3^a · 5 · 11` ⇒ Sylow-3 が正規) — `p = 5` (`φ(5) = 4`)
 と `p = 11` (`φ(11) = 10`) で使う。どちらも最小素因数ではない。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

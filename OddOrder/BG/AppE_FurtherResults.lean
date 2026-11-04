@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_CollectionFormula
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.HallCollection
-import OddOrder.GroupTheory.HallPetresco
-import OddOrder.GroupTheory.RegularPGroup
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.BG.AppE_CentralizerDecomposition
+module
+
+public import OddOrder.BG.AppE_CollectionFormula
+public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.HallCollection
+public import OddOrder.GroupTheory.HallPetresco
+public import OddOrder.GroupTheory.RegularPGroup
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.BG.AppE_CentralizerDecomposition
 
 /-!
 # BG Appendix E: Further Results of Feit and Thompson
@@ -62,6 +64,8 @@ pointer comments here at their book positions.  Per-result status:
 | E.4 (corrected, `+hdc`) | **proved** — in `AppE_PropE4.lean` (printed form is false) |
 | E.5 (`maximalSubgroups_isTypeI_or_isTypeII`) | **proved** — in `AppE_E5Counting.lean` |
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

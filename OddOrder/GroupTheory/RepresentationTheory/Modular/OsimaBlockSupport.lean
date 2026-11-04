@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 
 /-!
 # Osima's theorem: a block sees no `p`-singular element
@@ -37,6 +39,8 @@ of `Φ_φ(g) = 0`, or it does not, in which case every term vanishes separately.
 * `OddOrder.RepresentationTheory.Modular.coeff_blockIdempotent_eq_zero_of_not_isPRegular` — the
   form the block theory consumes
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

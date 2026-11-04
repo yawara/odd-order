@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Mathlib.Subgroup
-import Mathlib.GroupTheory.Sylow
+module
+
+public import OddOrder.Mathlib.Subgroup
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Prime-complement residuals
@@ -18,6 +20,8 @@ This is shared infrastructure for **Peterfalvi, Part II, Chapter I, section 3
 (pp. 100-107), Lemma 1**, where the case `p = 2` is denoted by the
 prime-complement residual notation.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

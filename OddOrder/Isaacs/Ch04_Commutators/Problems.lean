@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.IsExtraspecial
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.GroupTheory.IsExtraspecial
 
 /-!
 # Isaacs Chapter 4 — Problems §4A (Commutators)
@@ -15,6 +17,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4 "Commutators" の章
 
 方針は Ch.1-Ch.3 の `Problems*.lean` と同じ (ラッパーは書かず実証明; 教科書番号は docstring)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

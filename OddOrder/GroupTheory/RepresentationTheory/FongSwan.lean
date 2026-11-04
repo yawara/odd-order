@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SolvablePrimeIndex
-import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateDirectSum
-import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
-import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Solvable
-import Mathlib.Data.Set.Finite.Lemmas
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+module
+
+public import OddOrder.GroupTheory.SolvablePrimeIndex
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateDirectSum
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.Data.Set.Finite.Lemmas
+public import Mathlib.Algebra.Group.Subgroup.Finite
+public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 
 /-!
 # Fong–Swan: `dim M ∣ |G|` for an absolutely irreducible solvable-group module (BG Lemma 2.3)
@@ -46,6 +48,8 @@ Lemma 2.3), **not** the modular Fong–Swan theorem via Brauer lifting:
 
 * Bender, Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 1994), Lemma 2.3.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

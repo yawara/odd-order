@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AnisotropicNormForm
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupTwistedCoordinates
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
+module
+
+public import OddOrder.Algebra.AnisotropicNormForm
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupTwistedCoordinates
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
 
 /-!
 # An anisotropic twisted product over `𝐅_{q²}` is the unitary root group
@@ -37,6 +39,8 @@ This file supplies the bridge.  Three facts combine:
   isomorphism.
 * `ProjectiveUnitary.nonempty_mulEquiv_rootGroup_of_anisotropic` — the bridge.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

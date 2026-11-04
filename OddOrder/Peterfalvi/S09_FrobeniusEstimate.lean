@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
 # Peterfalvi (7.8.b) for a Frobenius family — the `ζ`-norm estimate
@@ -17,6 +19,8 @@ Uses the shared representation-theory helper
 `inner_induce_conj_eq_zero_of_frobenius_of_odd` for the `⟨ζ_0, ζ̄_0⟩ = 0` input to the
 (7.8.a) `⊥ 1_G` fact `coherence_extension_orthogonal_constOne`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

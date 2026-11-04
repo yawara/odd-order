@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
 
 /-!
 # PisetBetaDisjoint
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Theorems 15.7-15.9 — TI failure and final local constraints

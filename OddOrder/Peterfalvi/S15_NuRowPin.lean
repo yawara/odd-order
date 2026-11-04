@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S15_CaseACoherenceT
+module
+
+public import OddOrder.Peterfalvi.S15_CaseACoherenceT
 
 /-!
 # Peterfalvi (13.3.c)-`T` — the ν-row pin machinery (coherence-generic)
@@ -36,6 +38,8 @@ The pin dichotomy itself (`coherentIndT_nuRow_pin_of_irr`, mirror of
 `sSet_coherent_indT_A` build on these; the γ-trick vanishing and the pin live downstream in
 this file's continuation (issue 2035 #41 steps 4–5).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # The Singer line bound: `|C| ∣ (p^q − 1)/(p − 1)`
@@ -24,6 +26,8 @@ of (13.12) `c_eq_one`.
 
 The arithmetic heart (`dvd_div_of_coprime_of_dvd_sub_one`) is a general `ℕ` fact isolated for reuse.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

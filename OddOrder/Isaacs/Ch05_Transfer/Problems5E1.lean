@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5E
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5E
 
 /-!
 # Isaacs Problem 5E.1 (Itô) — 極小非 `p`-冪零群 (書籍 p. 175)
@@ -27,6 +29,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5E
   ゆえ `p`-冪零で `[P,S] = 1`。`H` は Sylow たちで生成される (`iSup_sylow_eq_top`) ので
   `H ≤ C_G(P)` ⟹ `H` が正規 `p`-補群になり矛盾 ⟹ `|H|` は素数冪。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

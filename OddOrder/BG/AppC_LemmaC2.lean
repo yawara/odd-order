@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_FrobeniusClassSum
+module
+
+public import OddOrder.BG.AppC_FrobeniusClassSum
 
 /-!
 # BG Appendix C: Lemma C.2 Packaging
@@ -15,6 +17,8 @@ q >= 5 class-sum calculation from `AppC_FrobeniusClassSum`.  It is kept as a
 small downstream wrapper to avoid making the finite-field norm-set leaf depend on
 class-sum representation theory.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

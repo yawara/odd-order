@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 
 /-!
 # Navarro (5.2) in block language
@@ -35,6 +37,8 @@ decomposition numbers of `χ ∈ Irr(B)` are supported on the blocks of `C_G(x)`
 * `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` — Navarro (5.8) as the
   textbook states it, as a sum over the blocks inducing the block of `χ`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

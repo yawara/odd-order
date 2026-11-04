@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
 
 /-!
 # Isaacs Problem 6B.8 — 帰納法本体と主定理の組み立て (書籍 p. 196)
@@ -26,6 +28,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
 「`P/Z` が D/SD/Q だからその指数 `2` の巡回部分群を引き戻す」という段を避けられるので,
 具体群 D/SD/Q の構造 (指数 `2` の巡回部分群を持つこと) を証明せずに済む。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

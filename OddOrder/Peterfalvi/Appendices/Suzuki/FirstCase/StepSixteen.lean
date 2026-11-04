@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteenLV
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteenLV
 
 /-!
 # Peterfalvi Part II, Ch. II, step (16)
@@ -18,6 +20,8 @@ This file collects the structural facts about `R₁` that the proof needs.  The 
 that `L` fills up `R₁` over `RΣ`: `RΣ` has index `3` in `R₁` by (14), and `L ⊄ RΣ`
 by (15), so `R₁ = RΣL`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

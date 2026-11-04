@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
-import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
-import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
-import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
+public import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
+public import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
+public import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
 
 /-!
 # Peterfalvi (9.1): the kernel-FPF dimension fact (†) over an algebraically closed field
@@ -35,6 +37,8 @@ The two completed engines it stitches together are:
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (NEXT — carrier-level, items 1–2), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.WielandtKernelFPF
 

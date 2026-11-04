@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 可解な多重推移群
@@ -22,6 +24,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
   `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
   可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

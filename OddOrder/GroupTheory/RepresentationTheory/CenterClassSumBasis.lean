@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.Algebra.Group.Conj
-import Mathlib.LinearAlgebra.Basis.Basic
-import Mathlib.Tactic.Group
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.Algebra.Group.Conj
+public import Mathlib.LinearAlgebra.Basis.Basic
+public import Mathlib.Tactic.Group
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
 
 /-!
 # The class-sum basis of the centre of a group algebra (general field)
@@ -24,6 +26,8 @@ The repository already has class sums over `ℂ` (`ClassSumAlgebra.lean`); this 
 `Z(k[G]) = Subalgebra.center k (MonoidAlgebra k G)` (over any field — the centre is exactly the
 functions constant on conjugacy classes, of which the class sums are the indicators).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterClassSum
 

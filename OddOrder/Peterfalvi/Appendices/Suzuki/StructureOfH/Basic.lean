@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
 
 /-!
 # Peterfalvi Part II, Ch. III: hypothesis (C1) and the action of `D` on `Q₁`
@@ -36,6 +38,8 @@ Fixed-point-freeness for arbitrary `g ∈ D^#` follows by passing to a
 subgroup of prime order of `⟨g⟩`, which centralizes whatever `g`
 centralizes.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

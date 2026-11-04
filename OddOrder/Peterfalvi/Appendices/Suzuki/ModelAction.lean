@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
 
 /-!
 # Step (4) of the Ch. III §3 Proposition: the `K₁W₁`-action on the model
@@ -32,6 +34,8 @@ form a homomorphism on `K × W` outright.
   the book's subgroup `B`.
 * `Hypothesis.exists_modelScalarHom` — the instance for `K W` itself.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

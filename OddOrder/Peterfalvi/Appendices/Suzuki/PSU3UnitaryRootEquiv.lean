@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
 
 /-!
 # The unitary coordinates *are* the root group of `PSU(3, q)`
@@ -33,6 +35,8 @@ model's reciprocal needs: both are formulas in `(a, y)`.
   `unitaryRootEquiv_snd`.
 * `unitaryRootEquiv_symm_apply` — its inverse, through `ofUnitary`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

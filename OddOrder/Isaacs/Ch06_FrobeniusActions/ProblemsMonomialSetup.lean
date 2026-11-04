@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+module
+
+public import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
 
 /-!
 # Isaacs Problems 6A.2 / 6A.3 の共通土台 — モノミアル行列による Frobenius complement
@@ -35,6 +37,8 @@ Isaacs Problem 6A.2 (`GL(3,43)` の位数 `7·3²` の群) と 6A.3 (`GL(5,p)` �
 `scalar_mulVec_ne_of_ne_one` / `exists_diagonal_eq_one_of_mulVec_eq` / `diagonal_mul_scalar` /
 `eq_one_of_pow_eq_one_of_coprime`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

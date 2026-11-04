@@ -3,17 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.CrossedHomomorphism
-import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
-import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
-import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.CrossedHomomorphism
+public import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
+public import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
+public import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch03
 open SemidirectProduct
 open scoped Pointwise

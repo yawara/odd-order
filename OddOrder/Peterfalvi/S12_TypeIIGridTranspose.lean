@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_TypeIIColumnPin
-import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
-import OddOrder.Peterfalvi.S13_Section16PairData
+module
+
+public import OddOrder.Peterfalvi.S12_TypeIIColumnPin
+public import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
+public import OddOrder.Peterfalvi.S13_Section16PairData
 
 /-!
 # Peterfalvi (8.8)/(10.7): the σ-agreement bridge for the type-P pair grid transpose
@@ -67,6 +69,8 @@ pair `(dataT : TypePData mp.T) (hTW1 : dataT.W1 = mp.Kstar)`, and
 `exists_section16_partner_typePData` supplies it `P₂`-free — by Schur–Zassenhaus conjugacy
 of complements of `T'`, transported through the whole-datum `TypePData.conj`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.GroupTheory.RepresentationTheory.ClassTwoSquareIndex
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+public import OddOrder.GroupTheory.RepresentationTheory.ClassTwoSquareIndex
 
 /-! # Peterfalvi (11.7): the chief-kernel triviality frame
 
@@ -41,6 +43,8 @@ then splits:
 Coq: `PFsection11.FTtype34_Fcore_kernel_trivial` (which recasts the linear algebra of the
 original text in pure group theory; we follow the same plan, with the extraspecial-order step
 replaced by the square-index theorem). -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 

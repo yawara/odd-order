@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
 
 /-!
 # Higman Lemma 13: the ambient range of one common pairwise factor
@@ -22,6 +24,8 @@ prescribed factor, regards the same ambient element as an element of the
 other join, and then uses the second factor coordinate's surjectivity onto
 that prescribed factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

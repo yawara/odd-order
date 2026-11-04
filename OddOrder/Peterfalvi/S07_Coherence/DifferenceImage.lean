@@ -1,16 +1,20 @@
-import Mathlib.Algebra.Module.Submodule.LinearMap
-import Mathlib.Data.Fin.Tuple.Sort
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+module
+
+public import Mathlib.Algebra.Module.Submodule.LinearMap
+public import Mathlib.Data.Fin.Tuple.Sort
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 
 /-!
 # Peterfalvi (5.2) — integral character maps, difference images R(χ), producers
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §7: Coherence

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import Mathlib.Data.Nat.Factorization.Basic
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.Data.Nat.Factorization.Basic
 
 /-!
 # `p`-elements, `p`-regular elements, and the `p` / `p'` decomposition
@@ -44,6 +46,8 @@ is performed first.
 * `OddOrder.GroupTheory.isPElement_pPart` / `OddOrder.GroupTheory.isPRegular_pRegularPart`
 * `OddOrder.GroupTheory.eq_pPart_of_commute` — uniqueness of the factorisation
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

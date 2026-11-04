@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven
-import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 
 /-!
 # Higman's Lemma 12: models for the ξ-length-two factors
@@ -25,6 +27,8 @@ The restricted actor bridges below transfer cyclicity, involution
 transitivity, and Higman's prime-support condition to an invariant factor.
 Thus every noncommutative lifted factor is classified by Lemma 11.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

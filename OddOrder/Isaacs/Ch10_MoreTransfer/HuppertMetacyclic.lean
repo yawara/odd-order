@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
-import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.GroupTheory.PrimeOrderSubgroups
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+module
+
+public import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.GroupTheory.PrimeOrderSubgroups
+public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # Isaacs §10B — Huppert's metacyclic Sylow theorem (pp. 304-307)
@@ -44,6 +46,8 @@ Theory", §10B: Huppert の定理に向けた main lemma。
 
 issue 3007 参照。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 

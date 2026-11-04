@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.GroupTheory.NarrowPGroup
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.GroupTheory.NarrowPGroup
 
 /-!
 # BG §9: Theorem 9.1 (noncyclic uniqueness via Hall–Higman)
@@ -30,6 +32,8 @@ Sylow-promotion / Eq(9.5)+STEP5-7 の各 helper を含む。
 `S09_Uniqueness` から import される。共通 helper (`centralizer_singleton_*`) と Thm 9.1
 の contrapositive helper (Lemma 9.5 で使用) もここに置き、cross-file 用に public 化。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S09
 

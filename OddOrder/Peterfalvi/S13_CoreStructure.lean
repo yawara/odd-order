@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_CoreStructure.KernelBounds
+module
+
+public import OddOrder.Peterfalvi.S13_CoreStructure.KernelBounds
 
 /-!
 # Peterfalvi Section 13: centralization and elementary-abelian core structure
@@ -15,6 +17,8 @@ This module continues the kernel bounds from `S13_CoreStructure.KernelBounds`. I
 that `U` centralizes `H₀`, identifies `H₀` with `H'`, eliminates the chief kernel, derives
 the elementary-abelian structure of `H`, and packages the coherence bridges used downstream.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 
@@ -874,7 +878,7 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {x} hx =>
-    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone (Y := hyp.H0C.subgroupOf M) bot_le
       (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
   -- the conjugate `μ̄ ∈ 𝒮(H₀C)` (closed under conjugation)
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=

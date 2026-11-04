@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.Classification
+module
+
+public import OddOrder.Higman.Suzuki2Groups.Classification
 
 /-!
 # Exponent four for Higman's Suzuki 2-groups
@@ -18,6 +20,8 @@ calculation through the honest type-`A`/`B`/`C`/`D` model equivalences and then
 applying the classification theorem proves the exponent-four clause for every
 Suzuki `2`-group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

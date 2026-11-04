@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
-import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
 
 /-!
 # BetaVanishing
@@ -7,6 +9,8 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
 Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (14.12)-(14.16) — comparing L and M

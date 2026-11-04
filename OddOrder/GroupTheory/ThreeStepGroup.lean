@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.GroupTheory.CardSupInf
-import OddOrder.GroupTheory.SubgroupInAmbient
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.GroupTheory.CardSupInf
+public import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Three-step groups (Gorenstein, Ch. 12 §1)
@@ -55,6 +57,8 @@ throughout, and only the former composes with the `π`-core machinery of `Ch03`.
 spelled `Ch03.oPiCore {q | q ≠ p}`; see `oPiCore_ne_eq_oPiCore_not_mem` for the conversion to the
 `{q | q ∉ {p}}` spelling that `Ch03` uses internally.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

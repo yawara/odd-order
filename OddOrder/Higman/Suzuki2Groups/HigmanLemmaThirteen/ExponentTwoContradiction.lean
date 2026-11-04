@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAlignedParameterBranches
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicParameterBranch
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAlignedParameterBranches
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicParameterBranch
 
 /-!
 # Higman's Lemma 13: exponent-two contradiction
@@ -18,6 +20,8 @@ parameter coincidence refines into three aligned branches and one all-equal
 nontrivial branch.  The corresponding branch contradictions therefore rule
 out exponent two in the Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Set.Finite.Lemmas
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import Mathlib.Data.Set.Finite.Lemmas
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # 有限可解群の素数指数正規部分群
@@ -18,6 +20,8 @@ import Mathlib.GroupTheory.QuotientGroup.Basic
 FongSwan の元 docstring が「once the BG side is refactored、単一の共有 public leaf へ統合すべき」と
 明記していた統合先。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

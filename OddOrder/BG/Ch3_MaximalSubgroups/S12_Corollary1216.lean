@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 
 /-!
 # BG §12 Corollary 12.16 — `σ(M)`-subgroup ↔ maximal-subgroup interaction (downstream leaf)
@@ -45,6 +47,8 @@ Sylow `q` を含む ⟹ `X` を共役で `M_σ` へ (rank 不変ゆえ結論を 
   - (b): `p ∈ τ₁(M)` ⟹ `p ∉ π(M')`。`(M ∩ H)'K` は `H = (M ∩ H)K` の正規 `p'`-部分群で `H'` を含む
     ⟹ `p ∉ π(H')` ⟹ `p ∉ π(N_H(Y)')`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12.Cor1216
 

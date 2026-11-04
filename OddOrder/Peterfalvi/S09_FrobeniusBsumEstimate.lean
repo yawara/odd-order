@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
 
 /-!
 # Frobenius-family B-sum estimate (Peterfalvi 7.10)
@@ -20,6 +22,8 @@ for the concrete set `B` of vanishing reverse coefficients.
 Textbook: Peterfalvi, Section 7, pp. 41-43, equation (7.10).
 Coq comparison: `PFsection7.v`, proof of `CoherentFrobeniusPartition`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BurnsideBasis
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BurnsideBasis
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 
 /-!
 # The monomial action of an intertwiner on the Burnside basis (BG (2.11))
@@ -26,6 +28,8 @@ The key lemma `cyclicEndConj_burnsideBasis` says `c_x (b c) = a · b (σ c)` whe
 character of `φ(out c) · out(σ c)⁻¹ ∈ Z(P)`.  This is the input to the orbit/eigenspace count that
 yields the keystone `dim E₀ = dim E_m + 1` of BG Theorem 2.5.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

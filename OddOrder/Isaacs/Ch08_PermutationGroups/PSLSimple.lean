@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Projectivization.Action
-import Mathlib.GroupTheory.GroupAction.Iwasawa
-import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration
+module
+
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import Mathlib.GroupTheory.GroupAction.Iwasawa
+public import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: `PSL(n,q)` is simple (Thm 8.33)
@@ -25,6 +27,8 @@ and together they contain all transvections, hence generate `SL`
 (Thm 8.31).  Since `SL` is perfect (Thm 8.32), so is `PSL`, and the Iwasawa
 criterion applies.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

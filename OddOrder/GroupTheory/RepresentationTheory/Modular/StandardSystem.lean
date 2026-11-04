@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
 # The standard `p`-modular system
@@ -29,6 +31,8 @@ records the instantiation.
 * `OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent_standardSystem`
 * `OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq_standardSystem`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

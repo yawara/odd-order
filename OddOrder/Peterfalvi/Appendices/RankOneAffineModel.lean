@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki
-import OddOrder.Peterfalvi.Appendices.SemilinearField
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Peterfalvi.Appendices.NearFieldClass
-import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
-import OddOrder.GroupTheory.SolvableTwoTransitive
-import OddOrder.GroupTheory.BrauerSuzuki
-import OddOrder.GroupTheory.BrauerSuzukiEndgame
-import OddOrder.GroupTheory.BrauerSuzukiQ8
-import OddOrder.GroupTheory.BrauerSuzukiGeneral
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki
+public import OddOrder.Peterfalvi.Appendices.SemilinearField
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Peterfalvi.Appendices.NearFieldClass
+public import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
+public import OddOrder.GroupTheory.SolvableTwoTransitive
+public import OddOrder.GroupTheory.BrauerSuzuki
+public import OddOrder.GroupTheory.BrauerSuzukiEndgame
+public import OddOrder.GroupTheory.BrauerSuzukiQ8
+public import OddOrder.GroupTheory.BrauerSuzukiGeneral
 
 /-!
 # Peterfalvi Appendix II, Proposition 1 — the affine near-field model of a rank-one group
@@ -26,6 +28,8 @@ for the near-field basics, the twisted-field construction, and Proposition 2.
 
 Same namespace `OddOrder.Peterfalvi.Appendices.NearFields` as `NearFields.lean`, so downstream
 references are unchanged. -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 

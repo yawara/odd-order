@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
+public import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 
 /-!
 # Peterfalvi (8.15) claim 1 for the book-literal type-`𝒫` support `A₀(M) = A(M) ∪ V^M`
@@ -25,6 +27,8 @@ but it used to live in `S15_HonestTypeP2A0.lean` (namespace `S15`), i.e. *downst
 ⚠ `escaping_typePACore0_eq_empty` deliberately stays behind in `S15_HonestTypeP2A0`: it is *not*
 part of this closure and genuinely depends on §14 (`S14.typeI_frobenius`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart2.SibleyBounds
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart2.SibleyBounds
 
 /-!
 # Peterfalvi §8: normalized degree gaps
 
 Generic normalized-degree and common-index divisibility lemmas for the §8 adjoining steps.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

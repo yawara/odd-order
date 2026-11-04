@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_AbelianCentralizer
-import OddOrder.GroupTheory.CommutatorSup
+module
+
+public import OddOrder.BG.AppE_AbelianCentralizer
+public import OddOrder.GroupTheory.CommutatorSup
 
 /-!
 # BG Appendix E, Proposition E.4: the combinatorics of `(E.24)`–`(E.27)`
@@ -36,6 +38,8 @@ Three things are supplied here:
 The lower bound `3 ≤ k` is the one BG does not state; it is what rules out the alternative
 recursion in `(E.23)` (see `commutator_self_le_of_generator`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

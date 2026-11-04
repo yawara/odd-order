@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusSibley
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusSibley
 
 /-!
 # Peterfalvi (7.8) for a Frobenius family — assembling the `Hypothesis78`
@@ -30,6 +32,8 @@ coherence's
 Dade map `(dade.fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap` (matching
 `coherence_hagree_dadeMap` definitionally) — mirroring `S14.Hypothesis.toHypothesis71`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

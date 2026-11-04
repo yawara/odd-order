@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: the Proposition, and Corollary 1, off the model
@@ -33,6 +35,8 @@ book's `h(ω) ∈ W` and never for `V = W`, which is what makes it available to 
 * `Hypothesis.nonempty_theoremAConclusion_of_isStandardModel` — **Corollary 1** from
   `IsStandardModel`: `O^{2′}(G) ≅ PSU(3, q)`, in the shape Theorem A's conclusion takes.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCore
-import OddOrder.Peterfalvi.S08_Theorem65c2
-import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
-import OddOrder.Peterfalvi.S08_PGroupReduction
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCore
+public import OddOrder.Peterfalvi.S08_Theorem65c2
+public import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
+public import OddOrder.Peterfalvi.S08_PGroupReduction
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -23,6 +25,8 @@ constructor).
 
 Reference note: `notes/peterfalvi/s08_coherence_theorems.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

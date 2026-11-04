@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. III §1, Proposition: the three cases for `S`
@@ -67,6 +69,8 @@ The Proposition itself (`SecondCaseHypothesis.trichotomy`) is assembled in
 `WNeBot.lean`, which supplies the `W ≠ 1` clause of case (c)
 (`W_ne_bot_of_card_cube`) and therefore has to import this file.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

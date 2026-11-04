@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Pi
-import Mathlib.Algebra.BigOperators.Pi
-import Mathlib.LinearAlgebra.Pi
-import OddOrder.Algebra.CommutatorSpan
+module
+
+public import Mathlib.Algebra.Algebra.Pi
+public import Mathlib.Algebra.BigOperators.Pi
+public import Mathlib.LinearAlgebra.Pi
+public import OddOrder.Algebra.CommutatorSpan
 
 /-!
 # The commutator span of a finite product of algebras
@@ -22,6 +24,8 @@ the factors.
 * `OddOrder.commutatorSpan_pi`
 * `OddOrder.commutatorRadical_pi_eq`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

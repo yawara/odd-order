@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Isaacs §3E: Hartley–Turull cluster (Lemmas 3.31–3.34, pp. 105-108)
@@ -58,6 +60,8 @@ abelian 置換の積が `N` の abelian 置換になる.
    補集合対も固定点数の仮定を満たす. `|Ω ∖ A•μ| < |Ω|` で帰納法の仮定を適用し,
    軌道上と補集合上の equivariant 全単射を貼り合わせて完成.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

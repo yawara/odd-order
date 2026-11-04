@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.WielandtAssembly
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+module
+
+public import OddOrder.GroupTheory.WielandtAssembly
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 
 /-!
 # Peterfalvi (9.1): per-chief-factor discharge of the Wielandt identity
@@ -44,6 +46,8 @@ ways:
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece C), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Basic
-import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 正則表現と regular normal 部分群
@@ -35,6 +37,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
   `mulEquiv_and_center_eq_bot_of_regular_normal` — **Problem 8A.4**: regular normal な
   `U`, `V` が `U ⊓ V = 1` を満たすと `C_G(U) = V` となり, `U ≅ V` で中心はともに自明。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

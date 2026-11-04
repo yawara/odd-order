@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoSupportCancellation
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoSupportCancellation
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
 
 /-!
 # Higman Lemma 13: common support of two pairwise mixed terms
@@ -21,6 +23,8 @@ be cancelled by one nonzero pair of scalars.
 This is the coordinate-level support calculation.  A downstream leaf
 identifies the two right coordinates with one actual ambient factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

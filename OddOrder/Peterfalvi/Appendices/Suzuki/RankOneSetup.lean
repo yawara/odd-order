@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
-import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
-import OddOrder.GroupTheory.RankOneBNPair
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
+public import OddOrder.GroupTheory.RankOneBNPair
 
 /-!
 # Hypotheses (A1)–(A3) give a rank-one split BN-pair
@@ -34,6 +36,8 @@ free: `t ∉ H` is an axiom, and `t x t ∉ H` for `x ∈ Q^#` is `Q ∩ D = 1`,
 * `Hypothesis.ofRankOneSetup` — the converse: a `Setup` whose `M` has trivial normal core
   and whose `Q`, `D` have the right parities is itself a standing hypothesis, on `L ⧸ M`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

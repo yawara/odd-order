@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.DirectSum.LinearMap
-import Mathlib.Algebra.MvPolynomial.Equiv
-import Mathlib.Data.Nat.ChineseRemainder
-import Mathlib.FieldTheory.IsAlgClosed.Classification
-import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
-import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-import Mathlib.LinearAlgebra.Semisimple
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
-import Mathlib.RingTheory.RootsOfUnity.Complex
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+module
+
+public import Mathlib.Algebra.DirectSum.LinearMap
+public import Mathlib.Algebra.MvPolynomial.Equiv
+public import Mathlib.Data.Nat.ChineseRemainder
+public import Mathlib.FieldTheory.IsAlgClosed.Classification
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
+public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
+public import Mathlib.LinearAlgebra.Semisimple
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
+public import Mathlib.RingTheory.RootsOfUnity.Complex
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 
 /-!
 # Peterfalvi (1.9): cyclotomic Galois automorphisms acting on character values
@@ -51,6 +53,8 @@ Note that a nontrivial such `σ` is necessarily discontinuous and does **not** c
 complex conjugation globally — but it does commute with conjugation on cyclotomic values
 (the Galois group of `ℚ_n/ℚ` is abelian), which is what coherence transport needs.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

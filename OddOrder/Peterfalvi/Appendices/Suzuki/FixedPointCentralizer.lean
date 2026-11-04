@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
 
 /-!
 # Peterfalvi Part II, Ch. I §1: Proposition 6 (centralizers on fixed points)
@@ -24,6 +26,8 @@ here `MulAction.fixedPoints X Ω`):
 * **Prop 6 (b)**: `|C_Q(X)|` is even.
 * **Prop 6 (c)**: `X` is conjugate in `D` to a subgroup of `V`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

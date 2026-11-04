@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Defs
-import Mathlib.Algebra.MonoidAlgebra.MapDomain
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Defs
+public import Mathlib.Algebra.MonoidAlgebra.MapDomain
 
 /-!
 # `MonoidAlgebra` の穴埋め補題
@@ -24,6 +26,8 @@ mathlib v4.32 で `MonoidAlgebra R M` は `M →₀ R` の透明な別名でな�
 将来 mathlib 本体へ寄与する際の配置候補: `Mathlib/Algebra/MonoidAlgebra/Defs.lean`
 (`coeff_sum` の直後)。
 -/
+
+@[expose] public section
 
 namespace MonoidAlgebra
 

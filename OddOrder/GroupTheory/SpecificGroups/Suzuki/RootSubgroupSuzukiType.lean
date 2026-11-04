@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
-import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
-import Mathlib.FieldTheory.Finite.Basic
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import Mathlib.FieldTheory.Finite.Basic
 
 /-!
 # The standard Suzuki root as a Sylow subgroup and a Suzuki 2-group
@@ -25,6 +27,8 @@ identification of the concrete root group of `Sz(2^(2m+1))`:
 The multiplication is the explicit type-A central extension attached to the
 quadratic map `x |-> x * theta(x)` from Appendix III, Definition 2.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 
 /-!
 # Higman's Lemma 13: normalized restricted-factor coordinates
@@ -17,6 +19,8 @@ in Higman's Frobenius half-range normalization.  The coordinate flip changes
 only the quotient coordinate, so the common generator, the transported
 `Φ(P)²` kernel coordinate, and the primitive scalar stay fixed.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

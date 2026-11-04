@@ -1,15 +1,19 @@
-import OddOrder.BG.AppC_FinalContradiction
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
-import OddOrder.Peterfalvi.S06_MuColumnBridge
-import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S13_Orthogonality
-import OddOrder.Peterfalvi.S13_Section16PairData
+module
+
+public import OddOrder.BG.AppC_FinalContradiction
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
+public import OddOrder.Peterfalvi.S06_MuColumnBridge
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S13_Orthogonality
+public import OddOrder.Peterfalvi.S13_Section16PairData
 
 /-!
 # Feit–Thompson Section 16 carriers and type-`P` setup
 
 Prefix-split from `OddOrder.FeitThompson` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Feit-Thompson Theorem

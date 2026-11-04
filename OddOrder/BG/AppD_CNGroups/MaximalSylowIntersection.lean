@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppD_CNGroups.Basic
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.CNGroupStructure
+module
+
+public import OddOrder.BG.AppD_CNGroups.Basic
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.GroupTheory.CNGroupStructure
 
 /-!
 # BG Appendix D: maximal Sylow intersections in a minimal simple CN-group
@@ -39,6 +41,8 @@ the repair is short: Theorem 6.2 applied to `M` and its Sylow subgroup `S = P �
 therefore `N_P(S) ≤ P ∩ M = S`; a `p`-subgroup that is self-normalizing in `P` is `P`, so
 `S = P` after all.  Everything BG writes is then correct as written.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppD
 

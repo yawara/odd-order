@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
-import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Algebra.Group.Commutator
-import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.BG.Ch1_Preliminary.PLength
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.Algebra.Group.Commutator
+public import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
 
 /-!
 # BG §6: Additional Results — the normal-J hub (FT critical)
@@ -67,6 +69,8 @@ case** で `J(P) ⊴ G` を与える。本ファイルでは、その awkward �
 ステップが要る — 後続コミットで対応。
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

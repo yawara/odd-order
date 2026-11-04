@@ -3,7 +3,9 @@ Copyright (c) 2026 OddOrder contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
 /-!
 # Invariant Schur–Zassenhaus (complement form)
@@ -20,6 +22,8 @@ obtain it for free from BG Proposition 1.5(b)
 `π'`-subgroup `U`; coprimality of the `π`- and `π'`-parts makes `U` a complement of the Hall
 `π`-subgroup `N`.
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

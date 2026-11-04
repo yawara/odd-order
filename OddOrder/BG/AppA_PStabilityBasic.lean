@@ -3,27 +3,31 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Dimension.Finite
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.Order.OrderIsoNat
-import Mathlib.RingTheory.Artinian.Module
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.BG.Ch1_Preliminary.S02_Representations
-import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
-import OddOrder.GroupTheory.ChiefFactor
-import OddOrder.Isaacs.Ch02_Subnormality.Main
+module
+
+public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.LinearAlgebra.Dimension.Finite
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.RepresentationTheory.Subrepresentation
+public import Mathlib.Order.OrderIsoNat
+public import Mathlib.RingTheory.Artinian.Module
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.BG.Ch1_Preliminary.S02_Representations
+public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+public import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
+public import OddOrder.GroupTheory.ChiefFactor
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
 
 /-!
 # AppA_PStabilityBasic
 
 Prefix-split from `OddOrder.BG.AppA_PStability` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Appendix A: p-Stability — Theorems A.1 and A.2

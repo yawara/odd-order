@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_FurtherResults
+module
+
+public import OddOrder.BG.AppE_FurtherResults
 
 /-!
 # BG Appendix E, Theorem E.3: the regular-operator eigenvalue count
@@ -32,6 +34,8 @@ through the tightness of the counting; the kernel argument needs no counting at 
 sharpened `Ch1.S05.index_centralizer_le_card_of_commutator_mem` remains a genuine
 improvement to that lemma, but is not needed here.)
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

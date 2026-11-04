@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.ZMod
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.LinearAlgebra.Prod
-import OddOrder.GroupTheory.CentralElementaryExtension
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+module
+
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
+public import Mathlib.LinearAlgebra.Prod
+public import OddOrder.GroupTheory.CentralElementaryExtension
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 
 /-!
 # Peterfalvi Appendix III: Suzuki 2-group types A and B
@@ -28,6 +30,8 @@ quadratic extensions are Peterfalvi's groups `A(n, phi)` and
 `B(n, phi, epsilon)`.  Thus `TypeAData P` and `TypeBData P` contain genuine
 group equivalences rather than proposition-valued classification labels.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
 
 /-!
 # BG §8 — `SCN₃` and the Fitting subgroup of a maximal subgroup (scn3_map layer)
@@ -15,6 +17,8 @@ Sylow normalizer transport, and the `O_{π'}(C(A))`-vanishing facts, for the cas
 Split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (issue 0149); that file
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S08
 open OddOrder.GroupTheory

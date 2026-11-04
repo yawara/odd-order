@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley Theorem — supporting layer (pp. 145–150)
@@ -22,6 +24,8 @@ issue 0149).  The statements live in the `Hypothesis` namespace of
 `OddOrder.Peterfalvi.Appendices.FeitSibley` and extend the structure API of
 that file.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

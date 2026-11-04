@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SubgroupSum
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.SylowContaining
+module
+
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.SylowContaining
 
 /-!
 # The sum of the `p`-elements, and the sum of the `p`-regular elements
@@ -37,6 +39,8 @@ runs on.
 * `OddOrder.GroupAlgebra.mapRingHom_pRegularSum`, `OddOrder.GroupAlgebra.mapRingHom_pElementSum`
 * `OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center` — `∑_P P̂` is central over any base
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

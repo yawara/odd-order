@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Focal
-import Mathlib.GroupTheory.Abelianization.Defs
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Focal
+public import Mathlib.GroupTheory.Abelianization.Defs
 
 /-!
 # Weakly closed subgroups
@@ -24,6 +26,8 @@ Weak closure is the hypothesis of the Hall–Wielandt/Grün transfer theorems; s
 issue 9503, where it is used for the Sylow `3`-subgroup of Peterfalvi Part II, Ch. II,
 step (17).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

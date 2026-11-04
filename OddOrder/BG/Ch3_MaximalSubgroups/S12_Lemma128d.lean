@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
 
 /-!
 # BG §12: Lemma 12.8(d)(e)(f) and assembly
@@ -24,6 +26,8 @@ characteristic (`A = Ω₁(S)`, `S = O_p(E₂)`, `E₂ = O_{τ₂}(E₂E₃)`,
 - `S12_Lemma128` の全部品 (chain core / `sylow_eq_opiCore…` / (a)(b)(c))。
 - Proposition 10.11(d) = `S10.sigma_complement_commutator_cyclic_normal` ((e))。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

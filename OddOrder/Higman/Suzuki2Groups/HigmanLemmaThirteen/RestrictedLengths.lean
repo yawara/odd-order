@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
 
 /-!
 # Higman's Lemma 13: lengths of the lifted invariant factors
@@ -17,6 +19,8 @@ branches require different arguments; in particular, an exponent-four
 restricted subgroup is not lifted to an ambient normal subgroup without a
 separate proof.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

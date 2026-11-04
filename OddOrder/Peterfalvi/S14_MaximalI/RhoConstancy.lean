@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
 # Peterfalvi §12 — `rho` の定数性
@@ -7,6 +9,8 @@ import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 prefix-split 済 (module 名は不変ゆえ下流の import は無変更)。
 本ファイルは (12.4) の coherence pin 以降を扱う。
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # Basic
 
 Prefix-split from `OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # OddOrder.Isaacs.Ch07 — The Thompson Subgroup
@@ -145,7 +149,7 @@ private theorem prime_lt_of_pGroup_faithful_on_cyclic
 
 /-- `Z(O_p(M))` viewed in `H` (for a subgroup `M ≤ H`): the image of
 `zCenterOpCoreSubgroup ↥M p` under `M.subtype`. -/
-private def zCenterOpCoreH {H : Type*} [Group H] (M : Subgroup H) (p : ℕ) : Subgroup H :=
+def zCenterOpCoreH {H : Type*} [Group H] (M : Subgroup H) (p : ℕ) : Subgroup H :=
   (zCenterOpCoreSubgroup ↥M p).map M.subtype
 
 open OddOrder.Isaacs.Ch06 in

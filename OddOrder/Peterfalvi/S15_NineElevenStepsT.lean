@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_NineElevenPairBoundT
-import OddOrder.Peterfalvi.S15_NineElevenSteps
+module
+
+public import OddOrder.Peterfalvi.S15_NineElevenPairBoundT
+public import OddOrder.Peterfalvi.S15_NineElevenSteps
 
 /-!
 # Peterfalvi (9.11.1)–(9.11.4) at `T` — step lemmas of the refuter-`T` campaign (pp. 87–91)
@@ -25,6 +27,8 @@ the (9.11.5)–(9.11.8) endgame of the `T`-instance (9.11) equality-configuratio
 The (9.11.2) TI-witness bricks (`cuSubOf_zero_tiWitness`, `exists_cuSubOf_centralizer_witness`,
 `S15_NineElevenSteps.lean`) are `{M}`-generic and cited directly — no mirror needed.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.TISubset
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+public import OddOrder.GroupTheory.TISubset
 
 /-!
 # Real classes under a TI Sylow setup: the Peterfalvi (6.7.3) real-class atom
@@ -46,6 +48,8 @@ leaf module downstream of both.
 * `ConjClasses.eq_one_of_isConj_inv_of_odd_card` (`BrauerPermutation.lean`): the group-theoretic
   core that an element conjugate to its inverse in a finite group of odd order is trivial.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

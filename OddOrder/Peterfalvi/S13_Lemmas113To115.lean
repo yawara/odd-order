@@ -3,15 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
-import OddOrder.Peterfalvi.S12_TypeVSibley
-import OddOrder.Peterfalvi.S13_SixTwoImageData
+module
+
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+public import OddOrder.Peterfalvi.S12_TypeVSibley
+public import OddOrder.Peterfalvi.S13_SixTwoImageData
 
 /-!
 # S13_Lemmas113To115
 
 Prefix-split from `OddOrder.Peterfalvi.S13_MaximalIII_IV` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S13
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

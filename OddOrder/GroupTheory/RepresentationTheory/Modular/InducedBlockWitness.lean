@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockCornerLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
+module
+
+public import OddOrder.Algebra.BlockCornerLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 
 /-!
 # Navarro (5.6)
@@ -32,6 +34,8 @@ The proof is the textbook one.  Split the block idempotent as `f_B = a - c`, wit
 
 * `OddOrder.RepresentationTheory.Modular.exists_inducedBlock_witness` — Navarro (5.6)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

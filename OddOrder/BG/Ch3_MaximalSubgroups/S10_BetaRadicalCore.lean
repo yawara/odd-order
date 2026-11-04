@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
-import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
+public import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
 
 /-!
 # BG §10 β-radical spine — Core (Thm 10.6 / Cor 10.7 / Lem 10.8)
@@ -22,6 +24,8 @@ mmd `references/bg/local-analysis.mmd` L2779-2826。
 GroupTheory の public 同名 subgroup-normalizer 版との衝突回避) /
 `isUniquelyMaximal_of_le_of_lt_top` (旧 `isUniquelyMaximal_of_le`, 定義は Global 側)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

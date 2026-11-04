@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import OddOrder.GroupTheory.BrauerSuzukiSetup
-import OddOrder.GroupTheory.SylowNormalRelIndex
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import OddOrder.GroupTheory.BrauerSuzukiSetup
+public import OddOrder.GroupTheory.SylowNormalRelIndex
 
 /-!
 # Brauer–Suzuki: the structure of `N = N_G(T)` (Gorenstein Ch. 12, Lemma 1.2)
@@ -26,6 +28,8 @@ This file develops the proof along the book's lines:
 The Burnside normal `2`-complement `H` of `C` and the assembly `N = SH`, `C = XH`
 follow in the sequel.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

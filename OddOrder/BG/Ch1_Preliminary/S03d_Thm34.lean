@@ -3,20 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
-import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RepresentationTheory.Subrepresentation
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+public import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+public import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 
 /-!
 # BG §3: Theorem 3.4 (coprime action, fixed-point-free complement)
@@ -65,6 +67,8 @@ core (`thm34_algClosed`) は **`[IsAlgClosed F]` 付き**で証明し (Thm 2.5 /
 (`ρ.comp (H ⊔ R).subtype`), (b) `G/N` on submodule `M` (`Subrepresentation.toRepresentation` →
 `Representation.ofQuotient`).  一般 `F` は base change (BG (2.9) = `BaseChange.lean`) で導く.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03d
 

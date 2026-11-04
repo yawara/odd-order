@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+module
+
+public import Mathlib.Tactic.Group
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 
 /-!
 # Conjugation action on class functions and the inertia group
@@ -44,6 +46,8 @@ mathlib に「class function 上の G-action」「Inertia group」は不在 (Pet
 * Peterfalvi §2 line 25 (`θ^g` notation), §3 (1.5) (Clifford suite), §3 (1.7).
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

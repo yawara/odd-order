@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman Lemma 13: normalized factor-parameter coherence
@@ -21,6 +23,8 @@ that the two source eigenvalues lie in one Frobenius orbit.  Higman's
 alternative would make the two positive lower-half representatives sum to
 `n`, which can happen only when they are already equal.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

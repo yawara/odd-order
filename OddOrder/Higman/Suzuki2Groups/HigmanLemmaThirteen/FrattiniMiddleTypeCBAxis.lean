@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBSupport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBSupport
 
 /-!
 # Higman's Lemma 13: the type-C/B middle-commutator axis
@@ -15,6 +17,8 @@ For a supported type-C/B pair, a nonzero middle Frattini commutator lies on
 the canonical middle eigenline with index `i + 2`.  Its type-B source index is
 necessarily `i + r + 2`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import Mathlib.Algebra.Free
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import Mathlib.Algebra.Free
 
 /-!
 # Formal commutators and formal words
@@ -48,6 +50,8 @@ lower-central-series bookkeeping is unaffected.
 * `FormalCommutator.evalWord_mem_lowerCentralSeries` — hence an ordered product
   of formal commutators all of weight `≥ w` lies in `γ_w`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

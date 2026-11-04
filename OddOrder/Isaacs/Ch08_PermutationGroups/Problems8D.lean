@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.DegreeEight
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeSubdegree
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankBound
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankThree
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.DegreeEight
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeSubdegree
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankBound
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankThree
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8D (p. 269)

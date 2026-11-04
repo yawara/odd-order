@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AugmentationIdeal
-import OddOrder.GroupTheory.PRegularElementCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+module
+
+public import OddOrder.Algebra.AugmentationIdeal
+public import OddOrder.GroupTheory.PRegularElementCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # A character of the principal block does not vanish on all `p`-singular elements
@@ -40,6 +42,8 @@ zero — and Cauchy supplies a `p`-singular element.
 * `OddOrder.RepresentationTheory.Modular.not_dvd_card_of_character_eq_zero_of_pSingular`
 * `OddOrder.RepresentationTheory.Modular.exists_not_isPRegular_character_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

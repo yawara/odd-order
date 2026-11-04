@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBAssembly
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBAssembly
 
 /-!
 # Peterfalvi §8: case-(B) `X ∪ Y` base union (generation hypothesis)
@@ -31,6 +33,8 @@ anchor member degree `μ_{j₀}(1)`), so the per-`X` degree ratio is always an i
 
 Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` (session 44).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

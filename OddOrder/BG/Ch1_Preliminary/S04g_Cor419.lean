@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
+module
+
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 
 /-!
 # BG §4H: Corollary 4.19 — general form
@@ -36,6 +38,8 @@ chief factor を移送して reduced endpoint に帰着させる。
 (`T = O_{p',p}(G*)`) は `G*/O_{p',p}(G*)` が `p'`-群 (Thm 4.18(e)) と `U/V` が `p`-群の
 衝突から従う (`collapse`)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 

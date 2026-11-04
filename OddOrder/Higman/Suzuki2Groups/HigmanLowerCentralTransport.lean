@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
 
 /-!
 # Transport of Higman's lower-central layers
@@ -22,6 +24,8 @@ lower-central term, the square subgroup, the next term, and hence the
 quotient kernel.  The resulting quotient equivalence is used to compare one
 actual factor when it is embedded in two different pairwise joins.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

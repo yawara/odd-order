@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+module
+
+public import OddOrder.GroupTheory.MaximalSubgroupType
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 
 /-!
 # Peterfalvi §10 ↔ BG §16 interface (shared-notation consumption layer)
@@ -32,6 +34,8 @@ structure directly.  That structure is now proved, so what those wirings still l
 the citeable bridge, not an unproved upstream.  See
 `notes/peterfalvi/s10_13_maximal_structure.md` §5.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10Interface
 

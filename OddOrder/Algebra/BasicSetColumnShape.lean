@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.LinearCombination
-import OddOrder.Algebra.ThreeNormColumn
+module
+
+public import Mathlib.Tactic.LinearCombination
+public import OddOrder.Algebra.ThreeNormColumn
 
 /-!
 # Reading off the columns `D^t_j` — Navarro p. 143
@@ -35,6 +37,8 @@ exchanging `(i, δ_1)` with `(j, δ_2)`.
 * `OddOrder.Algebra.sign_relation_six` — (6), once `D^y_0` vanishes at `j`
 * `OddOrder.Algebra.exists_sign_relations` — (6) and (7) after the notation is chosen
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelian
-import Mathlib.GroupTheory.PGroup
-import Mathlib.Algebra.Order.GroupWithZero.Canonical
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
-import Mathlib.LinearAlgebra.Dimension.Free
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.Algebra.Order.GroupWithZero.Canonical
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
+public import Mathlib.LinearAlgebra.Dimension.Free
 
 /-!
 # p-Rank of a Group
@@ -65,6 +67,8 @@ Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確�
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
 性質補強 2026-05-30 (BG §4 最初の山, `notes/bg/s04_implementation_plan_2026_05_30.md` §4.1).
 -/
+
+@[expose] public section
 
 -- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
 open scoped IsMulCommutative

@@ -3,26 +3,28 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
-import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Data.Nat.Choose.Dvd
-import Mathlib.Data.Nat.Factorization.Basic
-import Mathlib.Algebra.Module.ZMod
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
-import OddOrder.BG.Ch1_Preliminary.S02_Representations
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.IsMetacyclic
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+module
+
+public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Index
+public import Mathlib.SetTheory.Cardinal.NatCard
+public import Mathlib.Data.Nat.Choose.Dvd
+public import Mathlib.Data.Nat.Factorization.Basic
+public import Mathlib.Algebra.Module.ZMod
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+public import OddOrder.BG.Ch1_Preliminary.S02_Representations
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # S04_SmallRankBasic
@@ -30,6 +32,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §4: p-Groups of Small Rank
@@ -162,7 +166,7 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic (hR : IsPGroup 
 /-- `Ω₁(Z(R))` as a subgroup of `R`: the central elements of order dividing `p`.
 The center is abelian, so this is the genuine `Ω₁` (the set is closed under
 multiplication). -/
-private def omega1Center (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
+def omega1Center (R : Type*) [Group R] (p : ℕ) : Subgroup R :=
   omega1OfAbelian R (Subgroup.center R) p
     (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)
 

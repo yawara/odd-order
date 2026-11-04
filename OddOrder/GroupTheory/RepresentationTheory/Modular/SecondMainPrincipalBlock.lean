@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
-import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 
 /-!
 # `χ(x y) = d^x_{χ φ_0}` when `C_G(x)` has a normal `p`-complement
@@ -39,6 +41,8 @@ character value is `1`.
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_ne_principal`
 * `OddOrder.RepresentationTheory.Modular.character_mul_eq_generalizedDecompositionNumber`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

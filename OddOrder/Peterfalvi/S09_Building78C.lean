@@ -10,8 +10,10 @@ This file lives outside `S09` (which is concurrently edited for the `(7.11)` ass
 conflicts; it imports the `S09` machinery and supplies standalone lemmas toward the certificate
 discharge (issue 1013).
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
 
 /-!
 # S09_Building78C
@@ -19,6 +21,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
 Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09.Cert
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # A character vanishing off the `p`-regular elements has degree divisible by `|G|_p`
@@ -32,6 +34,8 @@ entirely in ordinary character theory over a field of characteristic `0`.
 
 * `OddOrder.RepresentationTheory.Modular.ordProj_dvd_finrank_of_character_eq_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

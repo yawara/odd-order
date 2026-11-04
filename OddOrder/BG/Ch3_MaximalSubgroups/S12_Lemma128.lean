@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 
 /-!
 # BG §12: Lemma 12.8 — the abelian Sylow `p`-subgroup case
@@ -31,6 +33,8 @@ Sylow `q` を丸ごと含む。
 - Theorem 4.20(a) = `Ch1.S05.derived_le_fitting_of_rank_fitting_le_two`。
 - Proposition 10.11(d) = `S10.sigma_complement_commutator_cyclic_normal` ((e) で)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_NormSet
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
+module
+
+public import OddOrder.BG.AppC_NormSet
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # Galois-field models for faithful conjugation actions
@@ -26,6 +28,8 @@ This is side-agnostic: Peterfalvi's `S`-side uses `(E,C)=(P,U)` and the `T`-side
 * Peterfalvi, `(9.7.b)`, `(14.2)(a)`, and `(14.4)`.
 * `issues/9097-conjugation-galois-field-model.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.ConjugationFieldModel
 

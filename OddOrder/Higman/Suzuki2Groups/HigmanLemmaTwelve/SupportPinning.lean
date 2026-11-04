@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman Lemma 12: support pinning for the mixed Frobenius pairing
@@ -31,6 +33,8 @@ The common upstream input `orderOf λ = 2^n - 1` (with the implicit
 `gcd(1 + 2^r, 2^n - 1) = 1`) is recovered from the primitivity of
 `ν = λ θ(λ)` by `orderOf_eq_and_coprime_of_pow_eq_orderOf`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

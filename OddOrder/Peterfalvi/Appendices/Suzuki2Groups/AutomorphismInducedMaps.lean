@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.End
-import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+module
+
+public import Mathlib.Algebra.Group.End
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Induced maps of automorphisms of an anisotropic quadratic extension
@@ -37,6 +39,8 @@ Main declarations:
 * `QuadraticExtension.isElementaryAbelian_ker_autQuotientHom` — hence
   elementary abelian of exponent `2`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

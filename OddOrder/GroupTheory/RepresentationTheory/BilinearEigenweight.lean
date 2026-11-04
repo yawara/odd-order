@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Basis.Bilinear
-import Mathlib.LinearAlgebra.Eigenspace.Basic
+module
+
+public import Mathlib.LinearAlgebra.Basis.Bilinear
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
 # Weights of an equivariant bilinear map
@@ -27,6 +29,8 @@ Illinois J. Math. **7** (1963), p. 90: if `x₀ ξ = λ x₀` and `y₀ ξ = μ 
 `[xᵢ, yⱼ]` can be nonzero only if `λ^(2^i) μ^(2^j)` is an eigenvalue of `ξ` on
 `Φ(G)`.  Nothing here refers to the group-theoretic origin of the modules.
 -/
+
+@[expose] public section
 
 open Module
 

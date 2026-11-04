@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareNonzero
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareNonzero
 
 /-!
 # Higman's Lemma 13: type-C square brackets on Frobenius eigenvectors
@@ -19,6 +21,8 @@ exponents shift the source and middle indices, and the sharp equation
 every pair required by Higman's type-C/C Jacobi argument has nonzero
 square-valued bracket.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

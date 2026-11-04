@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
 
 /-!
 # Higman's Lemma 13: the ξ-length-four reduction
@@ -23,6 +25,8 @@ Lemma 9's constructed maximal normal invariant abelian subgroup; it is not
 supplied as new data.  The separate descent from an arbitrary longer chain
 to an ambient-normal exact-length-four subgroup is not asserted here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

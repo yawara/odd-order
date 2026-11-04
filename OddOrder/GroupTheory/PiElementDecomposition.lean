@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Data.Nat.ModEq
-import Mathlib.Data.Nat.Factorization.Basic
-import Mathlib.Algebra.BigOperators.Associated
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Data.Nat.ModEq
+public import Mathlib.Data.Nat.Factorization.Basic
+public import Mathlib.Algebra.BigOperators.Associated
+public import Mathlib.Tactic.Ring
+public import Mathlib.Tactic.Group
 
 /-!
 # π-part / π′-part decomposition of a group element
@@ -25,6 +27,8 @@ foundation of Bender–Glauberman's σ-decomposition (Local Analysis §1, mmd L3
 * `OddOrder.GroupTheory.exists_isPiElement_mul` — existence of the decomposition.
 * `OddOrder.GroupTheory.isPiElement_mul_unique` — uniqueness.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

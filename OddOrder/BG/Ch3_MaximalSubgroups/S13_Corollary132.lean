@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 
 /-!
 # BG §13: Corollary 13.2 (`τ₁(M) ∪ τ₃(M)`-specialization of Lemma 13.1)
@@ -28,6 +30,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 (c) の `β(M*)` 部分は `p ∈ σ(M*)` から `r_p(M*) = r_p(G)`
 (`pRank_eq_of_mem_sigma`)、`idealPrime` の `r_p(G) ≥ 3` と合わせて `p ∈ α(M*)`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

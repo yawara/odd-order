@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
 
 /-!
 # The `KW`-orbits of `Q/Q₀`
@@ -48,6 +50,8 @@ the orbit of `ω` — the book's "`ω̄'_i` is in the orbit of `ω̄_i` under `K
 * `Hypothesis.exists_f_eq_conj_inv` — **§2's closing Proposition** (p. 129):
   `∃ ω ∈ Q − Q₀`, `ω² = y` and `f(ω) = (ω⁻¹)^ζ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

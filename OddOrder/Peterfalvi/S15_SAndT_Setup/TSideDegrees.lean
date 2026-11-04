@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_CoreStructure
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S13_TypeDetermination
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
-import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+module
+
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+public import OddOrder.Peterfalvi.S13_TypeDetermination
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
 
 /-! # T-side degree arithmetic for Peterfalvi (13.3.a,c) (pp. 76-77)
 
@@ -32,6 +34,8 @@ The `T`-side mirrors of the `S`-side (13.3) degree/counting layer, giving the `Î
 Consumed by `Hypothesis.deltaPrime_eq_one_T` (`S15_CharacterDegreeSupply`), whose only
 remaining input is the Î½-grid supply itself (`nuGridSupply`, a-owned producer threading).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

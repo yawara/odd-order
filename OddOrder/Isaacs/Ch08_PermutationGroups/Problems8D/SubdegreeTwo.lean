@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Primitive
-import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+public import Mathlib.GroupTheory.IndexNormal
 
 /-!
 # Isaacs Problem 8D.1 (p. 269) — subdegree 2 をもつ原始群
@@ -29,6 +32,8 @@ block なので原始性から `Ω` 全体となり `G_α ◁ G`, 再び `G_α =
 - `card_stabilizer_eq_two_of_subdegree_eq_two` — subdegree 2 があれば `|G_α| = 2`。
 - `ncard_orbit_eq_two_of_subdegree_eq_two` — **Problem 8D.1** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

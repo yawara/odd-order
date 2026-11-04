@@ -3,25 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
-import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Data.Nat.Choose.Dvd
-import Mathlib.Data.Nat.Factorization.Basic
-import Mathlib.Algebra.Module.ZMod
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.BG.Ch1_Preliminary.S02_Representations
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.IsMetacyclic
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+module
+
+public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Index
+public import Mathlib.SetTheory.Cardinal.NatCard
+public import Mathlib.Data.Nat.Choose.Dvd
+public import Mathlib.Data.Nat.Factorization.Basic
+public import Mathlib.Algebra.Module.ZMod
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.BG.Ch1_Preliminary.S02_Representations
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # BG §4A — commutator collection and `Ω₁` exponent under small class (Lem 4.2, Prop 4.3)
@@ -32,6 +34,8 @@ formula `(4.4)` under class ≤ 3, and the `Ω₁` exponent facts of Proposition
 Split from `OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic` (issue 0149); that file
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 

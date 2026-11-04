@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.Isaacs.Ch01_Sylow.Problems
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problem 7A.5 — 正規 elementary abelian 部分群は `𝓔(P)` の元を正規化する
@@ -27,6 +29,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
 ⚠ 書籍は `P` を `p`-群としているが, **証明は `P` が `p`-群であることを使わない** ので
 一般の有限群の部分群 `P` (と `U ⊴ P` elementary abelian) で形式化する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RepresentationTheory.Subrepresentation
+module
+
+public import Mathlib.RepresentationTheory.Maschke
+public import Mathlib.RepresentationTheory.Subrepresentation
 
 /-!
 # Maschke: invariant complements of subrepresentations
@@ -24,6 +26,8 @@ Isaacs Problem 10B.2 (`E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ So
 
 * `OddOrder.GroupTheory.exists_isCompl_invariant`
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

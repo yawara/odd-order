@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Index
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Index
+public import Mathlib.Tactic.Group
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 剰余類・指数と軌道
@@ -30,6 +32,8 @@ import Mathlib.Tactic.Group
   核心は `[G_α : H ⊓ G_α] = [G : H]` と相対指数の二通りの分解から出る
   `(n - 1) ∣ |Δ| · [G : H]` (`Δ` は `H ⊓ G_α`-軌道)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

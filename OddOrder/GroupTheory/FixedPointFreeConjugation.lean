@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.Data.Fintype.Card
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.Data.Fintype.Card
+public import Mathlib.Tactic.Group
 
 /-!
 # Fixed-point-free conjugation: the twisted map, quotient descent, and involutions
@@ -28,6 +30,8 @@ nonidentity fixed points, after D. Gorenstein, *Finite Groups* (2nd ed.), Ch. 10
 These are general finite-group lemmas with no dependence on any of the three books; they were
 written for Gorenstein Ch. 12 §1 Theorem 1.5 (`OddOrder.GroupTheory.CNGroupStructure`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

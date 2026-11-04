@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.Data.ZMod.Basic
+module
+
+public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # The action of the linear automorphism group on the non-zero vectors
@@ -40,6 +42,8 @@ apply to any field the caller has already identified with `𝔽₂`.
   turn `LinearMap.commutator_transvection` into perfectness of the linear group in
   dimension `≥ 3`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

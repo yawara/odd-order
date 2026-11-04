@@ -1,4 +1,6 @@
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Sylow intersect normal is Sylow (relative-index form)
@@ -10,6 +12,8 @@ Hoisted from `BG/Ch1_Preliminary/S04_Prop44b.lean` (2026-07-22, issue 9318) so t
 generic `GroupTheory` leaves (Brauer–Suzuki) can use it without importing the BG tree;
 the statement is pure mathlib group theory.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

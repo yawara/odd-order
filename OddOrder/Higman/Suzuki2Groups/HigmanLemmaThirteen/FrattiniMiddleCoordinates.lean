@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
 
 /-!
 # Higman's Lemma 13: common coordinates on the middle Frattini layer
@@ -18,6 +20,8 @@ The construction is independent of either restricted factor: its kernel
 calculation uses transitivity on involutions and the nontriviality of the
 ambient Frattini square.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_PropE4
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+module
+
+public import OddOrder.BG.AppE_PropE4
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
 /-!
 # BG Corollary E.5: the local data `(E.29)`
@@ -32,6 +34,8 @@ This leaf assembles the corollary in stages (issue 3028):
   instantiation for `(O_p(M), K₁, E)`, `(ii) ∧ hdc ⟹ (i)` via Theorem E.3 and the
   corrected Proposition E.4 (`AppE_PropE4.lean`), and the `(E.33)`/`(E.34)` counting.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

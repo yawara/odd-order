@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
-import Mathlib.GroupTheory.GroupAction.Primitive
-import Mathlib.Data.Fintype.Pigeonhole
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.Data.Fintype.Pigeonhole
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: orbital graphs (Thm 8.35, Lem 8.36)
@@ -24,6 +26,8 @@ connectivity uses the symmetrized relation.
   `orbital_connected_of_isPreprimitive`): a transitive action is primitive
   iff every non-diagonal orbital graph is connected.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

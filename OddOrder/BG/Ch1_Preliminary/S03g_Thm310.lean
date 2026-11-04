@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
 
 /-!
 # BG §3E: Proposition 3.9 and Theorem 3.10
@@ -32,6 +34,8 @@ BG の証明が引く Gorenstein 結果は Isaacs/repo の既形式化で埋ま�
 * **Clifford (G 3.4.1) / G 3.4.3** (Thm 3.10 Case 2) =
   `OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar` (§3B Thm 3.4/3.5 で使用)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03
 

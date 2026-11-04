@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Projectivization.Action
-import Mathlib.LinearAlgebra.Projectivization.Cardinality
-import Mathlib.RepresentationTheory.Irreducible
-import OddOrder.BG.Ch1_Preliminary.S02_Representations
-import OddOrder.GroupTheory.FreeActionOrbitCount
-import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+module
+
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import Mathlib.LinearAlgebra.Projectivization.Cardinality
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.BG.Ch1_Preliminary.S02_Representations
+public import OddOrder.GroupTheory.FreeActionOrbitCount
+public import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
 
 /-!
 # Free projective actions in dimension two
@@ -28,6 +30,8 @@ combining BG Theorem 2.6(a), which makes the group abelian, with the existing
 faithful irreducible Singer mechanism.  Divisibility is the free-orbit count
 on the projective line, whose cardinality is `|F| + 1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

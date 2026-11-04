@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Fintype.Card
-import Mathlib.GroupTheory.OrderOfElement
+module
+
+public import Mathlib.Data.Fintype.Card
+public import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Automorphisms of order three of a Klein four group
@@ -32,6 +34,8 @@ involutions `a`, `b`.
 * `OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_odd_of_klein` — the two combined, in the form
   Navarro (7.2) uses
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

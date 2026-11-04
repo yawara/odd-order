@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_LemmaC3_FixedPointFree
-import OddOrder.BG.AppC_LemmaC2
-import OddOrder.Peterfalvi.S16_NonExistenceG
+module
+
+public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+public import OddOrder.BG.AppC_LemmaC2
+public import OddOrder.Peterfalvi.S16_NonExistenceG
 
 /-!
 # BG Appendix C: The Final Contradiction
@@ -32,6 +34,8 @@ example `p = 2`, `G = SL(2, 2^q)` supplies another (`hypothesisBAbstract_sl2`).
 The hypotheses (A) and (B) themselves live upstream in `OddOrder.BG.AppC_HypothesisB`
 (`conditionA`, `primeLine`, `HypothesisBAbstract`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 -- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md

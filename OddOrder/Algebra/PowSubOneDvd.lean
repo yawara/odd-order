@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.NumberTheory.Fermat
+module
+
+public import Mathlib.NumberTheory.Fermat
 
 /-!
 # Divisibility among the numbers `aⁿ − 1`
@@ -23,6 +25,8 @@ invariant under a fixed-point-free action of order `q − 1` has order `1`, `q` 
 * `OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff`
 * `OddOrder.Nat.eq_zero_or_eq_or_eq_two_mul_of_two_pow_sub_one_dvd`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Nat
 

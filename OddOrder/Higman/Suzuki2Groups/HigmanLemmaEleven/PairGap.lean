@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
 
 /-!
 # Higman's classification of Suzuki 2-groups of length two
@@ -17,6 +19,8 @@ argument rules out a proper odd extension.  This leaf contains the common
 splitting-field eigenbasis and unequal-degree bracket normal form.  The trace
 calculation is collected in the downstream `TraceFormula` leaf.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

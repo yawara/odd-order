@@ -3,14 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IsSubnormal
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import Mathlib.GroupTheory.IsSubnormal
+public import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # Basic
 
 Prefix-split from `OddOrder.Isaacs.Ch02_Subnormality.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch01
 

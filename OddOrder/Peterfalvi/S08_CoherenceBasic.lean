@@ -3,15 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart2
-import OddOrder.Peterfalvi.S08_SibleyHypothesisBasic
-import OddOrder.Peterfalvi.S08_SixSixGeneral
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart2
+public import OddOrder.Peterfalvi.S08_SibleyHypothesisBasic
+public import OddOrder.Peterfalvi.S08_SixSixGeneral
 
 /-!
 # S08_CoherenceBasic
 
 Prefix-split from `OddOrder.Peterfalvi.S08_CoherenceCore` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §08 Coherence Core — Part 3/3 (second `SibleyDadeHypothesis` block; chain head)

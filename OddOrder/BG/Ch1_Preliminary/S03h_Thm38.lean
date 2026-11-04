@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.BG.Ch1_Preliminary.S06_Additional
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+public import OddOrder.BG.Ch1_Preliminary.S06_Additional
 
 /-!
 # BG Theorem 3.8 — `⁅K, R⁆ ⊆ F(K)` for a coprime action (LMS LNS 188, §3, mmd L1221-1259)
@@ -34,6 +36,8 @@ Theorem 3.7's Frobenius argument with **Theorem 3.4** (`S03d.thm34`), through th
 `commutator_acts_trivially_via_thm34` — the `thm34`-analog of
 `S03c.kernel_acts_trivially_of_coprime_fixedPointFree`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03h
 

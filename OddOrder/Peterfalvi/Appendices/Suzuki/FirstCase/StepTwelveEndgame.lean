@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
 
 /-!
 # Peterfalvi Part II, Ch. II, step (12): the endgame
@@ -15,6 +17,8 @@ The `s`-inverted complement `T₁ ≤ R₁` (order `p²`, all of whose nonidenti
 elements are strongly real), the identification `N_G(R₁) = N_G(R)`, and the
 final Hall–Wielandt/transfer contradiction with hypothesis (B2).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

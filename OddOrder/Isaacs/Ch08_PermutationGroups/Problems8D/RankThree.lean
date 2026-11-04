@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
 
 /-!
 # Isaacs Problem 8D.5 (p. 269) — rank 3 で subdegree が互いに素なとき
@@ -28,6 +30,8 @@ Isaacs のヒント通り `k_m` が `1 + m + n` を割ることを使う。
 
 - `succ_dvd_of_rank_three` — **Problem 8D.5** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

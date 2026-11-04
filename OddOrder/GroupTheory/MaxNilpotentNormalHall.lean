@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.GroupTheory.OpResidual
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.GroupTheory.OpResidual
 
 /-!
 # Maximal nilpotent normal Hall subgroups
@@ -19,6 +21,8 @@ same maximal nilpotent-normal-Hall property is part of the later BG Section 15
 analysis, so downstream files should use the definition for statements and cite
 that later result for proofs.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

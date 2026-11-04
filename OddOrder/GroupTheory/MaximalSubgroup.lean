@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Lattice
-import Mathlib.Algebra.Group.Subgroup.Order
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Data.Fintype.EquivFin
-import Mathlib.Data.Finset.Max
-import Mathlib.Order.Atoms
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Algebra.Group.Subgroup.Order
+public import Mathlib.Data.Fintype.Basic
+public import Mathlib.Data.Fintype.EquivFin
+public import Mathlib.Data.Finset.Max
+public import Mathlib.Order.Atoms
 
 /-!
 # Maximal subgroup families `ℳ`, `ℳ(H)` and the uniqueness predicate `𝒰`
@@ -33,6 +35,8 @@ every chapter II–IV section refers to them.
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994),
   Chapter II §7 (p. 55), §9 (pp. 62-66).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

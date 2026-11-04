@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 
 /-!
 # BG §12: Theorem 12.12 — regular 場合の Frobenius 因子分解
@@ -18,6 +20,8 @@ import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 3 大ケース (τ₂(M)=∅ / nonabelian Sylow p / abelian Sylow) のための部品を順次構築する。
 最終的に `frobenius_factorization_of_regular` (S12_E の scaffold) をここで充足・移植する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

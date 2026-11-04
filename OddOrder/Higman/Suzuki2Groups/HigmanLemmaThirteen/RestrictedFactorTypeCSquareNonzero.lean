@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorMixedTermBridge
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorMixedTermBridge
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
 
 /-!
 # Higman's Lemma 13: nonzero type-C square commutators
@@ -18,6 +20,8 @@ transposing the factor order, the restricted mixed-term bridge transports
 that formula to the actual ambient pairing
 `Φ(P)/Φ(P)² × P/Φ(P) → Φ(P)²`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

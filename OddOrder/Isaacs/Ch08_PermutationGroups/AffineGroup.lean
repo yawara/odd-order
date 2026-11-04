@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.NonzeroVectors
-import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.NonzeroVectors
+public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the affine group of `𝔽₂ⁿ` (Cor 8.7)
@@ -31,6 +33,8 @@ instances (`SMul`/`MulAction`/`MulDistribMulAction`/`FaithfulSMul` of a group
 on `Multiplicative V` induced from the additive action on `V`) are
 general-purpose, mathlib-gap infrastructure.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

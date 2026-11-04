@@ -3,7 +3,9 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Peterfalvi (6.2)/(6.3): the *standalone* general (6.1) coherence theorems
@@ -48,6 +50,8 @@ Hypothesis (5.2) data in general (`S08_SixTwoThreeFromImageFamilies`), and in th
 context from the `muGrid` columns (`S12.Hypothesis.exists_source_of_coherence_dichotomy`,
 `S13_SixTwoBridge`).  See `notes/peterfalvi/s06_standalone_62_63_producer.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

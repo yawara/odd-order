@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Charpoly.Basic
-import Mathlib.RingTheory.Coprime.Lemmas
-import Mathlib.RingTheory.Nakayama
-import OddOrder.Algebra.AlgClosedFractionField
-import OddOrder.Algebra.IdempotentLift
+module
+
+public import Mathlib.LinearAlgebra.Charpoly.Basic
+public import Mathlib.RingTheory.Coprime.Lemmas
+public import Mathlib.RingTheory.Nakayama
+public import OddOrder.Algebra.AlgClosedFractionField
+public import OddOrder.Algebra.IdempotentLift
 
 /-!
 # Idempotents lift over a coefficient ring whose fraction field is algebraically closed
@@ -46,6 +48,8 @@ by `b` modulo `𝔪B` identifies it with `b`.
   `B ↠ B/𝔪B`
 * `OddOrder.existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed` — uniquely so
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

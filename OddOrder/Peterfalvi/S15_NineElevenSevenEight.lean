@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_NineElevenSteps
+module
+
+public import OddOrder.Peterfalvi.S15_NineElevenSteps
 
 /-!
 # Peterfalvi (9.11.7)–(9.11.8) — the `S`-instance orthogonal-branch refutation
@@ -19,6 +21,8 @@ produces a norm-`1` bridge target `Γ`, and the union-pair extension
 contradicting the no-pair clause.  Consumed by the (9.11.6) norm bound
 `nineElevenNormBoundS` (`S15_CaseACoherence`, which imports this file).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

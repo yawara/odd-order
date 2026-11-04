@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourJacobi
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourJacobi
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
 
 /-!
 # Higman's Lemma 13: common coordinates on the Frattini square
@@ -17,6 +19,8 @@ the same internal Frattini image `Φ(P)²`.  Before choosing coordinates on
 either factor, this file chooses one Singer generator and one finite-field
 coordinate for the actual ambient actor action on that common subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Star.Basic
-import Mathlib.Algebra.Star.Module
-import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+module
+
+public import Mathlib.Algebra.Star.Basic
+public import Mathlib.Algebra.Star.Module
+public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Real (self-conjugate) class functions
@@ -41,6 +43,8 @@ ringhom レベルのみ). 本モジュールで `ClassFunction.conj` と `IsReal
 * Audit: §3 (1.1) bucket = "new helper 要".
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
 
 /-!
 # Peterfalvi §8 case-(B): coherence assembly
@@ -11,6 +13,8 @@ import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
 The downstream coherence and Dade-isometry assembly for Peterfalvi (6.8), case (B).
 Constituent aggregation and pinning are factored into `ConstituentPinning`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 

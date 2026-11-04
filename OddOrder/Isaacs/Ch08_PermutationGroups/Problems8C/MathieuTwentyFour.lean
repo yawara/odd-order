@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 /-!
 # Isaacs Problem 8C.5 (p. 257) — 次数 24 の 5-transitive 群
@@ -38,6 +40,8 @@ Wielandt 9.1 (`SubMulAction.ofStabilizer.isMultiplyPretransitive`) で 1 点ず�
 - `not_isSimpleGroup_of_card_eq_twentytwo` — 位数 22 の単純群は存在しない。
 - `isSimpleGroup_of_five_transitive_degree_twentyfour` — **Problem 8C.5** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

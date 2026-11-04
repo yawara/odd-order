@@ -3,26 +3,30 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ChiefFactor
-import OddOrder.GroupTheory.FittingSelfCentralizing
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import Mathlib.Order.Minimal
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.GroupTheory.ChiefFactor
+public import OddOrder.GroupTheory.FittingSelfCentralizing
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import Mathlib.Order.Minimal
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # S01_FrattiniBurnside
 
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S01_Solvable` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §1: Elementary Properties of Solvable Groups

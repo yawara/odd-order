@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
 
 /-!
 # Peterfalvi Part II, Ch. II, step (8): the case `Q₁ ≠ 1`
@@ -18,6 +20,8 @@ The first step of the argument is that `F` is a *field*: by step (5) the model's
 near-field is either commutative or `≅ F_{9,2}`, and the exceptional near-field
 `F_{9,2}` occurs only with `Q₁ = 1`.  So `Q₁ ≠ 1` forces `F` commutative.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

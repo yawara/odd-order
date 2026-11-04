@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Conjugacy
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Conjugacy
 
 /-!
 # Isaacs Problem 3C.7(c) — 冪零商と Carter 部分群
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Conjugacy
 - `normalizer_eq_self_of_isCarterSubgroup_le` — Carter 部分群を含む部分群は自己正規化。
 - `sup_eq_top_of_isNilpotent_quotient` — **Problem 3C.7(c)**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

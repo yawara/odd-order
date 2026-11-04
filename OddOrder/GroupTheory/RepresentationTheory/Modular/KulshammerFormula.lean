@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 
 /-!
 # Navarro (6.14): Külshammer's formula, the `z = Ĝ⁰` instance of (4.23)
@@ -26,6 +28,8 @@ Külshammer's formula is what this becomes once the two values of `λ_B(Ĝ⁰)` 
 * `OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum_principalBlock` —
   **Navarro (6.14)**
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

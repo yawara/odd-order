@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+module
+
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # BG §10 β-radical spine — Prop 10.14 (β(G)-prime の global 構造)
@@ -14,6 +16,8 @@ Bender–Glauberman §10, mmd L2894。`S10_BetaRadicalCore.lean` からの prefi
 (粒度規約, 2026-06-12)。Proposition 10.14 (`beta_global_structure`) と 10.14(d)
 nontrivial `β(M)`-subgroup normalizers。下流は `S10_BetaRadical.lean` (Cor 10.9 + Prop 10.10)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

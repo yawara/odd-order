@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # Normal `p`-complements of nilpotent groups, and their uniqueness
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Basic
   `p`-complement is fixed by every automorphism — in particular it is characteristic,
   and invariant under any group acting by automorphisms.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

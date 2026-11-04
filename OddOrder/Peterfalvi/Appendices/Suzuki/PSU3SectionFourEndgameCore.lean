@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the field-theoretic endgame
@@ -20,6 +22,8 @@ their assembly — is in `PSU3SectionFourEndgame`, which imports this file.
 This is a prefix split of `PSU3SectionFourEndgame` (it had grown past the 1500-line
 `longFile` limit); the module names of the downstream consumers are unchanged.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

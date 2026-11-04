@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
-import Mathlib.GroupTheory.GroupAction.Quotient
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
+public import Mathlib.GroupTheory.GroupAction.Quotient
 
 /-!
 # Free-orbit module count (Peterfalvi (9.1), the kernel-FPF dimension fact (†))
@@ -22,6 +24,8 @@ nontrivial irreducible).  This file lifts the count to that situation:
 The proof groups `ι` into `G`-orbits (each of size `|G|`, by freeness) and shows both `dim V` and
 `|G|·dim Vᴳ` equal `|G| · ∑_{ω} dim (A ω.out)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.WielandtCounting
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.QuadraticFrobenius
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+module
+
+public import OddOrder.Algebra.QuadraticFrobenius
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Pairs of Frobenius powers on a finite field of characteristic `2`
@@ -44,6 +46,8 @@ split out into a base leaf, this import should follow it.
 * `restrictToFrobFixed`, `odd_orderOf_restrictToFrobFixed_inv_mul` — the same for a pair
   of automorphisms of `E`, restricted to `F`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

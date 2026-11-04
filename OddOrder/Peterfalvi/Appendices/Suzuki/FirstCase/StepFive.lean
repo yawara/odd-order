@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
-import OddOrder.Higman.Suzuki2Groups.ExponentFour
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
+public import OddOrder.Higman.Suzuki2Groups.ExponentFour
 
 /-!
 # Peterfalvi Part II, Ch. II, step (5): supporting identifications
@@ -28,6 +30,8 @@ identifications on which its proof (and the later steps) rest:
 Everything consuming the near-field model depends on step (2)(b)
 through `exists_affineNearFieldModel`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

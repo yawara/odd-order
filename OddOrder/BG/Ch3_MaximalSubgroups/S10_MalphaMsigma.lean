@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 
 /-!
 # BG §10: M_α / M_σ / M_β (hub)

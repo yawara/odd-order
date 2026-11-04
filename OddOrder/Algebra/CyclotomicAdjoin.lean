@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.AdicCompletion.LocalRing
-import Mathlib.RingTheory.AdjoinRoot
-import Mathlib.RingTheory.LocalRing.ResidueField.Defs
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
-import OddOrder.Algebra.AdicCompletePi
+module
+
+public import Mathlib.RingTheory.AdicCompletion.LocalRing
+public import Mathlib.RingTheory.AdjoinRoot
+public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
+public import OddOrder.Algebra.AdicCompletePi
 
 /-!
 # The cyclotomic extension `A[ζ_n] = A[X]/Φ_n`
@@ -48,6 +50,8 @@ the hypothesis that the block idempotents are lifted along.
   `OddOrder.Algebra.maximalIdeal_cyclotomicAdjoin` /
   `OddOrder.Algebra.residueFieldEquiv` — its residue field is that of `A`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.PElementSumCount
-import OddOrder.GroupTheory.PRegularElementCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
-import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+module
+
+public import OddOrder.Algebra.PElementSumCount
+public import OddOrder.GroupTheory.PRegularElementCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
 
 /-!
 # Külshammer's route to the third main theorem: `e_{B_0}` is read off inside `C_G(Q)`
@@ -69,6 +71,8 @@ goes through Navarro (4.7) inside `H`), which at `H = C_G(Q)` would force `Q` ab
 they cover Navarro's range `Q C_G(Q) ⊆ H ⊆ N_G(Q)` and, in addition, `H = C_G(Q)` for
 non-abelian `Q`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

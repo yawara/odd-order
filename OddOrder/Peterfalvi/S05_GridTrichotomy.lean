@@ -3,22 +3,24 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.CharAndCard
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Data.Set.Card
-import Mathlib.Tactic.Abel
-import Mathlib.Tactic.Common
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.Group
-import Mathlib.Tactic.IntervalCases
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.Module
-import Mathlib.Tactic.NormNum.Prime
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Zify
+module
+
+public import Mathlib.Algebra.CharP.CharAndCard
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Data.Set.Card
+public import Mathlib.Tactic.Abel
+public import Mathlib.Tactic.Common
+public import Mathlib.Tactic.FieldSimp
+public import Mathlib.Tactic.FinCases
+public import Mathlib.Tactic.Group
+public import Mathlib.Tactic.IntervalCases
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.LinearCombination
+public import Mathlib.Tactic.Module
+public import Mathlib.Tactic.NormNum.Prime
+public import Mathlib.Tactic.Positivity
+public import Mathlib.Tactic.Ring
+public import Mathlib.Tactic.Zify
 
 /-!
 # Peterfalvi (3.8): the additive-grid trichotomy
@@ -42,6 +44,8 @@ The key simplification over the textbook's index-relabelling argument: an additi
 factors as `a (i, j) = f i + g j` (`exists_param`).  Then the trichotomy is a clean case split on
 whether `f` / `g` is constant, with a double-counting bound ruling out the "both non-constant" case.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

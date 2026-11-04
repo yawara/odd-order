@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S02_FixedSubmodules
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S02_FixedSubmodules
 
 /-!
 # BG §2F — the odd two-dimensional induction machinery
@@ -17,6 +19,8 @@ lemmas are public here because the assembly layer in the parent consumes them
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise

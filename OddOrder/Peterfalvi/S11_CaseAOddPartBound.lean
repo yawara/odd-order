@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_ImprimitiveUBound
-import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
-import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
+module
+
+public import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
 
 /-!
 # Peterfalvi (13.13): the odd part of the case-A block bound
@@ -19,6 +21,8 @@ lemma removes the entire 2-primary factor and yields
 This is the structural divisibility input used in Peterfalvi (13.13) to determine the case-A
 parameters.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 

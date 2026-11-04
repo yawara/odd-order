@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.MapDomain
-import OddOrder.Algebra.GroupAlgebraConjugation
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.MapDomain
+public import OddOrder.Algebra.GroupAlgebraConjugation
 
 /-!
 # Splitting `R[G]` along a subgroup
@@ -36,6 +38,8 @@ the two are kept apart.
 * `OddOrder.GroupAlgebra.commute_single_inclusionHom` — `H` centralises `inclusionHom H a` for
   central `a`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

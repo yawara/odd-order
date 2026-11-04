@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Abelianization.Defs
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.GroupTheory.Solvable
+module
+
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.GroupTheory.Solvable
 
 /-!
 # Isaacs Problem 3C.6 (書籍 p. 91) — 互いに素な位数の 3 元の積が 1 なら全て 1
@@ -34,6 +36,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.6 の形式化
 - `mem_commutator_of_mul_eq_one_of_coprime_orders` — 可換化での位数勘定 (帰納の 1 段)。
 - `eq_one_of_mul_eq_one_of_coprime_orders` — **Problem 3C.6**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

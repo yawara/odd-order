@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
-import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-import OddOrder.GroupTheory.TransferInvariantTransversal
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
-import OddOrder.GroupTheory.CommGroupAut
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
+module
+
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+public import OddOrder.GroupTheory.TransferInvariantTransversal
+public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.CommGroupAut
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 
 /-!
 # Isaacs §10A の演習 (書籍 pp. 307-308)
@@ -59,6 +61,8 @@ Isaacs は p. 297 で「`p`-群 `P` が **regular** とは, 任意の `x, y ∈ 
   regular 性の `c` は `⟨x,y⟩' ≤ P'` にあるので `c² = 1`, つまり `(xy)² = x² y²`。
   合わせて `⁅y,x⁆ = 1` となり矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 

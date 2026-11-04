@@ -2,9 +2,9 @@ name = "OddOrder"
 version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["OddOrder"]
-# 一時措置 (issue 0190): mathlib v4.35.0 は `requiresModuleSystem` を立てるので、非 module の
-# file は mathlib の import 1 行ごとに Lake が warning を出す。module 化の commit で外す。
-allowNonModules = true
+# 全 file が Lean の module system (issue 0190)。非 module の file が混入すると Lake が warning を
+# 出し、`bin/check-warnings --strict` が CI を赤にする。
+requiresModuleSystem = true
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`

@@ -3,11 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockOfSimpleModule
-import OddOrder.Algebra.TraceIsCompl
-import OddOrder.GroupTheory.MaschkeComplement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+module
+
+public import OddOrder.Algebra.BlockOfSimpleModule
+public import OddOrder.Algebra.TraceIsCompl
+public import OddOrder.GroupTheory.MaschkeComplement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+public import Mathlib.LinearAlgebra.FreeModule.PID
 
 /-!
 # Every ordinary character decomposes into irreducible ones
@@ -34,6 +37,8 @@ acts by a scalar.
 * `OddOrder.RepresentationTheory.Modular.exists_ordinary_decomposition_of_finrank_le`
 * `OddOrder.RepresentationTheory.Modular.exists_ordinary_decomposition`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

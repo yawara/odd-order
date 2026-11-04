@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
-import Mathlib.FieldTheory.Finite.GaloisField
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+public import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
 # The coordinate on `Q₀ = Z(Q)` inside `E`, and the exponent `d`
@@ -53,6 +55,8 @@ than imported from the type-B data; see issue 0167.
   additive *isomorphism* onto the subfield `F`, which is the form step (3) needs
   for the kernel map of Appendix III Lemma 1(c).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

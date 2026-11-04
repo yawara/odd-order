@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
-import Mathlib.GroupTheory.Perm.Option
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
+public import Mathlib.GroupTheory.Perm.Option
 
 /-!
 # Standard root, torus, and Weyl permutations of the Suzuki ovoid
@@ -18,6 +20,8 @@ the reciprocal Suzuki-norm identity.
 This is shared infrastructure for the Suzuki target in **Peterfalvi, Part II,
 Chapter I, Theorem A** (pp. 97-98).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -177,7 +181,7 @@ noncomputable def torusScaleHom (m : ℕ) : TorusParameter m →* MulAut (RootGr
 namespace Ovoid
 
 /-- Extend a permutation by fixing the extra `none` point. -/
-private def optionPermHom (α : Type*) : Equiv.Perm α →* Equiv.Perm (Option α) where
+def optionPermHom (α : Type*) : Equiv.Perm α →* Equiv.Perm (Option α) where
   toFun := Equiv.optionCongr
   map_one' := Equiv.optionCongr_one
   map_mul' e f := by

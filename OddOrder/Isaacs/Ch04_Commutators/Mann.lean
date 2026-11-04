@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main
 
 /-! # Isaacs §4B: Mann's theorem on small conjugacy classes (pp. 125-128)
 
@@ -37,6 +39,8 @@ indexing: `Subgroup.lowerCentralSeries S c` is `γ_{c+1}(S)` computed in the amb
 group), with `Group.nilpotencyClass ↥S ≤ c` versions derived via
 `Subgroup.top_subtype_lowerCentralSeries`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

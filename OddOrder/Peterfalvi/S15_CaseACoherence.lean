@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_NineElevenSevenEight
-import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
-import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
+module
+
+public import OddOrder.Peterfalvi.S15_NineElevenSevenEight
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.8) — the `S`-instance caseA coherence endgame and assembly
@@ -27,6 +29,8 @@ The endgame of the honest `S`-instance (9.11) campaign, on the step lemmas of
   `tau1S_ofHonest_inner_induce`, `tau1S_ofHonest_induce_mem_ZIrr`) for the (13.3)
   `CharacterDegreeData` `τ₁`-fields.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

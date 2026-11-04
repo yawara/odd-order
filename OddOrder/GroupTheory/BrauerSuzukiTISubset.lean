@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.BrauerSuzukiNormalizer
-import OddOrder.GroupTheory.TISubset
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiNormalizer
+public import OddOrder.GroupTheory.TISubset
 
 /-!
 # Brauer–Suzuki: the TI-subset `A = C − RH` (Gorenstein Ch. 12, Lemma 1.3)
@@ -29,6 +31,8 @@ whence any `g` with `a, gag⁻¹ ∈ A` satisfies `T = g⁻¹Tg`, i.e. `g ∈ N`
 
 This feeds Lemma 1.4 (`inner_induce_eq_of_isTISubset`, the TI induction isometry).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
-import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
+public import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: cyclicity of `W` and `|W| ∣ q + 1`
@@ -24,6 +26,8 @@ two-dimensional theorem then gives cyclicity of `W` and `|W| ∣ q + 1`.  For
 `W = 1` both conclusions are trivial, so Lemma 5's first two claims hold
 unconditionally.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

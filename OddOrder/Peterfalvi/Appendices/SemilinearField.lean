@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.Algebra.SemilinearFixedPoint
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RingTheory.SimpleModule.Rank
-import Mathlib.RingTheory.LittleWedderburn
+module
+
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.Algebra.SemilinearFixedPoint
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RingTheory.SimpleModule.Rank
+public import Mathlib.RingTheory.LittleWedderburn
 
 /-!
 # Peterfalvi, Appendix I, Proposition 2 — the field structure
@@ -34,6 +36,8 @@ instance gotchas that force this abstraction).  The endomorphism ring `D = End_{
 The bridge from the textbook data `(E, φ : U →* MulAut E, T)` to this core (building
 `M := ρ.asModule` for `ρ = (mulAutToEnd E p).comp φ|_T`) and part (b) are developed separately.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
 

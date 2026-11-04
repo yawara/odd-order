@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S06_Thm64
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S06_Thm64
+public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
 
 /-!
 # BG §6: Theorem 6.4 — 場合 2 (`π(F(G)) ⊆ π(H)`) と定理本体
@@ -71,6 +73,8 @@ Chapter I §6 (p. 50), mmd `references/bg/local-analysis.mmd` L2036–L2046。
 Ch.3 は Ch.1 の下流なので import できず, ここで再導出せざるを得ない。共通化するなら
 `OddOrder/GroupTheory/` の leaf へ移すのが筋 (本ファイルの守備範囲外)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Subgroup.Center
-import Mathlib.Algebra.CharP.Basic
-import Mathlib.Algebra.CharP.Algebra
-import Mathlib.Algebra.CharP.Lemmas
-import Mathlib.Algebra.Module.Torsion.Free
-import Mathlib.FieldTheory.Finite.Basic
-import OddOrder.Mathlib.Subgroup
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RepresentationTheory.Invariants
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Subgroup.Center
+public import Mathlib.Algebra.CharP.Basic
+public import Mathlib.Algebra.CharP.Algebra
+public import Mathlib.Algebra.CharP.Lemmas
+public import Mathlib.Algebra.Module.Torsion.Free
+public import Mathlib.FieldTheory.Finite.Basic
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # p-Group Fixed Vector on a char-p Vector Space
@@ -64,6 +66,8 @@ CLAUDE.md L20 方針 (BG 中の "G, Thm X.Y.Z" 引用は Isaacs FGT に読み替
 4. `G/⟨z⟩` (Z(G) 内の z の zpowers で商) は p-群で位数 `< |G|`. 帰納仮定で
    `W` 上の表現に非零 fixed vector が存在. これが `G` 全体での fixed vector.
 -/
+
+@[expose] public section
 
 /-! 既存 `OddOrder/GroupTheory/ChermakDelgado.lean` / `ElementaryAbelian.lean`
 の `Subgroup` namespace 拡張流儀に倣い, 本 module は mathlib `IsPGroup`

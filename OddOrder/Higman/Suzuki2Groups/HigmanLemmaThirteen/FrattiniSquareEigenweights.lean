@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutatorEquivariance
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutatorEquivariance
 
 /-!
 # Higman's Lemma 13: eigenweights of Frattini-square commutators
@@ -18,6 +20,8 @@ common Singer field.  Its actor equivariance forces every nonzero product of
 middle and outer eigenvectors to have one of the Frobenius-conjugate weights
 of the Frattini square.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

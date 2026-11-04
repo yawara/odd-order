@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AdicCompletePi
-import OddOrder.Algebra.IdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+module
+
+public import OddOrder.Algebra.AdicCompletePi
+public import OddOrder.Algebra.IdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # `Z(𝒪G)` is Henselian at `I·Z(𝒪G)`
@@ -34,6 +36,8 @@ occur in the statements, so as an instance it would be reported as unused.
 * `OddOrder.henselianRing_centerGroupAlgebra`
 * `OddOrder.existsUnique_isIdempotentElem_centerGroupAlgebra`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

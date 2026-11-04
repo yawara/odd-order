@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayerCore
-import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+module
+
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayerCore
+public import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 
 /-!
 # Peterfalvi §13 (pp. 85–86) — Core-typed order consequences
@@ -12,6 +14,8 @@ import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 This downstream leaf discharges the Core order API using the honest (13.3.b) dichotomy and
 actual Clifford certificates, rather than the legacy `CharacterDegreeData` carrier.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
 
 /-!
 # BG §13: Lemma 13.8 (forbidden configuration is impossible)
@@ -15,6 +17,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
 `q`-部分群・`q*`-部分群を持つ対称配置は不可能。Uniqueness / Thm 10.1(b)·10.2 / Lem 12.18 /
 Prop 10.14(d) / Thm 13.4 に依存（13.6 非依存）。`S13_Lemma137` の下流。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

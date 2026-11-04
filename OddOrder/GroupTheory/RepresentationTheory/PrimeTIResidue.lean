@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
-import OddOrder.Peterfalvi.S05_SigmaIsometry
-import OddOrder.Peterfalvi.S06_CertainTypeClifford
-import OddOrder.Peterfalvi.S06_CertainTypeSupport
-import OddOrder.Peterfalvi.S07_Coherence
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+public import OddOrder.Peterfalvi.S06_CertainTypeClifford
+public import OddOrder.Peterfalvi.S06_CertainTypeSupport
+public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Prime-TI residue characters (Peterfalvi (4.5), Feit–Thompson (13.2–13.3))
@@ -80,6 +82,8 @@ tracked in `issues/9014-primeti-residue-api.md`.
   `coq/theories/PFsection13.v:401-428` (`S1cases`, the consumer).
 * `issues/9014-primeti-residue-api.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

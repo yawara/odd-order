@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockIdempotent
+module
+
+public import OddOrder.Algebra.BlockIdempotent
 
 /-!
 # An algebra map on the centre is the character of a unique block
@@ -26,6 +28,8 @@ killed by `λ`; expanding gives `λ z = blockCharacter c₀ z`.
 * `OddOrder.MatrixModule.existsUnique_blockCharacter_eq`
 * `OddOrder.MatrixModule.blockOfCentralCharacter` — the block it singles out
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

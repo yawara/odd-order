@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 
 /-!
 # The generalized decomposition matrix
@@ -40,6 +42,8 @@ The `p`-element classes index everything directly — no representatives of them
   `E = J · diag(B)`
 * `OddOrder.RepresentationTheory.Modular.isUnit_det_blockDiagonal_brauerCharacterMatrix`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

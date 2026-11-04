@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
 
 /-!
 # Peterfalvi Appendix IV: the `𝒳`-relative `S`-side induction (step (3) Part B)
@@ -26,6 +28,8 @@ relative to `𝒳`: coherence of `𝒳₁ = 𝒳(S', Z)` (Part A,
   `Ind(θ ∘ q1Proj) ∈ 𝒳₁` (`exists_anchor_of_mem_XsetOf`) depends on the
   failing `ψ`, unlike the fixed degree-`d` anchor of reductions (1)(2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

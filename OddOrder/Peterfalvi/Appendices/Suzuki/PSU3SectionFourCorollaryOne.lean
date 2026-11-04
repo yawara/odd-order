@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
-import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
+public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. IV §4 → §3 Corollary 1: `O^{2′}(G) ≅ PSU(3, q)`
@@ -39,6 +41,8 @@ Every remaining input is section data:
   under §4's standing data, `Theorem A`'s conclusion holds for `G` acting on `Ω`, with
   `L = O^{2′}(G)` carrying the standard `PSU(3, q)` model.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,26 +3,30 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Fintype.Card
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Algebra.Module.Submodule.LinearMap
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
-import OddOrder.GroupTheory.TISubset
-import OddOrder.GroupTheory.CoprimeConjugacy
-import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.Peterfalvi.S02_Notation
-import OddOrder.Peterfalvi.S04_DadeHypothesisCore
+module
+
+public import Mathlib.Data.Fintype.Card
+public import Mathlib.Algebra.Group.Subgroup.Finite
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.Algebra.Module.Submodule.LinearMap
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Tactic.Group
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.GroupTheory.CoprimeConjugacy
+public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.Peterfalvi.S02_Notation
+public import OddOrder.Peterfalvi.S04_DadeHypothesisCore
 
 /-!
 # S04_DadeIsometryBasic
 
 Prefix-split from `OddOrder.Peterfalvi.S04_DadeIsometry` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §4: The Dade Isometry

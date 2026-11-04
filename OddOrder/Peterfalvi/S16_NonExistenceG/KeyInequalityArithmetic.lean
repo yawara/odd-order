@@ -1,5 +1,7 @@
-import OddOrder.BG.AppC_LemmaC3_FixedPointFree
-import OddOrder.Peterfalvi.S16_CoreLemmas
+module
+
+public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+public import OddOrder.Peterfalvi.S16_CoreLemmas
 
 /-!
 # Peterfalvi (14.8): pure key-inequality arithmetic
@@ -8,6 +10,8 @@ The axiom-clean arithmetic upstream of the Section 14 subgroup constructions.  K
 leaf before TTypeII lets the type-P2 contradiction use the strict cyclotomic ratio without
 creating the former TTypeII -> SubgroupL -> KeyInequality import cycle.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S16
 
 open OddOrder.GroupTheory

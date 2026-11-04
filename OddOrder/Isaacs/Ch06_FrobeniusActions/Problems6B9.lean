@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B1
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B1
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 
 /-!
 # Isaacs Problem 6B.9 — 可解 EPPO 群の素因数は高々 2 個 (書籍 p. 196)
@@ -24,6 +26,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 5. Frobenius 補群は Frobenius 群を部分群に持てない (Isaacs Thm 6.9 の可解分岐,
    6B.1 の "deduce" 部分) ので矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

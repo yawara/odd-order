@@ -3,8 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ChiefFactor
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
+module
+
+public import OddOrder.GroupTheory.ChiefFactor
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
+public import Mathlib.GroupTheory.Abelianization.Finite
 
 /-!
 # Peterfalvi §8: degree arithmetic and the Sibley–Dade carrier
@@ -13,6 +16,8 @@ Degree arithmetic, p-group recognition, and the Sibley–Dade carrier for the §
 plus the generic `Fin`-enumeration primitive for finite sets of class functions
 (`exists_finEnum_general`) that both the case-(B) machinery and the general (6.2) leaf consume.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

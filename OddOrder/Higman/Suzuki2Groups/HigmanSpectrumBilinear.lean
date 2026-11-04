@@ -3,25 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-import Mathlib.Algebra.Module.Submodule.Bilinear
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.Combinatorics.Colex
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.LinearAlgebra.Basis.Basic
-import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
-import Mathlib.LinearAlgebra.Charpoly.BaseChange
-import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
-import Mathlib.LinearAlgebra.TensorProduct.RightExactness
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RingTheory.Adjoin.PowerBasis
-import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import Mathlib.Algebra.Module.Submodule.Bilinear
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.Combinatorics.Colex
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.LinearAlgebra.Basis.Basic
+public import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
+public import Mathlib.LinearAlgebra.Charpoly.BaseChange
+public import Mathlib.LinearAlgebra.Eigenspace.Charpoly
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
+public import Mathlib.LinearAlgebra.TensorProduct.RightExactness
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RingTheory.Adjoin.PowerBasis
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 /-!
 # Higman — lower central spectrum: the bilinear-map layer
@@ -30,6 +32,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 set_option autoImplicit false
 

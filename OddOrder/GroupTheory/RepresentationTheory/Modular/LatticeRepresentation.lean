@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.Lattice
-import Mathlib.LinearAlgebra.Trace
-import OddOrder.Algebra.ValuationRingFreeModule
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
+module
+
+public import Mathlib.Algebra.Module.Lattice
+public import Mathlib.LinearAlgebra.Trace
+public import OddOrder.Algebra.ValuationRingFreeModule
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
+public import Mathlib.LinearAlgebra.FreeModule.PID
 
 /-!
 # Ordinary representations and their invariant lattices
@@ -42,6 +45,8 @@ mathlib's `Submodule.IsLattice.free` gets from the PID structure theorem.
 * `OddOrder.RepresentationTheory.Modular.exists_isLattice_invariant` — a `G`-invariant lattice
   always exists
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

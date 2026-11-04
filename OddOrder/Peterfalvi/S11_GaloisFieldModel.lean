@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_ImprimitiveUBound
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+module
+
+public import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # Peterfalvi (9.7.b) — the chief-factor Galois-field model
@@ -17,6 +19,8 @@ group of `H̄` with `GF(p^q)` and realizes `Ū` by multiplication.
 This file constructs the actual field carrier and scalar embedding.  It does not use the legacy
 opaque proposition `CliffordCaseBData.field_model`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 

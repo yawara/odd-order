@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockPartitionedMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+module
+
+public import OddOrder.Algebra.BlockPartitionedMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
 # Navarro (5.12): `k(B) = ∑_i ∑_{b^G = B} l(b)`
@@ -29,6 +31,8 @@ The block-diagonal shape of `J` is the second main theorem in the form
 
 * `OddOrder.RepresentationTheory.Modular.card_blockOfIrr_eq_card_inducedBlockOfCentralizer`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

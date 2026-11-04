@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_PairingCoherence
-import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+module
+
+public import OddOrder.Peterfalvi.S16_PairingCoherence
+public import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
 
 /-!
 # Peterfalvi (14.14), the pairing Bessel bounds
@@ -33,6 +35,8 @@ Main results:
 * `bessel_bound_of_inner_beta_zeta_ne_zero` — the single-branch Bessel bound.
 * `pairing_bounds_of_nonconjugate` — the (14.14) dichotomy of bounds.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

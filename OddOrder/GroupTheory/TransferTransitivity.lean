@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Abelianization.Defs
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Transfer
+module
+
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Transfer
 
 /-!
 # Transitivity of the transfer homomorphism
@@ -30,6 +32,8 @@ mathlib には transfer の tower 合成則が無い (2026-07-17 現在) — ups
 の因子と一致する。あとは `g • (γ[f,s]) = γ[g·f, s]` (集合として) と
 `transfer_def` 2 回で主定理。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

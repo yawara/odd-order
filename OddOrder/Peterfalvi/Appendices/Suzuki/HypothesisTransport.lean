@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 
 /-!
 # Transporting the standing hypothesis along an isomorphism of actions
@@ -37,6 +39,8 @@ universes of the source and target.
   replaced by `c t c⁻¹`.  Ch. IV §4 uses it to put `t` where the ambient group's
   involution lands.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

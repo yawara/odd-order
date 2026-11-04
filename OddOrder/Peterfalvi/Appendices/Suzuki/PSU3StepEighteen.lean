@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
-import OddOrder.GroupTheory.ZGroupNormalCyclic
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
+public import OddOrder.GroupTheory.ZGroupNormalCyclic
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (18): `(h(ω)ζ⁻¹)^m = 1`
@@ -34,6 +36,8 @@ Against this the book plays (H4): `h(ω(0,α)) = h(f(ω)^{ζ⁻¹}) = ζ h(ω)�
 * `Hypothesis.stepEighteen` — **step (18)**.
 * `Hypothesis.h_mem_W` — `h(ω) ∈ W`, the first half of §2's closing Proposition.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
 
 /-!
 # TAIL
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

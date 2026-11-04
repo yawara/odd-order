@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
-import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-import OddOrder.GroupTheory.CentralElementaryExtension
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
-import OddOrder.Algebra.FrobeniusExponentPairs
-import OddOrder.Algebra.QuadraticTraceCorrection
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.GroupTheory.CentralElementaryExtension
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
+public import OddOrder.Algebra.FrobeniusExponentPairs
+public import OddOrder.Algebra.QuadraticTraceCorrection
 
 /-!
 # Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`
@@ -57,6 +59,8 @@ canonical choice `φ = χ.toBilin basis` is recorded as
 
 The `K₁W₁`-action on the model is in `ModelAction.lean`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

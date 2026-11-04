@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Lemma615
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Lemma615
 
 /-!
 # OddOrder.Isaacs.Ch06 — Frobenius Actions
@@ -55,6 +57,8 @@ Import chain: FrobeniusActionTI -> FrobeniusGroup -> DQSDRecognition -> Lemma615
 * `Lemma615` — Lem 6.15 characteristic elementary-abelian p^2
 * `Main` (this file) — Lem 6.15 dispatch, Thm 6.12 congruence, Thm 6.11 route
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

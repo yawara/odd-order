@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.TensorProduct.Basis
-import Mathlib.RingTheory.TensorProduct.Basic
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+module
+
+public import Mathlib.LinearAlgebra.TensorProduct.Basis
+public import Mathlib.RingTheory.TensorProduct.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # A lattice recovers its ambient space after base change
@@ -36,6 +38,8 @@ irreducible lives on `V`.
 * `OddOrder.RepresentationTheory.Modular.exists_smul_id_of_commute_baseChange` — **absolute
   irreducibility of a Wedderburn component**, in the form `BlockOfLattice` asks for
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

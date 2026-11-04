@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.IsMetacyclic
-import OddOrder.GroupTheory.MaschkeComplement
-import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
-import Mathlib.Data.ZMod.Units
-import Mathlib.Data.Nat.Totient
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Nilpotent
+module
+
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.GroupTheory.MaschkeComplement
+public import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
+public import Mathlib.Data.ZMod.Units
+public import Mathlib.Data.Nat.Totient
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Isaacs, Finite Group Theory — Problems 10B (書籍 p. 312)
@@ -32,6 +34,8 @@ import Mathlib.GroupTheory.Nilpotent
   `p^{n-1}` を割る。
 * `OddOrder.Isaacs.Ch10.orderOf_one_add_prime_dvd` — `1 + p` の位数は `p^{n-1}` を割る。
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

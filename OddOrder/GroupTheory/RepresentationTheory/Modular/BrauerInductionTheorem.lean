@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
+public import Mathlib.NumberTheory.Basic
 
 /-!
 # Gorenstein Lemmas 7.8–7.10 and Brauer's characterization of characters
@@ -47,6 +50,8 @@ conclusion stronger in the same measure.
 * D. Gorenstein, *Finite Groups*, §4.7, Theorem 7.1 and Lemmas 7.8–7.10
   (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

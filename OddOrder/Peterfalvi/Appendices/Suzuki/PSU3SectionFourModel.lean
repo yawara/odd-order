@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
 
 /-!
 # Ch. IV §4, step (2): the standing hypothesis on `U/Z(U)`
@@ -33,6 +35,8 @@ Going through the model rather than through the faithful centralizer quotient
 * the transported hypotheses of `exists_standardModel`: `hVW`, `hQ0card`, `hcardQ`,
   `hst`, a non-trivial element of `W`, and the induction hypothesis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

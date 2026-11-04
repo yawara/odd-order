@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Algebra.Algebra.Operations
-import Mathlib.LinearAlgebra.Basis.Basic
-import Mathlib.LinearAlgebra.Quotient.Basic
-import Mathlib.GroupTheory.Abelianization.Defs
-import Mathlib.GroupTheory.Complement
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.Algebra.Algebra.Operations
+public import Mathlib.LinearAlgebra.Basis.Basic
+public import Mathlib.LinearAlgebra.Quotient.Basic
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.Complement
 
 /-!
 # The augmentation ideal of an integral group ring
@@ -36,6 +38,8 @@ principal ideal theorem (Thm 10.18, Furtwängler) と Alperin-Kuo (Cor 10.28) �
 * **Isaacs Theorem 10.20** (`abelianizationEquivAugmentationQuotient`):
   `G/G' ≅ Δ(G)/Δ(G)²`、対応は `G'g ↦ (g - 1) + Δ(G)²`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

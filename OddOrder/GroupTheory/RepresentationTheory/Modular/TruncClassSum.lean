@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SubgroupTruncation
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+module
+
+public import OddOrder.Algebra.SubgroupTruncation
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # The trace of a `G`-class on a subgroup
@@ -30,6 +32,8 @@ central character of `H` with it gives Navarro's `λ_b^G`.
 * `OddOrder.GroupTheory.CenterClassSum.centerTrunc` — the induced linear map `Z(kG) → Z(kH)`
 * `OddOrder.GroupTheory.CenterClassSum.inducedCentralCharacter` — `λ_b^G`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterClassSum
 

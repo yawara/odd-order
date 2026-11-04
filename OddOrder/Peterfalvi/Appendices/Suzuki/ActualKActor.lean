@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
 
 /-!
 # Peterfalvi Part II, Ch. I §2: the actual `K`-actor on `Q`
@@ -17,6 +19,8 @@ fixed-point-free, while §1 Proposition 3 makes it faithful and regular on
 the nonidentity involutions.  The subgroup `Q₀` is both normal in `Q` and
 invariant under this action.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

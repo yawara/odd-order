@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
 # Isaacs Problem 6B.4 — 部分が互いに可換な分割 (書籍 p. 195)
@@ -24,6 +26,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
   第三の部分を経由する。最後に共通の位数 `n` が素数であること (`n` の素因子 `p` について
   `x^(n/p)` の位数が `p` かつ `= n`) を見る。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

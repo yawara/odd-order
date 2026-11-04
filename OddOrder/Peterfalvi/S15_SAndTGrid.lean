@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_BridgeCharacter
-import OddOrder.Peterfalvi.S16_PairingCoherence
-import OddOrder.Peterfalvi.S16_PairingBessel
-import OddOrder.Peterfalvi.S16_GridExpansion
+module
+
+public import OddOrder.Peterfalvi.S15_BridgeCharacter
+public import OddOrder.Peterfalvi.S16_PairingCoherence
+public import OddOrder.Peterfalvi.S16_PairingBessel
+public import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # (13.19) Type-I orthogonality — producer / grid-facts layer
@@ -18,6 +20,8 @@ the Peterfalvi (13.19) type-I orthogonality **producer and grid facts** —
 row/column-constancy of the `β_L^τ` grid.  The (13.19.c) dichotomy and the (14.5) complement
 exclusion consume this layer and live in `S15_SAndT` (which imports this module).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

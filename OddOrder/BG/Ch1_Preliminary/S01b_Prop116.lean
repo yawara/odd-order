@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # BG Proposition 1.16: coprime-action generation by cocyclic centralizers
@@ -38,6 +40,8 @@ hypothesis to the smaller group `A/⟨a⟩` acting on `C_G(a)`.
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §1.
 * Isaacs, _Finite Group Theory_ (AMS GSM 92, 2008), Theorem 6.21.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S01
 

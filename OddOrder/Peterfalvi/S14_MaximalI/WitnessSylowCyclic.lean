@@ -1,7 +1,9 @@
-import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
-import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+public import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
 
 /-!
 # WitnessSylowCyclic
@@ -9,6 +11,8 @@ import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
 Prefix-split from `OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample` (2000-line limit, issue
 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (12.8)-(12.12) — minimal counterexample analysis

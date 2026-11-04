@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
 
 /-!
 # BG §10 局所補題 — Lemma 10.13 (rank-2 elementary abelian structure)
@@ -13,6 +15,8 @@ PDF p.79。Lemma 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) �
 helper 群 (GL₂(p)-transvection transitivity ほか)。Prop 10.11 / Lemma 10.12 は上流
 `S10_LocalLemmasCore.lean` (粒度規約による prefix-split, issue 0063)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

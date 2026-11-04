@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterArithmetic
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterArithmetic
 
 /-!
 # Higman Lemma 13: the all-distinct exponent-two parameter check
@@ -19,6 +21,8 @@ between lower-half Frobenius exponents and performs Higman's finite list
 check.  The downstream group-theoretic leaf supplies the three actual
 factors and transports one factor's coordinates between its two joins.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

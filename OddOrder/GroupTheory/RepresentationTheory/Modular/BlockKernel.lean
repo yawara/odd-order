@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SubgroupSum
-import OddOrder.Algebra.SubgroupSumBlockAction
-import OddOrder.GroupTheory.OpResidual
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+module
+
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.Algebra.SubgroupSumBlockAction
+public import OddOrder.GroupTheory.OpResidual
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 
 /-!
 # Navarro (6.9)/(6.10): the kernel of a block
@@ -61,6 +63,8 @@ halves say `ker(B)` is the **largest normal `p'`-subgroup of `G` inside `ker χ`
 * `OddOrder.RepresentationTheory.Modular.sum_character_one_mul_character_eq_zero` — weak block
   orthogonality, i.e. (5.11) at `h = 1`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

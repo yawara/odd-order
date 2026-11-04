@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 
 /-!
 # The block induced from the centraliser of a `p`-element
@@ -34,6 +36,8 @@ once.
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_toLinearMap_inducedBlockOfCentralizer` —
   the defining property `λ_{b^G} = λ_b^G`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

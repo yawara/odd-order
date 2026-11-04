@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Idempotents
-import Mathlib.RingTheory.SimpleModule.Basic
+module
+
+public import Mathlib.RingTheory.Idempotents
+public import Mathlib.RingTheory.SimpleModule.Basic
 
 /-!
 # A simple module lives on one central idempotent
@@ -19,6 +21,8 @@ simple module belongs to a unique block.
 
 * `OddOrder.exists_unique_smul_eq_self_of_completeOrthogonal`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

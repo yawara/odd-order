@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # Frobenius-family lower bound (Peterfalvi 7.10)
@@ -17,6 +19,8 @@ Peterfalvi's proof.
 Textbook: Peterfalvi, Section 7, pp. 42–43, equations (7.10)–(7.11).
 Coq comparison: `PFsection7.v`, `CoherentFrobeniusPartition`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

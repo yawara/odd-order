@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 
 /-!
 # Peterfalvi Part II, Chapter I §3, Proposition 2: the non-simple case
@@ -25,6 +27,8 @@ The later part of the proposition restricts (A1)--(A3) to this `L`, applies
 the induction hypothesis, and transports its concrete target back to `G`.
 Those steps are kept separate from the normal-subgroup reduction below.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

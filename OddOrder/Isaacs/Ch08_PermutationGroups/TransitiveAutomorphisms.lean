@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
+public import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: transitive automorphism actions (Lem 8.8)
@@ -27,6 +29,8 @@ Clause (c) is stated as `|N| ≤ 4`: in mathlib's convention
 force `|N| ≥ 4`; the book's tacit `k ≤ |N - {1}|` (hence its clause `k = 3`)
 has no separate content in this convention.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

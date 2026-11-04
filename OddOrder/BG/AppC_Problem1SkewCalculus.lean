@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_Problem1PairComposition
+module
+
+public import OddOrder.BG.AppC_Problem1PairComposition
 
 /-!
 # BG Appendix C, Problem 1: the skew-pair calculus
@@ -43,6 +45,8 @@ The calculus:
 
 Mathematical record: `notes/bg/appC_problem1_resolution.md` §3 (issues 0180/0181).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

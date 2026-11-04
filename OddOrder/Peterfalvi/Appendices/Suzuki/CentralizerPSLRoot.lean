@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
-import OddOrder.GroupTheory.SylowTransport
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+public import OddOrder.GroupTheory.SylowTransport
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the PSL centralizer root group
@@ -24,6 +26,8 @@ or posited root-group carrier.
 T. Peterfalvi, *Character Theory for the Odd Order Theorem*, Part II,
 Chapter I section 3, Proposition 1(c), pp. 105--106.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

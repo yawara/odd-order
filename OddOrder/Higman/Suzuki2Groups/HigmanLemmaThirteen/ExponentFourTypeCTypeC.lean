@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorsTypeCCCrossCommutator
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniCrossCommutatorContradiction
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorsTypeCCCrossCommutator
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniCrossCommutatorContradiction
 
 /-!
 # Higman's Lemma 13: the exponent-four type-C/type-C branch
@@ -17,6 +19,8 @@ restricted length-three Frattini covers are both of type C.  Their canonical
 ambient eigenfamilies force the cross commutator into `Φ(P)²`, contradicting
 the exponent-four Frattini chain.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppB_Thm62
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+module
+
+public import OddOrder.BG.AppB_Thm62
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 
 /-!
 # BG Appendix D: CN-groups and the standing hypothesis
@@ -44,6 +46,8 @@ vacuous, being dischargeable by `True`-instantiation).
 covered by this book"), so deriving Appendix D from `feitThompson` would invert the mathematical
 dependency order and produce contentless declarations.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppD
 

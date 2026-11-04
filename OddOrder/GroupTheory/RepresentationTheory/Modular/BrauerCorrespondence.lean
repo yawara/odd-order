@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.ClassSumOffCentralizer
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
+module
+
+public import OddOrder.Algebra.ClassSumOffCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 
 /-!
 # The induced central character is the Brauer homomorphism — Navarro (4.14), first part
@@ -37,6 +39,8 @@ decompose into `H`-classes or to introduce `O_p(H)`.
 * `OddOrder.RepresentationTheory.Modular.pi_truncClassSum_eq_centralizerTrunc`
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_truncClassSumCenter_eq`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

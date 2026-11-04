@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Pointwise.Set.Card
-import Mathlib.LinearAlgebra.Eigenspace.Zero
-import Mathlib.GroupTheory.RegularWreathProduct
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.IsMetacyclic
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.CriticalSubgroup
+module
+
+public import Mathlib.Algebra.Group.Pointwise.Set.Card
+public import Mathlib.LinearAlgebra.Eigenspace.Zero
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # Isaacs §10A — structure of class-generated index-`p` elementary abelian setups (pp. 295-301)
@@ -44,6 +46,8 @@ Lem 10.14 = `not_isMetacyclic_wreath`) も本 leaf に実装済み。
 * Isaacs Thm 4.7 =
   `Ch04.nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p_pow`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 

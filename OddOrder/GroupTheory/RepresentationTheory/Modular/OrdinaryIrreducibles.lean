@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionOfOrdinary
+module
+
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionOfOrdinary
 
 /-!
 # `Irr(G)` and the decomposition matrix
@@ -40,6 +42,8 @@ a genuine matrix `Irr(G) × IBr(G) → ℕ`: the decomposition matrix `D`.  The 
 * `OddOrder.RepresentationTheory.Modular.eq_decompositionMatrix` — anything with that property
   *is* the row of `D`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

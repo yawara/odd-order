@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Sequence
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Sequence
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (15): the sequence of (11) exhausts the orbit
@@ -43,6 +45,8 @@ The three steps here are:
 * `Hypothesis.stepElevenSeq_fst_injOn` — the `z_i` are pairwise distinct.
 * `Hypothesis.stepFifteen_exhaust` — the set counted by step (8) *is* `{z_0, …, z_N}`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

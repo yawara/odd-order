@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7B part 2 + S7C: normal-J close + Thm 7.1 proof + Thm 7.7
 (pp. 209-219)
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

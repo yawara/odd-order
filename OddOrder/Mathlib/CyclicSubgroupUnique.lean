@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 
 /-!
 # Subgroups of a finite cyclic group are determined by their order
@@ -16,6 +18,8 @@ Used by Peterfalvi (9.7)(a) (issue 0152): the block scalar characters `φ_i : Ū
 `W₁`-conjugate blocks have images of equal order `a = |U : C_U(H₁)|`, and since `𝔽_p^×` is cyclic
 that already forces the images to *coincide* -- which is what feeds the book's `|U| ∣ a^{q−1}`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

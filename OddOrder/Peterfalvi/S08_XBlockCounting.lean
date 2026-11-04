@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
+module
+
+public import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
 
 /-!
 # Peterfalvi (6.8) setting: coherence of `X(Z_c) ∪ Y` and the `(6.7)` congruences
@@ -17,6 +19,8 @@ Prefix-split from `OddOrder.Peterfalvi.S08_CoherenceCore` (2000-line limit, issu
 the restriction/orthogonality family was further moved to
 `OddOrder.Peterfalvi.S08_CentralCommutatorRestriction` (issue 0189, 1500-line limit).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

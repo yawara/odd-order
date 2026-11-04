@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 
 /-! # BG Lemma 14.13(a): a non-disjoint signalizer forces Frobenius type
 
@@ -36,6 +38,8 @@ The `τ₂(M)`-freeness is stated for **primes** only (`∀ p, p.Prime → p ∉
 so the literal `τ₂(M) = ∅` is not faithful — same prime-restriction as Lemma 12.11
 (`tau2_prime_mem_sigma_diff_beta`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

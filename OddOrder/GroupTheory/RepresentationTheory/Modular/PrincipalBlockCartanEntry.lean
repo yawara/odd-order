@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CentralSylowComplement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
+module
+
+public import OddOrder.GroupTheory.CentralSylowComplement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
 
 /-!
 # Navarro (6.13): the Cartan matrix of `B_0` is the `1 × 1` matrix `(|G|_p)`
@@ -40,6 +42,8 @@ So `c_{φ_0 φ_0} = ∑_χ d_{χ φ_0}² = ∑_{χ ∈ Irr(B_0)} χ(1)²`.
 * `…_eq_card_sylow_of_hasNormalPComplement` — the same with the complement packaged as
   `OddOrder.Isaacs.Ch05.HasNormalPComplement`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

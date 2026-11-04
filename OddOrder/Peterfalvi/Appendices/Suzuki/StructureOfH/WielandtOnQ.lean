@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+public import OddOrder.GroupTheory.WielandtFixedPoint
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 
 /-!
 # `|N| = |C_N(X)|^{|X|}` for `K`-invariant `2`-subgroups
@@ -39,6 +41,8 @@ centralized `K` it would lie in `W = C_V(K)`.
 * `Hypothesis.false_of_natCard_cQ_eq_cQ0_of_card_cube` — the contradiction the
   `PSL(2, ℓ)` branch runs into, in the case `p ∤ q₀ − 1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

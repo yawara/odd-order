@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
-import OddOrder.GroupTheory.RepresentationTheory.CyclicCharacterExtension
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicCharacterExtension
 
 /-!
 # Extensions of an irreducible character differ by a linear character
@@ -36,6 +38,8 @@ iterate of `CyclicCharacterExtension`.
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, Corollary 6.17.
 * Peterfalvi §3 (1.7)(b) (mult-one via extension); issue 9002 (v-b).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.PElementSum
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+module
+
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # The class sum of `W · L̂` in terms of a single Sylow subgroup
@@ -31,6 +33,8 @@ This is the step that lets Navarro (4.23) compare `π(Ĝ_p L̂)` with the `|Ω_{
   coefficients over a class multiplies by the class size
 * `OddOrder.RepresentationTheory.conjugacyClassSize_mk_inv`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_ExponentP
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+module
+
+public import OddOrder.BG.AppE_ExponentP
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Appendix E, Theorem E.3, Step 4: `B` fixes `R₀`
@@ -34,6 +36,8 @@ The counting half of Step 4 (`(E.15)`, `(E.17)`, the class/coset identification 
 to `R₀^β = R₀^x`, the semidirect product `G = S ⋊ B`, the Frattini variation, and the
 Schur–Zassenhaus descent.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

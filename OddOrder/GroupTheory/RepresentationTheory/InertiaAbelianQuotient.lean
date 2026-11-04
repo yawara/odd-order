@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import OddOrder.GroupTheory.RepresentationTheory.Inertia
+module
+
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
 
 /-!
 # Abelian inertia quotient `I(θ)/H` from an abelian complement
@@ -29,6 +31,8 @@ multiplicity-free decomposition of `Ind_H^L θ` (Peterfalvi (1.7); per PFsection
 `cfInd_central_Inertia`, `abelian` — not `cyclic` — suffices) in the general type-I constituent
 structure `typeI_induced_char_constituents`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

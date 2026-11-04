@@ -3,33 +3,35 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Subrepresentation
-import Mathlib.RepresentationTheory.Character
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.Algebra.Group.Conj
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.GroupAction.Quotient
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
-import OddOrder.GroupTheory.TISubset
-import OddOrder.Algebra.AlgInt
-import OddOrder.GroupTheory.FreeActionOrbitCount
-import OddOrder.GroupTheory.ConjClassSet
-import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-import OddOrder.GroupTheory.ConjClassCardinality
-import OddOrder.Mathlib.Sylow
-import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-import Mathlib.RingTheory.Finiteness.Basic
-import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RingTheory.Localization.FractionRing
-import Mathlib.RingTheory.Polynomial.RationalRoot
+module
+
+public import Mathlib.Analysis.Complex.Polynomial.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RepresentationTheory.Subrepresentation
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.Algebra.Group.Conj
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.GroupTheory.FreeActionOrbitCount
+public import OddOrder.GroupTheory.ConjClassSet
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import OddOrder.GroupTheory.ConjClassCardinality
+public import OddOrder.Mathlib.Sylow
+public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import Mathlib.RingTheory.Finiteness.Basic
+public import Mathlib.LinearAlgebra.Eigenspace.Charpoly
+public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.Localization.FractionRing
+public import Mathlib.RingTheory.Polynomial.RationalRoot
 
 /-!
 # Class sums — indexing, structure coefficients, and the pair action
@@ -43,6 +45,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

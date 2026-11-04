@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
-import OddOrder.GroupTheory.RepresentationTheory.CyclicPermEigenCount
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicPermEigenCount
 
 /-!
 # Discharging the BG (2.11) keystone for the extraspecial setup
@@ -21,6 +23,8 @@ with `c_x(b ⟦1⟧) = b ⟦1⟧`
 (its image is central, hence scalar, hence fixed by conjugation); every other `σ`-orbit is free
 because `C_{P/Z}(xᵏ) = 1` (the hypothesis `hcent`).  So the abstract keystone applies verbatim.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

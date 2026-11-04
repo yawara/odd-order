@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the distinguished PSL pair
@@ -30,6 +32,8 @@ This is exactly the `PSL(2,ell)` order calculation cited in T. Peterfalvi,
 *Character Theory for the Odd Order Theorem*, Part II, Ch. I section 3,
 Proposition 1(c), pp. 105--106.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

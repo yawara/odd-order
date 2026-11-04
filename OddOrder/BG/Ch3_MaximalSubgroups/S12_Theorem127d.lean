@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # BG §12: Theorem 12.7(d) and assembly — the complement `E₀` of `A₀` in `E`
@@ -32,6 +34,8 @@ coprime に作用するから、**Maschke** (`exists_aInvariant_complement_in_om
 - Maschke = `Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient`。
 - `℧¹` = `Agemo` (`OddOrder.GroupTheory.OmegaSubgroup`)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 
 /-!
 # Restricting an irreducible Brauer character to a `p'`-subgroup
@@ -44,6 +46,8 @@ exponent precisely for this.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.12), (3.16).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

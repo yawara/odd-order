@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_StructureSetup
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+module
+
+public import OddOrder.Peterfalvi.S10_StructureSetup
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
 
 /-!
 # Peterfalvi (8.15), claim 2: Hypothesis (4.6) for a type-`P` maximal, `H = M_F` / `H = M_s`
@@ -62,6 +64,8 @@ is the same brick the §10 producer uses
 The `M`-stability of `A(M)` is proved bare below (`conj_mem_typePA`), replacing the
 §10-bundled `le_normalizer_typePA`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

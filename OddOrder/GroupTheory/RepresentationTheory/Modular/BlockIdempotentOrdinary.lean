@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 
 /-!
 # A block idempotent is the sum of the ordinary idempotents in its block
@@ -30,6 +32,8 @@ they are the reductions of `∑_{χ ∈ Irr(B)} (χ(1)/|G|) χ(x_K⁻¹)`.
 
 * `OddOrder.RepresentationTheory.Modular.mapRingHom_blockIdempotent_eq_sum`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

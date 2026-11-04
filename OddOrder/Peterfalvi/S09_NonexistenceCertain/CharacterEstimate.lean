@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
 
 /-!
 # CharacterEstimate
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
 Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Frobenius family — §7 の主定理へ向けた family 構成と assembly

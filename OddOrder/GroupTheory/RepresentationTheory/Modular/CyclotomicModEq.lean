@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 
 /-!
 # Congruences modulo `p · ℤ[ω]`
@@ -41,6 +43,8 @@ Frobenius there.  Everything else is direct.
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.5 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

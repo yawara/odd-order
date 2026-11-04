@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.BrauerSuzukiSetup
-import OddOrder.GroupTheory.UniqueInvolutionSylow
-import Mathlib.GroupTheory.Sylow
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiSetup
+public import OddOrder.GroupTheory.UniqueInvolutionSylow
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Brauer–Suzuki: counting involutions (Gorenstein Ch. 12, Lemma 1.7)
@@ -22,6 +24,8 @@ is conjugate to the generalized quaternion group `S` (hence has a *unique* invol
 central involution commuting with (and inverted by) both `u` and `v`, forcing `u = v = (uv)ˢ`
 and hence `uv = 1` — contradicting even order `≥ 2`.
 -/
+
+@[expose] public section
 
 open scoped Pointwise
 

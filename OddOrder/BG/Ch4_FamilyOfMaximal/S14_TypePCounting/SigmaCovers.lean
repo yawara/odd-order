@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
 
 /-!
 # SigmaCovers
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Theorem 14.7 — Z = K ⊔ K* internal direct product (duality bedrock)

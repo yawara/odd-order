@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # Peterfalvi Part II, Ch. I §2 Corollary: Sylow 2-subgroups of Q
@@ -19,6 +21,8 @@ involutions of `S` with `H ∩ I` and proves that this action is regular.
 Thus `S` is either commutative or a Suzuki `2`-group in the honest sense
 of Appendix III, Definition 1.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

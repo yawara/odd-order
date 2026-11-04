@@ -3,12 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Blocks
-import Mathlib.GroupTheory.GroupAction.Primitive
-import OddOrder.GroupTheory.CyclicSylowBurnside
-import OddOrder.GroupTheory.FixedPointFreeConjugation
-import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
-import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+module
+
+public import Mathlib.GroupTheory.GroupAction.Blocks
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import OddOrder.GroupTheory.CyclicSylowBurnside
+public import OddOrder.GroupTheory.FixedPointFreeConjugation
+public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+public import Mathlib.GroupTheory.IndexNormal
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — 点安定化群の小さい suborbit
@@ -31,6 +34,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
   `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` —
   **8B.7**: 長さ 3 の軌道なら `|G_α| = 3 · 2^e`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MaxNilpotentNormalHall
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.ConjClassSet
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.TISubset
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.GroupTheory.MaxNilpotentNormalHall
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.GroupTheory.ConjClassSet
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.TISubset
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Maximal subgroup types for BG/Peterfalvi
@@ -23,6 +25,8 @@ faithful data is carried by `Type*Data` structures.  This avoids opaque
 placeholders while still allowing downstream statements to quantify over the
 mathematical witnesses (`H`, `U`, `W_1`, `W_2`, ...).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Mathlib.SemidirectProduct
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs Chapter 3 — Problem 3A.6 (忠実な軌道の存在)
@@ -27,6 +29,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3A.6 (書籍 p. 78)。
 * 軌道 `Δ_g` の各点固定部分群 `N = core_P(P_g)` は `P` **と `P^g` の両方**で正規なので,
   `|Y ⊓ Y^{inl g}|` を最小にする `g` に **Thm 1.38** を適用して `N ≤ O_p(Γ) = 1`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

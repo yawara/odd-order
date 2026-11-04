@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppA_PStability
+module
+
+public import OddOrder.BG.AppA_PStability
 
 /-!
 # BG §6: Theorem 6.1 (P. Hall & G. Higman) — 全素数版
@@ -25,6 +27,8 @@ Theorem 6.1" (mmd L4627) と述べており, 証明済みの `OddOrder.BG.AppA.t
 Sylow `2`-部分群が自明ゆえ `p = 2` の場合は `A = ⊥` で自明に成立する。よって本ファイルの
 定理は教科書の文言どおりの全素数版であり, §6 側の名前で引用できるようにしたもの。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

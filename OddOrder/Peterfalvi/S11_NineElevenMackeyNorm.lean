@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+module
+
+public import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
 
 /-!
 # Peterfalvi (9.11.4): the Mackey norm `‖α‖² = a + 1 + (q−1)a²/u` and `Supp(α) ⊆ A(M)`
@@ -57,6 +59,8 @@ per-`w` form needs the `W₁ ↔` Clifford-summand conjugation dictionary
 
 Reference note: `issues/closed/9083-lane-a-1007-decomp-moot-revised-frontier.md` (Phase D).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

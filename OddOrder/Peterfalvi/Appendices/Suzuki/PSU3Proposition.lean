@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: the Proposition
@@ -36,6 +38,8 @@ the Proposition available to §4, whose whole point is the case `V ≠ W`.
 * `Hypothesis.proposition_reciprocal` — the same, read in `RootGroup q` through
   `unitaryRootEquiv`: `ε (f ρ) = reciprocal (ε ρ)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

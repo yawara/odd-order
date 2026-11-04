@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D4
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5D4
 
 /-!
 # Isaacs Problem 5D.3(a) — 単純群の極大 `p`-部分群は Sylow (書籍 pp. 169-170)
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D4
 (c) (`P` の冪零類 ≥ 3) は **Problem 5C.6 (weak closure)** に依存するので、hub レーンの
 `OddOrder/GroupTheory/WeaklyClosed.lean` (issue 9503) が landing してから着手する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

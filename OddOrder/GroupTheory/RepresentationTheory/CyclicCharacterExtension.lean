@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+module
+
+public import Mathlib.Analysis.Complex.Polynomial.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 
 /-!
 # Extension of an invariant irreducible character along a cyclic quotient
@@ -56,6 +58,8 @@ handles the invariance propagation; see `RepresentationDeterminant`).
   characteristic-free core, in `CyclicExtension.lean`).
 * Peterfalvi §3 (1.7); Coq PFsection1 `cfInd_central_Inertia`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

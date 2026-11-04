@@ -1,5 +1,7 @@
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
-import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
 
 /-!
 # Isaacs §4D 後半 — Baer trick (Lem 4.37) と応用 (pp. 141-146)
@@ -7,6 +9,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
 Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement

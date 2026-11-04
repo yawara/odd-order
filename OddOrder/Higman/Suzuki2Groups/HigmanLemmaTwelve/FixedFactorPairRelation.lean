@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
 
 /-!
 # Higman's Lemma 12: factor-pair dispatch over fixed coordinates
@@ -20,6 +22,8 @@ but it never replaces the common ambient coordinate.
 This form is needed in Higman's Lemma 13, where the three pairwise joins must
 all be analyzed over one ambient `Φ(P)` Singer datum.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

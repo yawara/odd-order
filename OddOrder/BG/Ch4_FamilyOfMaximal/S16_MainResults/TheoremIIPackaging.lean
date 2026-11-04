@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TamelyImbedded
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TamelyImbedded
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
 
 /-! # BG Theorem II (Tii): the system of supporting subgroups for `A(M)`
 
@@ -38,6 +40,8 @@ The book states Theorem II for `X = A(M)` **or** `X = A₀(M)`; both are covered
 escaping set `D` is the same for the two choices (`escapingSharpSet_a0Set_eq_aSet`) and clause
 `(c)` is proved at the level of `\widehat{M_σ}`, which contains both.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

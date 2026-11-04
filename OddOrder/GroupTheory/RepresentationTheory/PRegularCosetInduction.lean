@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
-import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 
 /-!
 # Gorenstein Lemma 7.6
@@ -38,6 +40,8 @@ Then
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.6 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
 
 /-!
 # Peterfalvi (7.9) two-family datum for a Frobenius family
@@ -18,6 +20,8 @@ for each pair, the `hbeta_ne` input of the good-index estimate
 `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`
 in the (7.10) `card_G0_lower_bound` assembly (issue 0044).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

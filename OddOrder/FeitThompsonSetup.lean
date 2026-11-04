@@ -1,4 +1,6 @@
-import OddOrder.FeitThompsonSection16Core
+module
+
+public import OddOrder.FeitThompsonSection16Core
 
 /-!
 # Feit–Thompson Section 16 character-grid setup
@@ -6,6 +8,8 @@ import OddOrder.FeitThompsonSection16Core
 Peterfalvi §§3–13 (pp. 5–68): alignment API for the canonical type-`P`
 maximal pair and its `S`/`T` character grids.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

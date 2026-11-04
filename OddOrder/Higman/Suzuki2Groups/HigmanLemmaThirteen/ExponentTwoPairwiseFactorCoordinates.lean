@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorData
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseClassification
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorData
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseClassification
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
 
 /-!
 # Higman's Lemma 13: actual pairwise factors over the common coordinate
@@ -23,6 +25,8 @@ The returned source equations use the same scalar `nu` and the same
 transported Frattini coordinate.  Thus no new ambient coordinate is chosen
 when a different pairwise join is analyzed.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

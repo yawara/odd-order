@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 
 /-!
 # The Cartan matrix of a `p'`-group is the identity
@@ -33,6 +35,8 @@ force every term to be exactly what it must be: `c_{φφ} = 1` and `c_{φμ} = 0
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.12) (p. 25).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.9 (反復交換子系列と部分正規性)
@@ -28,6 +30,8 @@ normalizer に移して generator ごとに確かめる。
 (`exists_commIterate_top_le_of_isSubnormal`) を `IsSubnormal` の構造帰納で示し,
 `M = ⁅M, A⁆` を `d` 回反復する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

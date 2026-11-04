@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
 
 /-!
 # The decomposition numbers of an ordinary representation
@@ -28,6 +30,8 @@ Navarro (2.9), Isaacs Ch. 15 — and it is what lets `D` be a matrix.
 * `OddOrder.RepresentationTheory.Modular.decompositionNumber_latticeRepresentation_eq` — nor do
   the decomposition numbers
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

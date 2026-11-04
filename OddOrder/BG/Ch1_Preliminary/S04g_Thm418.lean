@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04g_Thm418Core
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04g_Thm418Core
 
 /-!
 # BG §4H: Theorem 4.18 — p-complement transfer and the characteristic Sylow series
@@ -15,6 +17,8 @@ module 名 `S04g_Thm418` は下流 import 互換のため本 file が保持し�
 本 leaf = normal `p`-complement の `O_{r ≠ p}`-core 転送・quotient 移送補題群・
 `CharacteristicSylowLayer/Step/Segment/Series` (BG Thm 4.20(c) の series データ)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 

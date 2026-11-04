@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+module
+
+public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 
 /-!
 # Glauberman Replacement Theorem (Gorenstein Thm 2.7)
@@ -25,6 +27,8 @@ Issue 9403 (証明分解は同 issue の「Thm 2.7 の完全分解」節)。
 p odd は Case 2 (`[[x,u],[x,v]]² = 1 ⟹ = 1`) でのみ使用 — `Odd (Nat.card G)`
 の形で受ける (Gorenstein 自身が p = 2 でも `[B,A;3] ≠ 1` なら成立と注記)。
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

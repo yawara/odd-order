@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_SemidirectFrattini
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+module
+
+public import OddOrder.BG.AppE_SemidirectFrattini
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # BG Appendix E, Proposition E.4: `C_S(Z₂(S))` is abelian of index `p`
@@ -33,6 +35,8 @@ Step 2 spells BG's `T = C_S(Z₂(S))` as `C_S(Ω₁(Z₂(S)))`, because Lemma 5.
 here since `S` has exponent `p`; `omega1UpperCentralTwo_eq_upperCentralSeries` is that
 bridge, and it is what lets the proposition be *stated* with BG's `Z₂(S)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

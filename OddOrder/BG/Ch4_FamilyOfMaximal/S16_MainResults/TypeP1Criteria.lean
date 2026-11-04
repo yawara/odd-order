@@ -1,5 +1,7 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
 
 /-!
 # TypeP1Criteria
@@ -7,6 +9,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Proposition 16.1 forward bridges — shared type data の構成

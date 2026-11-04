@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Peterfalvi §5/§7: the bridge gluing lemma for coherence (`bridge_coherent`)
@@ -47,6 +49,8 @@ Reference note: the (11.8) capstone `coherent_SOf_H0C_of_column_identities`
 (`S13_Orthogonality.lean`) currently routes through the false `hgen`; this lemma is its honest
 replacement.  See `notes/meta/coq_odd_order_reference.md` for the `.v` ↔ textbook correspondence.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

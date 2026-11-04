@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
-import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+public import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 
 /-!
 # BG §12: The exceptional bridge — Lemma 12.3 (+ Lemma 12.2(b))
@@ -34,6 +36,8 @@ mmd L3089-3123)。§11 (exceptional maximal subgroups) を §12 へ接続する�
   場合分け仮定 (`p ∉ σ(M)` / `p ∈ σ(M) − α(M)`) と `M* ≠ M` を欠いた unfaithful な
   statement だったため、原典 faithful な 2 定理に置き換えた。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3
 

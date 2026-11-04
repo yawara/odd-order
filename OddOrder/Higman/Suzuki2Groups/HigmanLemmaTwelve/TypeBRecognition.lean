@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
 
 /-!
 # Peterfalvi Appendix III, Theorem (e): isomorphic summands force type B
@@ -28,6 +30,8 @@ contradicting the case constraints.
 This is the substantial half of the equivalence (e), the one consumed by
 Part II, Ch. I §3, Lemma 5 (`W ≠ 1` forces type B).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_BridgeCharacter
+module
+
+public import OddOrder.Peterfalvi.S15_BridgeCharacter
 
 /-!
 # Peterfalvi §9/§13 — the (5.2.d) member `R`-families for the honest `S`-instance §9 family
@@ -32,6 +34,8 @@ This is the `S`-instance §9 route-B analogue of the M-instance `caseB_sOf_membe
 upstream).  The coherence assembly consuming these `R`-families (`sSet_coherent_dade_caseB` …
 `coherent_H0Cprime_S`) lives in `S15_CaseBReducibleCoherence`, which imports this file.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

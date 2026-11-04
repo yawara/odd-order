@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
-import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
-import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
-import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
-import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
+public import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
+public import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+public import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
+public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 
 /-!
 # Higman's Lemma 11: excluding a proper field extension
@@ -21,6 +23,8 @@ xi-length-two structure makes the actual first-layer square map nonzero away
 from zero, while Lemma 10 supplies a nonzero trace-zero coordinate in every
 proper odd-degree field extension.  Therefore the relative degree is one.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

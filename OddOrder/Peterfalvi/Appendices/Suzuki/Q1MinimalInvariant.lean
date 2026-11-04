@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-import OddOrder.GroupTheory.MinimalInvariantNormal
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.GroupTheory.MinimalInvariantNormal
 
 /-!
 # Peterfalvi Part II: minimal invariant subgroups of the odd part `Q₁`
@@ -30,6 +32,8 @@ Supporting facts proved here:
   `Q` is Frobenius (§2 Proposition 1(a)), and Frobenius actions force
   coprime orders.  Chapter II uses this as `r ∤ |K|` for primes `r ∣ |Q₁|`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
-import Mathlib.SetTheory.Cardinal.NatCard
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
+public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # The anisotropic norm and point carrier of the Suzuki ovoid
@@ -21,6 +23,8 @@ by the Weyl transformation and the exact point count `q^2 + 1`.
 This is shared infrastructure for the Suzuki target in **Peterfalvi, Part II,
 Chapter I, Theorem A** (pp. 97-98).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

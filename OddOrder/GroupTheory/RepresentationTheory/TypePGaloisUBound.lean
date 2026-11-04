@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
-import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-import OddOrder.Mathlib.CyclicSubgroupUnique
-import Mathlib.RepresentationTheory.Subrepresentation
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+public import OddOrder.Mathlib.CyclicSubgroupUnique
+public import Mathlib.RepresentationTheory.Subrepresentation
 
 /-!
 # The `typeP_Galois` `u`-bound dichotomy: `|U| ≤ (p^q − 1)/(p − 1)`
@@ -28,6 +30,8 @@ imprimitive decomposition (`Hbar = ⊕ H1^w`, the ratio embedding `Ū ↪ ℤ_a^
 `𝔽_p`-module + `W₁`-permutation content, discharged by the caller via
 `card_le_cyclotomicQuotient_of_injective_imprimitive`; the Galois branch is fully proven here.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

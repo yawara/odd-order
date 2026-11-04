@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.WielandtPerFactorDischarge
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+module
+
+public import OddOrder.GroupTheory.CoprimeAction
+public import OddOrder.GroupTheory.WielandtPerFactorDischarge
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 
 /-!
 # Peterfalvi (9.1): Wielandt's fixed-point formula (assembled) and the (13.17.b) engine
@@ -29,6 +31,8 @@ the modular Brauer / free-orbit count plus base change `𝔽_p → 𝔽̄_p`).
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece E), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

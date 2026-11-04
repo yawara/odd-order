@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
-import OddOrder.Peterfalvi.S12_TypeVCaseC
-import OddOrder.Peterfalvi.S13_Lemmas113To115
-import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+module
+
+public import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
+public import OddOrder.Peterfalvi.S12_TypeVCaseC
+public import OddOrder.Peterfalvi.S13_Lemmas113To115
+public import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 
 /-!
 # S12_Noncoherence — the unconditional Peterfalvi (10.8)
@@ -25,6 +27,8 @@ supply facts are assembled here from the `M`-seeded order-free pair
 consume the honest (10.7) without the import cycle that gated the `S12_MaximalBasic` original
 (issue 1020); every input is axiom-clean.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

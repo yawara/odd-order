@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 
 /-!
 # The Brauer character does not depend on the exponent
@@ -29,6 +31,8 @@ Two things have to be checked:
 * `OddOrder.RepresentationTheory.Modular.eigenspace_eq_bot_of_pow_ne_one`
 * `OddOrder.RepresentationTheory.Modular.brauerCharacter_eq_of_dvd`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

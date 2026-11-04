@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Isaacs Ch. 3 — Lemma 3.1: split extension の同型を除く一意性 (pp. 69-70)
@@ -38,6 +40,8 @@ Thm 3.2 (半直積の構成) と対になる。
 
 ノート: [notes/isaacs/ch03_split.md](../../../notes/isaacs/ch03_split.md)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

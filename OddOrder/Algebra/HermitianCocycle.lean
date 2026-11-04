@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AnisotropicNormForm
+module
+
+public import OddOrder.Algebra.AnisotropicNormForm
 
 /-!
 # The Hermitian cocycle of a quadratic extension, corrected into the subfield
@@ -35,6 +37,8 @@ written `star`.
   as an `F`-valued bilinear map, with diagonal the norm
   (`hermitianCocycle_diag`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+module
+
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 
 /-!
 # Peterfalvi Appendix III, Theorem (e), forward direction: setup
@@ -35,6 +37,8 @@ Theorem (e), issue 2052).  Combined with Lemma U
 summands of *any* invariant split equivariantly isomorphic whenever the
 actor satisfies the freeness/cardinality hypotheses there.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 
 /-!
 # The residue ring `ℤ[ω] / p` and its characteristic
@@ -33,6 +35,8 @@ Both facts come from the `ℤ`-basis `1, ω, …, ω^{n-1}` of `ℤ[ω]` establi
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.5 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

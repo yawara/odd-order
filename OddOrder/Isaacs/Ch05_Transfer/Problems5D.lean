@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 
 /-!
 # Isaacs Problems 5D — `A^p(G)` と p-transfer 制御 (書籍 pp. 169-170)
@@ -21,6 +23,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 `⟹` は「商が `P` の像で可換」+ `APrime_le`)。この同値を `H` 側で使って
 `A^p(H) ⊓ P = ⊥` を得, 仮説で `A^p(G) ⊓ P = ⊥` に移し, `G` 側で使い直す。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

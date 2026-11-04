@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import OddOrder.GroupTheory.QuaternionTwoFacts
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.QuaternionTwoFacts
 
 /-!
 # A Sylow `2`-subgroup with a unique involution
@@ -27,6 +29,8 @@ uniqueness as a bare hypothesis, so both cases are instances.
 * `OddOrder.GroupTheory.unique_involution_of_quaternionSylow` — a `Q₈` Sylow `2`-subgroup meets
   the hypothesis
 -/
+
+@[expose] public section
 
 open scoped Pointwise
 

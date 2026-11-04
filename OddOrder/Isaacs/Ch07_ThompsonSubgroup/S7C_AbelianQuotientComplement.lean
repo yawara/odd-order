@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_CentralizerCenter
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_CentralizerCenter
 
 /-!
 # Isaacs FGT Ch.7 — Theorem 7.1 Step 6: the quotient complement is abelian (p. 219)
@@ -12,6 +14,8 @@ This leaf proves the last structural input needed by the normal-J theorem.  In a
 minimal counterexample, the normal `p`-complement of `G/O_p(G)` is abelian;
 consequently every `2`-subgroup of `G` is abelian when `p ≠ 2`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

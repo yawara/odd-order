@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.AnalyticRelayer
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
+module
+
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.AnalyticRelayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
 
 /-!
 # Peterfalvi §13 (pp. 85–86) — Core-typed order consequences
@@ -14,6 +16,8 @@ order-theoretic engines for (13.11)–(13.15).  It depends only on `CharacterDeg
 `LambdaClusterData`, and explicit case-B facts, so the character-degree supply layer may use
 these consequences without an import cycle.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

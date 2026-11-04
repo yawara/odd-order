@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
 
 /-!
 # Peterfalvi (10.2)-(10.4) — the `mu`-grid and its construction
@@ -8,6 +10,8 @@ Prefix-split from `CharacterParameters.lean` (2000 行のハード上限、CLAUD
 `columnFamily` の次数と符号、および次数恒等式。`CharacterParameters.lean` が本ファイルを
 import し、内積理論 (`muGrid_inner_*`) と coherent extension を続ける。
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

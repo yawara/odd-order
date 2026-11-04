@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_NineElevenCoherence
+module
+
+public import OddOrder.Peterfalvi.S11_NineElevenCoherence
 
 /-!
 # Peterfalvi (9.11.2): the two-summand inertia inputs `[U:K₁] = [U:K₂] = a`, `C = K₁ ⊓ K₂`
@@ -47,6 +49,8 @@ with the three properties (`u = a ≤ a²` is then trivially true).
 
 Reference note: `issues/closed/9083-lane-a-1007-decomp-moot-revised-frontier.md` (Phase B).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
 
 /-!
 # Gorenstein Lemma 7.7: class functions whose values are divisible by `|G|`
@@ -34,6 +36,8 @@ with integer coefficients, because `|G| / |C_G(C.out)| = [G : C_G(C.out)]` is th
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.7 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

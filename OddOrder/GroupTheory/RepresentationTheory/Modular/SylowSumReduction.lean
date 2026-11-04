@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 
 /-!
 # Navarro (4.23) over the valuation ring, and its reduction
@@ -41,6 +43,8 @@ of the inner sum.
 * `OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_classSum` — **Navarro (4.23)**,
   in coefficient form
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

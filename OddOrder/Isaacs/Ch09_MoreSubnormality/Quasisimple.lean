@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IsPerfect
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import Mathlib.GroupTheory.IsPerfect
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Isaacs Ch. 9 — §9A: quasisimple groups (pp. 271-273)
@@ -33,6 +35,8 @@ component / layer / `F*(G)` は後続 leaf (`Components.lean` 以降) で扱う.
 `G' ≤ N`」= 「中心的補部分をもつ商は可換」) を `N := ⁅G',G'⁆` に適用して
 `G' ≤ ⁅G',G'⁆` を得る. 同じ一般補題が Lemma 9.2(a) も処理する.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04_ExtraspecialCommutator
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04_ExtraspecialCommutator
 
 /-!
 # TAIL
@@ -11,6 +13,8 @@ import OddOrder.BG.Ch1_Preliminary.S04_ExtraspecialCommutator
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 open OddOrder.BG.Ch1.S02

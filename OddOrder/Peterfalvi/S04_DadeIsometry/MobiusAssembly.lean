@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S04_InduceConjFinset
+module
+
+public import OddOrder.Peterfalvi.S04_InduceConjFinset
 
 /-!
 # Peterfalvi §4: Möbius orbit-averaging for the Dade isometry
@@ -14,6 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 This leaf proves the orbit-averaging and Möbius-summand identities used in formula (2.10), ending
 with the support-side transversal sum needed by the explicit Dade-map construction.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S04
 open OddOrder.RepresentationTheory
 open scoped Pointwise

@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.LinearAlgebra.Eigenspace.Pi
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.GroupTheory.Commutator.Basic
-import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RepresentationTheory.Invariants
+public import Mathlib.LinearAlgebra.Eigenspace.Pi
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.GroupTheory.Commutator.Basic
+public import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # BG §3 — Theorem 3.5, the step infrastructure (mmd L925-951)
@@ -24,6 +26,8 @@ assembly bridges.
 Split from `OddOrder.BG.Ch1_Preliminary.S03e_Thm35` (issue 0149, the longFile-1500
 campaign); `S03e_Thm35` imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03e
 

@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 
 /-!
 # Peterfalvi (9.8.d) count — def_Itheta reconstruction and assembly
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

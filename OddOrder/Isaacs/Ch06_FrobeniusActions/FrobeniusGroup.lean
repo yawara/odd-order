@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — finite abelian Z-groups, Lemma 6.16, Frobenius group Thm 6.4
 (pp. 184-193)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -741,19 +745,19 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-private theorem exists_ne_one_mem_of_ne_bot {H : Subgroup G} (hH : H ≠ ⊥) :
+theorem exists_ne_one_mem_of_ne_bot {H : Subgroup G} (hH : H ≠ ⊥) :
     ∃ x : G, x ∈ H ∧ x ≠ 1 := by
   by_contra hnone
   push Not at hnone
   apply hH
   exact (Subgroup.eq_bot_iff_forall H).mpr fun x hx => hnone x hx
 
-private noncomputable def conjugatesFinset [Finite G] (A : Subgroup G) :
+noncomputable def conjugatesFinset [Finite G] (A : Subgroup G) :
     Finset (Subgroup G) := by
   classical
   exact (Set.finite_range (fun g : G => MulAut.conj g • A)).toFinset
 
-private theorem mem_conjugatesFinset [Finite G] {A B : Subgroup G} :
+theorem mem_conjugatesFinset [Finite G] {A B : Subgroup G} :
     B ∈ conjugatesFinset A ↔ ∃ g : G, B = MulAut.conj g • A := by
   classical
   unfold conjugatesFinset

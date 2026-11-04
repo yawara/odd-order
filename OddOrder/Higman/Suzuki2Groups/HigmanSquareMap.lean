@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
-import Mathlib.LinearAlgebra.QuadraticForm.Basis
-import Mathlib.Algebra.CharP.Two
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+public import Mathlib.LinearAlgebra.QuadraticForm.Basis
+public import Mathlib.Algebra.CharP.Two
 
 /-!
 # Higman's square map on the first lower-central layer
@@ -20,6 +22,8 @@ uniqueness argument after scalar extension.  A normalized
 Frobenius-conjugate basis then identifies the actual square map with the
 upper-triangular coordinate candidate and gives Higman's displayed polynomial.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup
-import OddOrder.Peterfalvi.S05_GridRigidity
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup
+public import OddOrder.Peterfalvi.S05_GridRigidity
 
 /-!
 # Peterfalvi (3.6)–(3.8): the grid-coefficient theory of the `W`-grid
@@ -29,6 +31,8 @@ The `ω`-side principal identities (`omega_principal_eq_trivial`, `eta_principal
 live here as well: `ω₀₀ = 1_W` from the issue-2033 grid semantics (`omega_mul` +
 row/column-zero trivialities), hence `η₀₀ = τ₃(1_W) = 1_G` by `tau3_trivial`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.Data.SetLike.Fintype
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+module
+
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.Data.SetLike.Fintype
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
 # Chief factors
@@ -36,6 +38,8 @@ but it does not provide the group-level chief-factor centralizer API needed here
 The centralizer in a normal subgroup `G*` is obtained as
 `G* ⊓ chiefFactorCentralizer U V`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

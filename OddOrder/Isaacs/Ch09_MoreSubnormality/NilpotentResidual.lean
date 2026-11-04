@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IsSubnormal
-import OddOrder.Isaacs.Ch01_Sylow.Basic
+module
+
+public import Mathlib.GroupTheory.IsSubnormal
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs Ch. 9 — §9B: nilpotent residual `S^∞`, Lemma 9.15, Corollary 9.16 (pp. 279–281)
@@ -36,6 +38,8 @@ Wielandt automorphism tower theorem (Thm 9.10) に向けた §9B 前半の下部
 - ⚠ mmd 抽出 (L5069, L5075) は 9.15/9.16 の仮定を `S ◁ G` と誤抽出しているが,
   PDF 原文 (p. 280) は `S ◁◁ G` (subnormal). 本ファイルは PDF に従う.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

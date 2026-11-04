@@ -3,18 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
 
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
 
 /-!
 # BG §9: Corollaries 9.2, 9.3 and Lemma 9.4 (centralizer & rank criteria)
@@ -22,6 +24,8 @@ import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
 **スコープ**: Bender–Glauberman §9, Cor 9.2 (mmd L2541) / Cor 9.3 (L2545) / Lem 9.4 (L2555)。
 Thm 9.1 から `𝒰` のメンバーシップを中心化群・rank 条件へ広げる系。`S09_Theorem91` を import。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S09
 

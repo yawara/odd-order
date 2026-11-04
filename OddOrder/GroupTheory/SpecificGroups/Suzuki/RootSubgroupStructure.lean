@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 
 /-!
 # The standard root subgroup of the Suzuki permutation group
@@ -17,6 +19,8 @@ These are the concrete root-subgroup facts used in **Peterfalvi, Part II,
 Chapter I section 3, Proposition 1(c)** (pp. 105--106), in the Suzuki-group
 case of the induction.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -71,7 +75,7 @@ theorem centerLine_eq_sq_one (m : ℕ) :
   exact (RootGroup.sq_eq_one_iff x).symm
 
 /-- The root parameter `(0,1)` chosen for the standard central involution. -/
-private def standardRootInvolutionParameter (m : ℕ) : RootGroup m :=
+def standardRootInvolutionParameter (m : ℕ) : RootGroup m :=
   RootGroup.mk 0 1
 
 /-- **Peterfalvi Part II, Ch. I, Proposition 1(c), Suzuki case.**
@@ -95,7 +99,7 @@ theorem standardRootInvolution_mem_standardRootSubgroup (m : ℕ) :
     standardRootInvolutionParameter m * standardRootInvolutionParameter m = 1 := by
   ext
   · change (0 : Field m) + 0 = 0
-    rfl
+    exact add_zero 0
   · change (1 : Field m) + 1 + 0 * titsTwist m 0 = 0
     rw [zero_mul, add_zero, CharTwo.add_self_eq_zero]
 

@@ -1,5 +1,7 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
 
 /-!
 # OpicoreCentralizer
@@ -7,6 +9,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory

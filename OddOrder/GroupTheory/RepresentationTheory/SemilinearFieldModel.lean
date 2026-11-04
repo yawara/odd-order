@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_NormSet
+module
+
+public import OddOrder.BG.AppC_NormSet
 
 /-!
 # Generic semilinear `(9.7.b)` field-model realization `F_{r^s} ⋊ V*`  (issue 9078)
@@ -33,6 +35,8 @@ side instantiates it with its own `(E, C, e, μ)`.  Cf. Peterfalvi `(14.2)(a)`/`
 * Peterfalvi, *Character Theory for the Odd Order Theorem*, §9 (9.7.b), §14 (14.2)(a)/(14.4).
 * `issues/9078-semilinear-fieldmodel-leaf.md`, `9077` (HUB RULING B), `9000` scope note item 2.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.SemilinearFieldModel
 

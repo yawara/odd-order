@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman's Lemma 13: support of middle Frattini commutators
@@ -18,6 +20,8 @@ actual middle commutator can be nonzero only on equal Frobenius indices; its
 output index is their cyclic successor.  In particular, distinct eigenspaces
 commute in the middle graded layer.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

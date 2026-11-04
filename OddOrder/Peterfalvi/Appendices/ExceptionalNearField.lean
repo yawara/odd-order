@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
-import Mathlib.FieldTheory.Perfect
-import Mathlib.Algebra.CharP.Frobenius
-import OddOrder.Peterfalvi.Appendices.NearFields
+module
+
+public import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
+public import Mathlib.FieldTheory.Perfect
+public import Mathlib.Algebra.CharP.Frobenius
+public import OddOrder.Peterfalvi.Appendices.NearFields
 
 /-!
 # Peterfalvi Appendix II: the exceptional near-field `F_{r²,2}` (p. 138)
@@ -34,6 +36,8 @@ these and the fields are the only finite near-fields whose multiplicative group 
 cyclic index-`2` subgroup) is `cyclic_index_two_nearField_classification` in
 `NearFields.lean`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 

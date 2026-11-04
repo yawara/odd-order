@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularElement
+module
+
+public import OddOrder.GroupTheory.PRegularElement
 
 /-!
 # A `p`-subgroup sees the factorisations `g = x y` only through its centraliser
@@ -33,6 +35,8 @@ same action applied to `G⁰` itself gives `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
   an intermediate subgroup `Q C_G(Q) ≤ H`, which is what the third main theorem needs for a
   general `H` rather than only for `H = C_G(Q)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

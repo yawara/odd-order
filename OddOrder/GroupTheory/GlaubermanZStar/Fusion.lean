@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
-import OddOrder.GroupTheory.PRegularElement
+module
+
+public import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
+public import OddOrder.GroupTheory.PRegularElement
 
 /-!
 # Glauberman's `Z*`-theorem: Steps 6 and 7 — the fusion analysis
@@ -44,6 +46,8 @@ Step 2 (`zStar_proper`) puts that in `O_{2'}(C_G(z))`; `x` of odd order is a pow
 * `OddOrder.GroupTheory.MinimalConfig.pRegularPart_mem_oPiCore` — the `2'`-part lands in
   `O_{2'}(C_G(z))`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

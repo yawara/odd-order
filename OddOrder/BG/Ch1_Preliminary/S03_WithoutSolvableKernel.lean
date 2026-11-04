@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # BG §3: Lemma 3.2 and Theorem 3.5 without the solvability hypothesis
@@ -51,6 +53,8 @@ engines — they are used inside the §3 development, where solvability is alrea
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §3.
 * Isaacs, _Finite Group Theory_ (AMS GSM 92, 2008), Theorem 6.24 (Thompson).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03
 

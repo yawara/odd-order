@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.LocalRing.Module
-import Mathlib.LinearAlgebra.TensorProduct.Tower
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import OddOrder.Algebra.AugmentationIdeal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
+module
+
+public import Mathlib.RingTheory.LocalRing.Module
+public import Mathlib.LinearAlgebra.TensorProduct.Tower
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import OddOrder.Algebra.AugmentationIdeal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 
 /-!
 # Reduction of an `𝒪`-lattice modulo the maximal ideal
@@ -35,6 +37,8 @@ decomposition-map identity is that these containments are equalities on dimensio
   `OddOrder.RepresentationTheory.Modular.trace_eq_brauerCharacter_reduction` — the same
   identity for representations
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.BrauerSuzukiQ8.CharacterCore
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiQ8.CharacterCore
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the induction on `|G|` and the final statements
@@ -18,6 +20,8 @@ The reduction of `BrauerSuzukiQ8/Reduction.lean` and the character-theoretic cor
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 -/
 
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

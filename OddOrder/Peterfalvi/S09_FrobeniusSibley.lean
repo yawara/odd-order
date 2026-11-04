@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusHypothesis76
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis76
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
 
 /-!
 # Peterfalvi (6.8) coherence for a Frobenius family — wiring the Sibley datum
@@ -20,6 +22,8 @@ the
 Foundational coordinate lemma first: the Sibley kernel `(H_i).subgroupOf L_i : Subgroup ↥L_i` has
 `sharpImage` equal to `(H_i)^# = sharp (H_i)`, matching the `of_isTISubset` Dade support.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

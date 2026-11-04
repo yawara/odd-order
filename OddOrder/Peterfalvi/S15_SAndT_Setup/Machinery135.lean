@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Machinery135
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit` (2000-line limit, issue
 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (13.3)-(13.5) — character degrees, first case split, generic alpha

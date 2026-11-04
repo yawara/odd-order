@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.S09_ChiefSeriesStabilizer
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S09_ChiefSeriesStabilizer
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S09_Lemma95` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch2.S09
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

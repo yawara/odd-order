@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ_Setup
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ_Setup
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7B part 1: normal-J (Thm 7.6) Steps 1-6 (pp. 209-214)
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

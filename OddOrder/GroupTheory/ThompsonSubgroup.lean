@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.Data.Set.Card
-import Mathlib.Data.Set.Finite.Lemmas
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.Data.Set.Card
+public import Mathlib.Data.Set.Finite.Lemmas
+public import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Thompson Subgroup `J(P)`
@@ -38,6 +40,8 @@ BG §6, §8, §9 (Uniqueness Theorem) で繰り返し使われる shared concept
 * **Isaacs Thm 7.2** (`thompsonJ_eq_of_le_of_le`): `J(P) ≤ Q ≤ P ⇒ J(Q) = J(P)`.
   特に `J(P)` は `Q` 内 characteristic.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

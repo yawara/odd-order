@@ -1,13 +1,15 @@
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Solvable
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Mathlib.SemidirectProduct
-import OddOrder.Mathlib.Subgroup
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Mathlib.SemidirectProduct
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs §4A (part 1) — commutator identities, coatom lemmas, Lem 4.5/4.6 (pp. 113-122)
@@ -17,6 +19,8 @@ import OddOrder.Mathlib.Subgroup
 `commutatorElement_pow_left_of_class_le_two` は分割に伴い private を外した
 (ファイル跨ぎ private 禁止規約)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 
@@ -193,7 +197,7 @@ mathlib `Subgroup.commutator_top_left_le_iff` 直接 (Lemma 4.3 iff の `K = ⊤
 
 /-- General commutator identity (no hypothesis):
 `⁅x * y, z⁆ = x * ⁅y, z⁆ * x⁻¹ * ⁅x, z⁆`. -/
-private lemma commutatorElement_mul_left_eq (x y z : G) :
+lemma commutatorElement_mul_left_eq (x y z : G) :
     ⁅x * y, z⁆ = x * ⁅y, z⁆ * x⁻¹ * ⁅x, z⁆ := by
   simp only [commutatorElement_def]
   group
@@ -694,7 +698,7 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
 /-- Helper: For `A ⊴ G` and `b ∈ A`, `⁅b, g⁆ ∈ A` for any `g : G`.
 
 `⁅b, g⁆ = b · (g · b⁻¹ · g⁻¹)`. `b⁻¹ ∈ A` + A normal ⇒ `g · b⁻¹ · g⁻¹ ∈ A`. -/
-private lemma commutatorElement_mem_of_normal {A : Subgroup G} [A.Normal]
+lemma commutatorElement_mem_of_normal {A : Subgroup G} [A.Normal]
     {b : G} (hb : b ∈ A) (g : G) : ⁅b, g⁆ ∈ A := by
   have heq : ⁅b, g⁆ = b * (g * b⁻¹ * g⁻¹) := by
     rw [commutatorElement_def]; group

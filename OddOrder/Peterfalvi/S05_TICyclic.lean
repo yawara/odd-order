@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S03_PreliminaryCharacter
-import OddOrder.Peterfalvi.S04_DadeIsometry
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-import Mathlib.GroupTheory.FiniteAbelian.Duality
-import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+module
+
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+public import OddOrder.Peterfalvi.S04_DadeIsometry
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import Mathlib.GroupTheory.FiniteAbelian.Duality
+public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Peterfalvi §5: TI-Subsets with Cyclic Normalizers
@@ -23,6 +25,8 @@ the §4 Dade-isometry packages for the maps used in (3.2)-(3.5).
 
 Reference note: `notes/peterfalvi/s05_ti_cyclic_normalizer.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S05
 

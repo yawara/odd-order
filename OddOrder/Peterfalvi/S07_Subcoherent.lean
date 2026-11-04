@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_Coherence
-import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 
 /-!
 # Peterfalvi §5 (5.3)(a): the subcoherent `R`-datum producer (`irr_subcoherent`)
@@ -56,6 +58,8 @@ derived from the difference-isometry.
 
 Reference note: `notes/peterfalvi/s07_coherence.md`, issue `1017`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

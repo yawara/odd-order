@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 
 /-!
 # Relations among irreducible Brauer characters are divisible by `p`
@@ -22,6 +24,8 @@ recorded here is the one that carries the representation theory; the descent is 
 
 * `OddOrder.RepresentationTheory.Modular.mem_maximalIdeal_of_sum_irreducibleBrauerCharacter`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

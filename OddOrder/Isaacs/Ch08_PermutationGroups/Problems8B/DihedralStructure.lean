@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Dihedral
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
 
 /-!
 # Isaacs Problem 8B.6 (p. 249) の結論 — `G ≅ D₂ₚ`
@@ -32,6 +34,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
 - `nonempty_mulEquiv_dihedralGroup_of_card_stabilizer_eq_two` — **Problem 8B.6** の結論。
 -/
 
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch08
 
 open MulAction
@@ -40,17 +44,17 @@ section /- 二面体群の認識 (一般補題) -/
 
 variable {G : Type*} [Group G] {n : ℕ} {y t : G}
 
-private lemma natCast_val_self [NeZero n] (i : ZMod n) : ((i.val : ℕ) : ZMod n) = i :=
+lemma natCast_val_self [NeZero n] (i : ZMod n) : ((i.val : ℕ) : ZMod n) = i :=
   ZMod.natCast_rightInverse i
 
 /-- `orderOf y = n` なら `y` の整数冪は指数の `ZMod n` での像だけで決まる。 -/
-private lemma zpow_congr_of_orderOf (hy : orderOf y = n) {a b : ℤ}
+lemma zpow_congr_of_orderOf (hy : orderOf y = n) {a b : ℤ}
     (h : (a : ZMod n) = (b : ZMod n)) : y ^ a = y ^ b := by
   rw [zpow_eq_zpow_iff_modEq, hy]
   exact (ZMod.intCast_eq_intCast_iff a b n).mp h
 
 /-- `DihedralGroup n → G` の台となる写像。 -/
-private def dihedralFun (y t : G) (n : ℕ) : DihedralGroup n → G
+def dihedralFun (y t : G) (n : ℕ) : DihedralGroup n → G
   | .r i => y ^ (i.val : ℤ)
   | .sr i => t * y ^ (i.val : ℤ)
 

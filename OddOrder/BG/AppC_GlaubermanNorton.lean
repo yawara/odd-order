@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.Extension
-import OddOrder.Algebra.FiniteFieldIrreducibleCount
-import OddOrder.BG.AppC_LemmaC2
-import OddOrder.BG.AppC_AffineLineCondition
+module
+
+public import Mathlib.FieldTheory.Finite.Extension
+public import OddOrder.Algebra.FiniteFieldIrreducibleCount
+public import OddOrder.BG.AppC_LemmaC2
+public import OddOrder.BG.AppC_AffineLineCondition
 
 /-!
 # BG Appendix C, Remark (IV): the Glauberman–Norton sharpening `p ≤ 3`
@@ -59,6 +61,8 @@ needs — `q ≠ 2 ∨ p = 2` — and derives BG's condition-(A) form as a corol
 - `le_three_of_conditionA_of_normSetE_eq_inv` — **BG Appendix C, Remark (IV)** in the form BG
   states on p. 149: condition (A) and `E = E⁻¹` give `p ≤ 3`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

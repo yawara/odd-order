@@ -3,12 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch01_Sylow.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Frattini
-import Mathlib.GroupTheory.Perm.Cycle.Type
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.Frattini
+public import Mathlib.GroupTheory.Perm.Cycle.Type
+public import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Isaacs Chapter 1 — Problems §1D (Frobenius complements, Frattini, nilpotency)
@@ -20,6 +23,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 1 "Sylow Theory" の�
 (`exists_sylow_inf_card_eq`, `card_mul_card_inf` 等) は `Problems.lean` の import 経由で利用。
 方針は `Problems.lean` 冒頭と同じ (ラッパー方針)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

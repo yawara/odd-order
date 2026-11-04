@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 
 /-!
 # Isaacs Ch. 9 — §9C: Lemma 9.25 (E(G) = E(H) when F(G) = 1), p. 283
@@ -22,6 +24,8 @@ Thompson-Wielandt (Thm 9.24) の証明で使う補題。
 (`K.subgroupOf H ≠ V`) なので Thm 9.4 (`↥H` 内) で `V` は `K` を中心化 →
 `V` は `E(G) = F*(G)` (F=1) を中心化 → 9.8 で `V ≤ C_G(F*) ≤ F* = E(G)` 矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

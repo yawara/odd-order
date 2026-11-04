@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
 /-!
 # Peterfalvi Part II, Chapter I §3, Lemma 1 — the `Sz(q)` target
@@ -18,6 +20,8 @@ its ovoid, with `q = 2^(2m+1)` and `0 < m`.  Peterfalvi cites
 Huppert--Blackburn, Chapter XI, Theorems 3.3 and 3.6 for the standard-action
 degree and simplicity; here both come from the concrete constructed group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

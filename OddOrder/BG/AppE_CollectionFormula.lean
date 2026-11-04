@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.HallCollection
-import OddOrder.GroupTheory.HallPetresco
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.RegularPGroup
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.HallCollection
+public import OddOrder.GroupTheory.HallPetresco
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.RegularPGroup
 
 /-!
 # BG Appendix E, E.1 and E.2: the collection formula and regular `p`-groups
@@ -26,6 +28,8 @@ further upstream, in `OddOrder/GroupTheory/`: `HallCollection.lean` (the ordered
 its collapse lemmas), `HallPetresco.lean` (`(E.1)` in general form, via Mann's route), and
 `RegularPGroup.lean` (BG's unnumbered "Step 1", stated for arbitrary groups).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

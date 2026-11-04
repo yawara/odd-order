@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorIsomorphism
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorIsomorphism
 
 /-!
 # Higman's Lemma 13: two of the exponent-two factors are isomorphic
@@ -17,6 +19,8 @@ three normalized pair relations force two square-law parameters to coincide.
 The common-parameter extension classification then gives an isomorphism
 between that pair of actual factors.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

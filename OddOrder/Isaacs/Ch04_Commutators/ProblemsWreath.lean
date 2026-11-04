@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Data.Nat.Choose.Dvd
-import Mathlib.Algebra.Polynomial.Coeff
-import Mathlib.Algebra.Polynomial.Div
-import Mathlib.Algebra.Ring.GeomSum
-import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.Data.Nat.Choose.Dvd
+public import Mathlib.Algebra.Polynomial.Coeff
+public import Mathlib.Algebra.Polynomial.Div
+public import Mathlib.Algebra.Ring.GeomSum
+public import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.7 (正則 wreath product の元の位数)
@@ -27,6 +29,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.7 (書籍 p. 124)�
 
 `P` は §3A の一般 wreath product `C ≀[Q] Q` (`Q` = 位数 `p` の群の左正則作用) として実現する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

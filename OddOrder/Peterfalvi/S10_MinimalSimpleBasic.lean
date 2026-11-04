@@ -3,14 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_StructureSetup
-import OddOrder.Peterfalvi.S10_ConjugationTransport
+module
+
+public import OddOrder.Peterfalvi.S10_StructureSetup
+public import OddOrder.Peterfalvi.S10_ConjugationTransport
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleBasic` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 open OddOrder.GroupTheory

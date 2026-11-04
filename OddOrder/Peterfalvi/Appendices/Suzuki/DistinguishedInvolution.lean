@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 
 /-!
 # Peterfalvi Part II, Ch. I §1: the distinguished involution (Prop 4(b))
@@ -21,6 +23,8 @@ condition `k⁻² = a` for an element `a = yx ∈ K` coming from the canonical
 form of `tut`, and uses that `k ↦ k²` is a bijection of `K` (elements of
 `K ⊆ D` have odd order).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

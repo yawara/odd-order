@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_DegreeSums.CoherenceGlue
+module
+
+public import OddOrder.Peterfalvi.S08_DegreeSums.CoherenceGlue
 
 /-!
 # Peterfalvi §8: base blocks and degree sums
 
 Minimal-degree blocks, degree bounds, and character degree-sum identities for §8.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

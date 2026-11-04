@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
-import OddOrder.Peterfalvi.Appendices.FeitSibleyCoherentImage
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyCoherentImage
 
 /-!
 # Peterfalvi Part II, Ch. III, Theorem C: `Q` is a `2`-group
@@ -42,6 +44,8 @@ orthogonality used above, reads:
 * `Q1_eq_bot` — `Q₁ = 1`, the form the proof produces.
 * `isPGroup_two_Q` — **Theorem C** as the book states it: `Q` is a `2`-group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

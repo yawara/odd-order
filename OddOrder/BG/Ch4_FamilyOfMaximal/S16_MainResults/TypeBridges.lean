@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
 
 /-!
 # BG Section 16: type classification and Theorem A bridges
@@ -14,6 +16,8 @@ Section 16 — Theorem A and Proposition 16.1.
 This module continues `TypeVSinger` with the reverse type-classification bridges,
 the type-II--IV criteria, and the faithful Theorem A structure used downstream.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

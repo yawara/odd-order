@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # Peterfalvi (13.5)-(13.10) — counting layer
@@ -12,6 +14,8 @@ Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (director
 0103).
 Structural `(S, T)`-pair facts live upstream in `PairStructure.lean` (prefix-split).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S13_SixTwoImageData
-import OddOrder.Peterfalvi.S13_Orthogonality
+module
+
+public import OddOrder.Peterfalvi.S13_SixTwoImageData
+public import OddOrder.Peterfalvi.S13_Orthogonality
 
 /-!
 # The §13 column `R`-family is the (5.3)(b) certain-type family
@@ -40,6 +42,8 @@ The first three are packaged as `columnRImage_image_eq_certainTypeRImage_image`
 
 Reference: issue 0160 (the follow-up of issue 0159, where the abstract (5.3)(b) landed).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

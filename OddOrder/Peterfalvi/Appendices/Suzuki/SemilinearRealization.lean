@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
-import OddOrder.Peterfalvi.Appendices.SemilinearField
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
+public import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Peterfalvi Part II, Chapter I §2, Proposition 3 — semilinear realization
@@ -14,6 +16,8 @@ The first stage of Proposition 3 (p. 104) identifies the Fitting complement acti
 `Q₀` with the full multiplicative group of a finite field of order `|Q₀|`, and chooses
 the distinguished involution as the additive coordinate `1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

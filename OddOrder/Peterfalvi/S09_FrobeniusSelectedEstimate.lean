@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
 
 /-!
 # Frobenius-family selected-character estimate (Peterfalvi 7.8.b)
@@ -21,6 +23,8 @@ Frobenius small-index inequality.
 Textbook: Peterfalvi, Section 7, pp. 40-43, equations (7.8.b) and (7.10).
 Coq comparison: `PFsection7.v`, proof of `CoherentFrobeniusPartition`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 
@@ -41,12 +45,6 @@ variable (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
 variable (C : Subgroup ↥(F.L i))
 variable (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
   ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
-
-private noncomputable abbrev localH78 :=
-  F.hypothesis78 i hodd hnilp C hFrob
-
-private noncomputable abbrev localBD :=
-  F.hypothesis78_betaDecomp i hodd hnilp C hFrob
 
 /-- **Peterfalvi (7.8.b), canonical local form.**  The distinguished coherent
 image in the canonical `Hypothesis78` attached to a Frobenius-family member

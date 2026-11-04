@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.RingTheory.Artinian.Ring
-import OddOrder.Algebra.DefectGroupConjugacy
-import OddOrder.Algebra.GroupAlgebraConjugation
-import OddOrder.Algebra.Rosenberg
+module
+
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.RingTheory.Artinian.Ring
+public import OddOrder.Algebra.DefectGroupConjugacy
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import OddOrder.Algebra.Rosenberg
 
 /-!
 # Defect groups in the group algebra
@@ -38,6 +40,8 @@ What comes out is Brauer's theorem in its usual form: the defect groups of a blo
 * `OddOrder.GroupAlgebra.exists_conj_eq_of_isDefectGroup` — the defect groups of a primitive
   central idempotent form one conjugacy class.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

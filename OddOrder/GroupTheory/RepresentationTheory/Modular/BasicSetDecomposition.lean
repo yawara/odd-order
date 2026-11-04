@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
 
 /-!
 # Generalized decomposition numbers with respect to a basic set — Navarro (7.5)
@@ -50,6 +52,8 @@ is the separate content of Navarro (3.16).
 * `OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber_eq_character` —
   `χ(x w) = ∑_φ d^x_{χφ} η_φ(w)` (the display on p. 141)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

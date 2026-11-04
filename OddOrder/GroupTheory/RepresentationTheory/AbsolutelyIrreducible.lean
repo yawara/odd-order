@@ -3,20 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.AlgebraRepresentation.Basic
-import Mathlib.RingTheory.SimpleModule.Basic
-import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-import Mathlib.RingTheory.Finiteness.Basic
-import Mathlib.RingTheory.IntegralDomain
-import Mathlib.RingTheory.TensorProduct.Finite
-import Mathlib.RingTheory.LittleWedderburn
-import Mathlib.RingTheory.Finiteness.Cardinality
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.LinearAlgebra.TensorProduct.Basis
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RepresentationTheory.AlgebraRepresentation.Basic
+public import Mathlib.RingTheory.SimpleModule.Basic
+public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+public import Mathlib.RingTheory.Finiteness.Basic
+public import Mathlib.RingTheory.IntegralDomain
+public import Mathlib.RingTheory.TensorProduct.Finite
+public import Mathlib.RingTheory.LittleWedderburn
+public import Mathlib.RingTheory.Finiteness.Cardinality
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.LinearAlgebra.TensorProduct.Basis
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import Mathlib.LinearAlgebra.FreeModule.PID
 
 /-!
 # Burnside's theorem over an algebraically closed field (BG §2 Prop 2.1)
@@ -53,6 +56,8 @@ surjectivity of `A → End_F M`.
   `V` of an extraspecial group `P` over an algebraically closed field.
   Faithfulness is *not* needed for surjectivity — simplicity suffices.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

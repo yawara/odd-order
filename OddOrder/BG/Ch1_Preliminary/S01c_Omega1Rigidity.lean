@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.GroupTheory.CriticalSubgroup
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # BG §1: coprime `Ω₁`-rigidity (Theorem 1.11, Corollary 1.12)
@@ -23,6 +25,8 @@ Both are stated for an external action `φ : A →* MulAut G`, matching the repo
 `OddOrder.Isaacs.Ch04` coprime-action / `actionCommutator` conventions. Corollary 1.12 is the
 rigidity input to BG Lemma 10.3.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S01
 

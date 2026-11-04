@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.Tactic.NormNum.Prime
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Isaacs, Finite Group Theory — Problem 8C.6 (p. 257)
@@ -22,6 +24,8 @@ import Mathlib.Tactic.NormNum.Prime
 - `isSimpleGroup_mulAut_of_card_eq_three` — 位数 3 の群の自己同型群は単純
   (`Aut(Z₃) ≅ Z₂`)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

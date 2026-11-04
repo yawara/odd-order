@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
 
 /-!
 # Peterfalvi Part II, Ch. I §3 Lemma 4: the order-three PSL subgroup
@@ -30,6 +32,8 @@ are excluded because their root groups are noncommutative Suzuki 2-groups,
 whereas `Q₀` is commutative. The remaining target gives the source conclusion
 `⟨Q₀, K, t⟩ ≅ PSL(2,q)` with `q = |Q₀|`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

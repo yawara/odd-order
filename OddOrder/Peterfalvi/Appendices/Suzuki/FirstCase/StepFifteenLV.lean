@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteen
 
 /-!
 # Peterfalvi Part II, Ch. II, step (15): the subgroup `LV`
@@ -22,6 +24,8 @@ The first half of (15) — `L` is cyclic of order `9`, inverted by `s`, normaliz
 `3` in `LV`, which pins down the centre, and the `3`-torsion computation for `LV`
 gives `Ω₁(LV)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 
 /-!
 # `p`-sections
@@ -43,6 +45,8 @@ decomposition numbers see.
   `OddOrder.RepresentationTheory.Modular.pSection_eq_of_isConj` — the `p`-sections partition `G`,
   indexed by the `G`-classes of `p`-elements
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

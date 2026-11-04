@@ -3,22 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Finite.Perm
-import Mathlib.Data.Nat.Choose.Lucas
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Perm.Cycle.Type
-import Mathlib.GroupTheory.Subgroup.Simple
-import Mathlib.GroupTheory.Sylow
-import OddOrder.GroupTheory.ChermakDelgado
+module
+
+public import Mathlib.Data.Finite.Perm
+public import Mathlib.Data.Nat.Choose.Lucas
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.Perm.Cycle.Type
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.ChermakDelgado
 
 /-!
 # Basic
 
 Prefix-split from `OddOrder.Isaacs.Ch01_Sylow.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # OddOrder.Isaacs.Ch01 — Sylow Theory

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 
 /-!
 # `Φ^x_μ`: a projective indecomposable character of `C_G(x)` spread over the `p`-section
@@ -47,6 +49,8 @@ definition.
 * `OddOrder.RepresentationTheory.Modular.inner_sectionProjectiveCharacter_eq` —
   `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

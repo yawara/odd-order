@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorSameMiddleZero
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareEigenNonzero
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeCCEigenfamilyCrossCommutator
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorSameMiddleZero
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareEigenNonzero
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeCCEigenfamilyCrossCommutator
 
 /-!
 # Higman's Lemma 13: the cross commutator of two restricted type-C factors
@@ -20,6 +22,8 @@ square nondegeneracy, and the span of every ground class are all proved for
 those exact families.  The type-C/C Jacobi connector then places the subgroup
 cross commutator in the ambient square Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Isaacs Chapter 2 — Problems §2C: N-群 (p. 61)
@@ -21,6 +23,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2C (Problem 2
 Note (書籍): 非可解 N-群の分類は Thompson の仕事で、有限単純群分類への大きな一歩だった。
 minimal simple group (真部分群がすべて可解な非可換有限単純群) は明らかに N-群である。
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch01
 

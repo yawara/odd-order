@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.QuadraticTraceCorrection
+module
+
+public import OddOrder.Algebra.QuadraticTraceCorrection
 
 /-!
 # An anisotropic `F`-bilinear cocycle on `𝐅_{q²}` is the Hermitian norm
@@ -51,6 +53,8 @@ machinery is needed:
   computations use the `E`-scalar multiplication that a mere `F`-linear change of
   variable would not respect.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

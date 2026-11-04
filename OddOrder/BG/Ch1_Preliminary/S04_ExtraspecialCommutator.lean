@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 
 /-!
 # BG §4E — the extraspecial commutator constraint (Lemma 4.15)
@@ -14,6 +16,8 @@ with prescribed rank bounds.
 Split from `OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` (issue 0149); that file
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 open OddOrder.BG.Ch1.S02

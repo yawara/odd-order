@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
 
 /-!
 # Higman's Lemma 13: branch-specific composition series
@@ -25,6 +27,8 @@ exists above `Φ(P)`.  In the exponent-two branch, every nontrivial
 invariant term contains `Φ(P)`, so the first term of any length-four
 composition series is `Φ(P)` itself.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

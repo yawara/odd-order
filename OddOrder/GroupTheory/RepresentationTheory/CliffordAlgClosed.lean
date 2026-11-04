@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.Algebra.MonoidAlgebra.MapDomain
-import Mathlib.RingTheory.SimpleModule.Basic
-import Mathlib.RingTheory.SimpleModule.Isotypic
-import Mathlib.RingTheory.Artinian.Module
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Algebra.Module.Submodule.RestrictScalars
+module
+
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.Algebra.MonoidAlgebra.MapDomain
+public import Mathlib.RingTheory.SimpleModule.Basic
+public import Mathlib.RingTheory.SimpleModule.Isotypic
+public import Mathlib.RingTheory.Artinian.Module
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.Algebra.Module.Submodule.RestrictScalars
 
 /-!
 # Conjugation permutes the simple constituents of a restriction (general field)
@@ -39,6 +41,8 @@ No irreducibility of `ρ` and no algebraic closedness is needed here: `ρ g` is 
 * `isSimpleModule_map_conjSemilinearEnd` — the image of a simple `k[H]`-submodule under `ρ g` is
   again a simple `k[H]`-submodule.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

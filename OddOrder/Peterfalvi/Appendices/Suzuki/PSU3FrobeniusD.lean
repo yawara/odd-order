@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
 # Peterfalvi Part II, Ch. IV §2: `D` is a Frobenius complement
@@ -28,6 +30,8 @@ and Isaacs Cor 6.17 (`isZGroup_of_isFrobeniusAction_of_odd`) then gives the cycl
   acts as a Frobenius complement on `Q ⧸ Z(Q)`.
 * `Hypothesis.isZGroup_D_of_freeD` — hence every Sylow subgroup of `D` is cyclic.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

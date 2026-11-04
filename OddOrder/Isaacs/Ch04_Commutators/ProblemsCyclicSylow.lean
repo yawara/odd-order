@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
+module
+
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.7 (巡回 Sylow をもつ `p`-可解群)
@@ -34,6 +36,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.7 (書籍 p. 146)�
 `Aut` が可換になるのは `O_p(G)` が巡回だから (`mulAut_mul_comm_of_isCyclic`,
 mathlib `IsCyclic.mulAutMulEquiv : MulAut P ≃* (ZMod |P|)ˣ` の引き戻し)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

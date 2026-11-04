@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-import OddOrder.GroupTheory.RepresentationTheory.Clifford
+module
+
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
 
 /-!
 # Brauer's permutation lemma for ambient conjugation
@@ -19,6 +21,8 @@ This is the Layer B bridge needed by Peterfalvi (6.8): later files use the fixed
 conjugacy-class side, together with Frobenius fixed-point-freeness, to prove
 `ClassFunction.inertia θ = H` for nontrivial `θ`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

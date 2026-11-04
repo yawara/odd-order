@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
 
 /-!
 # Higman's Lemma 13: the Frattini layers
@@ -24,6 +26,8 @@ both assertions.  In particular, the Frattini layers used by the later
 Maschke splitting are actual normal actor-invariant subgroups rather than
 posited composition data.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

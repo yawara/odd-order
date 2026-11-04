@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.GroupTheory.Transfer
-import Mathlib.GroupTheory.Abelianization.Defs
-import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
+module
+
+public import Mathlib.Tactic.Group
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.GroupTheory.Transfer
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
 
 /-!
 # Isaacs Chapter 5 — Problems 5B (transfer evaluation / Dietzmann)
@@ -25,6 +27,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5B (書籍 p. 157)。
 Dietzmann の定理 (Thm 5.10) は `Dietzmann.lean` に landing 済
 (`dietzmann` / `dietzmann_setFinite`)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

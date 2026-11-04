@@ -1,10 +1,14 @@
-import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
 
 /-!
 # Peterfalvi (12.13)-(12.17) + (8.8) case-(b) dichotomy
 
 Split from the former monolithic `OddOrder.Peterfalvi.S14_MaximalI` (directory split, issue 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

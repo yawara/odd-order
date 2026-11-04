@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
 
 /-!
 # CaseBXi
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (9.8.d) (γ) core — summand-complement kernel W ⊆ Ker ζ

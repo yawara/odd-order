@@ -1,5 +1,7 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
 
 /-!
 # BG Proposition 16.1 taxonomy + Theorems I/II (Peterfalvi が消費する出力)
@@ -7,6 +9,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split,
 issue 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory

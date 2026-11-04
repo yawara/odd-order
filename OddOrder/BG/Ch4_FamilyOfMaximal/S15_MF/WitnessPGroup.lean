@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure
 
 /-!
 # BG Theorem 15.7(e) — pinning the witness prime to the TI-failure intersection
@@ -14,6 +16,8 @@ takes three steps (BG mmd L4264-4266):
 Split out of `PisetBetaDisjoint` (which supplies the witness and the `O_p`/`O_{p'}` structure) to
 keep that file under the 1500-line split trigger; see issues 3022 and 0124.
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S15
 
 open OddOrder.GroupTheory

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
 
 /-!
 # Higman's Lemma 13: the exponent-four Jacobi relation
@@ -18,6 +20,8 @@ then swaps the last two entries of a mixed triple commutator. This file
 establishes the actual subgroup membership and the lower-central
 faithfulness needed to state that identity for raw elements of P.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

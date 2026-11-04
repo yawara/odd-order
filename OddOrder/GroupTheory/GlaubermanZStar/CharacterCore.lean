@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.Fusion
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+module
+
+public import OddOrder.GroupTheory.GlaubermanZStar.Fusion
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 
 /-!
 # Glauberman's `Z*`-theorem: Step 8 — the character is constant on `cl(v)·cl(u)`
@@ -30,6 +32,8 @@ Brauer–Suzuki.
 * `OddOrder.GroupTheory.MinimalConfig.character_conj_mul_eq` — Step 8 at `h = 1`
 * `OddOrder.GroupTheory.MinimalConfig.character_const_on_class_product` — Step 8
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03 OddOrder.RepresentationTheory.Modular
 open OddOrder.RepresentationTheory OddOrder.MatrixModule

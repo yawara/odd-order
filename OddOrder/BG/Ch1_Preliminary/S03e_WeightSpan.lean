@@ -1,8 +1,10 @@
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-import Mathlib.LinearAlgebra.Semisimple
-import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-import Mathlib.FieldTheory.Separable
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import Mathlib.LinearAlgebra.Semisimple
+public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
+public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+public import Mathlib.FieldTheory.Separable
 
 /-!
 # Weight spaces span the whole space (abelian kernel, algebraically closed field)
@@ -26,6 +28,8 @@ for semisimple operators `maxGenEigenspace = eigenspace`, turning the simultaneo
 into
 the weight-space decomposition.
 -/
+
+@[expose] public section
 
 open Module
 

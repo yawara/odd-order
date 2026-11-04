@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
-import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
-import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+public import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
 
 /-!
 # BG §10: Theorem 10.2 後半 — `M_σ`/`M_α` の Hall 同定と `M_σ ≠ ⊥`
@@ -19,6 +21,8 @@ mmd `references/bg/local-analysis.mmd` L2713-2779。
 `hallSigmaSubgroup_eq_Msigma` / `Msigma_isHall` / `Malpha_isHall` → `Msigma_ne_bot` 系 →
 `isHall_Msigma_Malpha`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

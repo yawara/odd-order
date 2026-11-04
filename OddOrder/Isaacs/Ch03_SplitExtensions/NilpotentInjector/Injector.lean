@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
-import OddOrder.Isaacs.Ch01_Sylow.Problems
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problem 3C.8 — injector の `{p}`-部分は `C(p)` の Sylow `p`-部分群
@@ -36,6 +38,8 @@ Mann の構造定理の主要部分:
 - `eq_one_of_conj_mul_inv_mem_of_coprime` — 交換子消去の位数論法。
 - `isHallPart_pCentralizer_of_isNilpotentInjector` — 上記の主張。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
-import OddOrder.Mathlib.SemidirectProduct
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs §3F: cyclic quotient extensions (pp. 105-112)
@@ -13,6 +15,8 @@ Thm 3.35 (extension uniqueness) と Thm 3.36 (cyclic extension existence,
 `(N ⋊_σ ℤ)/⟨(a⁻¹, m)⟩` 構成) のクラスタ. `Main.lean` (issue 0103 の tail hub) から
 2026-07-17 に分割 (Main が 1500 行に接近したため; 下流は Main を import して不変).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

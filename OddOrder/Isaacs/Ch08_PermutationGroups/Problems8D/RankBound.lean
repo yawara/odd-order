@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Basic
-import Mathlib.GroupTheory.Perm.Basic
-import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+module
+
+public import Mathlib.GroupTheory.GroupAction.Basic
+public import Mathlib.GroupTheory.Perm.Basic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.3 (p. 269) — rank と最大 subdegree による位数の評価
@@ -27,6 +29,8 @@ rank は点安定化群 `G_α` の `Ω` 上の軌道 (= suborbit) の個数
 - `card_le_rank_mul_max_subdegree` — `|Ω| ≤ r · n`。
 - `card_le_factorial_rank_mul_max_subdegree` — **Problem 8D.3** 本体 `|G| ≤ (r · n)!`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

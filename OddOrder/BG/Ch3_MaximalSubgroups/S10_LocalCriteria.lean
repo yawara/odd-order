@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
-import OddOrder.BG.AppB_PuigB3B4
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+public import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+public import OddOrder.BG.AppB_PuigB3B4
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
 # BG §10 局所判定補題 (Lemmas 10.3 / 10.4)
@@ -27,6 +29,8 @@ Lemma 10.4(b) (`exists_prime_orderOf_zgroupCentralizer_of_complement`) を**実�
 (`S10_LocalLemmas` 内に置くと import が循環する)。残りの §10 局所補題
 (10.5 / 10.11 / 10.12 / 10.13) は従来どおり `S10_LocalLemmas`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

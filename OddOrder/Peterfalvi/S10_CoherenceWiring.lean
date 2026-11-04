@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
 
 /-!
 # Peterfalvi §10–16: the coherence-wiring bridge to (6.8)
@@ -37,6 +39,8 @@ This realizes the FT-path "signature 先行整備" decoupling
 
 Reference notes: `notes/meta/ft_path_policy.md`, `notes/peterfalvi/s10_13_maximal_structure.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.CoherenceWiring
 

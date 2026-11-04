@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
 
 /-!
 # The basic set of `G` read through a central `p`-subgroup: `C_𝓑 = |N| (1 + δ)`
@@ -27,6 +29,8 @@ single change-of-basis matrix `U` is meaningful on both sides.
 
 * `OddOrder.RepresentationTheory.Modular.sum_intBasicSetMatrix_mul_cartanMatrix_quotientPi`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

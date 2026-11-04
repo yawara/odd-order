@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.LinearMap.Defs
-import Mathlib.Basic.Complex.Basic
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.RepresentationTheory.Character
-import Mathlib.RepresentationTheory.Irreducible
-import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+module
+
+public import Mathlib.Algebra.Module.LinearMap.Defs
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Galois actions on class functions and irreducible characters
@@ -31,6 +33,8 @@ Downstream this yields the Galois permutation `IrreducibleCharacter.galoisPerm Ï
 `Irr(G)` and invariance of the virtual-character lattice `â„¤[Irr G]`
 (`ClassFunction.mapRingEquiv_mem_ZIrr_iff`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

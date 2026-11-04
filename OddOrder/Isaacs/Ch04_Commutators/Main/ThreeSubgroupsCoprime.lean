@@ -1,4 +1,6 @@
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # TAIL
@@ -6,6 +8,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 Prefix-split from `OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement
 

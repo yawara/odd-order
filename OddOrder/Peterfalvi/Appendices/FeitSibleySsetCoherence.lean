@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibley
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibley
 
 /-!
 # Peterfalvi Appendix IV: coherence of `𝒮(Q')` (pp. 145–146)
@@ -17,6 +19,8 @@ Notation" block (p. 145) with their elementary facts, the `H = Q ⋊ D` counting
 (`ssetOf_Qder_coherent`), and the degree-square bound of step (1)–(2)
 (`exists_deg_sq_le_of_mem_SsetOf`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

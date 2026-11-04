@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import OddOrder.Algebra.CentralCharacter
-import OddOrder.Algebra.PiMatrixSimpleModules
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.Algebra.CentralCharacter
+public import OddOrder.Algebra.PiMatrixSimpleModules
 
 /-!
 # The representation carried by a block
@@ -24,6 +26,8 @@ these representations are exactly the irreducible ones.
 
 * `OddOrder.RepresentationTheory.Modular.blockRepresentation`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

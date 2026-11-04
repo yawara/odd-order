@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+public import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
 
 /-!
 # Isaacs Problems 1E (pp. 37–38) — Sylow 計数の道具立てと 1E.1–1E.5
@@ -52,6 +54,8 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
 - `mul_comm_of_card_eq_prime_sq` / `le_normalizer_of_card_eq_prime_sq` — 位数 `p²` の
   部分群は可換で, その部分群を正規化する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

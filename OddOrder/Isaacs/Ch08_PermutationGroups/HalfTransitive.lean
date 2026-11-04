@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: half-transitive actions (Thm 8.9, Lem 8.10)
@@ -27,6 +29,8 @@ resp. a right coset of an invariant subgroup, cannot contain two distinct
 members of one `A`-orbit) is `smul_eq_of_fiber_eq`, a coprimality argument
 for the fibers of a map constant on `A`-orbit unions.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

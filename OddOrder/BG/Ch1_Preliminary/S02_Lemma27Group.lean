@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.CommGroupAut
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+module
+
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.GroupTheory.CommGroupAut
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
 
 /-!
 # BG §2 Lemma 2.7 in the book's own shape (`Q ⊆ Aut(P)`)
@@ -40,6 +42,8 @@ No mathematics is reproved here: the rendering uses the existing bridges
 
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §2.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S02
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.Transvection
-import OddOrder.GroupTheory.NonzeroVectorAction
-import Mathlib.GroupTheory.GroupAction.Iwasawa
+module
+
+public import OddOrder.GroupTheory.Transvection
+public import OddOrder.GroupTheory.NonzeroVectorAction
+public import Mathlib.GroupTheory.GroupAction.Iwasawa
 
 /-!
 # `GL(V)` is simple over `𝔽₂` in dimension at least three
@@ -32,6 +34,8 @@ needs `dim ker h ≥ 2`.
 * `OddOrder.GroupTheory.linearEquivIwasawaStructure` — the Iwasawa structure.
 * `OddOrder.GroupTheory.isSimpleGroup_linearEquiv` — **`GL(V)` is simple**.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

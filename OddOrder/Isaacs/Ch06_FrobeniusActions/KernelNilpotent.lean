@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
+public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 
 /-!
 # Isaacs Thm 6.24: Frobenius kernels are nilpotent (Thompson) (p. 196)
@@ -42,6 +44,8 @@ Frobenius, `IsFrobeniusAction.actorSubgroup`) and induct on `|N|`.
   form): the target of a Frobenius action of a nontrivial finite group is nilpotent.
 - `OddOrder.Isaacs.Ch06.IsFrobeniusGroup.isNilpotent_kernel`: subgroup-pair form.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 
 /-!
 # Peterfalvi Part II, Ch. IV §3 (5): the second case, wired up
@@ -34,6 +36,8 @@ and the bookkeeping that turns "the formula holds throughout the fibre of `f(ρ)
 * `Hypothesis.stepFive_secondCase_elem` — the second case: the inversion formula at
   `ρ s^{a⁻¹}`, given it on the fibre of `f(ρ)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

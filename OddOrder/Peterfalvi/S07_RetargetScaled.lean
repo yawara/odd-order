@@ -3,7 +3,9 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Peterfalvi (5.6.3): re-targeting for a **non-orthonormal** (reducible) break character
@@ -30,6 +32,8 @@ This file provides the scaled analogues:
 These feed the reducible-break (5.6) coherence bound needed by the case-(c2) (6.2)/(6.3) chain
 (`S08_Theorem65c2`).  Reference note: `notes/peterfalvi/s08_6_8_resume_roadmap.md` (cont.¹⁸).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

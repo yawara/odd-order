@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # A group of order-`4` Sylow `2`-subgroup with a central involution has a normal `2`-complement
@@ -36,6 +38,8 @@ order `4` (whose unique involution is central in it), which is why the hypothesi
 * G. Navarro, *Characters and Blocks of Finite Groups*, proof of (7.2), p. 132.
 * I. M. Isaacs, *Finite Group Theory*, Thm 5.13 (Burnside).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

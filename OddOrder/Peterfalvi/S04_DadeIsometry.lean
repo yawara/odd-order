@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S04_DadeIsometry.MobiusAssembly
+module
+
+public import OddOrder.Peterfalvi.S04_DadeIsometry.MobiusAssembly
 
 /-!
 # Peterfalvi §4: Dade maps, adjoints, and isometries
@@ -14,6 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 This module constructs the Dade map and its adjoint, proves the isometry identities, and packages
 the full Dade isometry.  The Möbius orbit-averaging lemmas are imported from `MobiusAssembly`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S04
 open OddOrder.RepresentationTheory
 open scoped Pointwise

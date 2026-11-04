@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockOfSimpleModule
-import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+module
+
+public import OddOrder.Algebra.BlockOfSimpleModule
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
 /-!
 # The block of a representation whose centre acts by a scalar
@@ -29,6 +31,8 @@ Navarro's Chapter 3 (3.1)/(3.3).
 
 * `OddOrder.RepresentationTheory.Modular.exists_eq_centralCharacterAlg_of_asAlgebraHom_eq_smul`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

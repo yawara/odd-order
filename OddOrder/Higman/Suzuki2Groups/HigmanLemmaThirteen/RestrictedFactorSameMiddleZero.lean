@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
 
 /-!
 # Higman's Lemma 13: same-factor middle brackets after scalar extension
@@ -18,6 +20,8 @@ natural map `L₀(S) → L₀(P)` and extension of scalars.  The final theorem i
 stated directly on the canonical ambient Frobenius family used by the
 type-C/C Jacobi argument.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

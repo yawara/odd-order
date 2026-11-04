@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.NumberTheory.Padics.RingHoms
-import Mathlib.Algebra.CharP.Algebra
-import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
+module
+
+public import Mathlib.NumberTheory.Padics.RingHoms
+public import Mathlib.Algebra.CharP.Algebra
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 
 /-!
 # `p`-modular systems
@@ -36,6 +38,8 @@ complete DVR is covered.
 * `OddOrder.RepresentationTheory.Modular.instIsPModularSystemPadicInt` — the `p`-adic integers
   `ℤ_[p]` are a `p`-modular system, so the notion is not vacuous
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

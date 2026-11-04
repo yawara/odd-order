@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
-import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
+public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 
 /-!
 # Isaacs Problem 7A.1 — 単純群の冪零な極大部分群は `2`-群 (書籍 p. 209)
@@ -28,6 +30,8 @@ import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 教科書 Thm 7.1 (`Z(P)` と `J(P)` の 2 つだけを仮定する強い版) は不要で, Thm 6.23 で足りる —
 冪零な極大部分群は `P` の characteristic 部分群を**すべて**正規化するから。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

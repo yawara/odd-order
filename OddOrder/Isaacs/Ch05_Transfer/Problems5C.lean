@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SchurZassenhaus
-import OddOrder.GroupTheory.AbelianPowerSubgroups
-import OddOrder.GroupTheory.WeaklyClosed
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import Mathlib.GroupTheory.SchurZassenhaus
+public import OddOrder.GroupTheory.AbelianPowerSubgroups
+public import OddOrder.GroupTheory.WeaklyClosed
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+public import Mathlib.GroupTheory.Abelianization.Finite
 
 /-!
 # Isaacs Chapter 5 — Problems 5C (transfer と非単純性)
@@ -24,6 +27,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5C (書籍 pp. 162-16
 着手中** (issue 9503; `IsWeaklyClosed` / `exists_mem_normalizer_conj_eq` 等) なので
 本ファイルでは扱わない。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 

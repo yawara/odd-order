@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
-import Mathlib.Algebra.Group.Action.End
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
+public import Mathlib.Algebra.Group.Action.End
 
 /-!
 # BG Theorem 3.10 — coprime fixed-point order split across an invariant normal subgroup
@@ -43,6 +45,8 @@ Combining them yields the restrict-form split below.  The `MulDistribMulAction` 
 so the Thm 3.10 top-level (stated for `MulDistribMulAction H M`) can invoke Prop 1.5(d)'s
 `MulAut`-framework infra directly.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03g
 

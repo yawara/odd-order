@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCanonicalInvariantPreimage
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceGeometry
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCanonicalInvariantPreimage
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceGeometry
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
 
 /-!
 # Higman's Lemma 13: invariant graph preimages
@@ -19,6 +21,8 @@ existing factor image, the graph is nonzero, meets that image trivially, and
 does not complement it.  Its canonical Frattini preimage is therefore an
 actual normal invariant type-A factor of restricted `ξ`-length two.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

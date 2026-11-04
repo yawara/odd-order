@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CentralCommutatorPower
-import OddOrder.GroupTheory.CentralProduct
-import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
+module
+
+public import OddOrder.GroupTheory.CentralCommutatorPower
+public import OddOrder.GroupTheory.CentralProduct
+public import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
 
 /-!
 # Isaacs Problem 5A.8(b) — 互いに素な直積の Schur 乗数
@@ -48,6 +50,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 5A.8(b) (書籍 p. 153
 `⁅x,y⁆ ^ |A| = ⁅x ^ |A|, y⁆ = 1` (中心元との交換子は自明)。同様に `⁅x,y⁆ ^ |B| = 1`。
 位数が `|A|` と `|B|` の両方を割るので coprime から `⁅x,y⁆ = 1`。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.FormalCollection
+module
+
+public import OddOrder.GroupTheory.FormalCollection
 
 /-!
 # The Hall–Petresco formula: the expanded word
@@ -28,6 +30,8 @@ a set `A` of slots sends `(g, j)` to `g` if `j ∈ A` and to `1` otherwise, so
 same size, which is what eventually forces the collected blocks to depend only
 on `|A|` and produces the binomial exponents by counting subsets.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

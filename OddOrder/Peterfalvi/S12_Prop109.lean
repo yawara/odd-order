@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_MaximalBasic
+module
+
+public import OddOrder.Peterfalvi.S12_MaximalBasic
 
 /-!
 # S12_Prop109
 
 Prefix-split from `OddOrder.Peterfalvi.S12_Props109To1011` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # S12_Props109To1011

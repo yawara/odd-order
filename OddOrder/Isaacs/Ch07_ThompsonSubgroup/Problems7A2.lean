@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Theorem131
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Theorem131
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
 
 /-!
 # Isaacs Problem 7A.2 — `SL(2,3)` の位数 `8` の正規部分群 (書籍 p. 209)
@@ -19,6 +21,8 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylo
 * 位数 `3` の元 `a = [[1,1],[0,1]]`, `b = [[1,0],[1,1]]` で `b ∉ ⟨a⟩`
   (書籍 hint の「`GL(n,q)` は Sylow `p`-部分群を 2 個以上持つ」を具体行列で実現する)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

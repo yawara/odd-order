@@ -1,6 +1,8 @@
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.GroupTheory.TISubset
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.GroupTheory.TISubset
 
 /-!
 # Peterfalvi (7.1)-(7.5) — TI-subset hypothesis, cardinality identity, family form
@@ -8,6 +10,8 @@ import OddOrder.GroupTheory.TISubset
 Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
 issue 0103).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §9: Non-existence of a Certain Type of Group of Odd Order

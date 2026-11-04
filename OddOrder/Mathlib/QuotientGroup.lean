@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Coset.Card
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import Mathlib.GroupTheory.Coset.Card
+public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # Injectivity of the maps induced on subgroup quotients
@@ -41,6 +43,8 @@ proved directly from `QuotientGroup.map`, whose kernel here is *definitionally*
 through it the induction of Bender–Glauberman Theorem 6.4 (see issue 3026), which must carry
 the hypothesis "`(G/G₀)/F(G/G₀)` is nilpotent" from `G` to a subgroup `S ≤ G`.
 -/
+
+@[expose] public section
 
 namespace QuotientGroup
 

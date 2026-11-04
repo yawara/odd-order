@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.Data.SetLike.Fintype
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SchurZassenhaus
+public import Mathlib.Data.SetLike.Fintype
+public import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # O_π(G): the π-residual / largest normal π-subgroup (definitional skeleton)
@@ -30,6 +32,8 @@ mathlib (re-checked at v4.34.1) does not define `O_π` for prime sets; this file
 foundational definitions.  Stronger lemmas (Sylow decomposition of `opPi`,
 disjointness with `opPi πᶜ`, etc.) are deferred to follow-up commits.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

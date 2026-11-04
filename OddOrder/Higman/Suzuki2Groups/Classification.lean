@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthBound
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthBound
 
 /-!
 # Higman's classification of Suzuki 2-groups
@@ -25,6 +27,8 @@ so the existence or nonexistence of a three-step chain completes the
 length dichotomy.  Higman closes the proof on p. 93 with “Thus Lemma 13 is
 proved, and with it, the main theorem.”
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
-import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.Algebra.Group.Commutator
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.BG.Ch1_Preliminary.PLength
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.Algebra.Group.Commutator
 
 /-!
 # BG §6 — additional lemmas: the opening blocks (conjugation bridges + Lem 6.3)
@@ -21,6 +23,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S06
 

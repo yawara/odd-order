@@ -1,15 +1,17 @@
-import OddOrder.Peterfalvi.S14_MaximalI
-import OddOrder.Peterfalvi.S07_Subcoherent
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.Peterfalvi.S09_CertificateDischarge
-import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.Algebra.GaloisRationalInteger
-import OddOrder.GroupTheory.TISubsetCounting
-import Mathlib.Algebra.BigOperators.ModEq
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S10_CoherenceWiring
+public import OddOrder.Peterfalvi.S09_CertificateDischarge
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+public import OddOrder.GroupTheory.WielandtFixedPoint
+public import OddOrder.Algebra.GaloisRationalInteger
+public import OddOrder.GroupTheory.TISubsetCounting
+public import Mathlib.Algebra.BigOperators.ModEq
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 
 /-!
 # SubcoherenceInputs
@@ -17,6 +19,8 @@ import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue
 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (13.1)-(13.2) — S,T hypothesis and basic structure

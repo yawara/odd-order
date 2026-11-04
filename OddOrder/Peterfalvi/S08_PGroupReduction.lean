@@ -3,10 +3,12 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBSeedGlue
-import OddOrder.Peterfalvi.S08_CoherenceCore
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBSeedGlue
+public import OddOrder.Peterfalvi.S08_CoherenceCore
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 /-!
 # Peterfalvi (6.5): reduction to a non-abelian `p`-group — `(6.8)` application
@@ -29,6 +31,8 @@ coherent ⟹ the bound), which is the remaining gate (via (6.2)).
 This leaf supplies the two odd-order side conditions and wires the **(6.8)(c1) Frobenius** reduction
 into the `SibleyDadeHypothesis` context, isolating `hbound` as the residual obligation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

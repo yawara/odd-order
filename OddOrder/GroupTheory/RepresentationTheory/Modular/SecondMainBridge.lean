@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SubgroupTruncation
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+module
+
+public import OddOrder.Algebra.SubgroupTruncation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
 
 /-!
 # Plumbing between the three group algebras of Navarro (5.2)
@@ -30,6 +32,8 @@ corresponding statement for an invariant lattice.
 * `OddOrder.RepresentationTheory.Modular.coe_latticeRepresentation_asAlgebraHom` — the lattice
   representation carries the restriction of the ambient group-algebra action
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

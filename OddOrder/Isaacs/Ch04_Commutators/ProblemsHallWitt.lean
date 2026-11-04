@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsNilpotencyClass
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsNilpotencyClass
 
 /-!
 # Isaacs Chapter 4 — Problems 4B.1 / 4B.4 (three subgroups lemma の応用)
@@ -25,6 +27,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 4B (書籍 p. 131)。
 ⚠ (b) は書籍が `X ⊴ G` を仮定するが, 実際には**不要** — `⁅X,Y⁆` が `X` で正規化される
 (`le_normalizer_commutator_left`) ことだけ使えばよい。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

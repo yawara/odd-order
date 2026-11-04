@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.Peterfalvi.S07_Subcoherent
-import OddOrder.Peterfalvi.S08_CoherenceWeighted
-import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S08_CoherenceWeighted
+public import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
 
 /-!
 # S11_SingleFactorCentralizer
@@ -14,6 +16,8 @@ import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
 Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (9.11): coherence of `𝒮(H₀C′)` — the maximality induction

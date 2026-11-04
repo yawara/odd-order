@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
-import OddOrder.BG.Ch1_Preliminary.S05b_Thm420Hall
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+public import OddOrder.BG.Ch1_Preliminary.S05b_Thm420Hall
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # BG Theorem 11.7: `M_σ A ⊴ M`
@@ -37,6 +39,8 @@ Theorem 11.5 / Corollary 11.6 を消費する単一定理 leaf。
     `[Q₀,Aᵢ] ⊴ M`。ゆえに `Q₀ ⊴ M`、`N_G(Q) ≤ N_G(Q₀) = M`。だが `Q` は `M` の
     Sylow `q` (Hall 連鎖) かつ `q ∉ σ(M)`、σ の定義に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S11
 

@@ -3,17 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Basic
-import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
-import OddOrder.Isaacs.Ch05_Transfer.NilpotentMaximal
-import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-import OddOrder.Isaacs.Ch05_Transfer.SylowTwoDirectFactor
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+public import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
+public import OddOrder.Isaacs.Ch05_Transfer.NilpotentMaximal
+public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+public import OddOrder.Isaacs.Ch05_Transfer.SylowTwoDirectFactor
 
 /-!
 # TAIL
 
 Prefix-split from `OddOrder.Isaacs.Ch05_Transfer.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 open scoped commutatorElement
 open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup/Monoid now scoped
 

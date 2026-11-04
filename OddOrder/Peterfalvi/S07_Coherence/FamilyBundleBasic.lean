@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
 
 /-!
 # Peterfalvi (5.6.1) — the character family bundle
@@ -8,6 +10,8 @@ The `CharacterFamilyBundle` layer and the (5.6.1) section.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory

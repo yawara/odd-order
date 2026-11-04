@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppA_PStabilityBasic
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.GroupTheory.GlaubermanZJ
+module
+
+public import OddOrder.BG.AppA_PStabilityBasic
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.GroupTheory.GlaubermanZJ
 
 /-!
 # BG Appendix A: p-Stability — Theorems A.4 and A.5
@@ -25,6 +27,8 @@ prefix-split 履歴 = issue 0103 第 2 パス → issue 0142 で A.3 クラス�
 * `OddOrder.BG.AppA.isPStableOp_of_odd_isSolvable` — Glauberman ZJ (Thm 2.10/2.11)
   の仮定形への bridge.
 -/
+@[expose] public section
+
 namespace OddOrder.BG.AppA
 open Representation Module Function LinearMap Submodule
 

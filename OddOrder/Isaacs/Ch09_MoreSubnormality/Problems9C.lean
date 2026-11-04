@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
-import Mathlib.GroupTheory.Abelianization.Defs
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
+public import Mathlib.GroupTheory.Abelianization.Defs
 
 /-!
 # Isaacs §9C の演習 (書籍 pp. 288-289)
@@ -47,6 +49,8 @@ normal で、非自明 (非自明な `p`-群の中心)。書籍 hint の核心�
 `V` について同じ議論で `Z ≤ K`、すなわち `1 ≠ Z ≤ D` が `G` に normal。`H ≠ K` なので
 `H` か `K` の一方は `⊤` より真に小さく、`NoNormalInSupergroup` に矛盾する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

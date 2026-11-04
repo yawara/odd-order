@@ -1,8 +1,10 @@
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Core
-import OddOrder.BG.Ch1_Preliminary.S03e_WeightSpan
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Core
+public import OddOrder.BG.Ch1_Preliminary.S03e_WeightSpan
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 
 /-!
 # BG Theorem 3.10(a): module core terminal (abelian kernel)
@@ -27,6 +29,8 @@ is `C_V(K) = 0`.  The prime-action condition then forces `|R|` prime via the key
 
 * `prime_card_of_abelian_frobenius_weight`
 -/
+
+@[expose] public section
 
 open Module
 open OddOrder.BG.Ch1.S03e OddOrder.RepresentationTheory

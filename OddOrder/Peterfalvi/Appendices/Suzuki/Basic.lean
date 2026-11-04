@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.GroupTheory.Sylow
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
-import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
-import OddOrder.GroupTheory.OddOrderInvolution
+module
+
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+public import OddOrder.GroupTheory.OddOrderInvolution
 
 /-!
 # Peterfalvi Part II: hypotheses (A1)–(A3) and Ch. I §1 Proposition 1
@@ -36,6 +38,8 @@ is in place.
 * (A3): `G` has 2-rank `≥ 2`, i.e. it contains an elementary abelian
   subgroup of order 4.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

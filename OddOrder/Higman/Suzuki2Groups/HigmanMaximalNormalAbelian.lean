@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanFinalCase
-import OddOrder.Higman.Suzuki2Groups.HigmanCoverPowerOverlap
-import OddOrder.Higman.Suzuki2Groups.HigmanCoverDerivedSeries
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanFinalCase
+public import OddOrder.Higman.Suzuki2Groups.HigmanCoverPowerOverlap
+public import OddOrder.Higman.Suzuki2Groups.HigmanCoverDerivedSeries
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Higman Lemma 9: maximal normal invariant abelian subgroups
@@ -31,6 +33,8 @@ from `Φ(P)` outside `A`. The square-commutator calculation puts
 `Φ(C)=A`. Lemmas 7 and 8 reduce to exponent two, after which maximality
 identifies `A` with the center and bounds the nilpotency class by two.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

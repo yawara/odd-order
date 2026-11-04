@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
-import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 
 /-!
 # Splitting `p`-modular systems
@@ -41,6 +43,8 @@ not posited.
 * `OddOrder.RepresentationTheory.Modular.natCard_rootsOfUnity_splittingSystem` — `μ_n(𝒪)` has
   exactly `n` elements
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

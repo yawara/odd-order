@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.LinearAlgebra.Dimension.Free
-import Mathlib.Data.ZMod.Units
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.FieldTheory.Finiteness
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.LinearAlgebra.Dimension.Free
+public import Mathlib.Data.ZMod.Units
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.FieldTheory.Finiteness
 
 /-!
 # The scalar character of a line (a `1`-dimensional `𝔽_p`-representation)
@@ -30,6 +32,8 @@ characters `φ : Fin (n+1) → (Ū →* (ZMod p)ˣ)`; this file is the bridge fr
 `𝔽_p`-module decomposition (each block a line) to that family.  It also generalizes the private
 homothety extraction of `ExtraspecialSinger` (route B, `|K| ∣ p − 1`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
-import OddOrder.GroupTheory.RepresentationTheory.SubgroupAverageTrace
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.SubgroupAverageTrace
 
 /-!
 # Dickson's theorem: `|G|_p` divides `Φ_φ(1)`
@@ -30,6 +32,8 @@ This is the arithmetic input of Navarro (3.8) (Osima): it is what makes the coef
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.8).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

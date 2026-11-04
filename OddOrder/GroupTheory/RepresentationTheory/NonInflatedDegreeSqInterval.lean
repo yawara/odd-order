@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # The kernel-interval degree-square sum `∑_{N ≤ ker χ, K ⊄ ker χ} χ(1)² = |G/N| − |G/K|`
@@ -22,6 +24,8 @@ Peterfalvi (9.11.3) consumes this for the quotient `HŪ/(H₀C)`: with `N = H₀
 equals `|HU/(H₀C)| − |HU/H| = p^q·u − u = u(p^q − 1)`, the character sum-of-squares of the (9.11.3)
 class equation.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

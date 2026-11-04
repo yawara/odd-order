@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFrattini
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFrattini
 
 /-!
 # Higman's Lemma 13: common Frattini coordinates in the exponent-two branch
@@ -21,6 +23,8 @@ Choosing the ambient coordinate before restricting to any pair is essential:
 the three pairwise applications of Higman's Lemma 12 must compare the
 parameters of the same length-two factors in one coordinate system.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

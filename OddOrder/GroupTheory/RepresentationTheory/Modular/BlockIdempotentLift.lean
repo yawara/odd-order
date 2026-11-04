@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BlockIdempotent
-import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+module
+
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 
 /-!
 # Block idempotents over `𝒪`
@@ -21,6 +23,8 @@ consumers only ever need one such idempotent per block.
 
 * `OddOrder.RepresentationTheory.Modular.exists_isIdempotentElem_blockCharacterPi_eq_single`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

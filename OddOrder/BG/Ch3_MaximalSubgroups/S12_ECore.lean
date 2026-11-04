@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
-import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.GroupTheory.PRank
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
+public import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # BG §12: The Subgroup `E` — 定義層 + 証明済みコア
@@ -35,6 +37,8 @@ Lem 12.2(a) / Lem 12.17 / Lem 12.19 / Lem 12.18 building block
 Import boundary: §12 mathematically sits after §11 (Prop 12.4 activates the
 exceptional-maximal setup; Thm 12.5 uses the §11 consequences under Hypothesis 11.1)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

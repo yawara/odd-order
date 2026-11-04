@@ -1,20 +1,22 @@
-import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
-import OddOrder.Peterfalvi.S10_CoherenceWiring
-import OddOrder.GroupTheory.CoprimeAction
-import OddOrder.GroupTheory.WielandtFixedPoint
-import OddOrder.GroupTheory.CoprimeFixedPoints
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-import OddOrder.Mathlib.SchurZassenhausConj
+module
+
+public import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+public import OddOrder.Peterfalvi.S10_CoherenceWiring
+public import OddOrder.GroupTheory.CoprimeAction
+public import OddOrder.GroupTheory.WielandtFixedPoint
+public import OddOrder.GroupTheory.CoprimeFixedPoints
+public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+public import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
+public import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Peterfalvi §11 — the Wielandt setup: opening layer
@@ -22,6 +24,8 @@ import OddOrder.Mathlib.SchurZassenhausConj
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

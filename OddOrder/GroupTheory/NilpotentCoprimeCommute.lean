@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # Coprime-order elements of a finite nilpotent group
@@ -21,6 +23,8 @@ originally written as a helper for Bender--Glauberman Proposition 10.11(d) and l
 * `commute_of_coprime_orderOf_of_isNilpotent` — coprime-order elements of a finite nilpotent
   group commute.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

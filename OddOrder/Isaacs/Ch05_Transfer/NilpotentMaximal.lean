@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Abelianization.Defs
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # Isaacs Thm 5.24: nilpotent maximal subgroups of simple groups (p. 172)
@@ -42,6 +44,8 @@ Assume distinct primes `p ≠ q` divide `|H|`.
   `H ≤ G` whose `G`-normalizer lies in `H` is a full Sylow `p`-subgroup of `G`.
 - `OddOrder.Isaacs.Ch05.exists_isPGroup_of_isCoatom_of_isNilpotent`: **Isaacs Thm 5.24**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

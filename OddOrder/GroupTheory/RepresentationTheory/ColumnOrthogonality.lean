@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Second (column) orthogonality of irreducible characters, unconditional form
@@ -52,6 +54,8 @@ The diagonal case at `g = 1` is the **Burnside degree-sum identity**
 Reference issues: `issues/0027-peterfalvi-column-orthogonality-core.md`,
 `issues/0044-peterfalvi-s09-card-g0-lower-bound.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FiniteAbelian.Duality
-import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
-import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+module
+
+public import Mathlib.GroupTheory.FiniteAbelian.Duality
+public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 
 /-!
 # Gallagher's decomposition for a coprime abelian quotient (toward Isaacs 6.17)
@@ -58,6 +60,8 @@ the extension `χ` is supplied by `IsIrreducibleCharacter.exists_extension_of_fo
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, 6.16/6.17.
 * Peterfalvi §3 (1.7)(b); issue 9002 (G2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

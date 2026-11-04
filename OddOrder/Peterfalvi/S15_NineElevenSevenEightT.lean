@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_NineElevenStepsT
+module
+
+public import OddOrder.Peterfalvi.S15_NineElevenStepsT
 
 /-!
 # Peterfalvi (9.11.7)–(9.11.8) at `T` — the orthogonal-branch refutation (pp. 87–91)
@@ -23,6 +25,8 @@ The `T`-side mirror of `S15_NineElevenSevenEight.lean` (issue 2035 refuter-`T` c
   contradicting the no-pair clause.  Consumed by the (9.11.6) norm bound
   `nineElevenNormBoundT` (next brick).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

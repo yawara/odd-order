@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
 
 /-!
 # BG Theorem 15.7(e): the non-TI Fitting structure
@@ -38,6 +40,8 @@ is the assembly plus the two *quotient bridges* that convert the internal comple
 * `exponent_quotient_mf_eq_exponent_typeFData_U` — `exponent (M/M_F) = exponent U`;
 * `index_mf_subgroupOf_eq_card_kappaHall` — `[M : M_F] = |K|`.
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

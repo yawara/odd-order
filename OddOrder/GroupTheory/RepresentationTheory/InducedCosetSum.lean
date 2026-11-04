@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Induction of class functions as a sum over cosets (division-free)
@@ -61,6 +63,8 @@ every conjugate of a `p`-regular element, because conjugation preserves `p`-regu
 * `induceCoset_eq_induce` — agreement with `induce` when `|H|` is invertible
 * `induceCosetTerm_mk`, `induceCoset_apply` — computation rules
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.ClassFunction
 

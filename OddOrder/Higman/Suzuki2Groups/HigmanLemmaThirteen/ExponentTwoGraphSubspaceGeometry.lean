@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
 # Higman's Lemma 13: graph-subspace geometry
@@ -13,6 +15,8 @@ nonzero proper subspace of their sum.  It stays disjoint from every subspace
 disjoint from that sum, and cannot generate the ambient space together with
 such a subspace.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

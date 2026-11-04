@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Character
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+module
+
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # The central character of a class sum, read off the character
@@ -34,6 +36,8 @@ runs on.
 * `OddOrder.RepresentationTheory.Modular.sum_centralScalar_mul_character_eq_card_mul_coeff` —
   Burnside's class-multiplication formula
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

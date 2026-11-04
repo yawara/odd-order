@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the square fiber of a summand
@@ -24,6 +26,8 @@ This is the source counting `|{x ∈ X | x² = s}| = (q² − q)/(q − 1) = q`:
 fiber of the square map over a fixed involution `s` is a single `Q₀`-coset,
 supplied here through the unique-fiber corollary.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

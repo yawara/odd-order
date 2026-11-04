@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorAmbientInclusion
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorRange
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoScalarReparameterization
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorAmbientInclusion
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorRange
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoScalarReparameterization
 
 /-!
 # Higman Lemma 13: scalar alignment of a common pairwise factor
@@ -17,6 +19,8 @@ range.  Once their quotient eigenvalues are identified with one primitive
 Singer scalar, the two ambient inclusions differ only by a nonzero scalar
 reparameterization of the field coordinate.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

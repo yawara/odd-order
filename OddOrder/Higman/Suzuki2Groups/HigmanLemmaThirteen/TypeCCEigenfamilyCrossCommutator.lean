@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCCCrossZero
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCrossCommutatorInclusion
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCCCrossZero
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCrossCommutatorInclusion
 
 /-!
 # Higman's Lemma 13: cross commutators of type-C/C eigenfamily spans
@@ -18,6 +20,8 @@ the restricted-factor layer supplies them later.  The Jacobi argument kills
 every generator pair, bilinearity kills the image of both spans, and faithful
 scalar descent places the subgroup cross commutator in `Φ(P)²`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

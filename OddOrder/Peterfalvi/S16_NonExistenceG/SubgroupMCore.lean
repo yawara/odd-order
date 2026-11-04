@@ -1,7 +1,9 @@
-import OddOrder.Peterfalvi.S16_PairingBessel
-import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
-import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
-import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
+module
+
+public import OddOrder.Peterfalvi.S16_PairingBessel
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
 
 /-!
 # Peterfalvi (14.10)-(14.11) — the `M`-carrier and the norm-cascade/parity groundwork
@@ -12,6 +14,8 @@ the norm-cascade arithmetic, `main_size_bounds`, the `±1`-rigidity basis
 `β_M` expansion data.  Prefix-split from `SubgroupM.lean` (2000-line limit); the Frobenius-kernel
 and field-model layer stays in `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

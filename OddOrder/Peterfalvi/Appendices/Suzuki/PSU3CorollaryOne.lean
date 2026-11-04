@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
-import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
-import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 
 /-!
 # Peterfalvi Part II, Ch. IV §3, Corollary 1
@@ -40,6 +42,8 @@ This file supplies that isomorphism.
   `Hypothesis.nonempty_theoremAConclusion_psu3` — Corollary 1 in the shape Theorem A's
   conclusion takes: `O^{2′}(G)` with the standard `PSU(3, q)` action.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

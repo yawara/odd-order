@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Flat.TorsionFree
-import Mathlib.RingTheory.LocalRing.Module
+module
+
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.LocalRing.Module
 
 /-!
 # Finite torsion-free modules over a valuation ring are free
@@ -31,6 +33,8 @@ trace.
 
 * `OddOrder.free_of_isTorsionFree` — finite + torsion-free ⟹ free
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

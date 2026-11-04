@@ -3,17 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup
-import OddOrder.Peterfalvi.S15_HonestTypeP2A0
-import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup
+public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
 /-!
 # S15_SAndTDefs
 
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndTBasic` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # S15_SAndTBasic

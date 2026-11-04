@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
-import OddOrder.Peterfalvi.Appendices.SemilinearField
-import OddOrder.Algebra.QuadraticFrobenius
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+public import OddOrder.Peterfalvi.Appendices.SemilinearField
+public import OddOrder.Algebra.QuadraticFrobenius
 
 /-!
 # Peterfalvi Part II, Ch. III §3: the field `E = 𝐅_{q²}` on `S ⧸ Q₀`
@@ -45,6 +47,8 @@ hand.  Let `U ≤ S/Q₀` be `KW`-invariant.
   `|E| = q²` over which `Q ⧸ Z(Q)` is a line, together with the scalar
   realization `μ : K × W →* Eˣ` of the action.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

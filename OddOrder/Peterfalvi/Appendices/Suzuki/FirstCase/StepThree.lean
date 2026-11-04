@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.Peterfalvi.Appendices.Huppert
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Peterfalvi.Appendices.Huppert
 
 /-!
 # Peterfalvi Part II, Ch. II, step (3): the dimension identity for `M`
@@ -40,6 +42,8 @@ No `r ≠ p` hypothesis is needed — the identity is characteristic-free in
 As a corollary, `C_M(P) ≠ 1` for `M ≠ 1` — the book's opening Frobenius
 argument for `C_M(P) ≠ 0` is subsumed by the identity itself.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

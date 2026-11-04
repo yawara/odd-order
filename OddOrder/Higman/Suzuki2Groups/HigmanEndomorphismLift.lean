@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.StdBasis
-import OddOrder.GroupTheory.Homocyclic
+module
+
+public import Mathlib.LinearAlgebra.StdBasis
+public import OddOrder.GroupTheory.Homocyclic
 
 /-!
 # Higman Lemma 3: the one-minus-two endomorphism lift
@@ -17,6 +19,8 @@ modulo the square subgroup has the form one minus twice a genuine
 endomorphism. The square root is chosen only on a ZMod basis and extended
 linearly, so no incompatible elementwise choice is made.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

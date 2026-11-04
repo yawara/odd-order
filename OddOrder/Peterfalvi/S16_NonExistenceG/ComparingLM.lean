@@ -1,6 +1,8 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
-import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+public import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
 
 /-!
 # TAIL
@@ -8,6 +10,8 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
 Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory

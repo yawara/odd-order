@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.Basic
-import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
-import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
+module
+
+public import OddOrder.GroupTheory.GlaubermanZStar.Basic
+public import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
 
 /-!
 # Glauberman's `Z*`-theorem: the inductive reduction (Navarro (7.9), Steps 1–4)
@@ -31,6 +33,8 @@ order at most `n` in a fixed universe.
 * `OddOrder.GroupTheory.commutator_eq_one_of_mem_normal`
 * `OddOrder.GroupTheory.commutator_eq_one_of_center_ne_bot`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

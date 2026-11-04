@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppD_CNGroups.Basic
-import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
-import OddOrder.BG.AppD_CNGroups.SylowTI
+module
+
+public import OddOrder.BG.AppD_CNGroups.Basic
+public import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
+public import OddOrder.BG.AppD_CNGroups.SylowTI
 
 /-!
 # BG Appendix D: CN-Groups of Odd Order

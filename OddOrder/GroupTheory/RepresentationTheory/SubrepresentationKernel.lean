@@ -1,11 +1,15 @@
-import Mathlib.RepresentationTheory.Subrepresentation
-import OddOrder.Mathlib.Subgroup
+module
+
+public import Mathlib.RepresentationTheory.Subrepresentation
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # Subrepresentation kernel helpers
 
 Shared representation-theoretic kernel lemmas used by the odd-order formalization.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.RepresentationTheory
 

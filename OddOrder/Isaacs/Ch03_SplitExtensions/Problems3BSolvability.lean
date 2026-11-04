@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
+public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
 
 /-!
 # Isaacs Chapter 3 — Problems §3B (前半: 可解性の判定)
@@ -14,6 +16,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3 の章末演習 §3B
 **3B.1-3B.3** (極大部分群の素数冪指数 / abelian 因子の subnormal 列 / 合成因子と可解性)。
 残り (3B.4-3B.15) は [`Problems3B.lean`](Problems3B.lean) にある (本ファイルを import)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

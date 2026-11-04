@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
 
 /-!
 # The centre coordinate `Q₀ ≃ F`, at the level of `G`
@@ -28,6 +30,8 @@ book's coordinate form `b^{1+θ} = α + a^{-(1+θ)}`.
 * `Hypothesis.centerCoord_mul`, `Hypothesis.centerCoord_eq_zero_iff` — additivity, and
   that the coordinate vanishes exactly at `1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

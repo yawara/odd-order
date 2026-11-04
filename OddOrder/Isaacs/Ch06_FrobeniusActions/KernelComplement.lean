@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Isaacs Thm 6.7: self-centralizing normal subgroups are Frobenius kernels (p. 181)
@@ -26,6 +28,8 @@ nontrivial and `IsFrobeniusGroup.of_centralizer_kernel_le` (Thm 6.4 (4) ⇒ (1))
 
 - `OddOrder.Isaacs.Ch06.exists_isComplement'_of_centralizer_le`: **Isaacs Thm 6.7**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

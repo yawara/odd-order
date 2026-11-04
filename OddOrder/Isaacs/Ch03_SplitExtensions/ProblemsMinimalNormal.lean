@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # Isaacs Problem 3C.4 (書籍 p. 90) — 自己中心化極小正規部分群は分裂する
@@ -42,6 +44,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.4 の形式化
 - `exists_isComplement'_of_isMinimalNormal_centralizer_eq` — **Problem 3C.4 (分裂)**。
 - `isComplement'_conj_of_isMinimalNormal_centralizer_eq` — **Problem 3C.4 (補元の共役性)**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

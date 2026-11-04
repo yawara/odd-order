@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
 
 /-!
 # Higman Lemma 12: the mixed-term value (functional-equation core)
@@ -21,6 +23,8 @@ foundation: the `n` Frobenius powers are `F`-linearly independent (Artin), so th
 monomial coefficients `c_{ij}` are uniquely determined and the eigenvalue
 argument can extract them.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

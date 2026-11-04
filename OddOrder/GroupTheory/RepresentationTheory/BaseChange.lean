@@ -3,18 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
-import Mathlib.LinearAlgebra.TensorProduct.Basis
-import Mathlib.LinearAlgebra.TensorProduct.Tower
-import Mathlib.LinearAlgebra.TensorProduct.Pi
-import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-import Mathlib.RingTheory.Flat.Basic
-import Mathlib.RingTheory.Flat.Equalizer
-import Mathlib.LinearAlgebra.Dimension.Constructions
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RepresentationTheory.Invariants
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
+public import Mathlib.LinearAlgebra.TensorProduct.Basis
+public import Mathlib.LinearAlgebra.TensorProduct.Tower
+public import Mathlib.LinearAlgebra.TensorProduct.Pi
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Flat.Equalizer
+public import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # Scalar extension (base change) of group representations
@@ -40,6 +42,8 @@ of `F` and `V* = F* ⊗_F V`").
 The fixed-space / `C_V(R)` transfer lemmas (`C_V(R) = 0 ⟹ C_{V*}(R) = 0`, dimension invariance)
 build on this; see the `invariants` lemmas below.
 -/
+
+@[expose] public section
 
 open scoped TensorProduct
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BrauerHomomorphism
-import OddOrder.Algebra.ClassSum
-import OddOrder.GroupTheory.PGroupRelIndex
+module
+
+public import OddOrder.Algebra.BrauerHomomorphism
+public import OddOrder.Algebra.ClassSum
+public import OddOrder.GroupTheory.PGroupRelIndex
 
 /-!
 # The kernel of the Brauer homomorphism
@@ -35,6 +37,8 @@ of `G` with blocks of `N_G(P)`.
 * `OddOrder.GroupAlgebra.brauerProj_eq_zero_iff` — the kernel description.
 * `OddOrder.GroupAlgebra.brauerProj_eq_iff_sub_mem` — the Brauer quotient.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

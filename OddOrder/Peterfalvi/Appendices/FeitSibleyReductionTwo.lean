@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (2) machinery (pp. 146–147)
@@ -24,6 +26,8 @@ arithmetic:
 * `false_of_reduction_two_bounds`: the closing arithmetic
   `|S⧸S₁|·|Z(Q₁)|·(|Q₁|−2) < 4d²` versus `≥ 2(4d²−1)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

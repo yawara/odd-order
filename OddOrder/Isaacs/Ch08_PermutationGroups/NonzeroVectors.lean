@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Projectivization.Action
+module
+
+public import Mathlib.LinearAlgebra.Projectivization.Action
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: transitivity on nonzero vectors
@@ -29,6 +31,8 @@ The `SubMulAction` of a group on the nonzero vectors (generalizing mathlib's
 `Units.nonZeroSubMul` from `Rˣ` to an arbitrary group acting distributively)
 is general-purpose and written mathlib-compatibly for future upstreaming.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

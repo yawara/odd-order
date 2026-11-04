@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
 
 /-!
 # Higman's Lemma 13: commuting factors in the exponent-two branch
@@ -22,6 +24,8 @@ involution. If the factors commute, the quotient of those roots is an
 involution outside `Φ(P)`, contradicting that every ambient involution lies
 in the Frattini subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_TwoFamiliesParity
+module
+
+public import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 
 /-!
 # Peterfalvi (7.9) conclusion for a Frobenius family (pp. 41-42)
@@ -24,6 +26,8 @@ Together with the already-landed cross orthogonality `hypothesis79_zetaImage_cro
 this closes the (7.9) chain; the conclusion is the `hbeta_ne` input of the good-index
 estimates in the (7.10) `card_G0_lower_bound` assembly (issue 0044).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

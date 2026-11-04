@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Data.Set.Card
-import Mathlib.FieldTheory.Finite.Basic
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Data.Set.Card
+public import Mathlib.FieldTheory.Finite.Basic
 
 /-!
 # The affine "midpoint line" condition (C) and Glauberman–Norton Proposition 6
@@ -44,6 +46,8 @@ after normalizing `0, 1 ∈ S`, one shows `-2 ∈ S` and then derives a contradi
 of `4, -4` lies in `S`.  For `p = 5` this is not a separate case — there `-4 = 1`, so the first
 branch fires on the already-known point `1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Affine
 

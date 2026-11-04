@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
 
 /-!
 # Higman's Lemma 13: diagonal support of middle Frattini commutators
@@ -17,6 +19,8 @@ submodules onto the span of its supported generator values.  Applied to two
 type-B Frobenius eigenfamilies and the middle Frattini commutator, Higman's
 weight calculation restricts that support to the diagonal.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

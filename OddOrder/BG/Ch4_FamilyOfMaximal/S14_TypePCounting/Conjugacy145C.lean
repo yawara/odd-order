@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
 
 /-!
 # Conjugacy145C
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Theorem 14.4 / Lemma 14.5 — sigma-length one centralizers

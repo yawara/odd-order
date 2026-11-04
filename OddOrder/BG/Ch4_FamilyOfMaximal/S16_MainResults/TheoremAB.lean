@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
 
 /-!
 # BG §16 — Theorems A and B, the component layer
@@ -9,6 +11,8 @@ the TI-subset statement, tameness) and the `κ`/`σ`-complement bridging lemmas.
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
-import Mathlib.NumberTheory.Multiplicity
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+public import Mathlib.NumberTheory.Multiplicity
 
 /-!
 # Peterfalvi Part II, Ch. II, step (10): the two cases
@@ -34,6 +36,8 @@ so that `(|Q|+1)_p = p^{m+1}`.  This file formalizes that **arithmetic core**:
 The structural `|G|_p` computation and the case split are built on top of these
 in later sections.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

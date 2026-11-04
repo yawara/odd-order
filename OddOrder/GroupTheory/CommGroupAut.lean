@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelianLinear
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Exponent
-import Mathlib.Data.ZMod.Units
-import Mathlib.Data.ZMod.QuotientGroup
-import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.Tactic.NormNum.Prime
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelianLinear
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.Exponent
+public import Mathlib.Data.ZMod.Units
+public import Mathlib.Data.ZMod.QuotientGroup
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The automorphism group of a commutative group
@@ -34,6 +36,8 @@ Together: a finite abelian `A` with simple `Aut(A)` and an element of order `> 2
 * `OddOrder.GroupTheory.card_mulAut_eq_two_of_isSimpleGroup`
 * `OddOrder.GroupTheory.totient_exponent_le_card_mulAut`
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

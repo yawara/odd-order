@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
-import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 
 /-!
 # Cases (a) and (b) of Ch. III §1 give the conclusion of Theorem A
@@ -37,6 +39,8 @@ arbitrary subgroup with that carrier.
 * `Hypothesis.theoremAConclusion_of_orderFiveCarrier_subgroup` — the
   conclusion of Theorem A.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

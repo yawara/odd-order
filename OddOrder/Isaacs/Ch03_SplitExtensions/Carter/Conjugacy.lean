@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
-import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
 
 /-!
 # Isaacs Problem 3C.7(b) — Carter 部分群の共役性
@@ -37,6 +39,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
 - `exists_conj_sup_eq_sup_of_ih` — 上記 step 3。
 - `exists_conj_of_isCarterSubgroup` — **3C.7(b) 本体** (2 つの Carter 部分群は共役)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

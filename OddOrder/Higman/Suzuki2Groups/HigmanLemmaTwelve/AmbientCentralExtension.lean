@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
 
 /-!
 # Higman's Lemma 12: the ambient central extension
@@ -26,6 +28,8 @@ is nontrivial and actor-invariant, so transitivity puts every involution in it.
 Every nonidentity element of the elementary-abelian `Φ(P)` is an involution.
 The same involution argument puts `Φ(P)` in the center.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

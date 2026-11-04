@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CentralCharacterBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
+module
+
+public import OddOrder.Algebra.CentralCharacterBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 
 /-!
 # The block of an ordinary character
@@ -33,6 +35,8 @@ That makes "`χ ∈ B`" a genuine equation `blockOfLattice = B`, and combining i
 * `OddOrder.RepresentationTheory.Modular.apply_eq_zero_of_blockOfLattice_ne` — (3.13.a), `χ ∉ B`
 * `OddOrder.RepresentationTheory.Modular.apply_eq_id_of_blockOfLattice_eq` — (3.13.a), `χ ∈ B`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

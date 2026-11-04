@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
 
 /-!
 # Navarro (3.9): `Irr(B)` is a single connected component of the Brauer graph
@@ -34,6 +36,8 @@ the decomposition matrix of a block is not `(* 0; 0 *)`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.8), (3.9), (3.10).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

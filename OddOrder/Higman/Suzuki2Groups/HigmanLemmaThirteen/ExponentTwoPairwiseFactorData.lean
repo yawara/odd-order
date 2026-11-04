@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFrattini
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFrattini
 
 /-!
 # Higman's Lemma 13: prescribed factors inside an exponent-two pairwise join
@@ -20,6 +22,8 @@ complements inside the join.  Normality follows from `P' ≤ Φ(P)`, the
 intrinsic Frattini equality comes from the exponent-two branch, and the
 common field parameter is recovered from the common ambient involution set.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

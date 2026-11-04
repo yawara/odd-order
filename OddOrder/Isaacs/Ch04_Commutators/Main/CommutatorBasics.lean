@@ -1,14 +1,16 @@
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.Solvable
-import Mathlib.LinearAlgebra.Dual.Lemmas
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Mathlib.SemidirectProduct
-import OddOrder.Mathlib.Subgroup
-import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Mathlib.SemidirectProduct
+public import OddOrder.Mathlib.Subgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs §4A — Thm 4.7/4.8: maximal class p-群, Ω_r (pp. 113-122)
@@ -18,6 +20,8 @@ Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (direct
 §4A 前半 (identities + Lem 4.5/4.6) は `CommutatorIdentities.lean` へ prefix-split 済 (issue 0122)。
 -/
 
+
+@[expose] public section
 
 /-!
 # OddOrder.Isaacs.Ch04 — Commutators

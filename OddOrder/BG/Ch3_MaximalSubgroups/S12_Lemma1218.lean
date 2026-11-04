@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 
 /-!
 # BG §12: Lemma 12.18 — `τ₁`-elements against `M_α`
@@ -31,6 +33,8 @@ conjunct of (a) (the hard core), the part (b) reduction, and the assembled
 - `tau1_Malpha_centralizer_PQ_eq_bot`: (a) second conjunct `C_{M_α}(PQ) = 1`
 - `tau1_Malpha_interaction`: **BG Lemma 12.18**
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

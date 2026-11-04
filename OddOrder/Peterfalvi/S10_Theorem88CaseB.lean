@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import OddOrder.GroupTheory.TISubset
+module
+
+public import OddOrder.GroupTheory.MaximalSubgroupType
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.GroupTheory.TISubset
 
 /-!
 # Peterfalvi Section 10, Theorem (8.8) case (b) and result (8.9)
@@ -38,6 +40,8 @@ Proposition 16.1, Theorem B and Theorem C(3)"); it is discharged on the BG side 
 consumed through this datum.  (8.9), by contrast, carries a proof in the book, which
 is what this file formalises.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

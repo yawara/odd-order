@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
 
 /-!
 # BG §13: Theorem 13.9 (σ-disjointness) + Theorem 13.10 (`E₁` regular on `E₃`)
@@ -18,6 +20,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
 
 ともに 13.6 + 13.8 依存。`S13_Lemma138` の下流。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

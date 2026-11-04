@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.OpResidual
-import Mathlib.Algebra.Group.Subgroup.Pointwise
+module
+
+public import OddOrder.GroupTheory.OpResidual
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # `A`-invariant `π`-subgroup families `ℋ_H(A;π)` and `ℋ_H*(A;π)`
@@ -31,6 +33,8 @@ The pervasive single-prime form `ℋ_H*(A;q)` is `hInvariantStar H A {q}`, and B
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994),
   Chapter II §7 (pp. 55-60).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

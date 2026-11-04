@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Defs
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.LinearAlgebra.Quotient.Basic
-import OddOrder.Algebra.WordExpansion
+module
+
+public import Mathlib.Algebra.Algebra.Defs
+public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.LinearAlgebra.Quotient.Basic
+public import OddOrder.Algebra.WordExpansion
 
 /-!
 # The commutator span of an algebra is closed under `p`-th powers
@@ -24,6 +26,8 @@ of a single commutator is again a commutator.
 * `OddOrder.pow_mem_commutatorSpan` — `t ∈ T ⟹ t ^ p ∈ T`
 * `OddOrder.pow_pow_mem_commutatorSpan` — the same for every power `p ^ m`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

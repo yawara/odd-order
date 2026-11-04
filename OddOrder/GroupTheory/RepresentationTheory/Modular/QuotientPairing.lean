@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularQuotient
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+module
+
+public import OddOrder.GroupTheory.PRegularQuotient
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
 # Navarro's pairing under a quotient by a normal `p`-subgroup
@@ -27,6 +29,8 @@ the displayed computation on p. 137 behind `C_B = |P| C_B̄`.
 * `OddOrder.RepresentationTheory.Modular.sum_pRegular_quotient`
 * `OddOrder.RepresentationTheory.Modular.card_mul_pairingZero_quotient`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

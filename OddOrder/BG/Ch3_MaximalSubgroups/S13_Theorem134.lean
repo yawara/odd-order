@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 
 /-!
 # BG §13: Theorem 13.4 (the main step — `C_{M_σ}(P) ⊆ C_{M_σ}(R)`)
@@ -31,6 +33,8 @@ prime action 解析の中心。
 `uniform_exclusion` で sorry-free に。Theorem 13.4 全体が証明完了 (axiom-clean; sorryAx は §12
 scaffold [Cor 12.16 / Prop 12.15 / Thm 12.13] 由来のみ、Lane F 完成で自動 unconditional 化)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

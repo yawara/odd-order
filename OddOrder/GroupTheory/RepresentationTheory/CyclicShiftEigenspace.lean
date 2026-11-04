@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
 
 /-!
 # Eigenspaces of a cyclic shift (single-cycle core of BG (2.11))
@@ -24,6 +26,8 @@ to be exactly `1`.
 This is the per-orbit input to the pure-permutation eigenspace count yielding the keystone
 `dim E₀ = dim E_m + 1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

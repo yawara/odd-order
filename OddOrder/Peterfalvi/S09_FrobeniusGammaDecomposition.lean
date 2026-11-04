@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
-import OddOrder.Peterfalvi.S09_FrobeniusParity
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+public import OddOrder.Peterfalvi.S09_FrobeniusParity
 
 /-!
 # Frobenius-family Gamma decomposition (Peterfalvi 7.10)
@@ -16,6 +18,8 @@ sums of the other members.
 Textbook: Peterfalvi, Section 7, pp. 41-43.
 Coq comparison: PFsection7.v, CoherentFrobeniusPartition.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 
@@ -38,7 +42,7 @@ variable (C : Subgroup ↥(F.L i))
 variable (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
   ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
 
-private noncomputable abbrev localH78 :=
+noncomputable abbrev localH78 :=
   F.hypothesis78 i hodd hnilp C hFrob
 
 omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in

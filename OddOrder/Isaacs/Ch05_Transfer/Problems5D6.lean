@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Main
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Main
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
 
 /-!
 # Isaacs Problem 5D.6 — `A^p(G) ∩ P = P'` かつ `P'` 可換 (書籍 p. 170)
@@ -26,6 +28,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
    一意性 (`map_mulAut_of_normal_pcomplement`) から `A` に characteristic, `A ⊴ G` ゆえ `K ⊴ G`。
    `p ∤ |K|` と `|G:K| = |G:A|·|A:K|` が `p`-冪 ⟹ 結論。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceBasic
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceBasic
 
 /-!
 # Peterfalvi (6.8) setting: `Y`-set extensions restricted to the central commutator
@@ -22,6 +24,8 @@ Each result comes in a Frobenius (`_of_frobenius`) form and a certain-type case-
 mirror.  Split out of `S08_XBlockCounting` (issue 0189: the v4.34 bump left that file at 1490
 lines, against the 1500-line limit).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

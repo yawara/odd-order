@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Inertia
-import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Clifford
-import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Frobenius irreducibility of induced characters ([Is] Theorem 6.34)
@@ -37,6 +39,8 @@ constituents live in `Irr G`, and that every constituent has the common degree `
 * I. M. Isaacs, *Finite Group Theory* (AMS GSM 92), Theorem 6.34.
 * Peterfalvi, *Character Theory for the Odd Order Theorem*, §6 (used in the proof of (6.8)).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

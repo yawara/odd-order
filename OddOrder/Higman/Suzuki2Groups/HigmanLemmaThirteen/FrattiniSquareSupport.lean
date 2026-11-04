@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman's Lemma 13: support of Frattini-square commutators
@@ -18,6 +20,8 @@ Higman's two-power congruence therefore forces a nonzero square-valued
 commutator to pair equal Frobenius indices, and its output has that same
 index in the square layer.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

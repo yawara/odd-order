@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S15_SAndTDefs
+module
+
+public import OddOrder.Peterfalvi.S15_SAndTDefs
 
 /-!
 # Peterfalvi (14.6) — trapping the case-A Sylow center
@@ -10,6 +12,8 @@ Sylow maximality then identifies `C_R(x)` with `R₀`, and traps `Z(R)` in `R₀
 
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

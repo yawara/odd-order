@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.RegularWreathProduct
-import Mathlib.Data.ZMod.Basic
+module
+
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # Isaacs §3A: general wreath product over a `G`-set (pp. 73-76)
@@ -20,6 +22,8 @@ mathlib は **regular** wreath product (`Ω = Q` の左正則作用, `D ≀ᵣ Q
 ミラー (upstream しやすい形). `wreathEquivRegular` で `Ω = Q` (左正則作用) の場合が
 mathlib の `D ≀ᵣ Q` と同型であることを記録する.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

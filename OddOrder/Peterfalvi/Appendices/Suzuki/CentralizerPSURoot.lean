@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
-import OddOrder.GroupTheory.SylowTransport
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.GroupTheory.SylowTransport
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the PSU centralizer root group
@@ -36,6 +38,8 @@ standard Weyl element.
 T. Peterfalvi, *Character Theory for the Odd Order Theorem*, Part II,
 Chapter I section 3, Proposition 1(c), pp. 105--106.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

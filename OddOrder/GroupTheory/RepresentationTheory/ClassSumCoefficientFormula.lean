@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 
 /-!
 # Character Formula for Class-Sum Coefficients
@@ -13,6 +15,8 @@ This module records the class-sum structure-constant formula used in BG Appendix
 Lemma C.2.  It sits downstream of both the central-character algebra and the public
 column orthogonality theorem, avoiding an import cycle in `ClassSumAlgebra`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelian
-import Mathlib.GroupTheory.Frattini
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
-import Mathlib.GroupTheory.Subgroup.Center
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.Algebra.Group.Commutator
-import Mathlib.Algebra.Group.Subgroup.Order
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import Mathlib.GroupTheory.Frattini
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+public import Mathlib.GroupTheory.Subgroup.Center
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.Algebra.Group.Commutator
+public import Mathlib.Algebra.Group.Subgroup.Order
 
 /-!
 # Frattini Subgroup of a finite p-group
@@ -44,6 +46,8 @@ BG §1 Lemma 1.7 は Frattini 部分群 `Φ(R)` の 4 つの基本性質を述�
 * BG, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), Lemma 1.7.
 * Gorenstein, _Finite Groups_ (1968), Theorem 5.1.3, p. 174.
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup is now scoped

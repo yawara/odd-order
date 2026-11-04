@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FiniteAbelian.Basic
-import Mathlib.LinearAlgebra.Matrix.Adjugate
-import Mathlib.RingTheory.Ideal.Quotient.Defs
+module
+
+public import Mathlib.GroupTheory.FiniteAbelian.Basic
+public import Mathlib.LinearAlgebra.Matrix.Adjugate
+public import Mathlib.RingTheory.Ideal.Quotient.Defs
 
 /-!
 # Annihilators of modules with finite-index ideal multiples
@@ -31,6 +33,8 @@ ideal, and suppose `A` and `U` are finitely generated as additive groups and
 (`Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul`) は
 `m = 1` の特殊形のみなので独立に証明する。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

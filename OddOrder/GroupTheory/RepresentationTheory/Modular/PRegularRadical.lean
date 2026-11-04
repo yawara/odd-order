@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.Basic
-import OddOrder.Algebra.CommutatorSpan
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
-import Mathlib.LinearAlgebra.Dimension.Constructions
+module
+
+public import Mathlib.FieldTheory.Finite.Basic
+public import OddOrder.Algebra.CommutatorSpan
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
+public import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # Group elements and their `p'`-parts agree in the `p`-radical
@@ -22,6 +24,8 @@ group algebra this means `g - g_{p'}` lies in the `p`-radical `T'` of the commut
 * `OddOrder.GroupTheory.exists_pow_prime_pow_eq_pRegularPart`
 * `OddOrder.RepresentationTheory.Modular.single_sub_single_pRegularPart_mem`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

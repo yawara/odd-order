@@ -3,34 +3,38 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Int.ModEq
-import Mathlib.Data.Nat.ModEq
-import Mathlib.Data.Set.Card
-import Mathlib.Data.Set.Card.Arithmetic
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.GroupTheory.FixedPointFree
-import Mathlib.GroupTheory.GroupAction.Basic
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.GroupTheory.GroupAction.FixedPoints
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.NumberTheory.Multiplicity
-import Mathlib.SetTheory.Cardinal.Finite
-import OddOrder.GroupTheory.SemiDihedral
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+module
+
+public import Mathlib.Data.Int.ModEq
+public import Mathlib.Data.Nat.ModEq
+public import Mathlib.Data.Set.Card
+public import Mathlib.Data.Set.Card.Arithmetic
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.GroupTheory.FixedPointFree
+public import Mathlib.GroupTheory.GroupAction.Basic
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.GroupTheory.GroupAction.FixedPoints
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import Mathlib.Algebra.Group.Subgroup.Finite
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.NumberTheory.Multiplicity
+public import Mathlib.SetTheory.Cardinal.Finite
+public import OddOrder.GroupTheory.SemiDihedral
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Frobenius action basics, Lemma 6.5 TI counting,
 subgroup-partition helper (pp. 177-183)
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 
@@ -367,18 +371,18 @@ structure SubgroupPartition (G : Type*) [Group G] where
 
 namespace SubgroupPartition
 
-private theorem finite_subgroups_of_finite {G : Type*} [Group G] [Finite G] :
+theorem finite_subgroups_of_finite {G : Type*} [Group G] [Finite G] :
     Finite (Subgroup G) :=
   Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
 
-private noncomputable def subgroupsOfCard (G : Type*) [Group G] [Finite G] (n : ℕ) :
+noncomputable def subgroupsOfCard (G : Type*) [Group G] [Finite G] (n : ℕ) :
     Finset (Subgroup G) := by
   classical
   haveI : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
   haveI : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
   exact Finset.univ.filter fun H => Nat.card H = n
 
-private theorem mem_subgroupsOfCard {G : Type*} [Group G] [Finite G] {n : ℕ}
+theorem mem_subgroupsOfCard {G : Type*} [Group G] [Finite G] {n : ℕ}
     {H : Subgroup G} :
     H ∈ subgroupsOfCard G n ↔ Nat.card H = n := by
   classical

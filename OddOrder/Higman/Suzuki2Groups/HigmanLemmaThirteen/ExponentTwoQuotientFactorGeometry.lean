@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorQuotientRange
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorQuotientRange
 
 /-!
 # Higman Lemma 13: factor geometry in the Frattini quotient
@@ -20,6 +22,8 @@ linear range API.
 The optional full-geometry versions also retain that the three quotient
 factors span the whole Frattini quotient.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

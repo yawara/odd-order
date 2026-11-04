@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_EigenvalueCombinatorics
+module
+
+public import OddOrder.BG.AppE_EigenvalueCombinatorics
 
 /-!
 # BG `(E.23)`: the `β`-eigenvalue supply from the 2-step centralizer hypothesis
@@ -30,6 +32,8 @@ centrality of `Hₐ₊₁/Hₐ₊₂` (`chain_map_le_center`).
 Throughout, `H a` abbreviates the chain `iterCommutator T ⊤ a` (`H 0 = T`,
 `H (a+1) = ⁅H a, ⊤⁆`; for BG's `S`, `H a = γₐ₊₁(S)` by `(E.8)`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

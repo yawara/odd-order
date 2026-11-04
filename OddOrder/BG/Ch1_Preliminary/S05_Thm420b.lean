@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import Mathlib.GroupTheory.Sylow
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # BG §4: Theorem 4.20(b) — characteristic subgroups of a Sylow inside `S'` are `G`-normal
@@ -35,6 +37,8 @@ Write `F := F(G)`, `p` the prime with `S` a Sylow `p`-subgroup, `TG := T`-inside
    the nilpotent `F` (`le_opCore_of_isPGroup_of_le_fitting`).
 6. `⊤ = N_G(S) ⊔ F ≤ N_G(TG)`, so `N_G(TG) = ⊤`, i.e. `TG ⊴ G`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S05
 

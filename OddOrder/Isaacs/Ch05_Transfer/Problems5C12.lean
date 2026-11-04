@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C11
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C11
 
 /-!
 # Isaacs Problem 5C.12 — 巡回 Sylow と指数が `p` で割れる正規部分群 (p. 164)
@@ -27,6 +29,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C11
 ⭐ `N` が完全群 (`N = N'`) の場合も込みで一様に効くのがこの論法の要点。`N` 自身に Thm 5.17 を
 当てるだけでは (完全群では `|N:N'| = 1` ゆえ) 何も出ない — `P` 全体を含む `Y = NP` に上げるのが鍵。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

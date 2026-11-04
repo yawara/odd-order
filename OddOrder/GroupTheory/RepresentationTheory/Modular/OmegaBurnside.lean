@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # Navarro (4.19): the character formula for `|Ω_{K,L}|`
@@ -30,6 +32,8 @@ statement holds over the splitting field with no valuation bookkeeping.
 * `OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul` — with the
   `p`-part cancelled
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

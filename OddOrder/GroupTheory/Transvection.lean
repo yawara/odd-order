@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.Equiv.Basic
-import Mathlib.Tactic.Abel
-import Mathlib.Tactic.Module
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.LinearAlgebra.Matrix.Transvection
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
-import Mathlib.LinearAlgebra.Dimension.Free
+module
+
+public import Mathlib.Algebra.Module.Equiv.Basic
+public import Mathlib.Tactic.Abel
+public import Mathlib.Tactic.Module
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.LinearAlgebra.Matrix.Transvection
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
+public import Mathlib.LinearAlgebra.Dimension.Free
 
 /-!
 # Transvections, coordinate-free
@@ -48,6 +50,8 @@ subgroups by the points of the action — here the non-zero vectors — and requ
 
 Iwasawa, *Über die Einfachheit der speziellen projektiven Gruppen* (1941).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

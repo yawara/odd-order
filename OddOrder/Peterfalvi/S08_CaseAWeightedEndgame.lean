@@ -3,8 +3,10 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
-import OddOrder.Peterfalvi.S08_CoherenceCore
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+public import OddOrder.Peterfalvi.S08_CoherenceCore
 
 /-!
 # Peterfalvi §6.8.3 — case-(A) norm-weighted endgame
@@ -26,6 +28,8 @@ feeds the norm-weighted (5.6) bound `xSum_le_two_psi_caseB`, a column break feed
 (`centralCommutator_card_subgroupOf_lower_c2_caseA`, `W₁` FPF on `Z`), the arithmetic core
 `false_of_centralCommutator_break_arith` yields a contradiction.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

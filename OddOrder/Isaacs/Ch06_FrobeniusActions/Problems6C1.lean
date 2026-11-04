@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # Isaacs Problem 6C.1(a) — 素数位数の固定点自由な自己同型 (書籍 p. 197)
@@ -17,6 +19,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 書籍の (b) 「位数 `4` では冪零でない例 (`|G| = 75`) がある」は別 leaf で扱う。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.IsolatedInvolution
-import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+module
+
+public import OddOrder.GroupTheory.IsolatedInvolution
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # Glauberman's `Z*`-theorem: the statement and how its hypothesis travels
@@ -28,6 +30,8 @@ of an image divides the order of the element.  That is exactly why (7.8) is prov
 * `OddOrder.GroupTheory.odd_orderOf_commutator_subgroup` — the hypothesis inside `H ≤ G`
 * `OddOrder.GroupTheory.odd_orderOf_commutator_quotient` — the hypothesis inside `G ⧸ N`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 
 /-!
 # `IBr(G)` is indexed by the `p`-regular classes
@@ -25,6 +27,8 @@ one-sided inverse is two-sided and `[Φ_θ, φ]⁰ = δ_{θφ}` follows.
 * `OddOrder.RepresentationTheory.Modular.equivPRegularClass`
 * `OddOrder.RepresentationTheory.Modular.pRegularRep` and its two characterising lemmas
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

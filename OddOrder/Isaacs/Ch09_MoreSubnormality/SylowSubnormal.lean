@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IsSubnormal
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.IsSubnormal
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # Isaacs Ch. 9 — Lemma 9.31: Sylow subgroups meet subnormal subgroups in Sylow subgroups (p. 291)
@@ -37,6 +39,8 @@ normal 段は第二同型定理の指数版:
 (`inf_relIndex_left`, `relIndex_sup_left`, `relIndex_mul_relIndex`,
 `relIndex_dvd_index_of_le`) で組む。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

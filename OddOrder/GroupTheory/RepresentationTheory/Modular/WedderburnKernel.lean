@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 
 /-!
 # The kernel of an ordinary irreducible, and Navarro's objective
@@ -37,6 +39,8 @@ This file turns the character-theoretic conclusion into that subgroup:
 * `OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_character_eq` — Navarro's
   objective, packaged as the subgroup
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

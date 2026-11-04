@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Lagrange
-import Mathlib.LinearAlgebra.Eigenspace.Basic
-import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
-import Mathlib.Algebra.DirectSum.LinearMap
-import OddOrder.Algebra.LagrangeInterpolationRing
-import OddOrder.Algebra.ValuationRingFreeModule
+module
+
+public import Mathlib.LinearAlgebra.Lagrange
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+public import Mathlib.Algebra.DirectSum.LinearMap
+public import OddOrder.Algebra.LagrangeInterpolationRing
+public import OddOrder.Algebra.ValuationRingFreeModule
 
 /-!
 # Diagonalisability from a split squarefree annihilating polynomial
@@ -43,6 +45,8 @@ That is what makes Brauer characters well defined.
 * `OddOrder.trace_eq_sum_finrank_smul` — over a valuation ring, the trace is the sum of the
   eigenvalues weighted by the ranks of the eigen-submodules
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

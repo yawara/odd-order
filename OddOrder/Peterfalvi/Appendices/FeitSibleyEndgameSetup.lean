@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.OddOrderInvolution
-import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
+module
+
+public import OddOrder.GroupTheory.OddOrderInvolution
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 
 /-!
 # Feit–Sibley — endgame: setup layer
@@ -13,6 +15,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

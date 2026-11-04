@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.LinearAlgebra.Projectivization.Cardinality
-import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+module
+
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.LinearAlgebra.Projectivization.Cardinality
+public import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
 /-!
 # Peterfalvi Part II, Chapter I §3, Lemma 1 — the `PSL(2,q)` target
@@ -18,6 +20,8 @@ This file discharges the target-group inputs to Lemma 1 when the normal
 subgroup supplied by Theorem A is `PSL(2,q)` in its standard action on the
 projective line, with `q` a power of two and `q > 2`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

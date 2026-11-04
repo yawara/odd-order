@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Metacyclic Groups
@@ -43,6 +45,8 @@ mathlib (v4.34.1 で再確認) にはこの概念 (∃ cyclic normal `N ⊴ G` �
 Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確定.
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

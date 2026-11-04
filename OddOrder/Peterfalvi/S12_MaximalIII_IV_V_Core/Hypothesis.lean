@@ -1,9 +1,11 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
-import OddOrder.Peterfalvi.S05_SigmaTrichotomy
-import OddOrder.Peterfalvi.S08_CaseBEndgame
-import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
-import Mathlib.GroupTheory.IsPerfect
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+public import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
+public import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+public import OddOrder.Peterfalvi.S08_CaseBEndgame
+public import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
+public import Mathlib.GroupTheory.IsPerfect
 
 /-!
 # Peterfalvi (10.1) — type III/IV/V hypothesis + §5/§6 bridge prerequisites
@@ -11,6 +13,8 @@ import Mathlib.GroupTheory.IsPerfect
 Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split,
 issue 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S12
 
 open OddOrder.GroupTheory

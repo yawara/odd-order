@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupIdentification
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupIdentification
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: `Q` in the unitary coordinates of `PSU(3, q)`
@@ -32,6 +34,8 @@ that its hypotheses are exactly what Ch. III §3 and §3 (3) have already produc
 * `Hypothesis.nonempty_mulEquiv_rootGroup` — `Q ≅ RootGroup q`, the unipotent group of
   `PSU(3, q)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

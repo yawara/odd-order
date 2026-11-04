@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
-import OddOrder.GroupTheory.PGroupRelIndex
+module
+
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+public import OddOrder.GroupTheory.PGroupRelIndex
 
 /-!
 # Isaacs Ch. 9 — §9D: Bartels の定理 (9.28) (pp. 290-293)
@@ -35,6 +37,8 @@ Lem 9.31 は [`SylowSubnormal`](SylowSubnormal.lean)。
 
 最後に `|G|` の強帰納法で `BartelsIH` を供給して `strongClosure_isSubnormal` を得る。
 -/
+
+@[expose] public section
 
 universe u
 

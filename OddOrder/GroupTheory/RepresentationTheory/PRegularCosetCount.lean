@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
+module
+
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 
 /-!
 # Counting conjugates into the coset `uP`
@@ -34,6 +36,8 @@ Both are statements about `conjugateCount`, so they combine with
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.6 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

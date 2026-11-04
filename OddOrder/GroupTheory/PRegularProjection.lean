@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularCosetSubgroup
+module
+
+public import OddOrder.GroupTheory.PRegularCosetSubgroup
 
 /-!
 # The `p'`-part map on an elementary subgroup is a homomorphism
@@ -34,6 +36,8 @@ The point of this file is that no nilpotent-group Sylow decomposition is needed 
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.15) (p. 28).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

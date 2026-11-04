@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-import OddOrder.GroupTheory.CoprimeFixedPoints
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+public import OddOrder.GroupTheory.CoprimeFixedPoints
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the standing hypothesis and step (1)'s discriminators
@@ -90,6 +92,8 @@ element of `Q − Q₀` does *not* square to `1`.
   centralizer quotient on §4's ambient hypotheses alone**: both standing bundles and the
   numerics of `exists_standardModel`, with no residual hypothesis about the quotient.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

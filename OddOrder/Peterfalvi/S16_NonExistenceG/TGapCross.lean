@@ -1,6 +1,8 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
-import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
+public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 
 /-!
 # Peterfalvi (14.9): assembly of the S/T gap identity
@@ -14,6 +16,8 @@ the claimed equality follows formally.  The only subtlety is that the
 class-function inner product is Hermitian; integrality makes it symmetric
 on virtual characters.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

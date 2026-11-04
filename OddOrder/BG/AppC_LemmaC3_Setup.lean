@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_FrobeniusBasics
+module
+
+public import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3: the transported configuration
@@ -22,6 +24,8 @@ Everything here is stated against the book's abstract hypotheses
 (`OddOrder.BG.AppC.FieldNormalizerData` = (A) + (B)); nothing refers to the Peterfalvi Section 16
 configuration, which supplies one instance of (B) along the Feit--Thompson spine (issue 0151).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

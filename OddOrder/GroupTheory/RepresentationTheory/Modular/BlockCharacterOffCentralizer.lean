@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 
 /-!
 # A central character of `H` only sees the coefficients on `C_G(P)`
@@ -30,6 +32,8 @@ coefficients on `C_G(P)`:
 * `OddOrder.RepresentationTheory.Modular.pi_classSum_subgroup_eq_zero_of_notMem_centralizer`
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_eq_of_coeff_eq_on_centralizer`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

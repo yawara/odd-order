@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 
 /-!
 # BG §12: Theorem 12.12 — three-case assembly
@@ -25,6 +27,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 素数はすべて `|E|` を割る (`p ∉ σ(M)` ゆえ `p ∤ |M_σ|`、かつ `pRank_M = 2` から `p ∣ |M|`) ので、
 素数性は `Nat.prime_of_mem_primeFactors` で自動的に得られる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 
 /-!
 # The generalized decomposition numbers at `x⁻¹`, read inside `C_G(x)`
@@ -34,6 +36,8 @@ function `y ↦ χ(x⁻¹ y)` is a class function of `C_G(x)`, so it has a uniqu
   hypothesis `hdinv` of (5.13)(b)
 * `OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumberInv_eq_cartanMatrix`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

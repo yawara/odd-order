@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Nat.Choose.Sum
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
+module
+
+public import Mathlib.Data.Nat.Choose.Sum
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.8(d): 正則 wreath product の冪零類
@@ -39,6 +41,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.8(d) (書籍 p. 124
 上界は `Δ ∘ T_p = 1` から, 下界は `f = δ₁ c` で `T_p f = const c` かつ
 `c^{p^{n-1}} ≠ 1` から出る。群環や加群を構成せずに済むのが要点。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

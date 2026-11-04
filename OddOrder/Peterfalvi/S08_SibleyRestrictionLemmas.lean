@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_XBlockCounting
+module
+
+public import OddOrder.Peterfalvi.S08_XBlockCounting
 
 /-!
 # Peterfalvi §8 — Sibley–Dade restriction/extension: opening layer
@@ -11,6 +13,8 @@ import OddOrder.Peterfalvi.S08_XBlockCounting
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory

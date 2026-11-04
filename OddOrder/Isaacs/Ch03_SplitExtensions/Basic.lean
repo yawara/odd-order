@@ -3,25 +3,29 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.Frattini
-import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.Solvable
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Mathlib.Subgroup
-import OddOrder.Mathlib.SchurZassenhausConj
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
-import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+module
+
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.Frattini
+public import Mathlib.GroupTheory.SchurZassenhaus
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.Solvable
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Mathlib.Subgroup
+public import OddOrder.Mathlib.SchurZassenhausConj
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
+public import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # Basic
 
 Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # OddOrder.Isaacs.Ch03 — Split Extensions

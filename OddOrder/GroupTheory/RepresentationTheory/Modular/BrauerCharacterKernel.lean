@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.RootsOfUnitySum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+module
+
+public import OddOrder.Algebra.RootsOfUnitySum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 
 /-!
 # A Brauer character attains its degree only on its kernel
@@ -27,6 +29,8 @@ the representation is not used — the statement holds for any finite-dimensiona
 * `OddOrder.RepresentationTheory.Modular.eq_one_of_brauerCharacter_eq_finrank`
 * `OddOrder.RepresentationTheory.Modular.rep_eq_one_iff_brauerCharacter_eq`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

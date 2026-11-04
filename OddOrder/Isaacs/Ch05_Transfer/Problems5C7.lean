@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.NormNum.Prime
-import OddOrder.GroupTheory.CyclicSylowBurnside
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
+module
+
+public import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.GroupTheory.CyclicSylowBurnside
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
 
 /-!
 # Isaacs Problem 5C.7 — `|G| = 3^a · 5 · 11` なら Sylow-3 は正規 (p. 163)
@@ -24,6 +26,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
 (ここでは `p = 5, 11` で最小ではない) ので、一般形
 `OddOrder.GroupTheory.normalizer_le_centralizer_of_coprime_totient` (issue 9210) を使う。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
+module
+
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 
 /-!
 # Navarro (3.13.a): a block idempotent acts as `0` or `1`
@@ -33,6 +35,8 @@ upgrade is what Navarro (5.7) uses to know `M f_B = 0`.
 * `OddOrder.RepresentationTheory.Modular.apply_eq_id_of_reduce_centralScalar_ne_zero` —
   (3.13.a), the `χ ∈ B` half
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAlignedMixedTermCancellation
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseMixedTermAmbientBridge
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAlignedMixedTermCancellation
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseMixedTermAmbientBridge
 
 /-!
 # Higman Lemma 13: ambient bracket cancellation after factor alignment
@@ -22,6 +24,8 @@ the sum of the two mixed terms into the ambient bracket of the sum of the
 left vectors.  Injectivity of the ambient centre coordinate then proves that
 this bracket itself vanishes on the whole common-factor family.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

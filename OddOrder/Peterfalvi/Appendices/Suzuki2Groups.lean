@@ -3,24 +3,26 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismClassification
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBIsomorphicSplit
+module
+
+public import OddOrder.Higman.Suzuki2Groups
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismClassification
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBIsomorphicSplit
 
 /-!
 # Peterfalvi Appendix III: On Suzuki 2-Groups

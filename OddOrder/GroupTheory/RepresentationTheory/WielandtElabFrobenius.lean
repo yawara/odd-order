@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-import OddOrder.GroupTheory.WielandtPerFactorDischarge
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-import Mathlib.Algebra.Field.ZMod
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.GroupTheory.WielandtPerFactorDischarge
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.Algebra.Field.ZMod
 
 /-!
 # Peterfalvi (9.1): the kernel-FPF identity (†) over `𝔽_p`, via base change
@@ -36,6 +38,8 @@ yields the per-chief-factor identity, closing the lone `sorry` of `wielandt_fixe
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (NEXT — carrier-level, items 3 + assembly), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.WielandtKernelFPF
 

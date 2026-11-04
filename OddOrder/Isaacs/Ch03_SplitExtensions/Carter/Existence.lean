@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
 
 /-!
 # Isaacs Problem 3C.7(a) — Carter 部分群の存在
@@ -30,6 +32,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
 - `isCarterSubgroup_of_isCoatom_not_normal` — 上記 `K = ⊤` の場合の Carter 部分群。
 - `exists_isCarterSubgroup` — **Problem 3C.7(a)**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

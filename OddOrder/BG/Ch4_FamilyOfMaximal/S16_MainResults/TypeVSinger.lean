@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
 
 /-!
 # BG Section 16: type-V Singer forward bridges
@@ -14,6 +16,8 @@ Section 16 — Theorem A and Proposition 16.1(d).
 This leaf assembles the type-V Singer structure and the forward bridge from the
 `M_F = M_σ` type-`P₁` case to Peterfalvi type V.
 -/
+@[expose] public section
+
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

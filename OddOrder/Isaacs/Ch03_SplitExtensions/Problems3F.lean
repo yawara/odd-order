@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.QuaternionRecognition
-import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
+module
+
+public import OddOrder.GroupTheory.QuaternionRecognition
+public import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
 
 /-!
 # Isaacs §3F の演習 (書籍 pp. 110-111)
@@ -27,6 +29,8 @@ mathlib の `QuaternionGroup M` (位数 `4M`) が同じ群なので, `Q_n = Quat
   `⟨a 1⟩`, `⟨xa 0⟩`, `⟨xa 1⟩` のちょうど 3 個) と
   `quaternionTwo_exists_mulAut_map_zpowers` (`Aut(Q_8)` が推移的)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

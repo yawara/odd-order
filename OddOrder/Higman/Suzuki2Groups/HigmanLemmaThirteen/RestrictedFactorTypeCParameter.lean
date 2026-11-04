@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
 
 /-!
 # Higman's Lemma 13: the type-C parameter equation
@@ -18,6 +20,8 @@ mixed commutator in the restricted length-three group, together with Higman's
 type-C support pinning, sharpens this half-range normalization to the source
 equation `2 * r + 1 = n`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

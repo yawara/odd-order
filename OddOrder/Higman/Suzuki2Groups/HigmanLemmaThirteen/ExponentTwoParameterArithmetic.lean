@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
 
 /-!
 # Higman Lemma 13: exponent-two parameter arithmetic
@@ -18,6 +20,8 @@ the automorphism `Frob² : α ↦ α⁴`.
 This file isolates the arithmetic over `ZMod n`; the downstream factor
 theorem supplies these equations from the normalized B/C/D relations.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

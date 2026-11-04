@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.GroupWithZero.Basic
-import Mathlib.Algebra.Group.Basic
+module
+
+public import Mathlib.Algebra.GroupWithZero.Basic
+public import Mathlib.Algebra.Group.Basic
 
 /-!
 # Near-fields: the `NearField` class
@@ -21,6 +23,8 @@ import that construction to prove Appendix II, Proposition 1.  The namespace is 
 (`OddOrder.Peterfalvi.Appendices.NearFields`), so downstream references `NearFields.NearField`
 resolve exactly as before.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 

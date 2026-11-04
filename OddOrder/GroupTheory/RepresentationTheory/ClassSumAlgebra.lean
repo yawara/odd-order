@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
 
 /-!
 # TAIL
@@ -11,6 +13,8 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
 Prefix-split from `OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.RepresentationTheory
 open scoped MonoidAlgebra
 -- 類和の中核 (`classSum` ほか) は `ClassSumCore` の一般係数環版。

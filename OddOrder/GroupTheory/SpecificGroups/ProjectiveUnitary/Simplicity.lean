@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FixedPointFree
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
+module
+
+public import Mathlib.GroupTheory.FixedPointFree
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 
 /-!
 # Simplicity of the standard projective unitary group
@@ -23,6 +25,8 @@ Kapitel II, Satz 10.13 for this fact rather than proving it.  The hypothesis
 `1 < n` is the exact translation of Peterfalvi's `q > 2`; the case `n = 1`
 has group order `72` and is not simple.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

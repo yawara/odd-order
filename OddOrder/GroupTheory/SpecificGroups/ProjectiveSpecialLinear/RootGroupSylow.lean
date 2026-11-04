@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.GroupTheory.Sylow
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+module
+
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 
 /-!
 # The standard root group is Sylow in PSL(2,F)
@@ -20,6 +22,8 @@ group is a Sylow `2`-subgroup.
 This is the standard-group calculation used in Peterfalvi, Part II,
 Chapter I section 3, Proposition 1(c) (pp. 105--106).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

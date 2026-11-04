@@ -3,18 +3,20 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.Ring.Defs
-import Mathlib.Algebra.Group.Subgroup.Defs
-import Mathlib.Dynamics.PeriodicPts.Lemmas
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Push
-import Mathlib.Algebra.Group.Fin.Basic
-import Mathlib.Algebra.BigOperators.GroupWithZero.Action
-import Mathlib.GroupTheory.QuotientGroup.Defs
-import Mathlib.Tactic.Abel
-import Mathlib.Tactic.NoncommRing
+module
+
+public import Mathlib.Algebra.BigOperators.Fin
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Ring.Defs
+public import Mathlib.Algebra.Group.Subgroup.Defs
+public import Mathlib.Dynamics.PeriodicPts.Lemmas
+public import Mathlib.Tactic.Ring
+public import Mathlib.Tactic.Push
+public import Mathlib.Algebra.Group.Fin.Basic
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+public import Mathlib.GroupTheory.QuotientGroup.Defs
+public import Mathlib.Tactic.Abel
+public import Mathlib.Tactic.NoncommRing
 
 /-!
 # The noncommutative binomial expansion
@@ -30,6 +32,8 @@ change a product modulo the commutator subspace, so `(x + y) ^ p ≡ x ^ p + y ^
 * `OddOrder.wordProd` — the ordered product along a word
 * `OddOrder.add_pow_eq_sum_wordProd` — the expansion
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

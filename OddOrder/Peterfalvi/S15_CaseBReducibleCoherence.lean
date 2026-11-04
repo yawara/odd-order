@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SSetMemberRFamily
+module
+
+public import OddOrder.Peterfalvi.S15_SSetMemberRFamily
 
 /-!
 # Peterfalvi §9/§13 — caseB coherence and the (5.6) pair bound of the honest `S`-instance family
@@ -23,6 +25,8 @@ the per-member (5.2.d) `R`-families built in `S15_SSetMemberRFamily`:
 The (9.11) caseA equality campaign, the case-combined coherence assembly, and the (13.2.d) `τ₁`
 engines live downstream in `S15_CaseACoherence` (which imports this file).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

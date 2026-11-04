@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the equations (3), (5)–(9)
@@ -44,6 +46,8 @@ below are `sectionFour_seven_book`'s `h5`, `h6` at
   the denominator of (7), (8) nonzero.
 * `Hypothesis.sectionFour_seven_eight_nine` — **(7), (8), (9)**.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

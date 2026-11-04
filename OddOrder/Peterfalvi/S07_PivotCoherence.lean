@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Peterfalvi §5: pivot coherence (norm-general uniform-degree coherence, part 1)
@@ -33,6 +35,8 @@ isometry law reduces to the pivot inner products and `τ`'s isometry on the supp
 integrality follows since `s` is `ℤ`-valued on `ℤ[S]`.  The remaining (5.7) work — constructing
 `ζ₁` from the subcoherent `R`-datum (Coq `subcoherent_split`/`subcoherent_norm`) — is part 2.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

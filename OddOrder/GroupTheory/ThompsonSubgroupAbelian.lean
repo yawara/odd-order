@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Algebra.Group.Subgroup.Pointwise
-import Mathlib.GroupTheory.Commutator.Basic
-import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.Isaacs.Ch01_Sylow.Basic
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
-import OddOrder.Isaacs.Ch04_Commutators.Mann
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Finite
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import Mathlib.GroupTheory.Commutator.Basic
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch04_Commutators.Mann
 
 /-!
 # Abelian Thompson Subgroup `J_a(P)` (Gorenstein 版)
@@ -61,6 +63,8 @@ Gorenstein, *Finite Groups* (1968), Ch.8 §2 (pp. 270-271) の定義と基本補
 Thm 2.4 (Thompson)、Thm 2.5 (Thompson Replacement)、Thm 2.7 (Glauberman Replacement)、
 Lem 2.8-2.10、Thm 2.11 (**Glauberman `Z(J)`-定理**) は後続。
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

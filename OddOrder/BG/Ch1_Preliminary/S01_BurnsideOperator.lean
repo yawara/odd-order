@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
 
 /-!
 # BG §1C — Frattini + Burnside operator lemmas (Lem 1.7-1.10)
@@ -15,6 +17,8 @@ quotient / elementary abelian), Lemma 1.8-1.10 (the Burnside operator machinery 
 Split from `OddOrder.BG.Ch1_Preliminary.S01_Solvable` (issue 0149, the longFile-1500
 campaign); `S01_Solvable` imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S01
 open OddOrder.Isaacs.Ch01

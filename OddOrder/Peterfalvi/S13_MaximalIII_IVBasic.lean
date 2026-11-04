@@ -3,17 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.Peterfalvi.S13_SixTwoBridge
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral
+public import OddOrder.Peterfalvi.S13_SixTwoBridge
+public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+public import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # S13_MaximalIII_IVBasic
 
 Prefix-split from `OddOrder.Peterfalvi.S13_MaximalIII_IV` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi Section 13: Maximal Subgroups of Types III and IV

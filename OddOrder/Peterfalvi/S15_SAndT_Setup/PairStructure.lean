@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
 
 /-!
 # Peterfalvi §13 — structural facts of the maximal pair `(S, T)`
@@ -15,6 +17,8 @@ nilpotent abelian `V`, the κ-Hall complements `W₁`/`W₂` and their `M_σ`-in
 `W2 = W₁`), the TI-subsets `H^#`/`Q^#`, and the type classification
 `T_typeII_or_III_or_IV`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

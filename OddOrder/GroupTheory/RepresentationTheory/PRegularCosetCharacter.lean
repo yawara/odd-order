@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 
 /-!
 # The linear character of `H = ⟨u⟩ P` with kernel `P`
@@ -34,6 +36,8 @@ the commuting `p'`-times-`p` decomposition does all the work.
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.6 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

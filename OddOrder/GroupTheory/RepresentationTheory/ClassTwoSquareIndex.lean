@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 
 /-! # Faithful irreducibles of `p`-groups with center of order `p`, and the square-index theorem
 
@@ -27,6 +29,8 @@ chief kernel `H₀` were nontrivial, `H/Q` (for `Q ◁ H` of index `p` in `H₀`
 contradiction.  In the Coq formalization this is the `extraspecial`-order step of
 `PFsection11.FTtype34_Fcore_kernel_trivial`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

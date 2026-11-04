@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourModel
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourModel
 
 /-!
 # Ch. IV §4, step (2): the Proposition of Ch. III §3 on `U/Z(U)`
@@ -46,6 +48,8 @@ by `P` fixes both decompositions of Ch. I, so their factors stay in `C_G(P)`, an
 * `Hypothesis.corollaryTwo_residualQuotient` — **step (2) itself**: Corollary 2 of §3
   holds on `U/Z(U)`, with §2 run inside and nothing left as a hypothesis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

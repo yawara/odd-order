@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeCoherence
-import OddOrder.Peterfalvi.S06_CertainTypeSupport
-import OddOrder.Peterfalvi.S08_CrossOrthogonality
-import OddOrder.Peterfalvi.S08_InducedKernelFamily
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S06_CertainTypeSupport
+public import OddOrder.Peterfalvi.S08_CrossOrthogonality
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
 
 /-!
 # Peterfalvi (5.3)(b): subcoherence of an induction family over Hypothesis (4.6)
@@ -45,6 +47,8 @@ hold the `2w₁`-element reducible family.
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`; issue 0159.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

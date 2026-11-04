@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorCopyTransport
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorCopyTransport
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
 
 /-!
 # Higman Lemma 13: coherence of one factor across pairwise joins
@@ -15,6 +17,8 @@ The canonical equivalence between its two `subgroupOf` copies intertwines the
 restricted ambient actor.  Consequently, normalized factor coordinates in
 the two joins have the same square-law automorphism.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

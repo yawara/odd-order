@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 
 /-!
 # The projective indecomposable characters vanish off the `p`-regular classes
@@ -27,6 +29,8 @@ irreducible Brauer characters are linearly independent on the `p`-regular classe
 * `OddOrder.RepresentationTheory.Modular.algebraMap_sum_projectiveIndecomposableCharacter_mul_inv`
 * `OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 
 /-!
 # The Cartan matrix and the projective indecomposable characters
@@ -44,6 +46,8 @@ automatically integral, which is the standard "character values are algebraic in
 * `OddOrder.RepresentationTheory.Modular.cartanMatrix_comm` — `C` is symmetric
 * `OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_sum_cartanMatrix`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

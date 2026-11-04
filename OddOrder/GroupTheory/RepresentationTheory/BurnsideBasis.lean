@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 
 /-!
 # The Burnside basis of `End_F V` (BG (2.11))
@@ -25,6 +27,8 @@ Here we lift the independence to a standalone lemma and package both into
 `burnsideBasis : Basis (P ⧸ Z(P)) F (End_F V)`.  This is the carrier for the `H`-module structure
 of `E(P)` (the keystone `dim E₀ = dim E_m + 1` of BG Thm 2.5).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

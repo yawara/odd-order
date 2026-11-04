@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 /-!
 # Isaacs Problem 8C.3 (p. 256) — 次数 12, 位数 95040 の推移置換群は単純
@@ -31,6 +33,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 - `isSimpleGroup_of_card_eq_95040` — **Problem 8C.3** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

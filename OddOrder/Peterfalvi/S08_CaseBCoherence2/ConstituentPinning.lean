@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBTransport
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBTransport
 
 /-!
 # Peterfalvi §8 case-(B): constituent pinning and orthogonality
@@ -11,6 +13,8 @@ import OddOrder.Peterfalvi.S08_CaseBTransport
 The induction aggregates, integral coefficient bounds, and orthogonality lemmas used to pin each
 case-(B) constituent in Peterfalvi (6.8.2.3).  Split from `S08_CaseBCoherence2` under issue 0068.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 

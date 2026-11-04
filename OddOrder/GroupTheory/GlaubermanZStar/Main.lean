@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.FinalContradiction
-import OddOrder.GroupTheory.BrauerSuzukiEndgame
+module
+
+public import OddOrder.GroupTheory.GlaubermanZStar.FinalContradiction
+public import OddOrder.GroupTheory.BrauerSuzukiEndgame
 
 /-!
 # Glauberman's `Z*`-theorem
@@ -34,6 +36,8 @@ This file runs the induction on `|G|` that the previous files feed:
 * `OddOrder.GroupTheory.glauberman_zStar_sup_centralizer_eq_top` — the product form
   `G = O_{2'}(G) · C_G(u)`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 

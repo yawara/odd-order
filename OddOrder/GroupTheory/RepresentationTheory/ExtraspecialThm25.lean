@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
-import OddOrder.GroupTheory.RepresentationTheory.CyclicEndConjCount
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicEndConjCount
 
 /-!
 # Towards Bender–Glauberman Theorem 2.5 (the divisibility conclusion)
@@ -19,6 +21,8 @@ which comes from `C_{P/Z}(x) = 1`). Given that input, Prop 2.4(h)
 (`sum_sq_sub_finrank_cyclicEndConjEigenspaceFin`) turns it into `∑ᵢ(nᵢ−nᵢ₊ₘ)² = 2`, and
 `prop24j_fin` concludes `q = h·v₀ + δ` with `δ = ±1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 
 /-!
 # The `p`-sections partition the conjugacy classes
@@ -37,6 +39,8 @@ classes themselves and `Quotient.out` supplies the centralizer.
 * `OddOrder.RepresentationTheory.Modular.card_conjClasses_eq_sum_card_pRegularClass` —
   `k(G) = ∑_{[x] a p-element class} #cl(C_G(x)⁰)`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

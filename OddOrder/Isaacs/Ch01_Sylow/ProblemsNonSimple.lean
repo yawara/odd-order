@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsSylowCounting
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.ProblemsSylowCounting
 
 /-!
 # Isaacs Problems 1E (p. 38) — 1E.6 / 1E.7 / 1E.8
@@ -25,6 +27,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1E の後半。道具
 - `not_isSimpleGroup_of_card_eq_twofourty` — **Problem 1E.7**。
 - `not_isSimpleGroup_of_card_eq_twofivetwo` — **Problem 1E.8**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

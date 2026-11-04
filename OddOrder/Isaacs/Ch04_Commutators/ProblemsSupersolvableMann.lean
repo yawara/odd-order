@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
-import OddOrder.Isaacs.Ch04_Commutators.Mann
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
+public import OddOrder.Isaacs.Ch04_Commutators.Mann
 
 /-!
 # Isaacs Chapter 4 — Problem 4B.5 (超可解群の `M(G)`)
@@ -27,6 +29,8 @@ Mann の **Theorem 4.15** (`nilpotencyClass_mannSubgroup_le_of_centralizer_eq_se
 `B/A ≅ M̄` 巡回ゆえ**可換** (`isMulCommutative_of_isCyclic_of_ker_le_center`) で
 `A < B ⊴ G` — `A` の極大性に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

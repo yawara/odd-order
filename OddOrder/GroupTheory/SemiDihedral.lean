@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Basic
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
-import Mathlib.Tactic.LinearCombination
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import Mathlib.Tactic.LinearCombination
 
 /-!
 # Semidihedral group
@@ -56,6 +58,8 @@ the multiplication formula associative. We prove this as `twist_mul_self`.
 * Possible mathlib upstream as `Mathlib/GroupTheory/SpecificGroups/SemiDihedral.lean`.
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -114,20 +118,20 @@ theorem twist_mul_self : twist n * twist n = 1 := by
 
 /-- Multiplication on the semidihedral group, given by the formulas derived from
 `a c = c^r a` (equivalently `c a = a c^r`), where `r := 2^(n-1) - 1`. -/
-private def mul : SemiDihedralGroup n → SemiDihedralGroup n → SemiDihedralGroup n
+def mul : SemiDihedralGroup n → SemiDihedralGroup n → SemiDihedralGroup n
   | c i, c j => c (i + j)
   | c i, ca j => ca (twist n * i + j)
   | ca i, c j => ca (i + j)
   | ca i, ca j => c (twist n * i + j)
 
 /-- The identity element `1` is `c 0 = c^0`. -/
-private def one : SemiDihedralGroup n := c 0
+def one : SemiDihedralGroup n := c 0
 
 instance : Inhabited (SemiDihedralGroup n) := ⟨one⟩
 
 /-- Inverse on the semidihedral group. For `c i`, the inverse is `c (-i)`.
 For `ca i`, we need `ca i * ca j = c (twist n * i + j) = 1`, so `j = -(twist n * i)`. -/
-private def inv : SemiDihedralGroup n → SemiDihedralGroup n
+def inv : SemiDihedralGroup n → SemiDihedralGroup n
   | c i => c (-i)
   | ca i => ca (-(twist n * i))
 

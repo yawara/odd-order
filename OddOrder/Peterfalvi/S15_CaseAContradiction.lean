@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
+module
+
+public import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
 
 /-!
 # Peterfalvi (14.6) — the final contradiction in case A
@@ -14,6 +16,8 @@ that producer is being relayered under issue 0116.
 
 Peterfalvi, *Character Theory for the Odd Order Theorem*, (14.6).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

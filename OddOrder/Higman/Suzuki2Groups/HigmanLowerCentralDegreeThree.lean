@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 
 /-!
 # Higman's degree-three lower-central bracket
@@ -24,6 +26,8 @@ spanning range in `L₃` and intertwines every automorphism action induced
 from `H`.  These are the group-theoretic inputs for Higman's triple-weight
 argument in Lemma 6.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

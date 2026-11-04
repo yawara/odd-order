@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import Mathlib.RepresentationTheory.Basic
 
 /-!
 # BG §3B: Lemma 3.3 (Wielandt's fixed-point lemma for Frobenius groups)
@@ -26,6 +28,8 @@ plan = `notes/bg/s03_thm37_plan.md`。
 `σ_G = σ_K + ∑_{x∈K} σ_{R^x} − |K|·1` から `0 = ρ(σ_K)v − |K|v`、ゆえ `|K|v ∈ C_V(K)`。
 `|K| ≠ 0 in F` より `V = C_V(K)`、すなわち `K` は自明に作用 (対偶)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03b
 

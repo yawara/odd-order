@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
-import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
-import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+public import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
+public import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
 
 /-!
 # Peterfalvi Part II, Ch. II, step (6): the arithmetic lemma
@@ -30,6 +32,8 @@ This leaf formalizes that lemma as `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_
 The lemma is consumed by step (6) (`|F| = f^a = 2^b + 1`) and step (8)
 (`|C_F(w)| = f^a = 2^b + 1`).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

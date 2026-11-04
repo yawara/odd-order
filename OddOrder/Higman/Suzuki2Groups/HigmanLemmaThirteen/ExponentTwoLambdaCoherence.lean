@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
 
 /-!
 # Higman Lemma 13: quotient-eigenvalue coherence
@@ -21,6 +23,8 @@ nonzero elements of the characteristic-two field.  Primitivity of `ν`
 ensures that both source eigenvalues are nonzero, so they coincide exactly;
 there is no residual Frobenius-orbit ambiguity.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

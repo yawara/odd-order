@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Algebra.Group.ConjFinite
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import Mathlib.Tactic.Group
-import Mathlib.Tactic.NoncommRing
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.Algebra.Group.ConjFinite
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import Mathlib.Tactic.Group
+public import Mathlib.Tactic.NoncommRing
 
 /-!
 # The commutator subspace of a group algebra
@@ -26,6 +28,8 @@ conjugacy classes.
   summing the coefficients over a conjugacy class kills `T`; these functionals are what
   separate the classes in the quotient
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

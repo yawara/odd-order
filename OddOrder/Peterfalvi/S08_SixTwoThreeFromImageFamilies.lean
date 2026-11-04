@@ -3,8 +3,10 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.Peterfalvi.S08_GeneralAdjoin
+module
+
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral
+public import OddOrder.Peterfalvi.S08_GeneralAdjoin
 
 /-!
 # Peterfalvi (6.2)/(6.3) from the Hypothesis (5.2) image families — the oracle-free book form
@@ -54,6 +56,8 @@ of what (6.1) actually assumes.
 `dadeIntegralCharacterMap_inner_eq_on_supported_span` and
 `dadeIntegralCharacterMap_mem_ZIrr_of_supported`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

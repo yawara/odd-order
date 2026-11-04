@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import Mathlib.GroupTheory.Focal
-import Mathlib.GroupTheory.Schreier
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch05_Transfer.CentralTransfer
+module
+
+public import Mathlib.GroupTheory.Transfer
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import Mathlib.GroupTheory.Focal
+public import Mathlib.GroupTheory.Schreier
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch05_Transfer.CentralTransfer
 
 /-!
 # Basic
@@ -18,6 +20,8 @@ import OddOrder.Isaacs.Ch05_Transfer.CentralTransfer
 Prefix-split from `OddOrder.Isaacs.Ch05_Transfer.Main` (2000-line limit, issue 0103 第 2 パス).
 §5A-5B は `CentralTransfer.lean` へ分割済 (1500 行閾値, issue 1036).
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 open scoped IsMulCommutative -- rc2: IsMulCommutative→CommGroup/Monoid now scoped

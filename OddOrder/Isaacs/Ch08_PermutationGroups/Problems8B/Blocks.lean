@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Blocks
-import Mathlib.GroupTheory.GroupAction.Primitive
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+module
+
+public import Mathlib.GroupTheory.GroupAction.Blocks
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — block と原始性
@@ -27,6 +29,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 - `prime_pow_card_and_unique_isMinimalNormal_of_isSolvable` — **8B.4**: 可解原始置換群の
   次数は素数冪で, 極小正規部分群はただ一つ。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

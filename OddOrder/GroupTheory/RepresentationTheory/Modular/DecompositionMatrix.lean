@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 
 /-!
 # The decomposition matrix
@@ -23,6 +25,8 @@ this is the decomposition matrix `D`.
 
 * `OddOrder.RepresentationTheory.Modular.exists_decomposition_trace`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

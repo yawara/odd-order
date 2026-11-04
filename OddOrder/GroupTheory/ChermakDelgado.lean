@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Data.Fintype.Lattice
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.Subgroup.Simple
-import Mathlib.Tactic.Ring
-import OddOrder.Mathlib.Subgroup
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Finite
+public import Mathlib.SetTheory.Cardinal.NatCard
+public import Mathlib.Data.Fintype.Lattice
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.Tactic.Ring
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # Chermak-Delgado measure, lattice, and subgroup
@@ -40,6 +42,8 @@ Thm 1.44 / Cor 1.45 / Thm 1.41 / Cor 1.46 は同ファイル後半.
   H1 (`card_HK_mul_card_inf_eq_card_mul_card`), H2 (`le_centralizer_centralizer`),
   `centralizer_sup` を使用.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

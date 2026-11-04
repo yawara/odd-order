@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthTwoTypeAClassification
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthTwoTypeAClassification
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
 
 /-!
 # Higman's Lemma 13: models for the exponent-two factors
@@ -19,6 +21,8 @@ ambient involutions in every nontrivial invariant factor. The inclusive
 xi-length-two classification therefore gives an honest `A(n, phi)` model
 for each factor, including the abelian case `phi = 1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

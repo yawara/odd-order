@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
 
 /-!
 # Higman's Lemma 13: a new invariant Frattini preimage
@@ -19,6 +21,8 @@ invariant subgroup `U`; the ambient length-four chain then makes the
 restricted action on `U` have length two, so the inclusive type-A
 classification applies.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

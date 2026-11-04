@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.AppB_Thm62
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.AppB_Thm62
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # BG §8 — `fittingInG` / `cFittingInG`: definitions and basic API
@@ -24,6 +26,8 @@ Split from `OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore` (issue 0149); th
 file imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S08
 

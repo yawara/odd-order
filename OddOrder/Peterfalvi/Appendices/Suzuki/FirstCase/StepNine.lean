@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
-import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
-import OddOrder.GroupTheory.TransferInvariantTransversal
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+public import OddOrder.GroupTheory.TransferInvariantTransversal
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Peterfalvi Part II, Ch. II, step (9): `p = f`
@@ -31,6 +33,8 @@ This file formalizes the **arithmetic finish** as `char_eq_p_of_p_dvd_card_Q_add
 (from `p ∣ |Q| + 1`, conclude `f = p`).  The transfer computation producing
 `p ∣ |Q| + 1` is the remaining frontier of step (9).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

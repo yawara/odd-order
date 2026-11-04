@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Mann
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
-import Mathlib.GroupTheory.IsSubnormal
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Mann
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
+public import Mathlib.GroupTheory.IsSubnormal
 
 /-!
 # Isaacs Chapter 4 — Problems 4C (安定化群)
@@ -35,6 +37,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 4C (書籍 p. 137)。
 そのまま対応する版 `exists_stabilizes_isSubnormal_chain_of_finite` /
 `nilpotencyClass_le_of_stabilizes_finite_normal_chain` も用意した。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

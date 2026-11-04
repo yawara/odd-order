@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 
 /-!
 # BG §12: Theorem 12.12 — Case 3 (abelian Sylow `p`), building blocks
@@ -19,6 +21,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 自動的に `C_{M_σ}(L) = 1` を満たす (BG L3345-3347 の「key fact」)。`L ≤ Ω₁(S) = A` ゆえ
 Cor 12.6(c) が `N_G(L) ⊆ M` を与え、`N_G(S) ≤ N_G(L) ⊆ M` が `N_G(S) ⊄ M` に矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

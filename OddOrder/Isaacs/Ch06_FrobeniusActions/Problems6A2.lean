@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
+module
+
+public import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6A.2 — 奇数位数の非可換 Frobenius complement (書籍 p. 184)
@@ -38,6 +40,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 **書籍の場合 `F = 𝔽₄₃`**: `exists_odd_order_nonabelian_frobenius_complement`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

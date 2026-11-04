@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Data.Fintype.Pi
-import Mathlib.Basic.Finite.Prod
-import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
-import Mathlib.GroupTheory.Coset.Card
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Data.Fintype.Pi
+public import Mathlib.Basic.Finite.Prod
+public import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
+public import Mathlib.GroupTheory.Coset.Card
 
 /-!
 # The imprimitive order bound: `|U| ≤ (p − 1)^(q−1)`
@@ -27,6 +29,8 @@ The structural inputs (the block decomposition and the injectivity of the ratio 
 imprimitive `𝔽_p`-module content, supplied by the caller (the Pf (9.7)(a) assembly); combined with
 `(p−1)^{q−1} ≤ (p^q−1)/(p−1)` this yields the non-Galois half of `basic_structure.u_bound`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

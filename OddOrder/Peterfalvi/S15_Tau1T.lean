@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S15_NuRowPin
-import OddOrder.Peterfalvi.S15_CaseACoherence
+module
+
+public import OddOrder.Peterfalvi.S15_NuRowPin
+public import OddOrder.Peterfalvi.S15_CaseACoherence
 
 /-!
 # The bundled coherent extension `τ₁T` (Peterfalvi (13.2.d)/(13.3.c) at `T`)
@@ -29,6 +31,8 @@ The pin is **bundled at construction** (`[[lean-nonempty-some-erases-witness-pin
 invariant across inhabitants (the `q = 3` flip), so it cannot be recovered from a bare
 `Nonempty.some`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

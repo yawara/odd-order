@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.Projection
-import Mathlib.LinearAlgebra.Quotient.Basic
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.Tactic.NoncommRing
-import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
+module
+
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.Projection
+public import Mathlib.LinearAlgebra.Quotient.Basic
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.Tactic.NoncommRing
+public import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
 
 /-!
 # Higman Lemma 3: commuting idempotents modulo two
@@ -30,6 +32,8 @@ Higman's proof:
 The later homomorphism, kernel, and exponent-at-most-four arguments of
 Higman Lemma 3 are not claimed here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

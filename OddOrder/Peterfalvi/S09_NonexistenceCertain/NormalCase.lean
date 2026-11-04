@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
 
 /-!
 # Peterfalvi (7.6)-(7.7) — normal-subgroup case A = H#
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
 Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
 issue 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 open OddOrder.GroupTheory (IsTISubset)

@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapMemberResidual
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapMemberResidual
 
 /-!
 # Peterfalvi §§3, 11, 15 (pp. 5–9, 50–57, 75–86): grid rigidity and omega exhaustion
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.TGapMemberResidual
 Arbitrary-grid dichotomy, eta-residual rigidity, and finite omega-grid
 exhaustion used by the T-gap contradiction.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

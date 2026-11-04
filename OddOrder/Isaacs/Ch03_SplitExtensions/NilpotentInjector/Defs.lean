@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
-import OddOrder.GroupTheory.FittingSelfCentralizing
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
+public import OddOrder.GroupTheory.FittingSelfCentralizing
 
 /-!
 # Isaacs Problem 3C.8 — nilpotent injector の定義と `C(p)`
@@ -39,6 +41,8 @@ Isaacs, *Finite Group Theory*, Problem 3C.8 (書籍 p. 91):
 - `nilPiPart_singleton_le_pCentralizer` — `F(G)` を含む冪零部分群の `{p}`-部分は `C(p)` に入る。
 - `pCentralizer_inf_le_centralizer_fitting` — `p ≠ q` なら `C(p) ⊓ C(q) ≤ C_G(F(G))`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

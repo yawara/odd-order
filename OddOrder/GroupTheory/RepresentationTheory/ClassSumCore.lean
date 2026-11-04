@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.Algebra.Group.Conj
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Tactic.Group
-import OddOrder.Mathlib.MonoidAlgebra
+module
+
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.Algebra.Group.Conj
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.Tactic.Group
+public import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Class sums in a monoid algebra, indexed by conjugacy classes
@@ -39,6 +41,8 @@ conjugacy class and is developed alongside the relative-trace machinery; the two
 * `OddOrder.GroupTheory.CenterClassSum.coeff_classSum` — its coefficients are the indicator of `C`.
 * `OddOrder.GroupTheory.CenterClassSum.classSum_mem_center` — class sums are central.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterClassSum
 

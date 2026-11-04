@@ -3,14 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Basic.Complex.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.Algebra.MonoidAlgebra.MapDomain
-import Mathlib.RingTheory.SimpleModule.Basic
-import OddOrder.GroupTheory.RepresentationTheory.Inertia
-import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.Algebra.MonoidAlgebra.MapDomain
+public import Mathlib.RingTheory.SimpleModule.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+public import Mathlib.RingTheory.DedekindDomain.Basic
 
 /-!
 # Clifford's theorem on irreducible characters of a normal subgroup
@@ -88,6 +91,8 @@ only the packaging as an `Equiv`, i.e. the surjectivity clause (every `χ ∈ Ir
 * Bender–Glauberman §2 Prop 2.2 (Clifford for cyclic quotient `G/H`) — uses the same
   decomposition.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

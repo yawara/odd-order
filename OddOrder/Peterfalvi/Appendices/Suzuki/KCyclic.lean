@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Huppert
-import OddOrder.FeitThompson
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Huppert
+public import OddOrder.FeitThompson
 
 /-!
 # Peterfalvi Part II, Ch. I §2, Proposition 2: `K` is a cyclic normal subgroup of `D`
@@ -43,6 +45,8 @@ Proposition 2 runs:
   equality forces `K = ⟨k⟩`; the genuine subgroup with carrier `K` is normal
   in `D` by §1 Lemma (b).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

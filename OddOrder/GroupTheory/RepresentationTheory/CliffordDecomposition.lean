@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
-import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
-import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
+public import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+public import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
 
 /-!
 # The constructive Clifford decomposition (toward Peterfalvi (1.7)(c))
@@ -52,6 +54,8 @@ bookkeeping on top.
 
 * Peterfalvi §3 (1.7)(c); Isaacs 6.11/6.17/8.16.  Issue 9002.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

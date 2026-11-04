@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
-import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 
 /-!
 # BG Theorem 3.10 for elementary abelian `M` — the reducible-module induction (issue 8013, piece 5)
@@ -26,6 +28,8 @@ via Maschke (`W = W₀ ⊕ W₁`, both subreps) and combine `finrank` additively
 **Status (issue 8013 piece 5)**: building the bridging infrastructure (invariants of a
 subrepresentation vs. ambient `C_V(H) ⊓ W`); the induction follows.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03
 

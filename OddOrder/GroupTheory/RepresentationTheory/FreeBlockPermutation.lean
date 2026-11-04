@@ -1,6 +1,8 @@
-import Mathlib.RepresentationTheory.Invariants
-import Mathlib.LinearAlgebra.Eigenspace.Pi
-import Mathlib.GroupTheory.GroupAction.Basic
+module
+
+public import Mathlib.RepresentationTheory.Invariants
+public import Mathlib.LinearAlgebra.Eigenspace.Pi
+public import Mathlib.GroupTheory.GroupAction.Basic
 
 /-!
 # Fixed-point dimension under a free block permutation
@@ -26,6 +28,8 @@ the Frobenius condition (a nonidentity complement element fixes no nontrivial `K
 
 * `Representation.finrank_eq_card_mul_finrank_invariants_of_freeBlock`
 -/
+
+@[expose] public section
 
 open Module LinearMap
 

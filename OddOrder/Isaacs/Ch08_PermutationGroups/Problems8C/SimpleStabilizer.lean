@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Blocks
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.Subgroup.Simple
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.GroupAction.SubMulAction.OfStabilizer
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
+module
+
+public import Mathlib.GroupTheory.GroupAction.Blocks
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.Tactic.Group
+public import Mathlib.GroupTheory.GroupAction.SubMulAction.OfStabilizer
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
 
 /-!
 # 点安定化群が単純な推移作用 (Isaacs Problems 8C.3 / 8C.4 の共通部分)
@@ -28,6 +30,8 @@ Isaacs Problem 8C.3 (`M₁₂`) と 8C.4 (`HS`) が共通に使う一歩。
   (`|G_α| ≠ r - 1` を仮定; `G_α ↪ Aut(Z_r)` と `G_α` の `Ω ∖ {α}` 上の推移性から)。
 - `faithfulSMul_ofStabilizer` / `card_ofStabilizer` — 点安定化群の `Ω ∖ {α}` への作用。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

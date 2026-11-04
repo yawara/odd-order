@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
 
 /-!
 # Higman's Lemma 13: factor isomorphism from a common square parameter
@@ -18,6 +20,8 @@ In the commutative branch this is the prescribed-kernel construction of
 quotient coordinates give a central extension with square map
 `alpha ↦ alpha * theta alpha`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -66,7 +70,7 @@ private theorem lowerCentralTerm_two_eq_bot_of_layerKernel_one_eq_bot
   rw [← Subgroup.map_subgroupOf_eq_of_le (lowerCentralTerm_succ_le S 1),
     hsub, Subgroup.map_bot]
 
-private theorem lowerCentralTerm_one_le_center_of_layerKernel_one_eq_bot
+theorem lowerCentralTerm_one_le_center_of_layerKernel_one_eq_bot
     {S : Type uP} [Group S]
     (hK1 : lowerCentralLayerKernel S 1 = ⊥) :
     lowerCentralTerm S 1 ≤ Subgroup.center S := by
@@ -84,7 +88,7 @@ private theorem lowerCentralTerm_one_le_center_of_layerKernel_one_eq_bot
     exact Subgroup.mem_bot.mp (hterm2 ▸ hzx)
   exact hcomm.symm.eq
 
-private noncomputable def CommutativeFactorCoordinateData.toTypeAModelData
+noncomputable def CommutativeFactorCoordinateData.toTypeAModelData
     {P : Type uP} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
     [IsMulCommutative (frattini P)]
@@ -110,7 +114,7 @@ private noncomputable def CommutativeFactorCoordinateData.toTypeAModelData
   exact xiLengthTwoTypeAData_of_homocyclic_four_prescribedKernel
     data.equivPi hNtop n hn (GaloisField.card 2 n hn.ne') data.eKernel
 
-private noncomputable def NoncommutativeFactorCoordinateData.toTypeAModelData
+noncomputable def NoncommutativeFactorCoordinateData.toTypeAModelData
     {P : Type uP} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
     [IsMulCommutative (frattini P)]

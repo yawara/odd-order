@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Maximal-class p-group 理論: 2-step centralizer 条件と degree of commutativity の同値
@@ -38,6 +40,8 @@ BG corrected Prop E.4 / (E.23) の追加仮説 `hdc` は 2-step 形
 
 将来の maximal class p-群 API (`IsExceptional` 述語等) はこの leaf に置く。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

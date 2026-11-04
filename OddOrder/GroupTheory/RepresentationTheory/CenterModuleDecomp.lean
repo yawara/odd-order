@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
-import Mathlib.RepresentationTheory.Basic
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
+public import Mathlib.RepresentationTheory.Basic
 
 /-!
 # Isotypic decomposition of a representation via the central idempotents (Peterfalvi (9.1), I-2)
@@ -21,6 +23,8 @@ algebra map `asAlgebraHom ρ : k[U] →ₐ[k] Module.End k W` of any representat
 This is the `DirectSum.IsInternal` input the free-orbit count (†) needs; the `E`-action then
 permutes these summands by `simplesAction φ` (the 3d.3c bridge, to follow).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterModuleDecomp
 

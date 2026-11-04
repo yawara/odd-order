@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
-import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+public import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
 
 /-!
 # Peterfalvi Part II, Ch. II, step (12): case (10.2) holds
@@ -17,6 +19,8 @@ Step (12) rules out case (10.1).  This leaf starts from the orbit count
 (so `|G|_p = p³`), heading for the Hall–Wielandt/transfer contradiction
 with hypothesis (B2).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

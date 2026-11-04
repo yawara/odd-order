@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Trace
-import OddOrder.Algebra.GroupAlgebraConjugation
+module
+
+public import Mathlib.LinearAlgebra.Trace
+public import OddOrder.Algebra.GroupAlgebraConjugation
 
 /-!
 # Characters of relative traces
@@ -37,6 +39,8 @@ assumption, and no finiteness of the module is used before the final step.
 * `OddOrder.GroupAlgebra.relIndex_dvd_finrank` — `[H : K] ∣ χ(1)` for `f ∈ R[G]^H_K` acting as `1`
 * `OddOrder.GroupAlgebra.index_dvd_finrank` — the `H = ⊤` case, the height inequality
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

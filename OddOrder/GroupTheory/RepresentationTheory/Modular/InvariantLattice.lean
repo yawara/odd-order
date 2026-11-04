@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RingTheory.Finiteness.Basic
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.Finiteness.Basic
 
 /-!
 # `G`-invariant lattices in a representation over the fraction field
@@ -24,6 +26,8 @@ finiteness of `G`.)
 
 * `OddOrder.RepresentationTheory.Modular.exists_invariant_lattice`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,30 +3,34 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Field.ZMod
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.GroupTheory.FiniteAbelian.Basic
-import Mathlib.GroupTheory.IndexNormal
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
-import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Tactic.LinearCombination
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ThompsonSubgroup
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch04_Commutators.Main
-import OddOrder.Isaacs.Ch05_Transfer.Main
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+module
+
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.GroupTheory.FiniteAbelian.Basic
+public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Tactic.LinearCombination
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.Isaacs.Ch05_Transfer.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 1: J(P) def, Thm 7.1 stmt, Lem 7.3 GL(2,p) lemma
 (pp. 201-208)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -95,7 +99,7 @@ abelian」と同値で, 後者の方が帰納法 (`Subgroup` の transitivity �
 **Aut(E) ≅ GL(n, ZMod p)** bridge は Thm 7.5 で初めて必要となる (ノート設計判断 (3)). -/
 
 -- `Neg (SpecialLinearGroup (Fin 2) F)` のための `Fact (Even 2)`.
-private instance instFactEvenFinTwo : Fact (Even (Fintype.card (Fin 2))) := ⟨by decide⟩
+instance instFactEvenFinTwo : Fact (Even (Fintype.card (Fin 2))) := ⟨by decide⟩
 
 /-- **Isaacs Lem 7.4** (mmd L3765): `F` field, characteristic ≠ 2 ⇒ `SL(2, F)`
 の唯一 involution は `-1` (= `-I`).

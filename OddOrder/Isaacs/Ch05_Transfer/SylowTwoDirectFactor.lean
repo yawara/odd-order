@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Basic
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-! # Isaacs Cor 5.19 (一般形): Sylow 2 が strict-max cyclic 直積因子を持てば非単純 (p. 167)
 
@@ -28,6 +30,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Corollary 5.19 (p. 167) の書
 核となる道具は Thm 5.18 強形
 `eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer` (同 `Basic.lean`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

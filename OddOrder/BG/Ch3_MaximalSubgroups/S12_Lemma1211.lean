@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 
 /-!
 # BG §12: Lemma 12.11 — τ₂ の `M* ∈ ℳ(N_G(A))` への移送
@@ -27,6 +29,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 `τ₁`-数なので互いに素、よって `H₁ ⊔ H₂ = K₀` (`Ch03.sup_eq_top_of_coprime_index`)
 — これが `E₁₂_hall` field を満たす鍵。`E₃` は独立な Hall `τ₃`-部分群。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

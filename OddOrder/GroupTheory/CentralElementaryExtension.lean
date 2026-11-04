@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.GroupTheory.GroupExtension.Basic
-import Mathlib.LinearAlgebra.QuadraticForm.Basis
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.GroupTheory.GroupExtension.Basic
+public import Mathlib.LinearAlgebra.QuadraticForm.Basis
+public import Mathlib.Tactic.Group
 
 /-!
 # Central elementary extensions are determined by their square map
@@ -28,6 +30,8 @@ the same collected multiplication law.  The main result
 short exact sequences; it does not assume a factor set or a posited
 multiplication law.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -95,7 +99,7 @@ variable {W : Type uW} [AddCommGroup W] [Module (ZMod 2) W]
 variable {E : Type uE} [Group E]
 
 /-- An `F₂` coefficient selects either the identity or one group element. -/
-private def bitFactor (a : ZMod 2) (x : E) : E :=
+def bitFactor (a : ZMod 2) (x : E) : E :=
   if a = 0 then 1 else x
 
 private theorem zmodTwo_eq_zero_or_one (a : ZMod 2) : a = 0 ∨ a = 1 := by
@@ -104,14 +108,14 @@ private theorem zmodTwo_eq_zero_or_one (a : ZMod 2) : a = 0 ∨ a = 1 := by
   · exact Or.inr rfl
 
 /-- Descending ordered word on `Fin n`: the last basis lift occurs first. -/
-private def collectedWord : ∀ n : ℕ, (Fin n → E) → (Fin n → ZMod 2) → E
+def collectedWord : ∀ n : ℕ, (Fin n → E) → (Fin n → ZMod 2) → E
   | 0, _, _ => 1
   | n + 1, x, a =>
       bitFactor (a (Fin.last n)) (x (Fin.last n)) *
         collectedWord n (fun i => x i.castSucc) (fun i => a i.castSucc)
 
 /-- Sum of entries selected by an `F₂` coefficient vector. -/
-private def bitSum : ∀ n : ℕ, (Fin n → ZMod 2) → (Fin n → W) → W
+def bitSum : ∀ n : ℕ, (Fin n → ZMod 2) → (Fin n → W) → W
   | 0, _, _ => 0
   | n + 1, a, d =>
       bitSum n (fun i => a i.castSucc) (fun i => d i.castSucc) +
@@ -120,7 +124,7 @@ private def bitSum : ∀ n : ℕ, (Fin n → ZMod 2) → (Fin n → W) → W
 /-- The universal kernel defect obtained when two descending binary words are
 collected.  `diag i` records the square of generator `i`, while `cross i j`
 records the cost of swapping generator `i` past generator `j` for `i < j`. -/
-private def collectedDefect : ∀ n : ℕ, (Fin n → W) → (Fin n → Fin n → W) →
+def collectedDefect : ∀ n : ℕ, (Fin n → W) → (Fin n → Fin n → W) →
     (Fin n → ZMod 2) → (Fin n → ZMod 2) → W
   | 0, _, _, _, _ => 0
   | n + 1, diag, cross, a, b =>
@@ -146,7 +150,7 @@ private theorem neg_eq_self (w : W) : -w = w := by
 
 variable (k : Multiplicative W →* E)
 
-private abbrev kernelValue (w : W) : E := k (Multiplicative.ofAdd w)
+abbrev kernelValue (w : W) : E := k (Multiplicative.ofAdd w)
 
 omit [Module (ZMod 2) W] in
 @[simp] private theorem kernelValue_zero : kernelValue k (0 : W) = 1 := by
@@ -471,11 +475,11 @@ variable {W : Type uW} [AddCommGroup W] [Module (ZMod 2) W]
 variable {E : Type uE} [Group E]
 
 /-- The kernel coordinate of the commutator forced by a square map. -/
-private def squareCross (q : V → W) (u v : V) : W :=
+def squareCross (q : V → W) (u v : V) : W :=
   q u + q (u + v) + q v
 
 /-- Arbitrarily lift each vector in a fixed basis through the quotient map. -/
-private def basisLift {n : ℕ}
+def basisLift {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (basis : Basis (Fin n) (ZMod 2) V) (i : Fin n) : E :=
   S.surjInvRightHom (Multiplicative.ofAdd (basis i))
@@ -488,13 +492,13 @@ omit [Module (ZMod 2) W] in
   simp [basisLift]
 
 /-- The descending basis word representing a quotient vector. -/
-private def extensionWord {n : ℕ}
+def extensionWord {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (basis : Basis (Fin n) (ZMod 2) V) (v : V) : E :=
   collectedWord n (basisLift S basis) (basis.equivFun v)
 
 omit [Module (ZMod 2) W] in
-@[simp] private theorem rightHom_extensionWord {n : ℕ}
+@[simp] theorem rightHom_extensionWord {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (basis : Basis (Fin n) (ZMod 2) V) (v : V) :
     S.rightHom (extensionWord S basis v) = Multiplicative.ofAdd v := by
@@ -536,7 +540,7 @@ private theorem mul_swap_of_squareMap
             rfl
 
 /-- The common defect in the basis-word multiplication law. -/
-private def extensionDefect {n : ℕ} (q : V → W)
+def extensionDefect {n : ℕ} (q : V → W)
     (basis : Basis (Fin n) (ZMod 2) V)
     (a b : Fin n → ZMod 2) : W :=
   collectedDefect n (fun i ↦ q (basis i))
@@ -564,7 +568,7 @@ private theorem extensionWord_mul {n : ℕ}
       (basisLift S basis i) (basisLift S basis j)
 
 omit [Module (ZMod 2) W] in
-@[simp] private theorem extensionWord_zero {n : ℕ}
+@[simp] theorem extensionWord_zero {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (basis : Basis (Fin n) (ZMod 2) V) :
     extensionWord S basis 0 = 1 := by
@@ -586,7 +590,7 @@ private theorem extensionWord_mul' {n : ℕ}
     extensionWord_mul S hcentral q basis hsq (basis.equivFun u) (basis.equivFun v)
 
 /-- Kernel coordinate in the normal form determined by the ordered basis. -/
-private def extensionKernelCoord {n : ℕ}
+def extensionKernelCoord {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (basis : Basis (Fin n) (ZMod 2) V) (e : E) : W :=
   (Function.invFun S.inl
@@ -713,7 +717,7 @@ private theorem extension_mul_normalForm {n : ℕ}
                       ((S.rightHom e).toAdd + (S.rightHom f).toAdd) := by group
               _ = _ := by rw [← kernelValue_add]
 
-private theorem extensionKernelCoord_mul {n : ℕ}
+theorem extensionKernelCoord_mul {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (hcentral : S.inl.range ≤ Subgroup.center E)
     (q : V → W)
@@ -730,14 +734,14 @@ private theorem extensionKernelCoord_mul {n : ℕ}
     extension_mul_normalForm S hcentral q basis hsq e f
 
 omit [Module (ZMod 2) W] in
-@[simp] private theorem extensionKernelCoord_inl {n : ℕ}
+@[simp] theorem extensionKernelCoord_inl {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (basis : Basis (Fin n) (ZMod 2) V) (w : W) :
     extensionKernelCoord S basis (S.inl (Multiplicative.ofAdd w)) = w := by
   apply extensionKernelCoord_eq_of_eq S basis
   simp only [GroupExtension.rightHom_inl, toAdd_one, extensionWord_zero, mul_one]
 
-private theorem normalForm_mul {n : ℕ}
+theorem normalForm_mul {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (hcentral : S.inl.range ≤ Subgroup.center E)
     (q : V → W)
@@ -788,7 +792,7 @@ private theorem normalForm_mul {n : ℕ}
                   extensionWord S basis (u + v) := by group
             _ = _ := by rw [← kernelValue_add]
 
-private def extensionComparisonHom {E' : Type uE'} [Group E'] {n : ℕ}
+def extensionComparisonHom {E' : Type uE'} [Group E'] {n : ℕ}
     (S : GroupExtension (Multiplicative W) E (Multiplicative V))
     (T : GroupExtension (Multiplicative W) E' (Multiplicative V))
     (hcentralS : S.inl.range ≤ Subgroup.center E)

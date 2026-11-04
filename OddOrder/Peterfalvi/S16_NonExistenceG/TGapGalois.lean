@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
-import OddOrder.Peterfalvi.S07_CoherenceGalois
-import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
+public import OddOrder.Peterfalvi.S07_CoherenceGalois
+public import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 
 /-!
 # Peterfalvi (11.9)(a): Galois transport of the T-side bridge
@@ -14,6 +16,8 @@ The Galois transform of a Dade bridge differs from the original bridge by the
 Dade image of the source-character correction.  This is Coq `FTtype34_structure`
 lemma `aut_phi`, isolated before the cyclotomic transitivity argument.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 
 /-!
 # The general Peterfalvi (1.7.b): equal-degree induced constituents (abelian inertia quotient)
@@ -30,6 +32,8 @@ The proof assembles the bottom-up chain:
 Here `induce_smul_eq_mul_sum_of_invariant` combines the last two into
 `e · Ind_H^K θ = ψ · ∑_β Inf(β)`, exhibiting the constituents `ψ·Inf(β)` (all of degree `ψ(1)`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

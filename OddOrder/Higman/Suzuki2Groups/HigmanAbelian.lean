@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
-import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+module
+
+public import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
+public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
 
 /-!
 # Higman's abelian invariant-subgroup lemma
@@ -22,6 +24,8 @@ Agemo filtration.  The proof follows Higman's original two sentences:
    layer, hence each quotient is irreducible and Agemo--Nakayama lifts this
    irreducibility to the complete invariant-subgroup classification.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

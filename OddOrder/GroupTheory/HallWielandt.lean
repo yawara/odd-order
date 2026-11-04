@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MackeyTransfer
-import OddOrder.GroupTheory.WeaklyClosed
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
+module
+
+public import OddOrder.GroupTheory.MackeyTransfer
+public import OddOrder.GroupTheory.WeaklyClosed
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
 
 /-!
 # The Hall–Wielandt transfer theorem (odd `p`, abelian weakly closed `A`)
@@ -32,6 +34,8 @@ This file develops the transfer ingredients:
 * the resulting double-coset difference formula (formula (17)), on top of the Mackey
   formula `transfer_eq_prod_doubleCoset` (Isaacs Thm 10.10) already available.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

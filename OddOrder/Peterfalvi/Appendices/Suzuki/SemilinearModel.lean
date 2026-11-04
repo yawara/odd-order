@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.ZMod
-import Mathlib.Algebra.Ring.Action.End
-import Mathlib.Algebra.Ring.AddAut
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.GroupTheory.SemidirectProduct
-import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+module
+
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.Algebra.Ring.Action.End
+public import Mathlib.Algebra.Ring.AddAut
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # Peterfalvi Part II, Chapter I §2 — the semilinear affine group
@@ -23,6 +25,8 @@ constructs that group honestly as `semilinearGroup F A`, including the full
 action API.  It also proves that `Aut(F)` and all its subgroups are cyclic
 when `F` is finite, the final clause used by Proposition 3.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 
 /-!
 # The square-root fibre `{y ∈ S | y² = s}` and its `K`-symmetry
@@ -60,6 +62,8 @@ it, and the way `K` permutes it.  This file isolates that apparatus, stated for
 * `Q_eq_Q0_of_commute_of_centralizer_le` — an abelian `Q` whose `P`-centralizer
   lies in `Q₀` equals `Q₀`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
 
 /-!
 # BG §10 β-radical spine — Cor 10.9 + Prop 10.10
@@ -14,6 +16,8 @@ module 名は分割前のまま、下流 import 不変): `S10_BetaRadicalCore` (
 Corollary 10.9 (β(M)'-部分群の centralization) + 10.9(a)(3)/(b) normalizer gates +
 Proposition 10.10 (`N_G(P)` の分解)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

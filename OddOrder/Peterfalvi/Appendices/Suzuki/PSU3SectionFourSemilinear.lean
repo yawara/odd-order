@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
-import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: `η` acts semilinearly on `E`
@@ -53,6 +55,8 @@ endomorphism field it returns with the model's `E`.
   `Hypothesis.coordConjD_eq_coordFieldAut_mul` — the semilinearity
   `x^η = x^μ · 1^η` in the form (5)–(9) consume.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

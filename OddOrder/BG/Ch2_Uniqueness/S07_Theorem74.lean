@@ -3,21 +3,23 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.AppA_PStability
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-import OddOrder.BG.Ch1_Preliminary.S06_Additional
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import Mathlib.GroupTheory.IsSubnormal
-import Mathlib.Algebra.Group.Subgroup.Pointwise
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.AppA_PStability
+public import OddOrder.BG.Ch1_Preliminary.PLength
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+public import OddOrder.BG.Ch1_Preliminary.S06_Additional
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import Mathlib.GroupTheory.IsSubnormal
+public import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # S07_Theorem74
@@ -25,6 +27,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §7: The Transitivity Theorem

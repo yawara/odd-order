@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 
 /-!
 # Higman's Lemma 13: type-C/C support in the middle Frattini layer
@@ -18,6 +20,8 @@ equation.  A nonzero middle bracket then has one of Higman's two cyclic
 supports: `j = i + r`, with output index `i + 1`, or the swapped support
 `i = j + r`, with output index `j + 1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

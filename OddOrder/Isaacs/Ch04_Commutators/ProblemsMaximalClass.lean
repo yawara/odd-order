@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-import OddOrder.Isaacs.Ch04_Commutators.Problems
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+public import OddOrder.Isaacs.Ch04_Commutators.Problems
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.6 (maximal class の `p`-群)
@@ -28,6 +30,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.6 (書籍 p. 124)�
 ⚠ mathlib の添字は古典的な `γ_i` から 1 ずれる (`lowerCentralSeries ⊤ 0 = P`,
 `lowerCentralSeries ⊤ 1 = P'`): 古典的 `γ_k` = `lowerCentralSeries ⊤ (k - 1)`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

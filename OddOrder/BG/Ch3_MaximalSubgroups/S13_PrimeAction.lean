@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
 
 /-!
 # BG §13: Prime Action
@@ -49,6 +51,8 @@ Thm 13.4/13.5/13.9/13.10)。
   `S10.sigma_complement_commutator_cyclic_normal` (Prop 10.11(d)). Keep those as
   upstream proof gates when filling Lemma 13.8 / Theorem 13.10.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

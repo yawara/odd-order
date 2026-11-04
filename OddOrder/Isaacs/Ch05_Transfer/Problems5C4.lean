@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
-import OddOrder.GroupTheory.CardSupInf
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.GroupTheory.CardSupInf
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C
 
 /-!
 # Isaacs Problem 5C.4 — Z-群の部分群 (p. 163)
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C
 巡回群 `G'` の位数 `m₁` の部分群 `M` (正規) と, Schur–Zassenhaus 補群 `H ≅ G/G'` (巡回) の
 位数 `m₂` の部分群 `H₂` を取って `K := H₂ ⊔ M` とすればよい。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

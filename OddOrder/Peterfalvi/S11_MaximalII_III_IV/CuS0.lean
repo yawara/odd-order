@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
 
 /-!
 # TAIL
@@ -7,6 +9,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

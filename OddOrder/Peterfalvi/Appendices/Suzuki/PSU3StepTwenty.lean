@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (20): `α₁ = α₂`
@@ -43,6 +45,8 @@ are `ζ^{±1}`, so the two conjugators sit in the same coset of `K` outright.
 * `Hypothesis.f_eq_conj_inv_of_stepTwenty_chain` — §2's closing Proposition, second half:
   `ω² = (0,α)` and `f(ω) = (ω⁻¹)^ζ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

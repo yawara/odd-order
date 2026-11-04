@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
 # Peterfalvi Section 14: witness Frobenius and intersection structure
@@ -14,6 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 This leaf proves the witness subgroup is Frobenius, identifies the intersection with the
 counterexample subgroup, and supplies the witness coherence used by the later (12.12) analysis.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

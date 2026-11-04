@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.GroupTheory.OpResidual
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
+public import OddOrder.BG.Ch1_Preliminary.PLength
+public import OddOrder.GroupTheory.OpResidual
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # BG §4H: Theorem 4.18 — rank-2 solvable structure (core proof)
@@ -18,6 +20,8 @@ Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04g_Thm418` (longFile 1500, issu
 rank/Fitting 系の直接系まで。normal `p`-complement の `O_{r ≠ p}`-core への転送層と
 BG Thm 4.20(c) の characteristic Sylow series 層は `S04g_Thm418` (旧 module 名を保持) 側。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
 

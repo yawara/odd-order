@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.CentralTransfer
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.CentralTransfer
 
 /-!
 # Isaacs Problems 5A.5 / 5A.7 — Schur 乗数の上界 (stem extension の ∀-形)
@@ -37,6 +39,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5A.5 / 5A.7 (書籍 p
 * `card_ker_dvd_relIndex_commutator` — **Problem 5A.5** の ∀-形。
 * `card_ker_lt_relIndex_commutator` — **Problem 5A.7** の ∀-形。
 -/
+
+@[expose] public section
 
 open scoped IsMulCommutative
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.MatrixNaturalModule
-import OddOrder.Algebra.ModuleAlongSurjection
-import OddOrder.Algebra.PiSimpleModule
+module
+
+public import OddOrder.Algebra.MatrixNaturalModule
+public import OddOrder.Algebra.ModuleAlongSurjection
+public import OddOrder.Algebra.PiSimpleModule
 
 /-!
 # The simple modules of a product of matrix algebras
@@ -29,6 +31,8 @@ turn the block count of Brauer's theorem into a count of irreducible modules.
 * `OddOrder.MatrixModule.blockModule`, `OddOrder.MatrixModule.isSimpleModule_blockModule`
 * `OddOrder.MatrixModule.exists_linearEquiv_blockModule`
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

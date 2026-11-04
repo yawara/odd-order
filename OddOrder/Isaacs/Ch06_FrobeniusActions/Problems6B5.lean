@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.IsSubnormal
-import OddOrder.Isaacs.Ch02_Subnormality.Basic
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
+module
+
+public import Mathlib.GroupTheory.IsSubnormal
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
 
 /-!
 # Isaacs Problem 6B.5 — subnormal 部分群からなる分割を持つ群は冪零 (書籍 p. 196)
@@ -30,6 +32,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
 
 ⭐ 当初考えていた Wielandt 補題 (subnormal + 交わり自明 ⟹ 可換) は**不要**だった。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

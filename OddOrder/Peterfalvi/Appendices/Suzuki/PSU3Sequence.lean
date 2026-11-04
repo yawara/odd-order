@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (11): the sequences `(u_i), (v_i), (d_i)`
@@ -51,6 +53,8 @@ The book's own formulas are these read off in the coordinates of the standard mo
   length half of step (15): the sequence lies in the set step (8) counts, so its `d_i`
   never lie in `K`, so it must stop before `ζ^i` returns to `1`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

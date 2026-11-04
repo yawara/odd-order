@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CentralElementaryExtension
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Mathlib.SchurZassenhausConj
+module
+
+public import OddOrder.GroupTheory.CentralElementaryExtension
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Isomorphisms of central elementary extensions along coordinate changes
@@ -40,6 +42,8 @@ Main declarations:
 * `GroupExtension.isElementaryAbelian_inducingIdAuts` — hence it is an
   elementary abelian `2`-group when `W` is.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -412,7 +416,7 @@ theorem _root_.Subgroup.exists_conj_range_eq_of_mul_inv_mem {G' : Type*} [Group 
 
 
 /-- The `W`-coordinate of an element of the embedded kernel. -/
-private noncomputable def kernelCoordinate (x : E) (hx : x ∈ S.inl.range) :
+noncomputable def kernelCoordinate (x : E) (hx : x ∈ S.inl.range) :
     W :=
   Multiplicative.toAdd ((MonoidHom.ofInjective S.inl_injective).symm ⟨x, hx⟩)
 
@@ -422,7 +426,7 @@ private theorem inl_kernelCoordinate (x : E) (hx : x ∈ S.inl.range) :
 
 /-- The deviation `Φ e * e⁻¹` of an inducing-the-identity automorphism lies
 in the embedded kernel. -/
-private theorem deviation_mem (Φ : MulAut E) (hΦ : S.InducesId Φ) (e : E) :
+theorem deviation_mem (Φ : MulAut E) (hΦ : S.InducesId Φ) (e : E) :
     Φ e * e⁻¹ ∈ S.inl.range := by
   rw [S.range_inl_eq_ker_rightHom, MonoidHom.mem_ker, map_mul, map_inv,
     hΦ.2, mul_inv_cancel]
@@ -440,7 +444,7 @@ private theorem deviation_eq_of_rightHom_eq (Φ : MulAut E)
   group
 
 /-- The deviation is multiplicative (centrality of the kernel). -/
-private theorem deviation_mul (hcentral : S.inl.range ≤ Subgroup.center E)
+theorem deviation_mul (hcentral : S.inl.range ≤ Subgroup.center E)
     (Φ : MulAut E) (hΦ : S.InducesId Φ) (e₁ e₂ : E) :
     Φ (e₁ * e₂) * (e₁ * e₂)⁻¹ = (Φ e₁ * e₁⁻¹) * (Φ e₂ * e₂⁻¹) := by
   have hcomm := Subgroup.mem_center_iff.mp
@@ -451,21 +455,21 @@ private theorem deviation_mul (hcentral : S.inl.range ≤ Subgroup.center E)
     _ = (Φ e₁ * e₁⁻¹) * (Φ e₂ * e₂⁻¹) := by group
 
 /-- A section of the quotient map. -/
-private noncomputable def sect (v : V) : E :=
+noncomputable def sect (v : V) : E :=
   Function.surjInv S.rightHom_surjective (Multiplicative.ofAdd v)
 
-private theorem rightHom_sect (v : V) :
+theorem rightHom_sect (v : V) :
     S.rightHom (sect S v) = Multiplicative.ofAdd v :=
   Function.surjInv_eq S.rightHom_surjective (Multiplicative.ofAdd v)
 
 /-- The underlying function of the induced homomorphism `V → W`. -/
-private noncomputable def inducesIdFun (Φ : MulAut E) (hΦ : S.InducesId Φ)
+noncomputable def inducesIdFun (Φ : MulAut E) (hΦ : S.InducesId Φ)
     (v : V) : W :=
   kernelCoordinate S (Φ (sect S v) * (sect S v)⁻¹) (deviation_mem S Φ hΦ _)
 
 /-- The characterizing property: the embedded value of `inducesIdFun` at the
 quotient coordinate of `e` is the deviation of `e`. -/
-private theorem inl_inducesIdFun (Φ : MulAut E) (hΦ : S.InducesId Φ)
+theorem inl_inducesIdFun (Φ : MulAut E) (hΦ : S.InducesId Φ)
     (e : E) :
     S.inl (Multiplicative.ofAdd
       (inducesIdFun S Φ hΦ (S.rightHom e).toAdd)) = Φ e * e⁻¹ := by

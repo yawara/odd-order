@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
 
 /-!
 # Isaacs Problem 8D.2 (p. 269) — 次数 8 の原始置換群は 2-transitive
@@ -32,6 +34,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
 
 - `ncard_orbit_stabilizer_eq_of_card_eq_eight` — **Problem 8D.2** 本体。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

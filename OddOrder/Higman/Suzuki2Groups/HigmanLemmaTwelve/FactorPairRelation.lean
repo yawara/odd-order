@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
 
 /-!
 # Higman's Lemma 12: parameter relations for a prescribed factor pair
@@ -21,6 +23,8 @@ disjunction `IsTypeB P ∨ IsTypeC P ∨ IsTypeD P`.  Its ambient coordinates
 are existential; cross-join applications use the fixed-coordinate core
 instead.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

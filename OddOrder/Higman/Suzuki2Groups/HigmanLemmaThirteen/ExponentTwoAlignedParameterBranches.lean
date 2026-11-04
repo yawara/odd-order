@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFirstAlignedParameterBranch
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
-import OddOrder.Isaacs.Appendix.SubgroupBasics
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFirstAlignedParameterBranch
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
+public import OddOrder.Isaacs.Appendix.SubgroupBasics
 
 /-!
 # Higman's Lemma 13: the three aligned parameter branches
@@ -17,6 +19,8 @@ This leaf dispatches all three oriented aligned-parameter alternatives.  The
 second and third alternatives require genuinely reversed pairwise joins; their
 normalized coordinate packages are reconstructed on those literal joins.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

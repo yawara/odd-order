@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 
 /-!
 # Peterfalvi Part II, Ch. II: Theorem B
@@ -23,6 +25,8 @@ The proof is the dichotomy on hypothesis (B2) (`p ∤ |G^{ab}|`):
 * if `p ∤ |G^{ab}|` — hypothesis (B2) — then steps (1)–(17) derive a contradiction
   (`false_of_step_seventeen`), so the case is vacuous.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Pi
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.Dimension.OrzechProperty
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
+module
+
+public import Mathlib.LinearAlgebra.Pi
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 
 /-!
 # `kG ⧸ [kG, kG]` is graded by conjugacy classes
@@ -25,6 +27,8 @@ This is the "ordinary" half of Brauer's count; the modular half replaces `T` by
 
 * `OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorSubmodule`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Order.BigOperators.Ring.Finset
-import Mathlib.Data.Fin.VecNotation
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+public import Mathlib.Data.Fin.VecNotation
+public import Mathlib.Tactic.FinCases
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.Ring
 
 /-!
 # The three half-sum columns of Navarro p. 142
@@ -37,6 +39,8 @@ separate (character-theoretic) input.
 * `OddOrder.Algebra.dotProduct_of_halfSum` — the pairing table of the `u_i`
 * `OddOrder.Algebra.dotProduct_degree_of_halfSum` — `(χ(1), u_i) = 0`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

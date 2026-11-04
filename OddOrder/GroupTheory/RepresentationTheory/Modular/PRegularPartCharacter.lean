@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularProjection
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
+module
+
+public import OddOrder.GroupTheory.PRegularProjection
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
 
 /-!
 # Navarro (2.15): `θ̂(x) = θ(x_{p'})` is a virtual character
@@ -38,6 +40,8 @@ ordinary after the `p`-part has been projected away).
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (2.15) (p. 28).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

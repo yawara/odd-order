@@ -3,9 +3,11 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBAssembly
-import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
-import OddOrder.Peterfalvi.S08_CaseBEnumeration
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBAssembly
+public import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+public import OddOrder.Peterfalvi.S08_CaseBEnumeration
 
 /-!
 # Peterfalvi §8 — the case-B anchored seed: setup layer
@@ -14,6 +16,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

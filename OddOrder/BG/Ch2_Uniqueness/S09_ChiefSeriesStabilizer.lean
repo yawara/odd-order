@@ -3,23 +3,27 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
-import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+public import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
 
 /-!
 # S09_ChiefSeriesStabilizer
 
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S09_Lemma95` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §9: Lemma 9.5 (SCN₃ subgroups are uniquely maximal)

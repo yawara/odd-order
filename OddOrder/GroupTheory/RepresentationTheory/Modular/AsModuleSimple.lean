@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.RingTheory.SimpleModule.Basic
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.SimpleModule.Basic
 
 /-!
 # Irreducible representations have simple `asModule`
@@ -21,6 +23,8 @@ Only the direction needed downstream is recorded — from "no proper nonzero inv
 
 * `OddOrder.RepresentationTheory.Modular.isSimpleModule_asModule`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

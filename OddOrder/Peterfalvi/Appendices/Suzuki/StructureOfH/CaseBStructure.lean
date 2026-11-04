@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Case (b) of Peterfalvi Part II, Ch. III §1, in its own terms
@@ -30,6 +32,8 @@ standing structure of `S` — `Z(S) = Q₀`, `S/Q₀` elementary abelian, `K` fr
   `t S t ⊆ S K t S`.
 * `Hypothesis.typeASubgroup` — **the Proposition of §2**.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

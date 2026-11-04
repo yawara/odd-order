@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllDistinctParameters
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPrescribedFactorTransport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllDistinctParameters
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPrescribedFactorTransport
 
 /-!
 # Higman Lemma 13: parameters on two joins with a common factor
@@ -19,6 +21,8 @@ the field of degree five.
 This is the parameter-level bridge only.  The equal-parameter alternatives
 are converted into the group-theoretic cases in downstream leaves.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

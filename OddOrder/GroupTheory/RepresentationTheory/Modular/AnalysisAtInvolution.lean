@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BrauerSuzukiEndgame
-import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
+module
+
+public import OddOrder.Algebra.BrauerSuzukiEndgame
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
 
 /-!
 # The "analysis at `t`", assembled — Navarro pp. 142–145 in one statement
@@ -31,6 +33,8 @@ hypotheses from a `2`-modular system over `𝓞_ℂ_[2]` (issue 9506).
   column of values at the involution
 * `OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_columns`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

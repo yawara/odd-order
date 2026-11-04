@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
 
 /-!
 # Peterfalvi Part II, Ch. IV §3 (4): `f` is inversion in the unitary coordinates
@@ -44,6 +46,8 @@ unitary coordinates and feeding them to the arithmetic of `PSU3StarEquation`.
 
 The arithmetic these run on — `(∗∗)` and its consequences — is `PSU3StarEquation`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

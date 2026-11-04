@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
-import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Isaacs Ch. 9 — §9C: Thompson–Wielandt (Theorems 9.23/9.24), pp. 285–288
@@ -21,6 +23,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
   `le_normalizer_relCore` (`H ≤ N_G(core_H(D))`, すなわち `core_H(D)` は `H` に normal),
   `le_relCore` (最大性: `N ≤ D`, `N ≤ H`, `H ≤ N_G(N)` ⇒ `N ≤ core_H(D)`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

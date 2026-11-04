@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Algebra.MonoidAlgebra.MapDomain
-import Mathlib.Algebra.Ring.Action.End
-import OddOrder.Algebra.RelativeTrace
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.Algebra.MonoidAlgebra.MapDomain
+public import Mathlib.Algebra.Ring.Action.End
+public import OddOrder.Algebra.RelativeTrace
 
 /-!
 # The group algebra as a `G`-algebra under conjugation
@@ -34,6 +36,8 @@ structures in mathlib and conjugation is not the expected default.  It lives in 
 * `OddOrder.GroupAlgebra.forall_smul_eq_iff_mem_center` — over a commutative base the `G`-fixed
   points are exactly the centre.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

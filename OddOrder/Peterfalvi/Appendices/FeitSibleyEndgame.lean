@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
-import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgameSetup
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgameSetup
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley endgame (steps (4)–(8))
@@ -26,6 +28,8 @@ class-algebra congruence → (8) conclusion) is built on top.
   `x = 1 ∧ m = 2` (the latter reduces to the former by a sign swap of the `e'`).
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

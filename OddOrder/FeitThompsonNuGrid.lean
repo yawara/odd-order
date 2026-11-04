@@ -1,5 +1,7 @@
-import OddOrder.FeitThompsonSetup
-import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+module
+
+public import OddOrder.FeitThompsonSetup
+public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
 
 /-!
 # Peterfalvi certain-Type-T ν-grid
@@ -8,6 +10,8 @@ This file constructs the canonical T-side grid used in Peterfalvi (4.3)--(4.9) a
 It mirrors the S-side `muS` supply from the certain-type hypothesis on the partner maximal
 subgroup, keeping the producer below the final Section 16 assembly.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

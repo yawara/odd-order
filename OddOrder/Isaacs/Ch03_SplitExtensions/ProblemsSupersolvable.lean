@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 
 /-!
 # Isaacs Chapter 3 — Problems §3B: 超可解群 (supersolvable groups)
@@ -15,6 +17,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 3B.7 (書籍 p.
 **`Nᵢ₊₁ = Nᵢ ⊔ ⟨x⟩` なる `x ∈ Nᵢ₊₁` の存在**として表す (商群の `Normal` instance を仮説の中で
 作らずに済み, `Nᵢ ≤ Nᵢ₊₁` も自動的に従う)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

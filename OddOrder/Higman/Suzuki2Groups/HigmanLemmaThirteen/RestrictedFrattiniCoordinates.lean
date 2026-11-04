@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
 
 /-!
 # Higman's Lemma 13: restricted Frattini coordinates
@@ -17,6 +19,8 @@ that equality into an explicit `ZMod 2`-linear equivalence and proves that
 the equivalence intertwines the restricted factor action with the ambient
 action on `Φ(P)²`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

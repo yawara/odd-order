@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ProblemsStabilityGroup
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsStabilityGroup
 
 /-!
 # Isaacs Chapter 4 — Problems 4D (coprime action)
@@ -27,6 +29,8 @@ Isaacs の Note: `G` が可解で `N = F(G)`, あるいは `G` が `p`-可解で
 `N = O_p(G)` のとき `C_G(N) ⊆ N` が成り立つので, これらの場合には「`A` が `G` に忠実かつ
 coprime に作用すれば `N` にも忠実に作用する」が従う。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

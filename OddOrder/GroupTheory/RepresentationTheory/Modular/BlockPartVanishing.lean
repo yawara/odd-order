@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 
 /-!
 # Navarro (5.10): the `B`-parts inherit vanishing on a `p`-section
@@ -38,6 +40,8 @@ particular on the `p`-section of `g_p` when `g_p` and `h_p` are not conjugate.
 * `OddOrder.RepresentationTheory.Modular.blockPart_eq_zero_of_forall_pSection` — Navarro (5.10)
 * `OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero` — Navarro (5.11)
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

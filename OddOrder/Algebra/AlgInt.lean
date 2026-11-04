@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Basic.Complex.Basic
-import Mathlib.RingTheory.Polynomial.RationalRoot
-import Mathlib.Algebra.Order.BigOperators.Group.Multiset
-import Mathlib.Algebra.Polynomial.Monic
-import Mathlib.Analysis.Complex.Norm
-import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
-import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+module
+
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.RingTheory.Polynomial.RationalRoot
+public import Mathlib.Algebra.Order.BigOperators.Group.Multiset
+public import Mathlib.Algebra.Polynomial.Monic
+public import Mathlib.Analysis.Complex.Norm
+public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
+public import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 
 /-!
 # Algebraic-integer congruences in `ℂ`
@@ -55,6 +57,8 @@ Peterfalvi (6.7.2)/(6.7.3) manipulate it: multiply through by `ψ(1)`, by `a_{ij
 * Peterfalvi, *Character Theory for the Odd Order Theorem*, LMS LNS 272 (2000), proof of (6.7),
   pp. 31–32.
 -/
+
+@[expose] public section
 
 namespace OddOrder.AlgInt
 

@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
 
 /-!
 # MsigmaNilpotent
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103
 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Corollary 15.5 helpers (§14-independent) + Theorem 15.2 assembly

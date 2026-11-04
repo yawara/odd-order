@@ -3,20 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.PLength
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.GroupTheory.CentralProduct
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.Isaacs.Ch05_Transfer.Main
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch1_Preliminary.PLength
+public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.GroupTheory.CentralProduct
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §10: The Subgroups `M_α` and `M_σ` — Core (定義層 + Thm 10.1 + Thm 10.2 前半)
@@ -71,6 +73,8 @@ BG 10.1--10.14 の証明本体は §10 の各 leaf に landing 済み (例: Lemm
   These are exact upstream interfaces, not hypotheses to hide in the downstream §12--§16 spine.
 
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S10
 

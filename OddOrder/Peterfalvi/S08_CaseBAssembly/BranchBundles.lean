@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBCoherence2
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBCoherence2
 
 /-!
 # Peterfalvi §8 case-(B): branch infrastructure and bundles
@@ -21,6 +23,8 @@ of class functions on `L`) to avoid the `↥h46.K` vs `↥H` type-mismatch of th
 
 Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` ("session 41 cont.⁷ 続⁵+").
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_BridgeCharacter
+module
+
+public import OddOrder.Peterfalvi.S15_BridgeCharacter
 
 /-!
 # Peterfalvi §9/§13 — the (5.2.d) member `R`-families for the `T`-instance §9 family
@@ -20,6 +22,8 @@ Everything is parametric in the ν-grid supply `pins : NuGridSupplyData` and the
 (14.9)-conclusional `hTP`/`Tdata` (the established `T`-side parameter layer, cf.
 `dadeHypT0`/`tauTbetaGrid`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

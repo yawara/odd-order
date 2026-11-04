@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Peterfalvi (5.9)(a): Galois automorphisms commute with coherent isometries
@@ -36,6 +38,8 @@ hypothesis on `σc` is needed — this is what makes it applicable to the wild a
 of `ℂ` produced by `CyclotomicGaloisAction` (which never commute with conjugation
 globally).  Used by (6.8.2.1) together with (1.9.b).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

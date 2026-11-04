@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-import OddOrder.GroupTheory.FreeActionOrbitCount
-import OddOrder.Algebra.PowSubOneDvd
-import Mathlib.FieldTheory.Finite.GaloisField
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+public import OddOrder.GroupTheory.FreeActionOrbitCount
+public import OddOrder.Algebra.PowSubOneDvd
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # ξ-length from the group order: the counting half
@@ -26,6 +28,8 @@ subgroup orders must be powers of `q = 2^n`.  In particular a group of order
 `q³` admits no chain of four strict inclusions of normal invariant
 subgroups — the counting half of "`|P| = q³` iff ξ-length `3`".
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteen
 
 /-!
 # Peterfalvi Part II, Ch. II, step (14): the action of `N_G(RΣ)` on `𝒜₂`
@@ -25,6 +27,8 @@ Conjugation is written with the pointwise action of `MulAut G` on `Subgroup G`,
 which is the mathlib idiom; `smul_eq_map_conj` bridges it to the `Subgroup.map`
 form used in `StepFourteen`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

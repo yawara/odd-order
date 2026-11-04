@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 
 /-!
 # Peterfalvi Part II, Ch. II, step (7): `N = P`
@@ -28,6 +30,8 @@ This leaf begins with the *decomposition* `N = (N ∩ W) × P`, phrased as
 The reduction `N ∩ W = 1 ⟹ N = P` is then immediate.  The hard direction,
 `N ∩ W = 1`, is the centralizer-trichotomy contradiction, handled separately.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

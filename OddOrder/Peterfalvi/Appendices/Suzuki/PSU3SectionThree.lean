@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: determination of `f`
@@ -48,6 +50,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.cocycle_scale_of_diagScale` — its `K`-scaling input, straight from
   `centreQuadraticMap_smul`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

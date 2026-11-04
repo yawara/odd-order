@@ -3,8 +3,10 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
-import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+module
+
+public import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
+public import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
 
 /-!
 # Peterfalvi §6.8.2 — case-(B) full `X(W₂) ∪ Y` coherence seed (the `(P4)` glue)
@@ -27,6 +29,8 @@ full-`X(W₂)` analogue of the single-class `coherentCertainTypeSet_union_Yset_c
 
 The seed feeds `nonempty_coherent_S_caseB` ((6.8.3) bootstrap) to give `IsCoherent hyp.tau S`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

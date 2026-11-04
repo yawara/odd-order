@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 
 /-!
 # Peterfalvi Part II, Ch. IV §4, opening paragraph: the dichotomy that closes Theorem A
@@ -47,6 +49,8 @@ not assumed: "`C_G(P)` has 2-rank ≥ 2" is the field
 `SecondCaseHypothesis.twoRank_centralizer_ge_two`, and `ℓ > 2` is
 `PSU3InductionTarget.one_lt_n` transported along `|C_{Q₀}(P)| = ℓ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

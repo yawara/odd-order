@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Higman theorem (d): the actual two-summand split
@@ -22,6 +25,8 @@ model count `|X| = |F|²`, and complementarity descends from
 `X ⊓ Y = Φ(P)`, `X ⊔ Y = ⊤`.  This constructs Peterfalvi's
 `OrderQModuleSplit` payload with `Z := Z(P)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.GroupTheory.ElementaryAbelian
-import Mathlib.GroupTheory.GroupAction.ConjAct
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import Mathlib.GroupTheory.GroupAction.ConjAct
 
 /-!
 # Minimal `L`-invariant normal subgroups are elementary abelian
@@ -30,6 +32,8 @@ subgroups of `H` contained in `N` (`ConjAct.normal_of_characteristic_of_normal` 
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece A), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

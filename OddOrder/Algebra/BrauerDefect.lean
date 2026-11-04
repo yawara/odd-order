@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.BrauerKernel
-import OddOrder.Algebra.DefectGroup
-import OddOrder.Algebra.MackeyFormula
+module
+
+public import OddOrder.Algebra.BrauerKernel
+public import OddOrder.Algebra.DefectGroup
+public import OddOrder.Algebra.MackeyFormula
 
 /-!
 # The Brauer homomorphism sees only the defect group
@@ -30,6 +32,8 @@ converse (`Br_D(e_B) ≠ 0`) it characterises the defect group as the largest `P
 * `OddOrder.GroupAlgebra.brauerProj_eq_zero_of_forall_not_le`
 * `OddOrder.GroupAlgebra.card_le_card_of_brauerProj_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

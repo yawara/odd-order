@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Frattini
-import OddOrder.Mathlib.Subgroup
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+module
+
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.Mathlib.Subgroup
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 
 /-!
 # Isaacs Ch. 9 — §9B: Schenkman's theorem (Lemmas 9.19–9.20, Theorems 9.21–9.22, p. 282)
@@ -33,6 +35,8 @@ Wielandt automorphism tower theorem (Thm 9.10) の最終ピース. Schenkman の
   `M = comap (mk' N) M̄` (`N ≤ M`) より `M ◁ G`.
 - ⚠ mmd 抽出 (L5091, L5095) は 9.19/9.20 の仮定を正しく `N ◁ G` と抽出.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

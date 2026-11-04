@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.DefectGroup
-import OddOrder.Algebra.MackeyFormula
-import OddOrder.Algebra.Rosenberg
+module
+
+public import OddOrder.Algebra.DefectGroup
+public import OddOrder.Algebra.MackeyFormula
+public import OddOrder.Algebra.Rosenberg
 
 /-!
 # The defect groups of an idempotent are conjugate
@@ -28,6 +30,8 @@ trace ideals are permuted by conjugation — forces equality.
 * `OddOrder.GAlgebra.exists_conj_eq_of_isDefectGroup_of_commute` — the form to use when `A^G` is
   commutative, where "non-unit in the corner" means "nilpotent".
 -/
+
+@[expose] public section
 
 namespace OddOrder.GAlgebra
 

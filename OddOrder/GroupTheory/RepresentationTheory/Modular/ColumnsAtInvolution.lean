@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
 
 /-!
 # The columns `D^t_j` of the "analysis at `t`": Navarro p. 141, equation (3)
@@ -37,6 +39,8 @@ one on the left of (7.4)+(7.6): both are `cartanMatrix … e` for the ordinary s
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (7.4), (7.5), (7.6), p. 141.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.CoprimeFixedPoints
-import OddOrder.GroupTheory.MinimalInvariantNormal
+module
+
+public import OddOrder.GroupTheory.CoprimeFixedPoints
+public import OddOrder.GroupTheory.MinimalInvariantNormal
 
 /-!
 # Peterfalvi (9.1): the chief-series assembly of Wielandt's fixed-point formula
@@ -30,6 +32,8 @@ hypothesis `WielandtPerFactor`, leaving the assembly purely group-theoretic and 
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece B), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

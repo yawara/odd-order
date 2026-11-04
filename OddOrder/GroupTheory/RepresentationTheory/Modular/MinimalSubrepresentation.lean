@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
+module
+
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 
 /-!
 # A nonzero finite-dimensional representation has an irreducible subrepresentation
@@ -23,6 +25,8 @@ which is what `exists_irreducibleBrauerCharacter_eq` consumes.
 * `OddOrder.RepresentationTheory.Modular.exists_minimal_invariant`
 * `OddOrder.RepresentationTheory.Modular.isSimpleModule_subrepresentation_of_minimal`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

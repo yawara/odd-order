@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # BG §12 Proposition 12.15 — σ(M)-subgroup / maximal interaction
@@ -29,6 +31,8 @@ S12_E の旧 forward-declaration `sigma_subgroup_maximal_interaction` (旧 `sorr
 (証明は 12.5(e)/12.6/12.10(d)/12.2(a)(b)/10.9 を要し、それらの leaf は S12_E より downstream
 ゆえ S12_E 内 in-place 証明不可; 12.13 と同型の downstream leaf 方式)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

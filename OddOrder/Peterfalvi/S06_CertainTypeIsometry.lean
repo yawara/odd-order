@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeSupport
-import OddOrder.Peterfalvi.S06_CertainTypeStructure
-import OddOrder.Peterfalvi.S05_GridTrichotomy
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeSupport
+public import OddOrder.Peterfalvi.S06_CertainTypeStructure
+public import OddOrder.Peterfalvi.S05_GridTrichotomy
 
 /-!
 # Peterfalvi (4.8): equal-degree certain-type differences are σ-isometric
@@ -39,6 +41,8 @@ Remaining (steps 5-8, the `(3.8)` trichotomy endgame): `ψ := (μ_{ij} − μ_{i
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 33").
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

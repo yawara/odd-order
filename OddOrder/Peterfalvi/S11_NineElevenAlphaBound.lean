@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
-import OddOrder.Peterfalvi.S11_NineElevenCaseA
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
+public import OddOrder.Peterfalvi.S11_NineElevenCaseA
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.6): the `α`-bound layer of the (9.11) endgame
@@ -48,6 +50,8 @@ bound `NineElevenNormBound` is discharged up to the single named residual
 
 Reference note: `issues/closed/9083-lane-a-1007-decomp-moot-revised-frontier.md` (Phase E).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S13
 

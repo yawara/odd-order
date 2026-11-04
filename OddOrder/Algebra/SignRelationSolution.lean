@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Order.Ring.Defs
-import Mathlib.Algebra.Ring.Basic
-import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Algebra.Order.Ring.Defs
+public import Mathlib.Algebra.Ring.Basic
+public import Mathlib.Tactic.LinearCombination
+public import Mathlib.Tactic.Ring
 
 /-!
 # The last step of Brauer–Suzuki: three sign relations force `χ_1(t) = χ_1(1)`
@@ -32,6 +34,8 @@ formula applied to the class of `t` — the product of two involutions has odd o
 
 * `OddOrder.Algebra.eq_of_sign_relations`
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

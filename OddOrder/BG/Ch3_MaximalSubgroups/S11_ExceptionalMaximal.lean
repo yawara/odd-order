@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.GroupTheory.NarrowPGroup
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.PRank
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.GroupTheory.NarrowPGroup
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.PRank
 
 /-!
 # BG §11: Exceptional Maximal Subgroups
@@ -53,6 +55,8 @@ Theorem 11.7 本体は単一定理 leaf `S11_MsigmaANormal.lean` (本ファイ�
   Proposition 1.6(d) (mmd L2997-L3021). It should not be hidden behind
   BG Theorem 4.16, §5 narrow hypotheses, or Peterfalvi assumptions.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S11
 

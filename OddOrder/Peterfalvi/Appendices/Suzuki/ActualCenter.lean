@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
 
 /-!
 # The actual Suzuki center and its Higman filtration
@@ -19,6 +21,8 @@ Agemo layer of the center. It does not claim the reverse center inclusion:
 that remaining statement is isolated exactly as the vanishing of the first
 Agemo layer.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

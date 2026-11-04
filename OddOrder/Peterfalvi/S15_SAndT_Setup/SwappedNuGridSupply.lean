@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — the honest ν-grid supply after swapping
@@ -12,6 +14,8 @@ The `S ↔ T` swap transposes the original `μ`-grid into its `ν`-grid.  Conseq
 already-carried `μ`-grid facts give a `NuGridSupplyData` bundle for the swapped hypothesis,
 starting from the explicitly supplied canonical bundle and requiring no generic producer.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

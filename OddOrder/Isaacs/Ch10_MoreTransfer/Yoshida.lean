@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
-import OddOrder.GroupTheory.MackeyTransfer
+module
+
+public import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
+public import OddOrder.GroupTheory.MackeyTransfer
 
 /-!
 # Isaacs §10A — Yoshida's theorem (pp. 295-296, 303-304)
@@ -29,6 +31,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 10, §10A の中核:
    `R ≤ Q := xMx⁻¹ ⊓ P`、`|S : Q| ≤ p` から `Φ(S) ≤ Q`、よって
    `W(n) ∉ R·Φ(S)` — Theorem 10.9 が `C_p ≀ C_p ↞ P` を与える。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch10
 

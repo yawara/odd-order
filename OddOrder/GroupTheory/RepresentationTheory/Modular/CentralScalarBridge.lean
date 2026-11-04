@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CenterIdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+module
+
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # The lattice central character and the Wedderburn central character agree
@@ -32,6 +34,8 @@ Wedderburn side, where the orthogonality relations and the primitive idempotents
 * `OddOrder.RepresentationTheory.Modular.exists_blockOfIrr_eq` — `blockOfIrr` is surjective:
   every block contains an ordinary irreducible character
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

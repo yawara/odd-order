@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04f_Omega1
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04f_Omega1
 
 /-!
 # BG §4F — Blackburn: the noncentral-Ω₁ opening layer
@@ -11,6 +13,8 @@ import OddOrder.BG.Ch1_Preliminary.S04f_Omega1
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): `R = T × P` and the regular action
@@ -28,6 +30,8 @@ to the quotient).  The abelianity of `R`, the `T = [R, s]` decomposition and
 the regularity claim land in subsequent commits (campaign issue 2053; proof
 plan recorded there from the p. 111 reading).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

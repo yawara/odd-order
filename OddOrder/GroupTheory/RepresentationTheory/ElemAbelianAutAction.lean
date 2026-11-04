@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-import OddOrder.GroupTheory.ElementaryAbelian
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RingTheory.SimpleModule.Basic
-import Mathlib.RingTheory.IntegralDomain
-import Mathlib.RingTheory.ZMod.UnitsCyclic
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RepresentationTheory.Maschke
+public import Mathlib.RingTheory.SimpleModule.Basic
+public import Mathlib.RingTheory.IntegralDomain
+public import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
 # Bender–Glauberman Lemma 2.7: `(ℤ/q)²` acting faithfully on `(ℤ/p)²`
@@ -48,6 +50,8 @@ pair `(χ₁, χ₂)` is injective, and each `χᵢ α` is a `q`-th root of unit
 `δ := χ₁ · χ₂⁻¹ : Q → 𝔽_pˣ` is not injective, giving `α ≠ 1` with `χ₁ α = χ₂ α =: r`, and `r ≠ 1`
 by faithfulness.  Then `r` has order `q`, `α` acts as `r`, and `q = orderOf r ∣ |𝔽_pˣ| = p − 1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

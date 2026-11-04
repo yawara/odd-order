@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Alternating
-import Mathlib.GroupTheory.Perm.Centralizer
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+public import Mathlib.GroupTheory.Perm.Centralizer
+public import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 
 /-!
 # Isaacs Problem 1C.5 — `A_{p+1}` の Sylow `p`-正規化群の位数
@@ -35,6 +37,8 @@ Isaacs は暗黙に `p` 奇素数を仮定しているので、本形式化は `
 - 掛け合わせ: `(2|N|)·(c·p) = 2|A|·(p−1)·p = (p+1)!·(p−1)·p = (p·(p−1))·(c·p)`、
   `c·p > 0` で cancel して `2|N| = p(p−1)`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

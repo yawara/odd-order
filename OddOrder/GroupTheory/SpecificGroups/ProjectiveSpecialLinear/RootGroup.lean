@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.ProjectiveSpecialLinearGroup
-import OddOrder.GroupTheory.ElementaryAbelian
+module
+
+public import Mathlib.LinearAlgebra.Matrix.ProjectiveSpecialLinearGroup
+public import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # The standard root group and Weyl element of PSL(2,F)
@@ -20,6 +22,8 @@ order three.
 This is the concrete PSL(2,q) structure cited in Peterfalvi, Part II,
 Chapter I section 3, Proposition 1(c) (pp. 105--106).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

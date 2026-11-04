@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import Mathlib.GroupTheory.SemidirectProduct
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Peterfalvi Part II, Chapter I §2, Proposition 3 — Suzuki-side identifications
@@ -18,6 +20,8 @@ subgroup `K` with `F(D̄)`, identifies `V̄` with the stabilizer of the distingu
 involution, proves that `F(D̄)` acts irreducibly on `Q₀`, and exhibits
 `D̄ = K̄ ⋊ V̄` as an internal and external semidirect product.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Perfect
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
-import OddOrder.GroupTheory.SylowTransport
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+module
+
+public import Mathlib.FieldTheory.Perfect
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.GroupTheory.SylowTransport
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the distinguished Suzuki pair
@@ -38,6 +40,8 @@ through the odd central kernel.
 This is the Suzuki branch of T. Peterfalvi, *Character Theory for the Odd
 Order Theorem*, Part II, Ch. I section 3, Proposition 1(c), pp. 105--106.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
@@ -102,7 +106,7 @@ private theorem standardBorel_conj_mem_standardRootSubgroup
 
 /-- The standard right-root parameter in the distinguished Suzuki structure
 equation. -/
-private noncomputable def standardStructureConjugatorParameter (m : ℕ) :
+noncomputable def standardStructureConjugatorParameter (m : ℕ) :
     RootGroup m :=
   RootGroup.mk 1 1
 

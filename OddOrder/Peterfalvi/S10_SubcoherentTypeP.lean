@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
-import OddOrder.Peterfalvi.S07_Subcoherent
-import OddOrder.Peterfalvi.S08_SixTwoGeneral
-import OddOrder.Peterfalvi.S10_TypePSupportA0
-import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+module
+
+public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral
+public import OddOrder.Peterfalvi.S10_TypePSupportA0
+public import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 
 /-!
 # Peterfalvi (8.15), claim 3: Hypothesis (5.2) for the type-`P` induced family
@@ -81,6 +83,8 @@ Everything is assembled via the (5.3.a) producer `S07.irrSubcoherent` from lande
 * **§8F** instantiates it at `A = A(M) = typePACore M`, `H = M_σ`
   (`typePACore_subcoherent`) — valid for **every** type `𝒫`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

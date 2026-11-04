@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
-import OddOrder.Peterfalvi.S14_MaximalI.PairCoherence
-import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
+public import OddOrder.Peterfalvi.S14_MaximalI.PairCoherence
+public import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
 
 /-!
 # Peterfalvi (12.15), first claim — the `ρ_M`-evaluation `ψ^{ρ_M}(g) = ψ(g)` on `K^#`
@@ -27,6 +29,8 @@ For the counterexample maximal `M` of (12.8) and the witness Dade character `ψ 
   (`orthogonal_character_constant_on_coset`) makes `ψ` constant on `g·N_F ⊇ g·H(g)`, collapsing
   the `ρ_M`-average (`chiRho_apply_eq_of_forall_coset`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory

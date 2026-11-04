@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 
 /-!
 # KappaHallCommutator
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Lemma 14.11 - Lemma 14.13 — global counting + subnormal closure

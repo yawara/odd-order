@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
 
 /-!
 # Higman's Lemma 13: ambient eigenvectors of a restricted factor
@@ -18,6 +20,8 @@ constructs the corresponding Frobenius-conjugate eigenfamily after scalar
 extension.  The family span contains every ground tensor coming from the
 factor, both in field coordinates and as an actual group element.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

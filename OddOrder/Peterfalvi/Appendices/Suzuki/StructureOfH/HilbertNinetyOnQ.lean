@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
-import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
+public import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 
 /-!
 # `C_{S/Q₀}(P) ≠ 1` from Hilbert 90
@@ -46,6 +48,8 @@ Both are stated for an `X ⊄ W` rather than in the branch `W = 1` where Ch. III
 uses them: the twist only ever needs a single element of `X` outside `W = C_V(K)`,
 and Ch. IV §4 — the case `V ≠ W` — has those without `W` being trivial.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

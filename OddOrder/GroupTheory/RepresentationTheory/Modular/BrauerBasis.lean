@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
-import Mathlib.RingTheory.Localization.Integer
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+module
+
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
+public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
+public import Mathlib.RingTheory.Localization.Integer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
 # The irreducible Brauer characters are a basis of the `p`-regular class functions
@@ -37,6 +39,8 @@ in `IBr(H)` — the coefficients being the generalized decomposition numbers `d^
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_map` — a vanishing left kernel is
   inherited by a field extension
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

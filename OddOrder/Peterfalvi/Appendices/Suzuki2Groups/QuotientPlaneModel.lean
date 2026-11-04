@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
-import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the plane model of `Q ⧸ Q₀`
@@ -24,6 +26,8 @@ equivariant isomorphism between the summands aligns the two coordinates into
 the diagonal scalar action.  This is the identification used in the last
 paragraph of Lemma 5 to place `W` inside `GL(2, q)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

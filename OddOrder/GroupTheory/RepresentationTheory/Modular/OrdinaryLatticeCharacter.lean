@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import OddOrder.Algebra.CentralCharacter
-import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
+module
+
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import OddOrder.Algebra.CentralCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 
 /-!
 # The `K`-side and the `𝒪`-side central characters agree
@@ -31,6 +33,8 @@ components it comes from `OrdinaryIrreducibles.wedderburnLattice`).
 
 * `OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_algebraMap_centralScalar`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
+module
+
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 
 /-!
 # Isaacs Problem 5C.9 — 非可換単純・偶数位数・`8 ∤ |G|` なら `3 ∣ |G|` (p. 163)
@@ -21,6 +23,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 ⚠ 書籍は `Aut(C₂ × C₂) ≅ S₃` (位数 6) を使うが, ここでは 5C.8 と共通の軌道数え上げ補題で
 `|Aut P|` を計算せずに済ませている。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

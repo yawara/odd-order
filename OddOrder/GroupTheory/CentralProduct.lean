@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.Subgroup.Center
-import Mathlib.Tactic.Group
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.Subgroup.Center
+public import Mathlib.Tactic.Group
+public import Mathlib.GroupTheory.Index
 
 /-!
 # Internal central products of subgroups
@@ -74,6 +76,8 @@ mathlib v4.34.1 に二因子の内部 central product 述語は不在 (`Mathlib/
 BG §4 Thm 4.16 着手 (issue 0051, 2026-05-30) の前提 shared module.
 設計メモは `notes/bg/s04_thm416_handoff.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

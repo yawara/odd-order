@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.FeitThompsonCharacterData
+module
+
+public import OddOrder.FeitThompsonCharacterData
 
 /-!
 # Feit–Thompson Section 16 assembly and odd-order theorem
@@ -12,6 +14,8 @@ Peterfalvi §§13–16 (pp. 64–92) and BG Appendix C: construct the named
 Section 16 inputs, derive the final contradiction, and perform the
 minimal-counterexample reduction.
 -/
+
+@[expose] public section
 
 namespace OddOrder
 open OddOrder.BG

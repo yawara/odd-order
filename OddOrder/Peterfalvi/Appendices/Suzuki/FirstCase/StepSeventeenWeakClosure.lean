@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSixteen
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSixteen
 
 /-!
 # Peterfalvi Part II, Ch. II, step (17): weak closure of `Z₁PΣ`
@@ -16,6 +18,8 @@ in the Sylow `3`-subgroup `R₂` (`map_conj_eq_of_le_sylow`), which is the hypot
 the Hall–Wielandt theorem, together with `N_G(R₂) = R₂⟨s⟩ = N_G(Z₁PΣ)`.  The final
 contradiction built on it is in `StepSeventeen.lean`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

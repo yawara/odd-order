@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Isaacs FGT Ch.6 — involution recognition helpers for Lemma 6.13 (pp. 192-193)
@@ -17,6 +19,8 @@ Split from `OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition` (issue 0149, 
 longFile-1500 campaign); `DQSDRecognition` imports this leaf transitively, so
 downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

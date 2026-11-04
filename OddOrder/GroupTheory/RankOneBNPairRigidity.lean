@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RankOneBNPair
-import OddOrder.GroupTheory.PrimeComplementResidual
-import OddOrder.Mathlib.SchurZassenhausConj
+module
+
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # The rigidity Lemma of a rank-one split BN-pair
@@ -46,6 +48,8 @@ into a homomorphism `permHom : L →* Equiv.Perm (Option ↥Q)` and reads the Le
 * `Setup.normalCore_eq_bot_of_isSimpleGroup` — the same conclusion in one line when `L`
   happens to be simple, which is the case Peterfalvi Ch. IV §4, step (2) needs.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

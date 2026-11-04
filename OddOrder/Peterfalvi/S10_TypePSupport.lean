@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+module
+
+public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 
 /-!
 # Peterfalvi (8.13) for the book-literal type-`𝒫` support `A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#`
@@ -20,6 +22,8 @@ Relocated here from `S15_SAndT_Setup/SubcoherenceInputs.lean` (issue 1044): thes
 about `A(M)`, not `S`/`T`-specific ones, and the type-uniform (8.18) chain in
 `S10_MinimalSimpleStructure.lean` consumes them upstream of §15.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S10
 

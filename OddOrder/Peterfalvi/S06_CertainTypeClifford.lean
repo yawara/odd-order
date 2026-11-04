@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters
 
 /-!
 # Peterfalvi §6 (4.5): Clifford theory of the certain-type characters
@@ -25,6 +27,8 @@ on `W − W₂` (the linear characters of a column agree on `W₂`), and
 
 Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S06
 

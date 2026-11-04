@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Peterfalvi (7.9) parity primitive — real virtual characters over a group of odd order
@@ -23,6 +25,8 @@ self-conjugate irreducible is the trivial one (`G` odd, Peterfalvi (1.1)), whose
 This file builds the primitive incrementally.  First: the conjugation involution's only fixed point
 is the trivial character (odd order).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
-import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S16_PairingCoherence
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
+public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.Peterfalvi.S16_PairingCoherence
 
 /-!
 # Peterfalvi (13.19, pp. 85–87): coherent images and the eta-grid
@@ -14,6 +16,8 @@ This upstream leaf contains the generic type-I coherent-image orthogonality and 
 avoidance results used on both the `L`- and `M`-sides of Section 16.  It is independent of the
 Section 16 `MHypothesis` carrier and of the downstream comparison argument.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

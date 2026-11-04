@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
 
 /-!
 # Peterfalvi Part II, Ch. I §3: the centralizer trichotomy
@@ -33,6 +35,8 @@ In accordance with Proposition 1(c), the unitary branch does not assert a
 type-B structure: that stronger conclusion belongs to a later result with
 an additional hypothesis.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

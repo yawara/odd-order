@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FixedPointFree
-import Mathlib.GroupTheory.Nilpotent
-import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+module
+
+public import Mathlib.GroupTheory.FixedPointFree
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 
 /-!
 # Simplicity of the standard Suzuki group
@@ -20,6 +22,8 @@ Peterfalvi cites Huppert--Blackburn, Chapter XI, Theorem 3.6 for this fact.  The
 proof here instead verifies the standard perfect/primitive/solvable-stabilizer
 criterion directly from the explicit generator relations.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

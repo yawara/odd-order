@@ -1,6 +1,8 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
-import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
-import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
+public import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
+public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 
 /-!
 # Peterfalvi (13.11)-(13.15) — order and divisor determination
@@ -8,6 +10,8 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

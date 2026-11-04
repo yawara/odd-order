@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
 # The support of `d^x_{χ ·}` seen through `C_G(x) ↠ C_G(x)/N`
@@ -28,6 +30,8 @@ then moves it to `B_0(C_G(x)/N)`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (5.8), (6.?), (7.6), p. 141.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

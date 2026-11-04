@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AlgClosedSplitting
-import OddOrder.Algebra.BlockIdempotent
-import OddOrder.Algebra.GroupAlgebraDefectGroup
+module
+
+public import OddOrder.Algebra.AlgClosedSplitting
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.GroupAlgebraDefectGroup
 
 /-!
 # The blocks of `k[G]` over an algebraically closed field
@@ -31,6 +33,8 @@ residue field of the `p`-modular system `𝕎(𝔽̄_p)`.
 * `OddOrder.GroupAlgebra.exists_modularDatum` — the splitting datum the modular theory carries,
   for *any* finite group, over an algebraically closed field
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

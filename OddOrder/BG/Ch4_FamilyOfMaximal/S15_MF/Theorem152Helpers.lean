@@ -1,5 +1,7 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 
 /-!
 # BG Theorem 15.2 — §14-gated conditional helpers
@@ -7,6 +9,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory

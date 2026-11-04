@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.NumberTheory.Multiplicity
-import Mathlib.Data.ZMod.Basic
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Algebra.Order.Ring.GeomSum
-import Mathlib.Algebra.Ring.GeomSum
+module
+
+public import Mathlib.NumberTheory.Multiplicity
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Algebra.Order.Ring.GeomSum
+public import Mathlib.Algebra.Ring.GeomSum
 
 /-!
 # Primitive prime divisors of `(p^q - 1)/(p - 1)` for `q` an odd prime
@@ -26,6 +28,8 @@ Used to upgrade the Singer irreducibility lemma `isSimpleModule_of_isCyclic_fait
 (`SingerField.lean`) from cyclic to **abelian** acting groups, closing the Peterfalvi (13.2.a)
 `U`/`V`-cyclic obligations of §16 without the §13 type-`P` structure theory.
 -/
+
+@[expose] public section
 
 namespace OddOrder.NumberTheory
 

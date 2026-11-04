@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
-import OddOrder.GroupTheory.CentralInvolutionNormalComplement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDegreeOdd
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
+public import OddOrder.GroupTheory.CentralInvolutionNormalComplement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDegreeOdd
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the character-theoretic core (Navarro pp. 139–146)
@@ -28,6 +30,8 @@ instantiated for the `Q₈` configuration (issue 9506).
 
 * `OddOrder.GroupTheory.q8_exists_proper_normal`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03
 open OddOrder.RepresentationTheory.Modular

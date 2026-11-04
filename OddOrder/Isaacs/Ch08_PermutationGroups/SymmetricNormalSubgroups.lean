@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+public import Mathlib.GroupTheory.Index
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the normal subgroups of `Sym Ω` (Cor 8.28)
@@ -22,6 +24,8 @@ The proof needs `Z(Sym Ω) = 1`, which is also absent from mathlib (mathlib's
 `Equiv.Perm.alternatingGroup.center_eq_bot` is the centre of the *alternating* group), so it is
 proved here first as `center_perm_eq_bot`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

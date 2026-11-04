@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.Lemmas
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
+module
+
+public import Mathlib.Algebra.CharP.Lemmas
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
 
 /-!
 # The twisted layer sum `s = ∑ ω^{-i} w_i`
@@ -32,6 +34,8 @@ replaces the former by the latter, which is what `twistedSum_corner` and `sum_co
   `f · v i · f`
 * `OddOrder.GroupTheory.exists_conj_eigen_corner` — the assembly: all three properties of `s`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

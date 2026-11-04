@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
-import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
-import OddOrder.Isaacs.Ch04_Commutators.Mann
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+public import OddOrder.Isaacs.Ch04_Commutators.Mann
 
 /-!
 # Peterfalvi Part II, Ch. I §2: Proposition 1 (the structure of `Q`)
@@ -29,6 +31,8 @@ From §2 onwards the book keeps the standing hypotheses (A1)–(A3) and the
 * **Prop 1 (c)**: `H ∩ I ⊆ Z(Q)`, and `(H ∩ I) ∪ {1}` is an elementary
   abelian `2`-group.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

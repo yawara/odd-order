@@ -1,14 +1,16 @@
-import OddOrder.BG.AppC_NormSet
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
-import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.Peterfalvi.S15_SAndT
-import OddOrder.Peterfalvi.S16_CaseBOrder
-import OddOrder.BG.AppC_LemmaC3_FixedPointFree
-import OddOrder.Peterfalvi.S16_CoreLemmas
-import OddOrder.Peterfalvi.S16_G0Coprime
-import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S16_PairingBessel
+module
+
+public import OddOrder.BG.AppC_NormSet
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+public import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.Peterfalvi.S15_SAndT
+public import OddOrder.Peterfalvi.S16_CaseBOrder
+public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+public import OddOrder.Peterfalvi.S16_G0Coprime
+public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # TSideTypeP
@@ -16,6 +18,8 @@ import OddOrder.Peterfalvi.S16_PairingBessel
 Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (14.3)-(14.7) — the subgroup L over N_G(U)

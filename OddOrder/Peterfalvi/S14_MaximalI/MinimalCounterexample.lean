@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
 
 /-!
 # Peterfalvi Section 14: minimal-counterexample representation bounds
@@ -14,6 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 This module continues `WitnessFrobenius` with the one- and two-dimensional representation
 bounds, the complement-order estimate, and the final witness exclusions used downstream.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 

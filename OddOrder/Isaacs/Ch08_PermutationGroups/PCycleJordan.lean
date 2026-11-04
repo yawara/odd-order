@@ -3,10 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Jordan
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
+module
+
+public import Mathlib.GroupTheory.GroupAction.Jordan
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
+public import Mathlib.Data.Nat.Prime.Factorial
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the `p`-cycle Jordan theorem (Thm 8.23)
@@ -41,6 +44,8 @@ element-level corrections):
   `3`-cycle since `3 ∤ p`, and the `3`-cycle Jordan theorem applies.
   (`p = 3` is the `3`-cycle Jordan theorem directly.)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

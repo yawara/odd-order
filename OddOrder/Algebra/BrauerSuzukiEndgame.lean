@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Int.ModEq
-import OddOrder.Algebra.BasicSetColumnShape
-import OddOrder.Algebra.HalfSumColumns
-import OddOrder.Algebra.SignRelationSolution
+module
+
+public import Mathlib.Data.Int.ModEq
+public import OddOrder.Algebra.BasicSetColumnShape
+public import OddOrder.Algebra.HalfSumColumns
+public import OddOrder.Algebra.SignRelationSolution
 
 /-!
 # The endgame of Brauer–Suzuki, assembled — Navarro pp. 142–145
@@ -44,6 +46,8 @@ relation (10) is an identity between integers again.
 * `OddOrder.Algebra.exists_eq_of_columns` — the whole endgame
 * `OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees` — the same, from textbook inputs only
 -/
+
+@[expose] public section
 
 namespace OddOrder.Algebra
 

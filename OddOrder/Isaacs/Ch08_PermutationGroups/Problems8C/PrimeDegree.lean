@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Primitive
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.GroupTheory.Sylow
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
-import Mathlib.Tactic.NormNum.Prime
+module
+
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+public import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # 素数次数の置換群 (Isaacs Problems 8C の準備)
@@ -24,6 +26,8 @@ import Mathlib.Tactic.NormNum.Prime
 - `card_normalizer_dvd_of_card_eq_prime` — `|N_G(H)| ∣ p(p-1)` (`N/C ↪ Aut(H)`,
   `|Aut(Z_p)| = p - 1`)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

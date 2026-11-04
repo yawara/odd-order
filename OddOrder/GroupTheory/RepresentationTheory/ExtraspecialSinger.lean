@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Determinant
-import Mathlib.LinearAlgebra.Alternating.Basic
-import Mathlib.RepresentationTheory.Irreducible
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.FrattiniPGroup
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
-import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+module
+
+public import Mathlib.LinearAlgebra.Determinant
+public import Mathlib.LinearAlgebra.Alternating.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.FrattiniPGroup
+public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # Singer / symplectic divisibility for extraspecial actions (BG §15.7(e), route B)
@@ -38,6 +40,8 @@ The mathematics:
 * `det_eq_one_of_compLinearMap_alternating` — pure linear algebra: a map preserving a nonzero
   top-degree alternating form has determinant `1`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -152,7 +156,7 @@ noncomputable def commMulEquiv : ↥(commutator P) ≃* Multiplicative (ZMod p) 
 
 /-- The commutator bihomomorphism `P →* P →* Multiplicative 𝔽_p`, `(x, y) ↦ ζ ⁅x, y⁆`
 (class `≤ 2`, so multiplicative in each slot). -/
-private noncomputable def commBihomP : P →* P →* Multiplicative (ZMod p) where
+noncomputable def commBihomP : P →* P →* Multiplicative (ZMod p) where
   toFun x :=
     { toFun := fun y => commMulEquiv hP ⟨⁅x, y⁆, commutatorElement_mem_commutator_top x y⟩
       map_one' := by simp [commutatorElement_one_right]
@@ -172,7 +176,7 @@ private noncomputable def commBihomP : P →* P →* Multiplicative (ZMod p) whe
 
 omit [Finite P] in
 /-- `ζ ⁅x, z⁆ = 1` when `z ∈ commutator P` (central, right slot). -/
-private theorem commBihomP_central_right (x : P) {z : P} (hz : z ∈ commutator P) :
+theorem commBihomP_central_right (x : P) {z : P} (hz : z ∈ commutator P) :
     commBihomP hP x z = 1 := by
   have hz1 : (⟨⁅x, z⁆, commutatorElement_mem_commutator_top x z⟩ : ↥(commutator P)) = 1 :=
     Subtype.ext (commutatorElement_eq_one_iff_commute.mpr
@@ -181,7 +185,7 @@ private theorem commBihomP_central_right (x : P) {z : P} (hz : z ∈ commutator 
 
 omit [Finite P] in
 /-- `ζ ⁅z, y⁆ = 1` when `z ∈ commutator P` (central, left slot). -/
-private theorem commBihomP_central_left {z : P} (hz : z ∈ commutator P) (y : P) :
+theorem commBihomP_central_left {z : P} (hz : z ∈ commutator P) (y : P) :
     commBihomP hP z y = 1 := by
   have hz1 : (⟨⁅z, y⁆, commutatorElement_mem_commutator_top z y⟩ : ↥(commutator P)) = 1 :=
     Subtype.ext (commutatorElement_eq_one_iff_commute.mpr
@@ -190,7 +194,7 @@ private theorem commBihomP_central_left {z : P} (hz : z ∈ commutator P) (y : P
 
 /-- The commutator bihom with the **second** argument descended: `P →* (P/Z) →* Multiplicative 𝔽_p`.
 -/
-private noncomputable def commBihom1 : P →* (P ⧸ commutator P) →* Multiplicative (ZMod p) where
+noncomputable def commBihom1 : P →* (P ⧸ commutator P) →* Multiplicative (ZMod p) where
   toFun x := QuotientGroup.lift (commutator P) (commBihomP hP x)
     (fun y hy => MonoidHom.mem_ker.mpr (commBihomP_central_right hP x hy))
   map_one' := by
@@ -203,7 +207,7 @@ private noncomputable def commBihom1 : P →* (P ⧸ commutator P) →* Multipli
       QuotientGroup.lift_mk', map_mul]
 
 /-- The fully descended commutator pairing `(P/Z) →* (P/Z) →* Multiplicative 𝔽_p`. -/
-private noncomputable def commBihom2 :
+noncomputable def commBihom2 :
     (P ⧸ commutator P) →* (P ⧸ commutator P) →* Multiplicative (ZMod p) :=
   QuotientGroup.lift (commutator P) (commBihom1 hP)
     (fun x hx => MonoidHom.mem_ker.mpr (by

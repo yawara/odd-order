@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_RegularOperator
+module
+
+public import OddOrder.BG.AppE_RegularOperator
 
 /-!
 # BG Appendix E, Theorem E.3, Step 3: `Ω₁(R)` has exponent `p`
@@ -30,6 +32,8 @@ equal because `C_R(R₀) = R₀ × R₁` with `R₀` of order `p`, and the centr
 one that is visibly `A`-invariant (`R₀` is `A`-invariant, hence so is its centralizer) —
 `R₁` on its own carries no invariance hypothesis in the setup.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

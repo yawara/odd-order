@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 
 /-!
 # BG §14 Proposition 14.2 support lemmas (`κ`-free)
@@ -25,6 +27,8 @@ Stated entirely without reference to `κ(M)` (defined downstream in `S14_TypePCo
 so this leaf sits **below** that file in the import DAG; lane H imports it with one line.
 See `issues/7000-s14-prop142-support.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

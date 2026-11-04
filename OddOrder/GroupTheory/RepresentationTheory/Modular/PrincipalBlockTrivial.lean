@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 
 /-!
 # The trivial character lies in the principal block
@@ -34,6 +36,8 @@ centre (`centerBasis`), so it is enough to compare them on `K̂`:
 * `OddOrder.RepresentationTheory.Modular.exists_blockOfIrr_eq_principalBlock_character_eq_one` —
   there is `χ ∈ Irr(B_0)` with `χ(g) = 1` for every `g`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

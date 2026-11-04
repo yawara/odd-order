@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
+module
+
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 
 /-!
 # The `p`-regular classes are a basis of `kG ⧸ T'`
@@ -32,6 +34,8 @@ halves of Brauer's count of the irreducible modular representations; the other h
 * `OddOrder.RepresentationTheory.Modular.basisPRegularQuotient`
 * `OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

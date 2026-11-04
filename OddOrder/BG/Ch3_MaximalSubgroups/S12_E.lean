@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
 
 /-!
 # BG §12: The Subgroup `E` — active scaffold leaf
@@ -39,6 +41,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
   Uniqueness Theorem (mmd L3454-L3482). Do not replace it by downstream
   prime-action assumptions in §13.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppC_LemmaC3_ConjugateLine
+module
+
+public import OddOrder.BG.AppC_LemmaC3_ConjugateLine
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: the scalar calculus `s^x` and the words `M₁, M₂, M₃`
@@ -23,6 +25,8 @@ words `M₁, M₂, M₃` whose (C.4) relation drives the rest of the argument.
 
 Migrated from `OddOrder.Peterfalvi.S16_AppendixC3` (issue 0151).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
 
 /-!
 # Isaacs FGT Ch.7 — normal-J theorem (Thm 7.6), Steps 1-5 + the `V`-setup (pp. 209-214)
@@ -18,6 +20,8 @@ Split from `OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ` (issue 0149, the
 longFile-1500 campaign); `S7B1_NormalJ` imports this leaf, so downstream imports are
 unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -430,7 +434,7 @@ private theorem zCenterOpCoreSubgroup_le_opCore
   rintro _ ⟨⟨z, hz_L⟩, _, rfl⟩
   exact hz_L
 
-private theorem zCenterOpCoreSubgroup_comm
+theorem zCenterOpCoreSubgroup_comm
     {G : Type*} [Group G] {p : ℕ} :
     ∀ x ∈ zCenterOpCoreSubgroup G p,
       ∀ y ∈ zCenterOpCoreSubgroup G p, x * y = y * x := by

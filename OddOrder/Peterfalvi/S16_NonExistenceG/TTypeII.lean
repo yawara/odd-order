@@ -1,8 +1,10 @@
-import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
-import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
-import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+module
+
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGalois
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapGridAlignment
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+public import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 
 /-!
 # Peterfalvi (14.9): the T-side Type-II theorem
@@ -10,6 +12,8 @@ import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
 The T-side type-III character estimate and the deduction that `T` is of Type II.
 Topic-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

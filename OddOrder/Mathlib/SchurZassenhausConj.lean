@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Sylow
-import OddOrder.Mathlib.Subgroup
+module
+
+public import Mathlib.GroupTheory.SchurZassenhaus
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)
@@ -34,6 +36,8 @@ Strong induction on `|G|`.
 3. **Main induction**: combine (1), (2), Sylow C-theorem, and abelian SZ conjugacy
    to handle the two solvability cases.
 -/
+
+@[expose] public section
 
 open scoped Pointwise
 open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid/CommGroup is now scoped

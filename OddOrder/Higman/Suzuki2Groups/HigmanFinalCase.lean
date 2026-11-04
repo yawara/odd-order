@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
-import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+public import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
 
 /-!
 # Higman Lemma 3: final case split
@@ -17,6 +19,8 @@ This file implements the final square identity and case split used to bound
 the exponent of the normal abelian subgroup. The subgroup denoted
 `A^(2-2η)` in the source is the range of `twoSubTwoMap`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

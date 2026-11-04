@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.CentralCharacter
-import OddOrder.Algebra.SubgroupSum
+module
+
+public import OddOrder.Algebra.CentralCharacter
+public import OddOrder.Algebra.SubgroupSum
 
 /-!
 # A normal subgroup whose sum acts invertibly on a block is killed by it
@@ -23,6 +25,8 @@ irreducible Brauer characters of `B`, the first half of Navarro (6.12).
 * `OddOrder.GroupAlgebra.pi_single_eq_one_of_isUnit_centralScalar` — `ω_i(N̂)` invertible ⟹ the
   `i`-th block kills `N`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 
 /-!
 # The orthogonality of `Φ_θ` against `IBr(G)`
@@ -37,6 +39,8 @@ over the `p`-regular classes.
 * `OddOrder.RepresentationTheory.Modular.sum_cartanMatrix_mul_pairingZero` — `([μ,φ]⁰)` inverts
   the Cartan matrix
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

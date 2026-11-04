@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.WittVector.Complete
-import Mathlib.RingTheory.WittVector.DiscreteValuationRing
-import Mathlib.Algebra.CharP.Algebra
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+module
+
+public import Mathlib.RingTheory.WittVector.Complete
+public import Mathlib.RingTheory.WittVector.DiscreteValuationRing
+public import Mathlib.Algebra.CharP.Algebra
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 
 /-!
 # Witt vectors of a perfect field of characteristic `p` form a `p`-modular system
@@ -33,6 +35,8 @@ Everything rests on two mathlib results about a perfect `k` of characteristic `p
 * `OddOrder.RepresentationTheory.Modular.instIsAlgClosedResidueFieldWittVector`
 * `OddOrder.RepresentationTheory.Modular.instIsPModularSystemWittVector` — the system itself
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

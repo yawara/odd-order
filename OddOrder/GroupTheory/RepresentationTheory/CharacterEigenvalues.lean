@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.EigenspaceDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+module
+
+public import OddOrder.Algebra.EigenspaceDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
 
 /-!
 # Character values as sums of roots of unity
@@ -33,6 +35,8 @@ eigenspaces of `ρ g` with eigenspaces of `ρ (g^k)`, which can merge.
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.5 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

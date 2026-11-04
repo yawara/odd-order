@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
-import OddOrder.GroupTheory.CoprimeConjugacy
-import OddOrder.Mathlib.Subgroup
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+public import OddOrder.GroupTheory.CoprimeConjugacy
+public import OddOrder.Mathlib.Subgroup
 
 /-!
 # BG §13: Lemma 13.7 (`E₁E₃` prime on `M_σ`) + prime-action helpers
@@ -18,6 +20,8 @@ import OddOrder.Mathlib.Subgroup
 に prime 作用）とその支持補題群（prime-action ⟹ trivial centralizer 等）。13.6 非依存。
 S13 frontier の prefix-split（active leaf = `S13_PrimeActionTransition`）。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

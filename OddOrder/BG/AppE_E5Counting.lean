@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_CorollaryE5
+module
+
+public import OddOrder.BG.AppE_CorollaryE5
 
 /-!
 # BG Corollary E.5: final assembly and the `(E.33)`/`(E.34)` counting
@@ -26,6 +28,8 @@ This leaf finishes Corollary E.5 (issue 3028 WP5) on top of the staged material 
   `𝒞_G(M̃), 𝒞_G(Ñ*), 𝒞_G(Ñ), 𝒞_G(Ẑ)` then measure more than `|G|`
   (`(E.33)` = Lemma 14.5(c), `(E.34)` = the `Ẑ` TI-count), a contradiction.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanZStar.CharacterCore
-import OddOrder.GroupTheory.GlaubermanZStar.CharacterIdentity
-import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+module
+
+public import OddOrder.GroupTheory.GlaubermanZStar.CharacterCore
+public import OddOrder.GroupTheory.GlaubermanZStar.CharacterIdentity
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
 
 /-!
 # Glauberman's `Z*`-theorem: Step 9 and the final contradiction
@@ -30,6 +32,8 @@ Navarro (7.9), Step 9 and the closing paragraph.  With `v ∈ P` a second involu
 
 * `OddOrder.GroupTheory.MinimalConfig.false_of_exists_involution`
 -/
+
+@[expose] public section
 
 open OddOrder.Isaacs.Ch03 OddOrder.RepresentationTheory.Modular
 open OddOrder.RepresentationTheory OddOrder.MatrixModule

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
-import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.GroupTheory.NilpotentAbelianization
+module
+
+public import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
+public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import OddOrder.GroupTheory.NilpotentAbelianization
 
 /-!
 # Peterfalvi (6.5) for a general kernel: the (6.3.b) coherence input
@@ -47,6 +49,8 @@ The `K = H` instance of all of this is the `SibleyDadeHypothesis` development in
 an arbitrary solvable normal subgroup of `L`, and members of `𝒮(X)` are allowed to be reducible
 everywhere except in the two theorems that explicitly take `hirr`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

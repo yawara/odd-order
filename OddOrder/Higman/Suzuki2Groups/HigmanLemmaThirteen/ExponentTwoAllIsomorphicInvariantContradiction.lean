@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphContradiction
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeTermGraphPreimage
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphContradiction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeTermGraphPreimage
 
 /-!
 # Higman's Lemma 13: the all-isomorphic invariant graph is impossible
@@ -19,6 +21,8 @@ eigenvalue propagates the seed bracket cancellation across the whole graph
 and target families.  The two actual factors consequently commute
 elementwise, contradicting the type-A factor geometry.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

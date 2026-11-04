@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
 
 /-!
 # Higman Lemma 13: pairwise mixed terms as ambient commutators
@@ -22,6 +24,8 @@ The final representative form retains membership in the two actual factors.
 It is the bridge needed to turn the coordinate support cancellation in
 Lemma 13 into a subgroup commuting with the third factor.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

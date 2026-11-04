@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 
 /-!
 # Counting lemmas for BG Prop 2.4(j)(k)
@@ -17,6 +19,8 @@ squares sum to `2` has exactly one `+1` and one `-1` (and is `0` elsewhere).
 This is the `m = 1` shape of Prop 2.4(j) once the sum-of-squares identity (h)
 turns the multiplicity hypothesis into `∑ (nᵢ − nᵢ₊₁)² = 2`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

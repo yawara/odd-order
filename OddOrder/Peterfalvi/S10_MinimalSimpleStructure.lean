@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
-import OddOrder.Peterfalvi.S10_TypePSupport
+module
+
+public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+public import OddOrder.Peterfalvi.S10_TypePSupport
 
 /-!
 # TAIL
@@ -12,6 +14,8 @@ import OddOrder.Peterfalvi.S10_TypePSupport
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleStructure` (2000-line limit, issue 0103 第 2
 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S10
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

@@ -1,6 +1,8 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
-import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
+public import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
 
 /-!
 # Peterfalvi (13.3.c) — the `μ`-column pin machinery (coherence-generic)
@@ -37,6 +39,8 @@ file.  ⚠ The pin target is the **global-sign disjunction** (Coq `typeP_TIred_c
 `PFsection13.v:338`): the clean pin for an *arbitrary* coherence is false — for `p = 3` the
 column-swapped sign flip is an equally valid inhabitant (issue 2035 更新 #16/#17).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

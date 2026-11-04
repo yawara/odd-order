@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppE_BetaSupply
+module
+
+public import OddOrder.BG.AppE_BetaSupply
 
 /-!
 # BG Proposition E.4, corrected: `C_S(Z₂(S))` is abelian of index `p`
@@ -50,6 +52,8 @@ inputs from the proved pieces:
 Throughout, `S' = H₁` (BG `(E.7)`, here `commutator_eq_and_card_quotient`) converts
 between the mod-`S'` eigenvalue statements on `S/S'` and the mod-`H₁` chain statements.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppE
 

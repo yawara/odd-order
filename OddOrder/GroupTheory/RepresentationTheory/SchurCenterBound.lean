@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.RepresentationTheory.Character
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.GroupTheory.Subgroup.Center
-import Mathlib.GroupTheory.Index
-import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
-import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+module
+
+public import Mathlib.Analysis.Complex.Polynomial.Basic
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.GroupTheory.Subgroup.Center
+public import Mathlib.GroupTheory.Index
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 
 /-!
 # Schur's center bound: `χ(1)² ≤ |G : Z|`
@@ -42,6 +44,8 @@ center of the relevant quotient.
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, Corollary 2.30.
 * Peterfalvi §1 (1.8); §6 (6.6)–(6.8); §9.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
+module
+
+public import Mathlib.GroupTheory.Sylow
 
 /-!
 # The Sylow subgroups containing a given `p`-subgroup
@@ -23,6 +25,8 @@ number of Sylow subgroups containing it.
 
 * `OddOrder.GroupTheory.card_sylow_containing_modEq_one`
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

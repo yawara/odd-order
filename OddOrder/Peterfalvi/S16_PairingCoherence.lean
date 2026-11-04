@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S14_MaximalI
-import OddOrder.Peterfalvi.S09_ParityPrimitive
-import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
-import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI
+public import OddOrder.Peterfalvi.S09_ParityPrimitive
+public import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
+public import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
 
 /-!
 # Peterfalvi (14.14), coherence pairing data for a type-I pair
@@ -39,6 +41,8 @@ Main definitions and results:
   (`ftThickenedSupport_A1_disjoint_of_nonconjugate`) through the faithful-support
   bridge `dadeSupport_eq_ftThickenedSupport`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S16
 

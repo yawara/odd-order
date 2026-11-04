@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
-import OddOrder.Peterfalvi.S09_ParityPrimitive
+module
+
+public import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
+public import OddOrder.Peterfalvi.S09_ParityPrimitive
 
 /-!
 # Peterfalvi (7.9): the parity step `⟨Δ₁, Δ₂⟩` is even, at Hypothesis (7.9) generality
@@ -36,6 +38,8 @@ conjugation identities) and the Frobenius layer's `hypothesis78_delta_isReal`.
 
 - `OddOrder.Peterfalvi.S09.Hypothesis79.delta_even`: **Peterfalvi (7.9), parity step**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S09
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
-import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Subrepresentation
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RepresentationTheory.Subrepresentation
 
 /-!
 # BG Theorem 3.10, general (non-abelian) kernel — the K₀ reduction (issue 8013, piece 3)
@@ -31,6 +33,8 @@ The base case `K₀ = K` (i.e. `K` minimal normal) is the abelian-kernel theorem
 This file builds that reduction.  **Status (issue 8013 piece 3)**: the irreducibility dichotomy is
 landed here; the induction (base + Case A + Case B quotient) is the remaining frontier.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03
 

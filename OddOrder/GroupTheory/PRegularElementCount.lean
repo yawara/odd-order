@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import OddOrder.GroupTheory.PRegularElement
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.PRegularElement
 
 /-!
 # The number of `p`-regular elements is prime to `p`
@@ -33,6 +35,8 @@ valuations) at this point of the development.
 * `OddOrder.GroupTheory.card_filter_isPRegular` — the `Finset` form of `|G⁰|`
 * `OddOrder.GroupTheory.not_dvd_card_isPRegular` — **`p ∤ |G⁰|`**
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 
 /-!
 # The change-of-basis matrix `U` of Navarro (7.3) is integral
@@ -39,6 +41,8 @@ So this file
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.16), (7.3), (7.4).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

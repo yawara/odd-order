@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Complement
-import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.Tactic.Group
 
 /-!
 # The mappings `f`, `g`, `h` of a rank-one split BN-pair
@@ -69,6 +71,8 @@ The `t`-twist in (H3)–(H6) is essential: `D = M ∩ M^t` is normalized by `t` 
 not be centralized, so `a^t ≠ a` in general.  The `pdftotext` extraction of p. 122
 silently drops these superscript `t`'s; the statements here follow the page image.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

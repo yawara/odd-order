@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Matrix.Basis
-import Mathlib.Algebra.Ring.Subring.Basic
-import OddOrder.Algebra.PiMatrixSimpleModules
+module
+
+public import Mathlib.Data.Matrix.Basis
+public import Mathlib.Algebra.Ring.Subring.Basic
+public import OddOrder.Algebra.PiMatrixSimpleModules
 
 /-!
 # Central characters of the blocks
@@ -28,6 +30,8 @@ point to the block decomposition.
 * `OddOrder.MatrixModule.centralCharacterPi_eq_zero_iff`
 * `OddOrder.MatrixModule.SameBlock`
 -/
+
+@[expose] public section
 
 namespace OddOrder.MatrixModule
 

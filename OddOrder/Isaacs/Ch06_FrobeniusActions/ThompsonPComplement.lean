@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
 
 /-!
 # Isaacs Thm 6.23: Thompson's normal `p`-complement theorem, characteristic-subgroup form (p. 198)
@@ -35,6 +37,8 @@ applies.  The degenerate case `P = ⊥` is `hasNormalPComplement_of_sylow_eq_bot
 - `OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer`:
   **Isaacs Thm 6.23**.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

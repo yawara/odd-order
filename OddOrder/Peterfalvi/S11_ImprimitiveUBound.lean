@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
-import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+public import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
+public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 
 /-!
 # Peterfalvi (9.7)(a): the non-Galois imprimitive `u`-bound `u ≤ (p^q − 1)/(p − 1)`
@@ -26,6 +28,8 @@ injectivity
 proved below by turning a common block scalar into a central automorphism and applying the descended
 Frobenius action (see `notes/peterfalvi/s11_9_7a_imprimitive_ubound.md`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorCopyTransport
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorCopyTransport
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
 
 /-!
 # Higman Lemma 13: transport between prescribed pairwise factors
@@ -20,6 +22,8 @@ This construction preserves the restricted ambient actor.  Consequently it
 also transports zeroth lower-central layers and identifies normalized
 square-law parameters without eliminating dependent factor records.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

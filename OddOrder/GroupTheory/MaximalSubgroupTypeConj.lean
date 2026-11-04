@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.MaximalSubgroupType
+module
+
+public import OddOrder.GroupTheory.MaximalSubgroupType
 
 /-!
 # Conjugation-invariance of the maximal-subgroup types
@@ -29,6 +31,8 @@ were `S`, then `S` would be type `I` (`isTypeI_pointwise_smul`), contradicting
   `isTISubset_pointwise_smul`, `rank_map_of_mulEquiv`, ...) phrased for the general
   pointwise `MulAut G` action; reusable across the §16 conjugacy arguments.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 
@@ -460,7 +464,7 @@ omit [Finite G] in
 /-- The centralizer of the `φ`-image of a subgroup is the `φ`-image of the centralizer:
 `centralizer ((φ • H : Subgroup G) : Set G) = φ • centralizer (H : Set G)`.  A convenience
 repackaging of `centralizer_pointwise_smul` with `coe_pointwise_smul` for the `TypePData` fields. -/
-private theorem centralizer_coe_pointwise_smul (φ : MulAut G) (H : Subgroup G) :
+theorem centralizer_coe_pointwise_smul (φ : MulAut G) (H : Subgroup G) :
     Subgroup.centralizer ((φ • H : Subgroup G) : Set G) = φ • Subgroup.centralizer (H : Set G) := by
   rw [centralizer_pointwise_smul, coe_pointwise_smul]
 

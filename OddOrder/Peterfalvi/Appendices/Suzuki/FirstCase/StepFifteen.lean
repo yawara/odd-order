@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenSylow
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.NonsplitTorus
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenSylow
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.NonsplitTorus
 
 /-!
 # Peterfalvi Part II, Ch. II, step (15): the cyclic subgroup `L` of order `9`
@@ -21,6 +23,8 @@ that reading: by the nonsplit torus construction the Sylow `3`-subgroups of `PSL
 are cyclic of order `9`, and one of them centralizes `st`; conversely `C_G(st)` is a
 `3`-group by (13), so the intersection has order dividing `9`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

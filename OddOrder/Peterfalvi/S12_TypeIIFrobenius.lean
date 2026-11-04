@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
-import OddOrder.Peterfalvi.S08_CrossOrthogonality
-import OddOrder.Peterfalvi.S12_Section9Counts
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-import OddOrder.Peterfalvi.S04_DadeIsometryBasic
-import OddOrder.Peterfalvi.S12_TypeIIDadeBase
-import OddOrder.Peterfalvi.S07_PivotCoherence
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+module
+
+public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
+public import OddOrder.Peterfalvi.S08_CrossOrthogonality
+public import OddOrder.Peterfalvi.S12_Section9Counts
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+public import OddOrder.Peterfalvi.S12_TypeIIDadeBase
+public import OddOrder.Peterfalvi.S07_PivotCoherence
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
 
 /-!
 # Peterfalvi (10.7): the Type-II `HU`-Frobenius dichotomy assembly
@@ -51,6 +53,8 @@ assembly is the heir `typeII_HU_frobenius_of_coherent'` (`S12_TypeIICrossIsometr
 The former in-file legacy chain (the bare-sorry gate `exists_typeIICrossIsometryData` and
 the assembly `typeII_HU_frobenius_of_coherent`) is retired (issues 1020/9079/9087).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S12
 

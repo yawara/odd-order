@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.SpecificGroups.ZGroup
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
 # Z-groups (every Sylow subgroup cyclic)
@@ -36,6 +38,8 @@ explicit hypothesis on a concrete subgroup in BG §3/§10) but bridge to the `ma
 
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §3, §10.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 
 /-!
 # `(SK) ∪ (SKtS)` is a subgroup
@@ -27,6 +29,8 @@ the closure of `(SK) ∪ (SKtS)`.  The two rewrites that do the work are
 * `Hypothesis.orderFiveCarrier` — the set `(SK) ∪ (SKtS)`.
 * `Hypothesis.orderFiveSubgroup` — it is a subgroup, given `h(x) ∈ K`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

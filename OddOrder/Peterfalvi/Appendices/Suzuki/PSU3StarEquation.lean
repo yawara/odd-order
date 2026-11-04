@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: the equation `(∗∗)` and its consequences
@@ -36,6 +38,8 @@ The group-theoretic side is `PSU3InverseFormula`, which imports this file.
 * `secondEntry_of_chain`, `star_of_chain` — the bridge from a two-factor identity in
   the twisted product to `(∗∗)`, which is how stage (1) enters.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

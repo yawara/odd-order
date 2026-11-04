@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.GroupTheory.OpResidual
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.GroupTheory.OpResidual
 
 /-!
 # Subgroup constructions realized in the ambient group
@@ -21,6 +23,8 @@ These were originally duplicated as `BG.Ch2.S07.{derivedInG, opiCoreInG}` and as
 the single canonical home (issue 0052). It sits low in the import graph (only
 `Isaacs.Ch03`) so every consumer can import it cheaply.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

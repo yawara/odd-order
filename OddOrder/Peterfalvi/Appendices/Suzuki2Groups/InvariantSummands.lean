@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
 # Peterfalvi Appendix III: invariant summands under a Frobenius action
@@ -26,6 +28,8 @@ summands in its central quotient.
 No elementary-abelian hypothesis is needed for these implications; that
 hypothesis belongs to Higman's construction of the summands themselves.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

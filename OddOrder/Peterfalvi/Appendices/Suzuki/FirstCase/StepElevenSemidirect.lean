@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): `T ⋊ C_Q(P) ≅ F ⋊ F^*`
@@ -32,6 +34,8 @@ Together the last two say exactly that the conjugation action of `C_Q(P)` on `T`
 the multiplication action of `F^*` on `F` — which is the content of
 `T ⋊ C_Q(P) ≅ F ⋊ F^*`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

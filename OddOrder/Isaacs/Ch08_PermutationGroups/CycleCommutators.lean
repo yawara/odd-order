@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Commutator
-import Mathlib.GroupTheory.Perm.Cycle.Basic
-import Mathlib.GroupTheory.Perm.Cycle.Type
+module
+
+public import Mathlib.Algebra.Group.Commutator
+public import Mathlib.GroupTheory.Perm.Cycle.Basic
+public import Mathlib.GroupTheory.Perm.Cycle.Type
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: cycle lemmas for Jordan–Bochert (Lem 8.24, 8.25)
@@ -20,6 +22,8 @@ theorem (Thm 8.23) and Bochert's theorem (Thm 8.26):
   exactly one point is moved by both permutations `x` and `y`, then the
   commutator `⁅x, y⁆` is a `3`-cycle.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

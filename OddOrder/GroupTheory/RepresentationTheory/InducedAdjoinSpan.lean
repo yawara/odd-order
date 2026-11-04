@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 
 /-!
 # Induction carries `ℤ[ω]·ch(H)` into `ℤ[ω]·v(G)`
@@ -23,6 +25,8 @@ closure induction.
 
 * D. Gorenstein, *Finite Groups*, §4.7 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

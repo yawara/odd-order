@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 
 /-!
 # Canonicalization
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi (13.5)-(13.10) — norm estimate tail

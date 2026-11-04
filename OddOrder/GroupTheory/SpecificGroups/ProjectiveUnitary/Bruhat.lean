@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
 
 /-!
 # Bruhat decomposition for the standard projective unitary group
@@ -21,6 +23,8 @@ Proposition 4(a), whose canonical form is `G ∖ H = H t H = H t Q`.  It then
 identifies the standard Borel with the stabilizer of infinity and computes the
 exact order of the generated permutation group.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

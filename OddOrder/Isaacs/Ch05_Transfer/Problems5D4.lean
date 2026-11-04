@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
-import OddOrder.Isaacs.Ch05_Transfer.Problems5D
+module
+
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5D
 
 /-!
 # Isaacs Problem 5D.4 — `O^p` と `A^p` の部分群への制限 (書籍 p. 170)
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5D
 
   を順に使う。⭐ 仮定 `O^p(K) = K ∩ O^p(G)` は 4 でだけ効く。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

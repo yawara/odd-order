@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.DefectNumber
-import OddOrder.Algebra.GroupAlgebraDefectGroup
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+module
+
+public import OddOrder.Algebra.DefectNumber
+public import OddOrder.Algebra.GroupAlgebraDefectGroup
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 
 /-!
 # The defect of a block of `kG`
@@ -27,6 +29,8 @@ This is the number the height of an ordinary character is measured against:
   property of `e_B`
 * `OddOrder.RepresentationTheory.Modular.card_defectGroup_blockIdempotentOf` — `|D| = p^{d(B)}`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

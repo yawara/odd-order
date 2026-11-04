@@ -3,7 +3,9 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S07_Coherence
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence
 
 /-!
 # Peterfalvi (5.7): the *standalone* constant-degree coherence theorem
@@ -33,6 +35,8 @@ element of `R(χ₀)`) is independent of the auxiliary member by the (5.4.b) two
 routes to the (5.2.d) base case.  Design + framework mapping are in
 `notes/peterfalvi/s05_57_constant_degree_coherence_producer.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 

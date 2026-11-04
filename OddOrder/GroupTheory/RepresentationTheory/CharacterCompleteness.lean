@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Irreducible
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.LinearAlgebra.Trace
-import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
-import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
-import OddOrder.Mathlib.MonoidAlgebra
+module
+
+public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.RepresentationTheory.Maschke
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+public import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Completeness of irreducible characters (work in progress)
@@ -29,6 +31,8 @@ inequality already proved) equality — `card_irreducibleCharacter_eq`, which th
 packages as `CharacterTableIndexing.ofFinite'` / `instCharacterTableIndexingOfFinite`, the
 square-table datum every downstream orthogonality result consumes.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

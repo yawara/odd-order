@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
-import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
+public import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
 
 /-!
 # Peterfalvi (9.1), item 0: a twisting automorphism permutes the isotypic projections
@@ -34,6 +36,8 @@ being a homomorphism.  The two ingredients are:
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (NEXT — carrier-level, item 0), issue 2014.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.CenterModuleDecomp
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6B.1 — Frobenius 補群は Frobenius 群を含まない (書籍 p. 195)
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 書籍が「deduce」と書いているのはこの合成のこと — 可解性の仮定は前半で外れる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

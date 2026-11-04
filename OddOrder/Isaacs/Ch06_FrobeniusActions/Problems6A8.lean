@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
+module
+
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
 
 /-!
 # Isaacs Problem 6A.8 — 正規部分群と Lemma 6.5 の集合 `X` (書籍 p. 186)
@@ -25,6 +27,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
      `g = m a₁` と分解すると `y` は `M` の中で `a₁ a a₁⁻¹ ∈ C` と共役)。
   4. 濃度が等しく包含があるので `X = X_M(C) ⊆ M`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

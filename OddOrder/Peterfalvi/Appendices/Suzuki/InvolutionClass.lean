@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
 
 /-!
 # Peterfalvi Part II, Ch. I §1: the involution class (Props 2–3)
@@ -20,6 +22,8 @@ Proposition 1 from `Suzuki.Basic`:
 * Prop 2 (d): `#{u ∈ I | H^u = H^t} = |H ∩ I|`;
 * Prop 3: `|K| = |H ∩ I|`, and `s^K = H ∩ I` for `s ∈ H ∩ I`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 

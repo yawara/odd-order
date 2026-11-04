@@ -3,15 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.SimpleModule.WedderburnArtin
-import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-import Mathlib.RingTheory.SimpleRing.Matrix
-import Mathlib.RingTheory.SimpleRing.Congr
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
-import Mathlib.LinearAlgebra.FiniteDimensional.Basic
-import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
-import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+module
+
+public import Mathlib.RingTheory.SimpleModule.WedderburnArtin
+public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+public import Mathlib.RingTheory.SimpleRing.Matrix
+public import Mathlib.RingTheory.SimpleRing.Congr
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+public import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
 /-!
 # Skolem–Noether for the endomorphism algebra of a finite-dimensional vector space
@@ -39,6 +41,8 @@ so `End k W₀` is the scalars, so `(finrank k W₀)² ≤ 1`.
 * `finrank_eq_one_of_aut_fixedScalar` — the same for an abstract finite-dimensional simple algebra
   over an algebraically closed field: it must be the scalars (`finrank k E = 1`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
 
 /-!
 # Navarro (3.16): `IBr(B)` is a `ℤ`-combination of `{χ⁰ : χ ∈ Irr(B)}`
@@ -41,6 +43,8 @@ the `φ_μ` are linearly independent on the `p`-regular classes
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (3.16).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

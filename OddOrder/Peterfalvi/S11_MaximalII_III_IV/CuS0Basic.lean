@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
 
 /-!
 # Peterfalvi §11 — `C_U(S₀)`: opening layer
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory

@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
+module
+
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-!
 # InertiaLift
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §9 — C_U(S₀) layer and character grid preparation

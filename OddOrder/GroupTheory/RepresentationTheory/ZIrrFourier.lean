@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.NatInt
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.IsReal
+module
+
+public import Mathlib.Algebra.Module.NatInt
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.IsReal
 
 /-!
 # Fourier coefficients of virtual characters
@@ -27,6 +29,8 @@ already lies in the `ℤ`-span of the orthonormal irreducibles.
 
 Reference issue: `issues/0025-peterfalvi-isometry-difference-core.md` (layer 2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 
 /-!
 # Peterfalvi Appendix I: transitivity implies irreducibility
@@ -16,6 +18,8 @@ action transitive on the nonidentity elements has no proper nontrivial
 invariant subgroup.  It is used independently of the later Fitting and
 fixed-point-free conclusions of the appendix.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

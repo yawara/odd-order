@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 
 /-!
 # `ω_χ(Ĝ⁰) = 0` outside the principal block
@@ -27,6 +29,8 @@ character.  Since `χ(1)` is a positive integer and `K` has characteristic zero,
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_blockOfIrr_pRegularSum_eq_zero` —
   `λ_B(Ĝ⁰) = 0` for `B ≠ B_0`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

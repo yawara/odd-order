@@ -1,4 +1,6 @@
-import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 
 /-!
 # ThreeSubgroups
@@ -6,6 +8,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 Prefix-split from `OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Isaacs §4B-§4D 前半 — three subgroups, Mann, coprime action, [G,A] (pp. 122-141)

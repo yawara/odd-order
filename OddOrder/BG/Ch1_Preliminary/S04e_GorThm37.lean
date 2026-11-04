@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-import OddOrder.GroupTheory.CoprimeAbelianPGroup
-import OddOrder.GroupTheory.IsExtraspecial
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+module
+
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.GroupTheory.CoprimeAbelianPGroup
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 
 /-!
 # Gorenstein "Finite Groups" Theorem 3.7 — minimal `ψ`-invariant ⇒ special structure
@@ -45,6 +47,8 @@ Thm 2.4 `actionCommutator_eq_bot_of_omega1_le_fixedPoints`, Thm 3.5
 Maschke `exists_aInvariant_complement_in_omega1_quotient`, three-subgroups
 `commutator_commutator_le_of_rotate`.
 -/
+
+@[expose] public section
 
 open scoped Pointwise commutatorElement
 

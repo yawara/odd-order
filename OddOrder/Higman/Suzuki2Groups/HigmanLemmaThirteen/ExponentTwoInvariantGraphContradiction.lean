@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommutingFactors
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphCommutativity
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommutingFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphCommutativity
 
 /-!
 # Higman's Lemma 13: the invariant graph factor gives a contradiction
@@ -18,6 +20,8 @@ involution condition.  This leaf records that final group-theoretic
 interface independently of the coordinate construction which supplies the
 two factors.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

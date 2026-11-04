@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Subgroup.Simple
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.SetTheory.Cardinal.Finite
-import OddOrder.GroupTheory.MaximalSubgroup
+module
+
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.SetTheory.Cardinal.Finite
+public import OddOrder.GroupTheory.MaximalSubgroup
 
 /-!
 # The fixed minimal counterexample `G` (BG §7)
@@ -37,6 +39,8 @@ via the whole §7–§16 + Appendix C contradiction, not by unwrapping this stru
 
 * Bender, Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994), §7.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG
 

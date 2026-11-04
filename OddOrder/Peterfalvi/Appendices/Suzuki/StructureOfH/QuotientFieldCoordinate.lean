@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
-import OddOrder.Peterfalvi.Appendices.SemilinearField
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
+public import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Coordinates on `S ⧸ Q₀`
@@ -29,6 +31,8 @@ into a field `F` with `|F| = q` on which `K` acts by multiplication.
   and satisfies `β (a⁻¹ y a) = γ a * β y` for a group isomorphism
   `γ : K ≃* Fˣ`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

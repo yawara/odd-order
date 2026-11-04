@@ -3,15 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.QuaternionRecognition
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
+module
+
+public import OddOrder.GroupTheory.QuaternionRecognition
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.13/6.14 D/Q/SD recognition + Thm 6.12 first
 enlargement (pp. 192-193)
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.FixedPointFree
-import Mathlib.GroupTheory.Nilpotent
-import Mathlib.GroupTheory.PGroup
-import Mathlib.Tactic.Group
+module
+
+public import Mathlib.GroupTheory.FixedPointFree
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.Tactic.Group
 
 /-!
 # Fixed-point-free automorphisms of order three
@@ -29,6 +31,8 @@ Pérez-Ramos, *2-Engel Relations between Subgroups*, Proposition 3.3 and
 Corollary 3.5.  Combining it with the orbit congruence `3 ∤ |G|` yields the
 class-two conclusion used by Higman, *Suzuki 2-groups*, Lemma 6.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

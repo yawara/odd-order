@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.Jacobson.Semiprimary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
-import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+module
+
+public import Mathlib.RingTheory.Jacobson.Semiprimary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
 /-!
 # Every Brauer character decomposes into irreducible ones
@@ -26,6 +28,8 @@ at all, since only there is `ρ g` of order prime to `p`.  The resulting multipl
 * `OddOrder.RepresentationTheory.Modular.exists_decomposition_of_finrank_le`
 * `OddOrder.RepresentationTheory.Modular.exists_decomposition`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

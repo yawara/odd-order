@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Index
+module
+
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Index
 
 /-!
 # Relative indices inside a `p`-group
@@ -21,6 +23,8 @@ than in either.
 
 * `OddOrder.dvd_relIndex_of_lt_of_isPGroup`
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

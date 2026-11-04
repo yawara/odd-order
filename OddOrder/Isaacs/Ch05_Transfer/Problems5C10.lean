@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
+module
+
+public import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 
 /-!
 # Isaacs Problem 5C.10 — 単純群の可換 Sylow-2 が位数 8 なら `7 ∣ |G|` (p. 164)
@@ -23,6 +25,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 ⭐ この論法は `P` の同型類 (`C₈` / `C₄×C₂` / `C₂³`) を場合分けしない。`S` が自明な場合も
 「不動点全体 = `P` が自明」となって同じ合同式で潰れる。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

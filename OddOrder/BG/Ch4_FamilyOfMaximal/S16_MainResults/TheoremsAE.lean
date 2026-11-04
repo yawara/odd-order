@@ -1,5 +1,7 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
 
 /-!
 # TAIL
@@ -7,6 +9,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory

@@ -3,20 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+module
 
 
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.AInvariantPiSubgroups
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.GroupTheory.ElementaryAbelianFamily
-import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
-import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
-import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.AInvariantPiSubgroups
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ElementaryAbelianFamily
+public import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+public import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+public import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
 
 /-!
 # BG §9: The Uniqueness Theorem (Theorem 9.6) — §9 capstone & hub
@@ -27,6 +29,8 @@ import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
 `import …S09_Uniqueness` で §9 全体を得られるよう、分割した `S09_Theorem91` /
 `S09_Corollaries` / `S09_Lemma95` を束ねる hub でもある。線形チェーン 9.1→9.2→…→9.6。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch2.S09
 

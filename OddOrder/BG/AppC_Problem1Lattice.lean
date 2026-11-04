@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.RelationLattice
-import OddOrder.BG.AppC_Problem1
+module
+
+public import OddOrder.Algebra.RelationLattice
+public import OddOrder.BG.AppC_Problem1
 
 /-!
 # BG Appendix C, Problem 1: the relation lattice of a witness
@@ -36,6 +38,8 @@ units are `U ∪ (-U)` because `-1` is a non-square.
 * `span_triples_normOne_eq_top` — **Lemma D for `𝔽_{3^q}`**: the relation lattice of a
   non-Frobenius exponent is everything.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

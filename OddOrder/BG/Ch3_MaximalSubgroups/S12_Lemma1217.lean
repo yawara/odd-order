@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
 
 /-!
 # BG §12: Lemma 12.17 (third clause — `M_σ ∩ M^g` is a `β(M)′`-group)
@@ -27,6 +29,8 @@ then gives `p ∉ β(M)`.
 
 (The full BG clause also asserts `M_σ ∩ M^g` is cyclic and meets `M_σ'` trivially; those parts —
 used in §15/§16 — are deferred, mirroring the existing `Msigma_E_relations` docstring.) -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

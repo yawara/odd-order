@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
-import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 
 /-!
 # Peterfalvi Part II, Ch. I §3: applying induction to the centralizer quotient
@@ -27,6 +29,8 @@ No simplicity or permutation-degree input is stored in the conclusion
 carrier: those facts are derived from the concrete standard models by the
 three existing Lemma 1 endpoints.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

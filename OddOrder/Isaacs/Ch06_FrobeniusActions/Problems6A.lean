@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-import Mathlib.Data.ZMod.Basic
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+module
+
+public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.Data.ZMod.Basic
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
 
 /-!
 # Isaacs Problems 6A — Frobenius 作用の演習 (書籍 pp. 184-186)
@@ -22,6 +24,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
 `K² = 0` なら `(1 + K)^n = 1 + n·K` (帰納法) で, 標数 `p` ゆえ `a^p = (1 + K)^p = 1`。
 よって `orderOf a ∣ p`, しかし `p ∤ |A|` から `p ∤ orderOf a` なので `orderOf a = 1`, 矛盾。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

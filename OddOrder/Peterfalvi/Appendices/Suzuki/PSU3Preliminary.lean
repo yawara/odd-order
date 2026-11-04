@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
-import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
-import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
-import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
 /-!
 # Peterfalvi Part II, Ch. IV §2: preliminary calculation
@@ -58,6 +60,8 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
   `Hypothesis.exists_mem_K_mem_W_mul` — the group-theoretic half of step (8)'s
   translation, including `D = K W` under `V = W`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

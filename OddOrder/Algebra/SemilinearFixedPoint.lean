@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.Algebra.Algebra.ZMod
-import OddOrder.Algebra.FixedPointsGalois
+module
+
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Algebra.Algebra.ZMod
+public import OddOrder.Algebra.FixedPointsGalois
 
 /-!
 # Automorphisms of a finite field are Frobenius powers
@@ -36,6 +38,8 @@ not in Ch. III).  The semilinear route replaces it and needs no coprimality.
   automorphism of prime order with **non-trivial twist**, on a line, has a
   non-zero fixed vector.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RingAut
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import OddOrder.GroupTheory.PRank
-import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Higman.Suzuki2Groups.AgemoLayers
-import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
-import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+public import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
 
 /-!
 # Higman Lemma 3: the actual idempotent action on `A / A²`
@@ -31,6 +33,8 @@ No cancellation identity for the chosen lifts, pairwise commutativity of the
 resulting idempotent family, or exponent-at-most-four conclusion is claimed
 here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

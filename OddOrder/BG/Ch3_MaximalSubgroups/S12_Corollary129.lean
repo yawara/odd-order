@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
 
 /-!
 # BG §12: Corollary 12.9
@@ -52,6 +54,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
 - cyclic 一意性 = `OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq` +
   `S10.isCyclic_of_pRank_le_one`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

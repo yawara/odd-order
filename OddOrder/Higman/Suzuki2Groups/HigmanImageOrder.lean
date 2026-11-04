@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanKernel
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanKernel
 
 /-!
 # Higman Lemma 3: the image and quotient have order two
@@ -18,6 +20,8 @@ two elements. Noether’s first isomorphism theorem then gives `|C / A| = 2`.
 The final exponent-at-most-four case split in Higman’s Lemma 3 is not claimed
 here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

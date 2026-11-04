@@ -3,13 +3,15 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.SumSquaresFour
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
-import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
-import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
-import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
+module
+
+public import OddOrder.Algebra.SumSquaresFour
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
 
 /-!
 # Navarro (7.2), character side: `Irr(B_0) = {1_G, χ_1, χ_2, χ_3}` and `χ_i(t) = ±1`
@@ -40,6 +42,8 @@ then forces four characters, each with `χ(t) = ±1`.
   vanish: exactly four are nonzero and each of those is `±1`
 * `OddOrder.RepresentationTheory.Modular.card_modEq_character_involution` — `χ(1) ≡ ε mod 4`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

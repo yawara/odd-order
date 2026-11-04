@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Tactic.LinearCombination
-import Mathlib.RingTheory.Int.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Tactic.LinearCombination
+public import Mathlib.RingTheory.Int.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Isaacs Problem 6B.6 — 巡回 2-群の位数 2 の自己同型 (書籍 p. 196)
@@ -21,6 +23,8 @@ import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 このファイルはその平方根補題 (mathlib に無い) を与える。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch06
 

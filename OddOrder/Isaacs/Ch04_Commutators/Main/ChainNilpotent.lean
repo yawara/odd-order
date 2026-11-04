@@ -1,4 +1,6 @@
-import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # Isaacs §4C Thm 4.24 — faithful chain action ⇒ A nilpotent
@@ -6,6 +8,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
 0103).
 -/
+@[expose] public section
+
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement
 

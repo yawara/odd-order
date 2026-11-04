@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
 
 /-!
 # CentralizerContainment
@@ -9,6 +11,8 @@ The §8.6.a / §8.16 centralizer-containment facts for type-`P` maximal subgroup
 import cycle back onto the §12 minimal-counterexample analysis (which needs the §11–§13
 type-determination results, in turn downstream of §10).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory

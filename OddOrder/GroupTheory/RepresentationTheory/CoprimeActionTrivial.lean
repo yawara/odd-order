@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RepresentationTheory.Basic
-import Mathlib.Data.Nat.Choose.Sum
-import Mathlib.GroupTheory.OrderOfElement
+module
+
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.Data.Nat.Choose.Sum
+public import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Coprime action — trivial step
@@ -41,6 +43,8 @@ import Mathlib.GroupTheory.OrderOfElement
 * `OddOrder/BG/AppA_PStability.lean` の `thmA3` (BG Thm A.3) 証明 Step 5
   (= H に p'-元 ⇒ V 上自明 ⇒ ρ faithful と矛盾).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.RepresentationTheory
 

@@ -1,4 +1,6 @@
-import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
+module
+
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
 
 /-!
 # TAIL
@@ -6,6 +8,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
 Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 open OddOrder.GroupTheory (IsTISubset)

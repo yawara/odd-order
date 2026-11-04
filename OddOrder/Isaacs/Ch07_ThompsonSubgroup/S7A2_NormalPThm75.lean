@@ -3,12 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A1_JpGL2p
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A1_JpGL2p
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 2: Lem 7.3 (formal) + Thm 7.5 normal-P + action
 infra (pp. 201-208)
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 
@@ -78,7 +82,7 @@ noncomputable def mulAutGLTwoEquivOfBasis
 
 /-- The `ZMod p` scalar-torsion condition supplied by an elementary-abelian multiplicative group.
 -/
-private lemma additive_nsmul_eq_zero_of_isElementaryAbelian
+lemma additive_nsmul_eq_zero_of_isElementaryAbelian
     {V : Type*} [Group V] {p : ℕ}
     (hV : OddOrder.GroupTheory.IsElementaryAbelian p V) :
     ∀ x : Additive V, (p : ℕ) • x = 0 := by

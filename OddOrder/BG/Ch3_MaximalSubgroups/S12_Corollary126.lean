@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 
 /-!
 # BG §12: Corollary 12.6 — `A ⊴ E` and centralizer control
@@ -19,6 +21,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
   `A` に入る (`Ω₁(P) = A` = `omega1_eq_of_tau2` 経由)。
 - `centralizer_le_E_of_tau2` (**12.6(b)**): `C_G(A) ≤ E`, `N_M(A) = E`, `N_G(A) ⊄ M`。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

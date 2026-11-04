@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_Noncoherence
+module
+
+public import OddOrder.Peterfalvi.S12_Noncoherence
 
 /-!
 # S13_TypeDetermination — Peterfalvi (13.2.a) and the κ-ordered maximal pair
@@ -28,6 +30,8 @@ The `OddOrder`-root declarations keep their names and namespace (they are the
 Feit–Thompson assembly layer, continuing `FeitThompsonSetup`); only their home moved
 below `S12_Noncoherence` to consume the honest (10.10).
 -/
+
+@[expose] public section
 
 namespace OddOrder
 

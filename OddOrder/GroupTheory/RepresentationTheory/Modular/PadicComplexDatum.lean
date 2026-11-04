@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.GroupAlgebraBlocks
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+module
+
+public import OddOrder.Algebra.GroupAlgebraBlocks
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 
 /-!
 # The complete datum of a finite group over `𝓞_ℂ_[p]`
@@ -30,6 +32,8 @@ in advance.  It is also the `CLAUDE.md` doneness criterion for the carrier: the 
 
 * `OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

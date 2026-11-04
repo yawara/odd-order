@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.SemidirectProduct
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.GroupTheory.FixedSubgroup
-import OddOrder.Mathlib.SchurZassenhausConj
+module
+
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Coprime Actions and Glauberman's Lemma (setup)
@@ -36,6 +38,8 @@ Isaacs PDF p.98 (mmd L1880-1906) の Γ = G ⋊ A 構成を Lean 4 で実装. �
 mathlib `SemidirectProduct` + `MulAction.stabilizer` + SZ existence + SZ conjugacy
 (`OddOrder.Mathlib.SchurZassenhausConj` — `axiom` 宣言ではなく証明済 module).
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

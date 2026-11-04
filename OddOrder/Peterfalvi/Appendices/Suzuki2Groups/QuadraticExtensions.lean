@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.GroupTheory.GroupExtension.Basic
-import Mathlib.LinearAlgebra.QuadraticForm.Basis
-import Mathlib.Tactic.Abel
-import OddOrder.GroupTheory.PRank
-import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+module
+
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.GroupTheory.GroupExtension.Basic
+public import Mathlib.LinearAlgebra.QuadraticForm.Basis
+public import Mathlib.Tactic.Abel
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # Peterfalvi Appendix III: central extensions from quadratic maps
@@ -31,6 +33,8 @@ descends to a quadratic map `P ⧸ W → W` whose polar form is the commutator
 pairing.  (The book states this for `P` a `2`-group; only `W ≤ Z(P)` and the
 exponent-`2` conditions are used, so we formalize the general statement.)
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
 
 /-!
 # BG §16 — Proposition 16.1 forward bridges: the shared type data
@@ -10,6 +12,8 @@ through `isTypeF_derivedInG_of_isTypeP2` and the conditional
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent imports
 this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory

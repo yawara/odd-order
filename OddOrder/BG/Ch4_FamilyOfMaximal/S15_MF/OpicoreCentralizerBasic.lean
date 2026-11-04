@@ -1,10 +1,14 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
 
 /-!
 # BG §15 — `O_p`-core centralizer: opening layer
 
 {D}
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory

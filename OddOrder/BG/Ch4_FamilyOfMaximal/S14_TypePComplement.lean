@@ -1,9 +1,11 @@
 /-
 Copyright (c) 2026 OddOrder contributors. All rights reserved.
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-import OddOrder.GroupTheory.AInvariantComplement
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+public import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
 # Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`
@@ -18,6 +20,8 @@ invariant Schur–Zassenhaus complement
 
 This discharges the U-side of the `Section16TypePStructure` producer (issue 7005 piece 2).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S14
 

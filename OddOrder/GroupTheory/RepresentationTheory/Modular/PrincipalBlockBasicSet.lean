@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 
 /-!
 # Navarro (7.4): a basic set for the principal block of a Klein four group
@@ -52,6 +54,8 @@ Navarro (7.3) — expressing `IBr(B_0)` in `𝓑` — is written down from the c
 * `OddOrder.RepresentationTheory.Modular.sum_principalBasicSetMatrix_mul_cartanMatrix` —
   `UᵗCU = 1 + δ`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

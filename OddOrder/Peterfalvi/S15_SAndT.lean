@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_BridgeCharacter
-import OddOrder.Peterfalvi.S15_CaseASylowCenter
-import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
-import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
-import OddOrder.Peterfalvi.S15_CaseAContradiction
-import OddOrder.Peterfalvi.S15_SSideGaloisFieldModel
-import OddOrder.Peterfalvi.S16_PairingCoherence
-import OddOrder.Peterfalvi.S16_PairingBessel
-import OddOrder.Peterfalvi.S16_GridExpansion
-import OddOrder.Peterfalvi.S15_SAndTGrid
+module
+
+public import OddOrder.Peterfalvi.S15_BridgeCharacter
+public import OddOrder.Peterfalvi.S15_CaseASylowCenter
+public import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
+public import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
+public import OddOrder.Peterfalvi.S15_CaseAContradiction
+public import OddOrder.Peterfalvi.S15_SSideGaloisFieldModel
+public import OddOrder.Peterfalvi.S16_PairingCoherence
+public import OddOrder.Peterfalvi.S16_PairingBessel
+public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.Peterfalvi.S15_SAndTGrid
 
 /-!
 # TAIL — (13.19.c) dichotomy + (14.5) complement exclusion
@@ -25,6 +27,8 @@ the Peterfalvi (14.5) exclusion of the small complement `E = W₁`.
 The (13.19) grid data is stated against the (12.6) coherence bundle `S16.TypeICoherent78Data L`
 (existence: `TypeICoherent78Data.nonempty`); `coh.extension` is the honest coherent extension `τ₁`.
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

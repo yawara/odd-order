@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 
 /-!
 # BG §4 — Proposition 4.11 (Huppert)
@@ -20,6 +22,8 @@ S04 本体 (`S04_PGroupsSmallRank.lean`) が肥大しているため、Prop 4.11
 本 leaf に分離 (S04 を凍結し再ビルドを軽く保つ)。namespace は §4 共通の
 `OddOrder.BG.Ch1.S04`。
 -/
+
+@[expose] public section
 
 open scoped commutatorElement
 

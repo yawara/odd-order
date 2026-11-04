@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.GroupAlgebraDefectGroup
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
-import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+module
+
+public import OddOrder.Algebra.GroupAlgebraDefectGroup
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 
 /-!
 # The principal block has full defect
@@ -30,6 +32,8 @@ Consequently `1_G`, of degree `1`, has height zero in `B_0`: the height inequali
 * `OddOrder.RepresentationTheory.Modular.exists_isIdempotentElem_defect_principalBlock` — such a
   lift exists, so the hypothesis is not vacuous
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

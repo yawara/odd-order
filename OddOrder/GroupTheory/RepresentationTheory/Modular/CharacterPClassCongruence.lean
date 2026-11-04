@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
+module
+
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 
 /-!
 # Gorenstein Lemma 7.5: integer-valued elements of `ch_R(G)` are constant mod `p` on `p`-classes
@@ -44,6 +46,8 @@ The proof is the classical Frobenius argument, arranged so that the coefficients
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.5 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

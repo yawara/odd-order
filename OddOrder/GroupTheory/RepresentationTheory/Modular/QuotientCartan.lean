@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
 
 /-!
 # Navarro (7.6): the Cartan matrices are related by `C = |P| C̄`
@@ -40,6 +42,8 @@ roots of unity for `G/N` may be chosen independently of those for `G`.  Only the
 * `OddOrder.RepresentationTheory.Modular.natCast_cartanMatrix_quotientPi` — `C = |N| C̄` in `K`
 * `OddOrder.RepresentationTheory.Modular.cartanMatrix_quotientPi` — `C = |N| C̄` in `ℕ`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # Higman's Lemma 12: the two-step Frattini quotient
@@ -18,6 +20,8 @@ series.  It follows that the actor induced on the Frattini quotient has
 ξ-length two.  Maschke's theorem then splits the unique middle term of the
 quotient by a complementary nontrivial proper invariant subgroup.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

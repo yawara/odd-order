@@ -3,13 +3,17 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S05_SignedTripleGrid
+module
+
+public import OddOrder.Peterfalvi.S05_SignedTripleGrid
 
 /-!
 # S05_Isometry32
 
 Prefix-split from `OddOrder.Peterfalvi.S05_SigmaIsometry` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §5: the `σ`-isometry of Theorem (3.2) and its Galois theory (3.6)-(3.9)

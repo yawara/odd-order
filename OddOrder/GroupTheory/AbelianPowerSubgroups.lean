@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Ker
-import Mathlib.GroupTheory.Index
-import Mathlib.GroupTheory.QuotientGroup.Finite
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Ker
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.QuotientGroup.Finite
 
 /-!
 # 可換群の冪核 `Ω` と冪像 `℧`
@@ -25,6 +27,8 @@ import Mathlib.GroupTheory.QuotientGroup.Finite
 用途: Isaacs Problem 5C.3 (可換 Sylow-2 が位数 `2^5` なら初等可換) — `Ω`/`℧` の位数を
 数え上げて「指数 2 の特性部分群対」を作り Problem 5C.2 に流し込む。
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10HCorrection
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10Correction
+module
+
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10HCorrection
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10Correction
 
 /-!
 # Peterfalvi §13 (pp. 84–86) — Core-typed analytic norm estimates
@@ -13,6 +15,8 @@ This file relayers Peterfalvi (13.9)–(13.10) below the honest character-degree
 The norm estimates use `CharacterDegreeCore`, `LambdaClusterData`, and explicit case-B
 structural facts, avoiding the overstrong legacy `CharacterDegreeData` carrier.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

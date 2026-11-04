@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.BrauerSuzukiTISubset
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+module
+
+public import OddOrder.GroupTheory.BrauerSuzukiTISubset
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 
 /-!
 # Brauer–Suzuki: the character `θ` on `N` (Gorenstein Ch. 12, Lemma 1.4)
@@ -27,6 +29,8 @@ This file develops the pieces in the book's order:
   order-`4` cyclic quotient `C/RH`, pulled back to `C` (`psiHom`, `psi`).
 * **The virtual character `θ`** and its degree, support, and norm.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

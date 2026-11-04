@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.SpecificGroups.Quaternion
-import Mathlib.GroupTheory.Abelianization.Defs
-import Mathlib.GroupTheory.Coset.Card
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Data.Fintype.Perm
-import Mathlib.Logic.Equiv.Option
-import Mathlib.SetTheory.Cardinal.NatCard
-import Mathlib.Algebra.Group.End
+module
+
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.Coset.Card
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Data.Fintype.Perm
+public import Mathlib.Logic.Equiv.Option
+public import Mathlib.SetTheory.Cardinal.NatCard
+public import Mathlib.Algebra.Group.End
 
 /-!
 # Odd automorphism groups of the quaternion group `Q₈`
@@ -35,6 +37,8 @@ while the image embeds into the permutations of the three nonidentity elements
 of the abelianization — a group of order `3! = 6`.  An odd divisor of `6`
 divides `3`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ChermakDelgado
+module
+
+public import OddOrder.GroupTheory.ChermakDelgado
 
 /-!
 # Isaacs Problems 1G (書籍 p. 43) — Chermak–Delgado 周辺
@@ -38,6 +40,8 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
   中心化群は各元の中心化群の `sSup` (Thm 1.44 の 2 元版の反復; 1G.4 の準備)。
 - `exists_normal_isMulCommutative_index_lt` — **Problem 1G.4**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch01
 

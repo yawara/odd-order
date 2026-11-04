@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
 
 /-!
 # Higman Lemma 12: the ambient `F × F` coordinate on `P / Φ(P)`
@@ -24,6 +26,8 @@ coordinate `eQuot : Additive (G ⧸ N) ≃ₗ F` with the ambient inclusion
 Both Higman branches (commutative `A(n, 1)` and noncommutative `A(n, θ)`) supply
 this data.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

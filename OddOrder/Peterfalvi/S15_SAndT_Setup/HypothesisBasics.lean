@@ -1,8 +1,10 @@
-import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
-import OddOrder.Peterfalvi.S11_ImprimitiveUBound
-import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
-import OddOrder.Peterfalvi.S11_CaseAOddPartBound
-import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+public import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+public import OddOrder.Peterfalvi.S11_CaseAOddPartBound
+public import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 
 /-!
 # TAIL
@@ -10,6 +12,8 @@ import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue
 0103 第 2 パス).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 
 /-!
 # BG §12: Theorem 12.7 — the nonabelian Sylow `p`-subgroup case
@@ -25,6 +27,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 - Theorem 12.5 / Corollary 12.6 (前 leaf 群)。
 - Maschke = `Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient` ((d) で)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S12
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCParameter
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeBTypeB
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeB
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeC
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCParameter
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeBTypeB
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeB
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeC
 
 /-!
 # Higman's Lemma 13: contradiction in the exponent-four branch
@@ -21,6 +23,8 @@ common Singer coordinate on `Φ(P)²`.  Their normalized right factors are
 each either type B or type C.  The B/B, C/B, B/C, and C/C alternatives are
 then discharged by the corresponding cross-commutator contradictions.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

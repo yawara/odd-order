@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
-import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
+module
+
+public import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 
 /-!
 # Gorenstein Lemma 7.4: descending from `ℤ[ω]`-coefficients to `ℤ`-coefficients
@@ -44,6 +46,8 @@ others must vanish.  So `u_0` and `θ` have the same pairings against every `χ_
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.4 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

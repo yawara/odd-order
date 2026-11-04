@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceGeometry
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceGeometry
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
 
 /-!
 # Higman's Lemma 13: a graph over a third coordinate axis
@@ -18,6 +20,8 @@ remains injective and disjoint from the third axis.  Adjoining that axis
 recovers exactly the sum of the original graph and the axis, so the latter
 sum's properness is preserved.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -1,5 +1,7 @@
-import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
-import OddOrder.Peterfalvi.S07_Coherence.CoherenceExtensionTau2
+module
+
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceExtensionTau2
 
 /-!
 # Peterfalvi (5.6.2)-(5.6.3), (6.8) — coherence-union extension τ₂, orthogonal coherent union, (6.6)
@@ -7,6 +9,8 @@ X coherence
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory

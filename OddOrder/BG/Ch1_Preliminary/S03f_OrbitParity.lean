@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+module
+
+public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+public import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
 
 /-!
 # BG §3: the orbit-parity contradiction closing Theorem 3.6 ((3.38), mmd L1154-L1196)
@@ -33,6 +35,8 @@ normalizes `K`, `⁅P,R₀⁆ = P` ((3.21)), `⁅K,P⁆ = K` ((3.24)), `|C_V(R�
 * `n = r` dies on a `P`-fixed `Vᵢ` ((3.24) + (3.14)), and `n = r + 1` is even while
   `n ∣ |G|` is odd.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch1.S03f
 

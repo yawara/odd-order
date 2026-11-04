@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Set.Card.Arithmetic
-import OddOrder.BG.AppC_NormSet
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
-import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-import OddOrder.Mathlib.SemidirectProduct
-import OddOrder.Peterfalvi.S08_CoherenceTheorems
+module
+
+public import Mathlib.Data.Set.Card.Arithmetic
+public import OddOrder.BG.AppC_NormSet
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.Mathlib.SemidirectProduct
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
 
 /-!
 # BG Appendix C — the norm-one Frobenius kernel: induction layer
@@ -25,6 +27,8 @@ Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

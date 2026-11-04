@@ -2,19 +2,23 @@
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.GroupTheory.Perm.Cycle.Type
-import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
-import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
-import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
-import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
-import OddOrder.GroupTheory.CentralProduct
+module
+
+public import Mathlib.GroupTheory.Perm.Cycle.Type
+public import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
+public import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
+public import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
+public import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+public import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
+public import OddOrder.GroupTheory.CentralProduct
 
 /-!
 # S04f_Omega1
 
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04f_Blackburn` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §4F — Blackburn rank-two classification

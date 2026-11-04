@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Cardinality of an irreducibly-induced family (the `G/H`-orbit count)
@@ -34,6 +36,8 @@ source induces irreducibly (`I_G(θ) = H`).
   `size calT1 = (v − 1) / p` (Coq `PFsection14.v` `FTtypeP_min_typeII`, lines 836–845, via
   `size_irr_subseq_seqInd`/`card_imset_Ind_irr`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
-import OddOrder.GroupTheory.WielandtFixedPoint
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
+public import OddOrder.GroupTheory.WielandtFixedPoint
 
 /-!
 # Peterfalvi Part II, Ch. II, step (4): `|Q| = |C_Q(P)|^p`
@@ -32,6 +34,8 @@ on `Q` by conjugation:
 Steps (3)–(4) inherit the step (2)(b) through
 `|C_M(P)| = r`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

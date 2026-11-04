@@ -3,15 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S12_Section9Counts
-import OddOrder.Peterfalvi.S12_TypeIIFrobenius
-import OddOrder.Peterfalvi.S09_CertificateDischarge
+module
+
+public import OddOrder.Peterfalvi.S12_Section9Counts
+public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
+public import OddOrder.Peterfalvi.S09_CertificateDischarge
 
 /-!
 # S12_MaximalBasic
 
 Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi Section 12: Maximal Subgroups of Types III, IV, and V

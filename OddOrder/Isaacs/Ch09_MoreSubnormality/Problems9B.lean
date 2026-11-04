@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.GroupAction.ConjAct
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Group
-import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
-import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
-import OddOrder.GroupTheory.DihedralAut
-import OddOrder.GroupTheory.SubgroupInAmbient
+module
+
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Tactic.Group
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+public import OddOrder.GroupTheory.DihedralAut
+public import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)
@@ -36,6 +38,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9B
 書籍の statement はページ画像 `references/isaacs/pages/isaacs-p284-297.png` /
 `isaacs-p285-298.png` で確定 (⚠ 9B.5 の `A, B ⊲⊲ G` は **subnormal**)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

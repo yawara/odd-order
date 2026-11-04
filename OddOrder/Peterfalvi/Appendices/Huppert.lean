@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.FeitThompson
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Peterfalvi.S16_NonExistenceG
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
-import OddOrder.GroupTheory.PrimeOrderSubgroups
-import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
+module
+
+public import OddOrder.FeitThompson
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Peterfalvi.S16_NonExistenceG
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+public import OddOrder.GroupTheory.PrimeOrderSubgroups
+public import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
 # Peterfalvi Appendix I: A Special Case of a Theorem of Huppert
@@ -49,6 +51,8 @@ this family, and a centrality argument supplies at least two nonzero summands,
 so part (1) gives fixed-point-freeness.  Thus the Lemma and Proposition 1 are
 both unconditional.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
 

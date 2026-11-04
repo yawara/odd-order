@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveEndgame
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveEndgame
 
 /-!
 # Peterfalvi Part II, Ch. II, step (12): conclusion
@@ -15,6 +17,8 @@ The line-stabilizer analysis on `V = R₁/T` (three fixed lines force triviality
 the identification `N_G(R₁) = N_G(R)`, and the final transfer contradiction
 with hypothesis (B2).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.OrderOfElement
+module
+
+public import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Odd-order groups contain no involution
@@ -20,6 +22,8 @@ This is used all over the odd-order material (Peterfalvi Part II Ch. I and
 Appendix IV, among others), so it lives in its own mathlib-only leaf rather than in
 any one book file.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

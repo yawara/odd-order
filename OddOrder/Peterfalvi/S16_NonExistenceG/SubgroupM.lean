@@ -1,5 +1,7 @@
-import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
-import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupMCore
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupMCore
 
 /-!
 # Peterfalvi (14.4)/(14.6)/(14.11.3) — the `S`/`T`-side Frobenius kernels over the `M`-carrier
@@ -8,6 +10,8 @@ Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (direct
 0103); the `MHypothesis` carrier and the (14.11) numeric/parity groundwork are in the prefix
 `SubgroupMCore.lean` (2000-line limit split).
 -/
+@[expose] public section
+
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

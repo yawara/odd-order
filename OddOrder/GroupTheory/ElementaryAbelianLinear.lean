@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Module.ZMod
-import Mathlib.Algebra.Module.Equiv.Basic
-import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
+module
+
+public import Mathlib.Algebra.Module.ZMod
+public import Mathlib.Algebra.Module.Equiv.Basic
+public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 
 /-!
 # An elementary abelian `p`-group is a vector space, and its automorphisms are linear
@@ -31,6 +33,8 @@ with `letI := AddCommGroup.zmodModule h` and then everything below applies.
 * `OddOrder.GroupTheory.mulAutEquivLinearEquiv` — `MulAut E ≃* (Additive E ≃ₗ[ZMod n] _)`,
   with `mulAutEquivLinearEquiv_apply` for the forward direction.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

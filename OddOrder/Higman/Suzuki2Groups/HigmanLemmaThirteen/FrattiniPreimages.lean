@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientSummands
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientSummands
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
 
 /-!
 # Higman's Lemma 13: Frattini preimages of quotient summands
@@ -18,6 +20,8 @@ preimages whose intersection is `Φ(P)` and whose join is `P`.  In the
 exponent-two branch there are three, with the corresponding successive
 intersection and join identities.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

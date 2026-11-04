@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
 
 /-!
 # Isaacs Problem 3C.8 — Mann の核心補題
@@ -33,6 +35,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
 - `map_conj_eq_self_of_normal_of_inf_le` — 一般形 (`D ⊴ G` で `D ⊓ C(q) ≤ C_G(F)`)。
 - `map_conj_eq_self_of_mem_pCentralizer` — `D = C(p)` (`p ≠ q`) の場合。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

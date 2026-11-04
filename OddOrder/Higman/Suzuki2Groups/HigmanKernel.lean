@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman Lemma 3: the kernel of the quotient endomorphism family
@@ -23,6 +25,8 @@ abelian subgroup `A` is trivial.
 No order calculation for `C / A` and no exponent bound for `A` are claimed
 here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.HigmanSims
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAut
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwentyFour
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
+module
+
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.HigmanSims
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAut
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwentyFour
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8C (pp. 256–257)

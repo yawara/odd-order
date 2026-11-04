@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
-import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+module
+
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
 /-!
 # Peterfalvi §13 (pp. 82–84) — Core-typed H-side `η₁₀` correction
@@ -13,6 +15,8 @@ This file reconstructs the (13.7) correction and norm estimate from the honest
 `CharacterDegreeCore`.  The (7.6) family is based at a `P`-nonkernel irreducible supplied
 by the reducible Core column, so the guarded coefficient-vanishing theorem applies.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

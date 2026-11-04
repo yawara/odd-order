@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Sylow
-import Mathlib.GroupTheory.SchurZassenhaus
-import Mathlib.GroupTheory.Complement
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.SylowNormalRelIndex
+module
+
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.GroupTheory.SchurZassenhaus
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.SylowNormalRelIndex
 
 /-!
 # Bender–Glauberman Proposition 4.4(b) — `C_G(A) = A × H` for `A ∈ SCN(R)`
@@ -57,6 +59,8 @@ Set `C = C_G(A)` and `M = N_G(A)`.
 * Gorenstein, _Finite Groups_ (1968), Theorem 7.6.5.
 * Tracking issue `issues/3012-prop44b-scn-centralizer-dprod.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

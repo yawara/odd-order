@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (13): `C_G(Z₁)` is a `3`-group — preliminaries
@@ -21,6 +23,8 @@ The centralizer identities feeding the step (13) counting
   fixes `t • basept`, so it lies in `D`; conversely `V = C_D(t) = C_D(s)`
   (Ch. I Prop 5).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

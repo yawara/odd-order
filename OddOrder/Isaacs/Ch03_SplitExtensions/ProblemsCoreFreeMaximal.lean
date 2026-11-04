@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
 
 /-!
 # Isaacs Problem 3C.5 (書籍 p. 91) — 核が自明な極大部分群
@@ -42,6 +44,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.5 の形式化
 - `existsUnique_isMinimalNormal_of_isCoatom_normalCore_eq_bot` — 極小正規部分群の一意性。
 - `conj_of_isCoatom_normalCore_eq_bot` — **Problem 3C.5 後半** (核自明な極大部分群は共役)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

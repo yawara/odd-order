@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
 
 /-!
 # Higman's Lemma 13: from factor spans to a cross-commutator inclusion
@@ -16,6 +18,8 @@ If scalar-extended ground classes from two restricted subgroups lie in two
 factor-family spans and the middle Frattini bracket vanishes on those spans,
 then the subgroup cross commutator lies in `Φ(P)²`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

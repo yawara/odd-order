@@ -3,9 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.CharP.Two
-import Mathlib.LinearAlgebra.Projectivization.Action
-import Mathlib.LinearAlgebra.Projectivization.Cardinality
+module
+
+public import Mathlib.Algebra.CharP.Two
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import Mathlib.LinearAlgebra.Projectivization.Cardinality
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — `SL(2, q)` は射影直線に sharply 3-transitive
@@ -35,6 +38,8 @@ import Mathlib.LinearAlgebra.Projectivization.Cardinality
   (教科書の形): `q` が 2 の冪なら `SL(2, q)` は `q + 1` 個の 1 次元部分空間に
   sharply 3-transitive。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch08
 

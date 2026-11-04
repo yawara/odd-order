@@ -3,16 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
-import OddOrder.BG.Ch2_Uniqueness.Setup
-import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-import OddOrder.BG.AppB_Thm62
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.GroupTheory.MaximalSubgroup
-import OddOrder.GroupTheory.SCN
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch01_Sylow.Main
+module
+
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+public import OddOrder.BG.AppB_Thm62
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.GroupTheory.MaximalSubgroup
+public import OddOrder.GroupTheory.SCN
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # S08_CenterFittingOpcore
@@ -20,6 +22,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Main
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG §8: The Fitting Subgroup of a Maximal Subgroup

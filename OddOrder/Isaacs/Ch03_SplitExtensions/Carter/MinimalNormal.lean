@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
-import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
-import OddOrder.Isaacs.Ch01_Sylow.Problems
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
+public import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problem 3C.7(b) — 極小正規部分群まわりの部品
@@ -41,6 +43,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
 - `exists_conj_of_isCarterSubgroup_of_isComplement` — 補元の場合の共役性。
 - `exists_conj_of_isCarterSubgroup_of_isMinimalNormal` — **step 4 の総括**。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

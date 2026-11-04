@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 
 /-!
 # Navarro (5.2): the core computation
@@ -36,6 +38,8 @@ that the textbook implicitly sums over.
 
 * `OddOrder.RepresentationTheory.Modular.blockCoeff_eq_zero_of_vanishing` — Navarro (5.2), core
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

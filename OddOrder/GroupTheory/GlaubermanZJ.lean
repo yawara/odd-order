@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.GlaubermanReplacement
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+module
+
+public import OddOrder.GroupTheory.GlaubermanReplacement
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Glauberman の `Z(J)`-定理 (Gorenstein Thm 2.10 / 2.11)
@@ -31,6 +33,8 @@ Thm 2.10 の仮定に取る. ⚠ repo 既存の `OddOrder.BG.AppA.IsPStable` は
 (odd solvable) では `AppA.stabilityLiftAux` (Gorenstein 6.5.3) が本条件をそのまま与える
 ので, discharge は BG 側 (issue 3017/3024) で行う. Issue 9403.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

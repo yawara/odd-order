@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3BSolvability
+module
+
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3BSolvability
 
 /-!
 # Isaacs Chapter 3 — Problems §3B (Schur-Zassenhaus と可解群)
@@ -18,6 +20,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3 の章末演習 §3B
 
 方針は Ch.1/Ch.2/§3A の `Problems*.lean` と同じ (ラッパーは書かず実証明; 教科書番号は docstring)。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
 

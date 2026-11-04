@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.Algebra.Group.Subgroup.Map
-import Mathlib.GroupTheory.Commutator.Basic
-import OddOrder.GroupTheory.PRank
-import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.Algebra.Group.Subgroup.Map
+public import Mathlib.GroupTheory.Commutator.Basic
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # Omega Subgroups
@@ -49,6 +51,8 @@ mathlib v4.34.1 に `Omega1` / `Omega` / `omega1` / `omegaSubgroup` 不在を確
 Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確定.
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

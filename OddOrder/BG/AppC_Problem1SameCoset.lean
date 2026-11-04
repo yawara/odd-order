@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.InverseClosedSubgroup
-import OddOrder.BG.AppC_Problem1Trace
+module
+
+public import OddOrder.Algebra.InverseClosedSubgroup
+public import OddOrder.BG.AppC_Problem1Trace
 
 /-!
 # BG Appendix C, Problem 1: the same-coset obstruction
@@ -43,6 +45,8 @@ under `s ↦ s⁻¹`, at which point `OddOrder.InverseClosed.pow_four_eq_one_or_
 * `false_of_sameCoset_pair` — **the certificate form**: two distinct Paley points scaled by one and
   the same factor under `z ↦ z ^ e` refute hypothesis (B).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.Problem1
 

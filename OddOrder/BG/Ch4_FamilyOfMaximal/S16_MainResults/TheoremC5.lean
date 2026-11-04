@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
 
 /-!
 # BG Theorem C(5) — maximal-overgroup uniqueness for prime-order subgroups of the pair
@@ -27,6 +29,8 @@ Both halves reduce to **Proposition 14.2(c)** (`S14.typeP_structure`, conjunct 6
 The partner `M*` is exposed via the *same* `∃!` predicate as `theoremC_paired_structure`'s
 C(4) block (Theorem 14.7), so the `M*` of C(5) is definitionally the `M*` of C(4).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S16
 

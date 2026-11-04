@@ -3,19 +3,21 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.Group.ConjFinite
-import Mathlib.Analysis.Normed.Field.Lemmas
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Data.Matrix.Basic
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.LinearAlgebra.Matrix.ConjTranspose
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-import Mathlib.SetTheory.Cardinal.Finite
-import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Group.ConjFinite
+public import Mathlib.Analysis.Normed.Field.Lemmas
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Data.Matrix.Basic
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.LinearAlgebra.Matrix.ConjTranspose
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.SetTheory.Cardinal.Finite
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 
 /-!
 # Second orthogonality (column orthogonality) of irreducible characters
@@ -94,6 +96,8 @@ This is [Is] Thm 2.18 / Thm 6.10 (column version).
 * Isaacs, *Character Theory of Finite Groups*, Thm 2.18 / Thm 6.10.
 * Peterfalvi §3 (1.2) (vanishing criterion for normal closures).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

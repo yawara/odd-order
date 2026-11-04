@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main
 
 /-!
 # Hall's collecting process: the general framework
@@ -61,6 +63,8 @@ theorem itself is proved elsewhere: `OddOrder.BG.AppE.hallCollection`
 sharper class-`≤ 2` / class-`≤ 3` forms in the same file.  See the module
 docstring of `OddOrder/BG/AppE_FurtherResults.lean` for the per-result table.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

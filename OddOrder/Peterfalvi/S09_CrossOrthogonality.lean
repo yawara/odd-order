@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Cross-orthogonality of coherent images (Peterfalvi (7.9) §1 primitive)
@@ -34,6 +36,8 @@ Without equal degree the sign relation `ε = ε'` fails and a sign-cancellation 
 `c = ν₂(ζ₂)`, `d = ν₂(ζ̄₂)`, where `a − b = τ₁(ζ₁ − ζ̄₁)` and `c − d = τ₂(ζ₂ − ζ̄₂)` are Dade images
 supported in the disjoint Dade supports (so `⟨a−b, c−d⟩ = 0` and `(a−b) 1 = (c−d) 1 = 0`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

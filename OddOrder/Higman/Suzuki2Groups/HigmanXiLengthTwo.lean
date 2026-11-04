@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 
 /-!
 # Higman's ξ-length-two reduction
@@ -28,6 +30,8 @@ The transitivity hypothesis is deliberately weaker than regularity.  Higman's
 original definition assumes a cyclic actor transitive on the involutions;
 regularity is obtained later from the classification.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

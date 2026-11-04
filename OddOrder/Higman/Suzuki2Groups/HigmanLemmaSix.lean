@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
-import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
-import OddOrder.GroupTheory.FixedPointFreeOrderThree
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+public import OddOrder.GroupTheory.FixedPointFreeOrderThree
 
 /-!
 # Higman's Lemma 6
@@ -26,6 +28,8 @@ triple-commutator sum from p. 86, and eliminate both its distinct- and
 repeated-weight terms. The source-facing contradiction is assembled in
 `HigmanTripleBracketContradiction`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

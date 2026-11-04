@@ -3,14 +3,18 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.GroupTheory.TISubsetCounting
+module
+
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import OddOrder.GroupTheory.TISubsetCounting
 
 /-!
 # Peterfalvi §8: induced degree-one families
 
 Inertia, induced irreducibility, and coherent degree-one families split under issue 0073.
 -/
+
+@[expose] public section
 
 /-!
 # Peterfalvi §08 Coherence Core — Part 2/3 (first `SibleyDadeHypothesis` block)

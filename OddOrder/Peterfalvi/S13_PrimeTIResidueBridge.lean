@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S15_SAndT_Setup
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
-import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
+module
+
+public import OddOrder.Peterfalvi.S15_SAndT_Setup
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+public import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
 
 /-!
 # The `S`-side prime-TI residue grid of the `(13.1)` hypothesis (Peterfalvi §13, issues 9014/9076)
@@ -39,6 +41,8 @@ available for the type-`P2` group `S`, via `typePData_toS06Hypothesis`, with **n
 * Coq: `PFsection4.v` (`primeTIred`, `prTIres_irr_cases`), `PFsection13.v` (`S1cases`).
 * `issues/9014-primeti-residue-api.md`, `issues/9076-cyclicti-rigidity-dade-crossrel.md`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S15
 

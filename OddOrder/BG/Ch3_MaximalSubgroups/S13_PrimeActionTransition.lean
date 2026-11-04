@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
-import Mathlib.GroupTheory.NoncommCoprod
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+public import Mathlib.GroupTheory.NoncommCoprod
 
 /-!
 # BG §13 (cont.): Corollary 13.11 + Lemma 13.12/13.13（active leaf / hub）
@@ -19,6 +21,8 @@ Theorem 13.9 / 13.10）は上流ファイルへ prefix-split 済（`S13_Theorem1
 * **Corollary 13.11** `E3_not_regular_consequences`: 13.10 + 13.7。
 * （frontier）**Lemma 13.12 / 13.13**: §14 Prop 14.2 funnel が直接依存（issue 2006）。
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch3.S13
 

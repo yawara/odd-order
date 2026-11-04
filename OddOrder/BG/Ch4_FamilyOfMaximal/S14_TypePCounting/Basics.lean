@@ -1,15 +1,17 @@
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
-import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
-import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
-import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
-import OddOrder.GroupTheory.MaximalSubgroupType
-import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.PiElementDecomposition
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+module
+
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
+public import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
+public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+public import OddOrder.GroupTheory.MaximalSubgroupType
+public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+public import OddOrder.GroupTheory.PiElementDecomposition
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
 
 /-!
 # BG §14 — split-extension derived subgroup + kappa(M), type-P families, sigma-length
@@ -17,6 +19,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
 split, issue 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S14
 

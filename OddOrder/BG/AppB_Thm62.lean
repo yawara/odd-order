@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.BG.AppB_PuigB3B4
+module
+
+public import OddOrder.BG.AppB_PuigB3B4
 
 /-!
 # BG Theorem 6.2 一般形: `Z(L(S))·O_{p'}(G) ⊴ G`
@@ -21,6 +23,8 @@ B.4(b) (`zCenter_lOdd_normal_of_oPiCore_eq_bot`, `O_{p'}(G)=1 ⇒ Z(L(S))⊴G`) 
 * `lOddIn_eq_map_subtype` — `L(H) = (L(↥H)).map H.subtype` (相対 = 絶対 in subtype).
 * `zCenter_lOdd_sup_oPiCore_normal` — **BG Thm 6.2 一般形** `Z(L(S))·O_{p'}(G) ⊴ G`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.AppB
 

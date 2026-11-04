@@ -1,4 +1,6 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
 
 /-!
 # ElemAbelianNeighbor
@@ -6,6 +8,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+@[expose] public section
 
 /-!
 # BG Lemma 14.1 / Proposition 14.2 — local structure of type-P members

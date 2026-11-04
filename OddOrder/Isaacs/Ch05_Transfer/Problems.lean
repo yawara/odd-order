@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Transfer
+module
+
+public import Mathlib.GroupTheory.Transfer
 
 /-!
 # Isaacs Chapter 5 — Problems 5A (transfer の基本)
@@ -27,6 +29,8 @@ Isaacs の `v : G → H/H'` は `A = H/H'`, `ϕ = 自然な射影` の場合に�
   その instance の `toGroup` が `Subgroup.toGroup` と構文的に一致しないため
   `MonoidHom.id ↥H` の型が合わない (diamond)。一般 `ϕ` 版で十分なので採らない。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch05
 

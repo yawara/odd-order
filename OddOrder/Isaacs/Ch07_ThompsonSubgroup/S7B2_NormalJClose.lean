@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
+module
+
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
 
 /-!
 # Isaacs FGT Ch.7 — the normal-J theorem, closing steps (Thm 7.6, pp. 209-214)
@@ -16,6 +18,8 @@ Split from `OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement` (iss
 0149, the longFile-1500 campaign); that file imports this leaf, so downstream imports
 are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch07
 

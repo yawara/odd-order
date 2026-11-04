@@ -1,6 +1,8 @@
-import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
-import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
-import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+module
+
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+public import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 
 /-!
 # Peterfalvi §14 — witness Sylow cyclic: opening layer
@@ -8,6 +10,8 @@ import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
 imports this leaf, so downstream imports are unchanged.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory

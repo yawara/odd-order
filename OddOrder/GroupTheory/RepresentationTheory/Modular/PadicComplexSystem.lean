@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.NumberTheory.Padics.Complex
-import Mathlib.RepresentationTheory.Maschke
-import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-import Mathlib.RingTheory.Valuation.LocalSubring
-import OddOrder.Algebra.AlgClosedFractionField
-import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+module
+
+public import Mathlib.NumberTheory.Padics.Complex
+public import Mathlib.RepresentationTheory.Maschke
+public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+public import Mathlib.RingTheory.Valuation.LocalSubring
+public import OddOrder.Algebra.AlgClosedFractionField
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
 # A splitting `p`-modular system: the valuation ring of `ℂ_[p]`
@@ -53,6 +55,8 @@ residue class.
 * `OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent` and its residue
   companion — the `ω`/`ω'` of *any* finite group, with no side condition to discharge
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

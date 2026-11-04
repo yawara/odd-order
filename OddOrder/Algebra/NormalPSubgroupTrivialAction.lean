@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import OddOrder.Algebra.AugmentationIdeal
-import OddOrder.Algebra.PiMatrixSimpleModules
-import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+module
+
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import OddOrder.Algebra.AugmentationIdeal
+public import OddOrder.Algebra.PiMatrixSimpleModules
+public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
 /-!
 # A normal `p`-subgroup acts trivially on every simple module
@@ -42,6 +44,8 @@ Brauer correspondence (4.14).
   `OddOrder.GroupAlgebra.eq_of_forall_pi_single_eq_one` — a block killing `G` has degree one, and
   there is at most one such block
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupAlgebra
 

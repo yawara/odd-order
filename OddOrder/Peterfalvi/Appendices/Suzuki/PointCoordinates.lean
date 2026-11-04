@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
-import OddOrder.GroupTheory.RankOneBNPairRigidity
+module
+
+public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+public import OddOrder.GroupTheory.RankOneBNPairRigidity
 
 /-!
 # `Ω` in the coordinates of Peterfalvi Part II, Ch. IV §1
@@ -34,6 +36,8 @@ for.
 * `Hypothesis.exists_conjQMulEquiv_actionEquiv` — the Lemma of §1 as a matching of
   permutation groups: `⟨Q^x⟩ ≃* ⟨Q'^x⟩` together with an equivariant `Ω ≃ Ω'`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

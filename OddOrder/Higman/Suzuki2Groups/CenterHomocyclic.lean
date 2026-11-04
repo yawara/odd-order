@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+module
+
+public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+public import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 
 /-!
 # The center of a Suzuki 2-group is homocyclic
@@ -19,6 +21,8 @@ the center homocyclic and classifies all of its actor-invariant subgroups as
 Agemo layers. This is the first hard input toward the reverse inclusion in
 Peterfalvi Appendix III theorem (a), `Z(P) ≤ Q₀`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

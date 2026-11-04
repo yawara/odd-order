@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.Perm.Cycle.Concrete
-import Mathlib.GroupTheory.Perm.Fin
-import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+module
+
+public import Mathlib.GroupTheory.Perm.Cycle.Concrete
+public import Mathlib.GroupTheory.Perm.Fin
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 
 /-!
 # Isaacs §9D の演習 (書籍 p. 294)
@@ -36,6 +38,8 @@ subnormal 部分群の任意集合の `sSup` が subnormal) から直ちに従�
 `X` での正規性は「共役 `(subnormalCore X)^x` (`x ∈ X`) も `X` に含まれる subnormal 部分群
 だから最大性で `≤ subnormalCore X`」という定型。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch09
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 
 /-!
 # Discharging the hypotheses of Navarro (5.2)
@@ -33,6 +35,8 @@ straight from the block structure of `K[H]`, not from a commutant argument.
 * `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_algebraMap_irreducibleBrauerCharacter`
 * `OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_one_of_decompositionMatrix_ne_zero`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

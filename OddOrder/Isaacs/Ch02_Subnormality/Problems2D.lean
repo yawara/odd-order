@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch01_Sylow.Problems
-import OddOrder.Isaacs.Ch02_Subnormality.Main
-import OddOrder.Isaacs.Ch02_Subnormality.Problems
-import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+module
+
+public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch02_Subnormality.Problems
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # Isaacs Chapter 2 — Problems §2D: `G = NA` での `|A| < |N|` (p. 64)
@@ -23,6 +25,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2D。いず�
 `A = 1`、すなわち `|A| = |N| = 1` となり結論 `|A| < |N|` は成り立たない。2D.2 では書籍自身が
 `N` 非自明を明示しているので、2D.1 でも同じ暗黙の仮定を置くのが原意と解した。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch02
 

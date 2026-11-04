@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientLengths
-import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientLengths
+public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # Higman's Lemma 13: invariant summands of the Frattini quotient
@@ -23,6 +25,8 @@ then complement `U`, and put `V = B ⊓ C` for the latter complement `C`.
 Modularity gives `U ⊔ V = B`, so the three summands retain the two prescribed
 composition steps.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Higman Lemma 12: assembling the B/C/D classification
@@ -23,6 +25,8 @@ term is a nonzero bilinear map), the Frobenius support extraction per case,
 the shear normalization (case `θ = φ ≠ 1`), the `ε` conditions from
 anisotropy, and the endpoint engines.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

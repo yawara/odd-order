@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 
 /-!
 # `v(G)` is an ideal of `ch(G)` — Gorenstein Lemma 7.3
@@ -38,6 +40,8 @@ subgroup of the shape `p`-group × `p'`-group, which is more than the elementary
 
 * D. Gorenstein, *Finite Groups*, §4.7, Lemma 7.3 (`references/gorenstein/pages/`).
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory
 

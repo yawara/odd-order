@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
 
 /-!
 # Higman Lemma 12: the B/C/D classification endpoint
@@ -21,6 +23,8 @@ Frobenius weight equation).  Given that value, the engine discharges the
 `ofExtension` square obligation via `ambientProductExtension_hsq_actual` and
 produces the honest type data.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+module
+
+public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.2 (Baer 加法における `xy - yx = ⁅x, y⁆`)
@@ -24,6 +26,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.2 (書籍 p. 145)�
 `(x * y) * (y * x)⁻¹ = ⁅x, y⁆`。奇数位数が要るのは `baerAdd` が群構造になる部分
 (`BaerMul.instCommGroup`) であって, 差の計算そのものではない。
 -/
+
+@[expose] public section
 
 namespace OddOrder.Isaacs.Ch04
 

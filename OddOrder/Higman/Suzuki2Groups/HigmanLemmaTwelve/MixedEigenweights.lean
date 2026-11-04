@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
 
 /-!
 # Higman's Lemma 12: the mixed weight equation
@@ -28,6 +30,8 @@ lower-central bracket already provides the pairing and its nonzero mixed
 witness.  The resulting weight equation `λ^(2^i) μ^(2^j) = ν^(2^k)` is exactly
 the input to Higman's B/C/D case analysis; no case is opened here.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

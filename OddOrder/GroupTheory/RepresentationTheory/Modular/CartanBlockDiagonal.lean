@@ -3,10 +3,12 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 
 /-!
 # The Cartan matrix is block diagonal
@@ -29,6 +31,8 @@ reduction is compatible with the whole group-algebra action
   two Brauer characters occurring in the same ordinary character have the same central character
 * `OddOrder.RepresentationTheory.Modular.cartanMatrix_eq_zero_of_centralCharacterAlg_ne`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
 
 /-!
 # Higman's Lemma 13: commutators into the Frattini square
@@ -21,6 +23,8 @@ directly from raw commutators.  It is not obtained by reversing the natural
 map from a lower-central layer.  The left descent uses
 `Phi(P)^2 <= Z(P)`; the right descent uses commutativity of `Phi(P)`.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 
 /-!
 # Navarro (4.23): cancelling `|K|` from the `Ω_{K,L}` formula
@@ -33,6 +35,8 @@ modulo the maximal ideal (where `|Syl_p| ≡ 1`) to give `R(z) = π(Ĝ_p z)`.
 
 * `OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

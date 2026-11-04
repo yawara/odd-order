@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Algebra.Algebra.Equiv
-import Mathlib.Algebra.Algebra.Pi
-import Mathlib.Algebra.GroupWithZero.Idempotent
-import Mathlib.Algebra.BigOperators.Pi
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Data.Fintype.BigOperators
+module
+
+public import Mathlib.Algebra.Algebra.Equiv
+public import Mathlib.Algebra.Algebra.Pi
+public import Mathlib.Algebra.GroupWithZero.Idempotent
+public import Mathlib.Algebra.BigOperators.Pi
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.Data.Fintype.BigOperators
 
 /-!
 # Algebra automorphisms of `ι → k` permute the standard idempotents
@@ -25,6 +27,8 @@ characteristic `p`) forces the supports to be pairwise disjoint, and they cover 
 family sums to `1`.  `|ι|` nonempty disjoint subsets covering an `|ι|`-set are all singletons, so
 each `ε i` is a single standard idempotent.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory.PiAlgebraAut
 

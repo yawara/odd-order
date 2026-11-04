@@ -3,9 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
-import Mathlib.GroupTheory.PGroup
-import Mathlib.GroupTheory.Subgroup.Center
+module
+
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Subgroup.Center
 
 /-!
 # The root group of a Suzuki group
@@ -22,6 +24,8 @@ It has order `|F|²`, exponent four, and the coordinate line `{(0, b)}` is a
 central subgroup consisting of involutions.  This is shared infrastructure for
 the Suzuki target in **Peterfalvi, Part II, Chapter I, Theorem A** (pp. 97–98).
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

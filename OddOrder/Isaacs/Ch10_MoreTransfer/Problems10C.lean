@@ -3,14 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Algebra.AugmentationIdeal
-import Mathlib.LinearAlgebra.Basis.SMul
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.LinearAlgebra.Matrix.Trace
-import Mathlib.LinearAlgebra.Matrix.Reindex
-import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import OddOrder.Mathlib.MonoidAlgebra
+module
+
+public import OddOrder.Algebra.AugmentationIdeal
+public import Mathlib.LinearAlgebra.Basis.SMul
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import Mathlib.LinearAlgebra.Matrix.Trace
+public import Mathlib.LinearAlgebra.Matrix.Reindex
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
+public import Mathlib.Analysis.Complex.Polynomial.Basic
+public import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Isaacs, *Finite Group Theory*, Problems 10C (pp. 324)
@@ -38,6 +40,8 @@ mathlib にそのまま在るので, 本リポジトリでは薄いラッパー�
 書籍のヒント (`A/pA` を `𝔽_p`-ベクトル空間と見る) は, mathlib では
 `StrongRankCondition` → `mk_eq_mk_of_basis` の一般論に置き換わっている。
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

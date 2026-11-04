@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 
 /-!
 # Summing a block over a `p`-subgroup collapses to the identity
@@ -26,6 +28,8 @@ Weak block orthogonality is taken as a hypothesis on the elements of `P`, since
 
 * `OddOrder.RepresentationTheory.Modular.sum_pSubgroup_sum_block_character`
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

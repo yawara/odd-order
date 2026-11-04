@@ -3,11 +3,13 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.GroupTheory.CriticalSubgroup
-import OddOrder.GroupTheory.IsMetacyclic
-import Mathlib.RingTheory.ZMod.UnitsCyclic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
+module
+
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.IsMetacyclic
+public import Mathlib.RingTheory.ZMod.UnitsCyclic
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Normal type-`(p,p)` subgroups inside a normal elementary abelian subgroup
@@ -39,6 +41,8 @@ Peterfalvi Appendix I/B, `Huppert.pGroup_cyclic_fixedPointFree`) reduces — via
 critical subgroup — to producing a noncyclic normal abelian subgroup, at which
 point the corollary here supplies the normal type-`(p,p)`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.GroupTheory
 

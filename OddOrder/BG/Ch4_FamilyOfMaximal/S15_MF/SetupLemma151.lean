@@ -1,9 +1,11 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
-import OddOrder.Mathlib.Subgroup
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+module
+
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+public import OddOrder.Mathlib.Subgroup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
 
 /-!
 # BG §15 notation + Lemma 15.1 (U M_sigma auxiliary structure)
@@ -11,6 +13,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
 0103).
 -/
+
+@[expose] public section
 
 namespace OddOrder.BG.Ch4.S15
 

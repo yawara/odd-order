@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
-import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
 
 /-!
 # Second (column) orthogonality over a splitting field
@@ -35,6 +37,8 @@ column relation.
 * `OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character` — the same for
   arbitrary elements
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

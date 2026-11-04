@@ -3,12 +3,14 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
-import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
-import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
-import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBlockBijection
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SupportOfGeneralizedDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
+module
+
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBlockBijection
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SupportOfGeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 
 /-!
 # `χ(t) = D^t_0 + ψ_1(1) D^t_1 + ψ_2(1) D^t_2` — Navarro p. 141 at `u = 1`
@@ -37,6 +39,8 @@ Evaluating at `u = 1` is legitimate because `1` is `p`-regular, and `x * 1 = x`.
 
 * G. Navarro, *Characters and Blocks of Finite Groups*, (7.4), (7.5), (7.6), p. 141.
 -/
+
+@[expose] public section
 
 namespace OddOrder.RepresentationTheory.Modular
 

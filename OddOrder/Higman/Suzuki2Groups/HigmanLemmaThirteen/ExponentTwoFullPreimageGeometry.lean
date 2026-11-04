@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
 
 /-!
 # Higman's Lemma 13: full geometry of the exponent-two preimages
@@ -16,6 +18,8 @@ actor-invariant subgroups of restricted `ξ`-length two.  Besides their
 pairwise intersections and joins, this leaf retains the directness identity
 `(X ⊔ Z) ⊓ T = Φ(P)` already supplied by the raw preimage construction.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 

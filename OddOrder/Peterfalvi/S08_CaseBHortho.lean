@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S08_CrossOrthogonality
+module
+
+public import OddOrder.Peterfalvi.S08_CrossOrthogonality
 
 /-!
 # Peterfalvi §8: case (B) — certain-type column vs break-pair cross-orthogonality
@@ -33,6 +35,8 @@ the break difference `c·ξ − c'·ξ' = (χ − χ̄)^τ` vanishes on the `(ti
 `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` then gives `⟨c·ξ, ω_{ij}^σ⟩ = 0`, and conjugate
 symmetry transports it to `⟨α, β⟩ = 0`.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.S08
 

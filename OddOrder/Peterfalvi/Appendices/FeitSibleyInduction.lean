@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
-import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+module
+
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (1) chief-factor induction support (pp. 146–147)
@@ -27,6 +29,8 @@ the Theorem (campaign issue 1054) from the one-step lemma
   `K` (via the normal `p`-complement), feeding the "`Z(Q₁/Q₃)` is not a
   `q`-group" step.
 -/
+
+@[expose] public section
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 

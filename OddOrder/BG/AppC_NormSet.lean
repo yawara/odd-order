@@ -3,17 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.Finite.Trace
-import Mathlib.GroupTheory.SemidirectProduct
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.Algebra.Ring.AddAut
-import Mathlib.Algebra.Polynomial.Roots
-import Mathlib.Algebra.Polynomial.SpecificDegree
-import Mathlib.Algebra.Ring.GeomSum
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Algebra.Module.ZMod
-import OddOrder.BG.AppC_NormSetBasic
+module
+
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.FieldTheory.Finite.Trace
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.Algebra.Ring.AddAut
+public import Mathlib.Algebra.Polynomial.Roots
+public import Mathlib.Algebra.Polynomial.SpecificDegree
+public import Mathlib.Algebra.Ring.GeomSum
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Algebra.Module.ZMod
+public import OddOrder.BG.AppC_NormSetBasic
 
 /-!
 # BG Appendix C: the finite-field norm-set argument
@@ -75,6 +77,8 @@ issue 3000 / `notes/bg/appC_normset_plan.md`.
   1994), Appendix C.
 -/
 
+
+@[expose] public section
 
 namespace OddOrder.BG.AppC.NormSet
 

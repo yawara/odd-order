@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllDistinctParameters
+module
+
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllDistinctParameters
 
 /-!
 # Higman Lemma 13: coincidence of exponent-two parameters
@@ -20,6 +22,8 @@ parameters equipped with the three pair relations cannot be pairwise
 distinct.  The conversion from parameter equality to isomorphism of the
 actual `A(n, θ)` factors belongs to the downstream group-theoretic layer.
 -/
+
+@[expose] public section
 
 set_option autoImplicit false
 
