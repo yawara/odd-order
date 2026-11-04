@@ -78,7 +78,6 @@ def noncommFactorInclusion
     data.eQuot
 
 omit [Finite P] in
-set_option backward.isDefEq.respectTransparency false in
 /-- **Factor square identity, noncommutative branch.**  The ambient square map
 of the factor inclusion equals the factor's type-A quadratic form `α · θ(α)`. -/
 theorem noncomm_ambientSquare_eq

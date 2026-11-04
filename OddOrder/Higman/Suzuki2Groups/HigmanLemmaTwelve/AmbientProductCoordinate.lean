@@ -309,7 +309,6 @@ end AmbientProduct
 
 section AmbientExtension
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Bridge `P / Φ(P) ≃* L₀`: the zeroth lower-central layer is the Frattini
 quotient once the layer kernel is identified with `Φ(P)`. -/
 def frattiniQuotientEquivLayerZero

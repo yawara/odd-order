@@ -269,7 +269,6 @@ lemma exists_four_subgroup_le_Q0 :
 
 
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi Part II, Ch. I §3, Lemma 4.** The group `Q₀` acts
 regularly on the generated orbit with its base point removed. -/
 noncomputable def orderThreeQ0RegularEquiv

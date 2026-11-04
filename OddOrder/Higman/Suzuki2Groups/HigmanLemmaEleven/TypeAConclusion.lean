@@ -424,7 +424,6 @@ noncomputable def lowerCentralTermZeroEquivAmbient
   (MulEquiv.subgroupCongr (by simp [lowerCentralTerm])).trans
     Subgroup.topEquiv
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Under the square-layer identity, the ambient first lower-central term
 maps to the kernel defining the zeroth lower-central layer. -/
 theorem lowerCentralTerm_one_map_zeroEquiv_symm
