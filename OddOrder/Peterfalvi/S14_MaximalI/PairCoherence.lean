@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
 # Peterfalvi (12.5) without global coherence — pair coherence of equal-degree members

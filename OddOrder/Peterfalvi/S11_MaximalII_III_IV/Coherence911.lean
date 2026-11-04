@@ -1,6 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 
 /-!
 # Peterfalvi (9.8.c)/(9.9.c) — irreducible-character constructions

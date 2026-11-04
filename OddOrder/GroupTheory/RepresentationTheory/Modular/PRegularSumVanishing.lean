@@ -5,11 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 
 /-!
 # `ω_χ(Ĝ⁰) = 0` outside the principal block

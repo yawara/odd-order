@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorMixedTermBridge
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutators
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorMixedTermBridge
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 
 /-!
 # Higman's Lemma 13: nonzero type-C square commutators

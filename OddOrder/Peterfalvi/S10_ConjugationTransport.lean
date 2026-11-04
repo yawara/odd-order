@@ -6,6 +6,18 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
 # Peterfalvi §10 — minimal simple groups: the conjugation-transport layer

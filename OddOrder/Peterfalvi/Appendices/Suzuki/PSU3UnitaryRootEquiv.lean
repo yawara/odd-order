@@ -7,6 +7,11 @@ module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The unitary coordinates *are* the root group of `PSU(3, q)`

@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Peterfalvi (5.9)(a): Galois automorphisms commute with coherent isometries

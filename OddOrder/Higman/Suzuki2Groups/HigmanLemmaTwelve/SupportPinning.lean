@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Tactic.LinearCombination
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman Lemma 12: support pinning for the mixed Frobenius pairing

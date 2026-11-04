@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_AbelianQuotientComplement
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_AbelianQuotientComplement
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_CentralizerCenter
 
 /-!
 # Isaacs FGT Ch.7 — Theorem 7.1 Step 7 and final assembly (pp. 218–219)

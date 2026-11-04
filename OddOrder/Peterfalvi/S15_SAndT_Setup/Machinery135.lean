@@ -1,6 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+public import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.TISubsetCounting
 
 /-!
 # Machinery135

@@ -5,9 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import Mathlib.GroupTheory.NoncommPiCoprod
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 
 /-!
 # Isaacs Ch. 9 — §9A: semisimple groups と Lemma 9.5 / Lemma 9.6 (pp. 274-275)

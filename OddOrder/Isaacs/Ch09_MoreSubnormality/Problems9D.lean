@@ -6,9 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Perm.Cycle.Concrete
-public import Mathlib.GroupTheory.Perm.Fin
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Isaacs §9D の演習 (書籍 p. 294)

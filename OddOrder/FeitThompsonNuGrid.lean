@@ -1,7 +1,9 @@
 module
 
 public import OddOrder.FeitThompsonSetup
-public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S06_MuColumnBridge
 
 /-!
 # Peterfalvi certain-Type-T ν-grid

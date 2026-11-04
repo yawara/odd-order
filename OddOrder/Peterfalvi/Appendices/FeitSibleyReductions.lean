@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-public import Mathlib.GroupTheory.PGroup
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction-step machinery (pp. 146–148)

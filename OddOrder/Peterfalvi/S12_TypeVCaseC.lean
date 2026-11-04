@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S12_Section9Counts
 
 /-!
 # Peterfalvi (10.10.2): the type-V case-(c) structural package

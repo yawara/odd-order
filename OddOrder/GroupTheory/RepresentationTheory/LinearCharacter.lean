@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
+import Mathlib.Analysis.Complex.Polynomial.Basic
+public import Mathlib.LinearAlgebra.FreeModule.PID -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Linear characters from group homomorphisms to `ℂˣ`

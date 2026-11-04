@@ -5,7 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 
 /-!
 # BG §16: the type-`P` dual pair intersection `S ∩ T = W`

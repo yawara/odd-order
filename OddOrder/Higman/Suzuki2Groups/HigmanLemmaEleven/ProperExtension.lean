@@ -6,11 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
-public import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
 public import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
-public import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+import Mathlib.FieldTheory.Finite.Trace
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 11: excluding a proper field extension

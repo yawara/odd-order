@@ -1,6 +1,10 @@
 module
 
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-!
 # Peterfalvi §11 — `C_U(S₀)`: opening layer

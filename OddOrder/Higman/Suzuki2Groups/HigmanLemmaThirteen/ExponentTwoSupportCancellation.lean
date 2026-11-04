@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.Ring
+public import Aesop.BuiltinRules
+public import Mathlib.Algebra.Field.Defs
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Higman Lemma 13: cancellation of commutator supports

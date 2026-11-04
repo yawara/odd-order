@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientLengths
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientLengths
 
 /-!
 # Higman's Lemma 13: invariant summands of the Frattini quotient

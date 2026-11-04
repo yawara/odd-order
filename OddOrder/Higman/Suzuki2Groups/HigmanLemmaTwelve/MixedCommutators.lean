@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: nonzero mixed commutators

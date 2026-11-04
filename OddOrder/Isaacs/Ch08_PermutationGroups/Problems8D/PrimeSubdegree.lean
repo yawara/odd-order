@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+public import Mathlib.GroupTheory.GroupAction.Primitive
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.6 (p. 269) — 素数の subdegree

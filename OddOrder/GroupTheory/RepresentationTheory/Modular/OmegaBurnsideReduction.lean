@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 
 /-!
 # Navarro (4.19) over the valuation ring

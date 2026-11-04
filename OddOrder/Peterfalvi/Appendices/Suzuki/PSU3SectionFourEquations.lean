@@ -6,6 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
+public import OddOrder.GroupTheory.RankOneBNPair
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the equations (3), (5)–(9)

@@ -1,6 +1,28 @@
 module
 
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151 -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.WitnessPGroup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
 # BG §16 — Proposition 16.1 forward bridges: the shared type data

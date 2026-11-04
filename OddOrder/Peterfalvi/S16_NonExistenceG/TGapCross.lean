@@ -1,8 +1,15 @@
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
-public import OddOrder.Peterfalvi.S16_GridExpansion
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+public import OddOrder.Peterfalvi.S15_BridgeCharacterBasic
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S15_BridgeCharacter
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (14.9): assembly of the S/T gap identity

@@ -5,15 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.SimpleModule.WedderburnArtin
-public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-public import Mathlib.RingTheory.SimpleRing.Matrix
-public import Mathlib.RingTheory.SimpleRing.Congr
-public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
-public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
-public import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
-public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import Mathlib.RingTheory.SimpleRing.Congr
+import Mathlib.RingTheory.SimpleRing.Matrix
 
 /-!
 # Skolem–Noether for the endomorphism algebra of a finite-dimensional vector space

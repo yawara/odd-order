@@ -1,16 +1,9 @@
 module
 
-public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.Solvable
-public import Mathlib.LinearAlgebra.Dual.Lemmas
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-public import OddOrder.Mathlib.SemidirectProduct
-public import OddOrder.Mathlib.Subgroup
-public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs §4A — Thm 4.7/4.8: maximal class p-群, Ω_r (pp. 113-122)

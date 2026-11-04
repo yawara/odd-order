@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Theorem131
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.GroupTheory.Complement
+import OddOrder.Isaacs.Ch01_Sylow.Theorem131
+public import OddOrder.GroupTheory.ChermakDelgado -- shake: keep (re-exported via `export`)
 
 /-!
 # TAIL

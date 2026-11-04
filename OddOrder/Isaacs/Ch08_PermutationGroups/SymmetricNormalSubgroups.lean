@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the normal subgroups of `Sym Ω` (Cor 8.28)

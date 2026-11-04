@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Lemma 3.18: series characterization of π-separability (pp. 90-91)

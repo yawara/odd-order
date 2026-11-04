@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
+public import Mathlib.Algebra.Group.Subgroup.Map
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # Factorisations through a subgroup, and pairs in the same coset

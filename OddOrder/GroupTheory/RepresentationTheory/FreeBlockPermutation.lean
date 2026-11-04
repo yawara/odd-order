@@ -1,8 +1,6 @@
 module
 
 public import Mathlib.RepresentationTheory.Invariants
-public import Mathlib.LinearAlgebra.Eigenspace.Pi
-public import Mathlib.GroupTheory.GroupAction.Basic
 
 /-!
 # Fixed-point dimension under a free block permutation

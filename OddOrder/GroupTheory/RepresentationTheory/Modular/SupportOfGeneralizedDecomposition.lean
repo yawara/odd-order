@@ -6,7 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
 # The support of `d^x_{χ ·}` seen through `C_G(x) ↠ C_G(x)/N`

@@ -7,7 +7,8 @@ module
 
 public import OddOrder.Peterfalvi.S06_CertainHypothesis46
 public import OddOrder.Peterfalvi.S06_CertainTypeClifford
-public import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S03b_Vanishing
 
 /-!
 # Peterfalvi (4.7), core support lemma: `H ⊄ Ker χ` characters live on `A ∪ {1}`

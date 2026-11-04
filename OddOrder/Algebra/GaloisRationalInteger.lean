@@ -5,13 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Minpoly.IsConjRoot
-public import Mathlib.FieldTheory.Galois.Basic
-public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+public import Mathlib.Analysis.Complex.Norm
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Algebra.CharP.IntermediateField
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.RootsOfUnity.Complex
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 
 /-!
 # Algebraic integers fixed by all Galois automorphisms are rational integers

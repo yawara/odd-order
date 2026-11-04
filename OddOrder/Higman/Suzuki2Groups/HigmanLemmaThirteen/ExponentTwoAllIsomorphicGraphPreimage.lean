@@ -5,11 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicAmbientCancellation
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketFaithfulness
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeParameterBranching
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeTermGraphPreimage
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicAmbientCancellation
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketFaithfulness
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorAmbientInclusion
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorQuotientRange
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaCoherence
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaPrimitivity
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseJoinInfrastructure
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeTermGraphPreimage
 
 /-!
 # Higman's Lemma 13: all-isomorphic graph and canonical preimage

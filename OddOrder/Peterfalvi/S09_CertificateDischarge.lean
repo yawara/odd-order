@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
 public import OddOrder.Peterfalvi.S09_CertificateBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Peterfalvi §7 — discharging the `(7.7.a)`/`(7.8.c)` certificates of `S09`

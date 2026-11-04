@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-public import OddOrder.Isaacs.Ch04_Commutators.Problems
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.6 (maximal class の `p`-群)

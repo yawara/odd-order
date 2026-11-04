@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
 public import OddOrder.Peterfalvi.S08_SibleyCoherenceLemmas
+public import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
+import OddOrder.Peterfalvi.S08_SibleyRestrictionLemmas
 
 /-!
 # TAIL

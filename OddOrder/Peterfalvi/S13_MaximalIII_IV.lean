@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
-public import OddOrder.Peterfalvi.S08_CrossOrthogonality
 public import OddOrder.Peterfalvi.S13_Lemmas113To115
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # TAIL

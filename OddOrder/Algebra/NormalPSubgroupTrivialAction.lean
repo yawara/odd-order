@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.ToLin
 public import OddOrder.Algebra.AugmentationIdeal
 public import OddOrder.Algebra.PiMatrixSimpleModules
-public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.RepresentationTheory.Basic
+import Mathlib.Data.Rat.Floor
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
 /-!
 # A normal `p`-subgroup acts trivially on every simple module

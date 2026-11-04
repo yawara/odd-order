@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
 
 /-!
 # Peterfalvi (4.9)(a): conjugation of the certain-type characters

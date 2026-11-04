@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 
 /-!
 # BG §4: Theorem 4.20(b) — characteristic subgroups of a Sylow inside `S'` are `G`-normal

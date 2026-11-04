@@ -5,16 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppE_CollectionFormula
-public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-public import OddOrder.GroupTheory.CriticalSubgroup
-public import OddOrder.GroupTheory.HallCollection
-public import OddOrder.GroupTheory.HallPetresco
-public import OddOrder.GroupTheory.RegularPGroup
-public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.SubgroupInAmbient
 public import OddOrder.BG.AppE_CentralizerDecomposition
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Appendix E: Further Results of Feit and Thompson
@@ -1028,8 +1030,6 @@ end RegularOperator
 /-! ## E.5: the maximal-subgroup application -/
 
 section MaximalApplication
-
-open OddOrder.BG.Ch3.S12 OddOrder.BG.Ch4.S14
 
 variable {G : Type*} [Group G]
 

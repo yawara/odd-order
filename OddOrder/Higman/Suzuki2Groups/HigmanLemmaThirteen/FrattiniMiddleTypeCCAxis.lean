@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCCSupport
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCCSupport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 
 /-!
 # Higman's Lemma 13: the type-C/C middle-commutator axes

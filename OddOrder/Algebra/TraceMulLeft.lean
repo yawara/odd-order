@@ -5,9 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.MonoidAlgebra.Module
-public import Mathlib.LinearAlgebra.Matrix.StdBasis
-public import Mathlib.LinearAlgebra.StdBasis
 public import Mathlib.LinearAlgebra.Trace
 
 /-!

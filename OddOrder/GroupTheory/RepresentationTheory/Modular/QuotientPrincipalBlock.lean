@@ -7,6 +7,10 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Blocks under `G ↠ G/N`: the central characters correspond

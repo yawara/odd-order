@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (3), `p`-power degrees (p. 146)

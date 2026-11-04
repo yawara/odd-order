@@ -5,21 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.AlgebraRepresentation.Basic
-public import Mathlib.RingTheory.SimpleModule.Basic
-public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-public import Mathlib.RingTheory.Finiteness.Basic
-public import Mathlib.RingTheory.IntegralDomain
-public import Mathlib.RingTheory.TensorProduct.Finite
 public import Mathlib.RingTheory.LittleWedderburn
-public import Mathlib.RingTheory.Finiteness.Cardinality
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import Mathlib.LinearAlgebra.TensorProduct.Basis
 public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 
 /-!
 # Burnside's theorem over an algebraically closed field (BG §2 Prop 2.1)

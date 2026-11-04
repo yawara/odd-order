@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
 
 /-!
 # Higman's Lemma 12: inclusive classification of xi-length-two groups

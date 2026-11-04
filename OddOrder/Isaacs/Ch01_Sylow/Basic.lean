@@ -5,16 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Finite.Perm
-public import Mathlib.Data.Nat.Choose.Lucas
-public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.Perm.Cycle.Type
-public import Mathlib.GroupTheory.Subgroup.Simple
-public import Mathlib.GroupTheory.Sylow
-public import OddOrder.GroupTheory.ChermakDelgado
+import Mathlib.Data.Finite.Perm
 
 /-!
 # Basic

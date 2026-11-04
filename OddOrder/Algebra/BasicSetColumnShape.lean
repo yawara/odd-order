@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.LinearCombination
-public import OddOrder.Algebra.ThreeNormColumn
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Reading off the columns `D^t_j` — Navarro p. 143

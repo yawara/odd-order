@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.CenterIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 
 /-!
 # A block idempotent is the sum of the ordinary idempotents in its block

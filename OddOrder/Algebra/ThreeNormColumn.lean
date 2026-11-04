@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.SumSquaresFour
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import OddOrder.Algebra.SumSquaresFour
 
 /-!
 # An integer column of norm `3` orthogonal to the degrees

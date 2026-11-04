@@ -5,22 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.CharP.CharAndCard
 public import Mathlib.Basic.Complex.Basic
 public import Mathlib.Data.Set.Card
-public import Mathlib.Tactic.Abel
-public import Mathlib.Tactic.Common
-public import Mathlib.Tactic.FieldSimp
-public import Mathlib.Tactic.FinCases
-public import Mathlib.Tactic.Group
-public import Mathlib.Tactic.IntervalCases
-public import Mathlib.Tactic.Linarith
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.Tactic.Module
-public import Mathlib.Tactic.NormNum.Prime
-public import Mathlib.Tactic.Positivity
-public import Mathlib.Tactic.Ring
-public import Mathlib.Tactic.Zify
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi (3.8): the additive-grid trichotomy

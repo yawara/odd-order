@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Sylow
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Inflation ∘ induction: the P-inflation norm bridge

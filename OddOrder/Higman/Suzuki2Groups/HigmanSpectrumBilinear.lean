@@ -6,24 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-public import Mathlib.Algebra.Module.Submodule.Bilinear
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.Combinatorics.Colex
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.LinearAlgebra.Basis.Basic
 public import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
-public import Mathlib.LinearAlgebra.Charpoly.BaseChange
-public import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-public import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
-public import Mathlib.LinearAlgebra.TensorProduct.RightExactness
-public import Mathlib.RepresentationTheory.Irreducible
 public import Mathlib.RingTheory.Adjoin.PowerBasis
 public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import Mathlib.LinearAlgebra.Charpoly.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.LinearAlgebra.Charpoly.BaseChange
+import Mathlib.LinearAlgebra.Eigenspace.Charpoly
 
 /-!
 # Higman — lower central spectrum: the bilinear-map layer
@@ -38,7 +29,6 @@ imports this leaf, so downstream imports are unchanged.
 set_option autoImplicit false
 
 open Module Polynomial
-open OddOrder.RepresentationTheory
 open scoped BigOperators TensorProduct IsMulCommutative Fin.NatCast
 
 namespace OddOrder.Higman.Suzuki2Groups

@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
+public import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
 
 /-!
 # Isaacs Problem 8D.5 (p. 269) — rank 3 で subdegree が互いに素なとき

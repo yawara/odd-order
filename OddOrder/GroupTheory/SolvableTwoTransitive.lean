@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.Solvable
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # Huppert II Satz 3.2 (Galois–Burnside): 2-transitive 群の可解正規核

@@ -6,11 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Sylow
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. I §1: the `Y × Z → X` decomposition (the Lemma)

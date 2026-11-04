@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
-public import OddOrder.Peterfalvi.S16_GridExpansion
-public import OddOrder.Peterfalvi.S16_PairingCoherence
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S15_SAndTGrid
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (13.19, pp. 85–87): coherent images and the eta-grid

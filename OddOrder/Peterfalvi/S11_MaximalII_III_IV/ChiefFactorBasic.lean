@@ -1,6 +1,11 @@
 module
 
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §11 — chief-factor core: opening layer

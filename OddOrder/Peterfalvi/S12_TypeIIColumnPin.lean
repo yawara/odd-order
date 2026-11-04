@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
-public import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
+import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
 
 /-!
 # Peterfalvi (5.8) for the type-II `S`-side column: the `ν^{τ₂}` pin

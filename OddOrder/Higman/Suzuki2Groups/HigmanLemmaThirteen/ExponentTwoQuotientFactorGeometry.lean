@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorQuotientRange
+public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 13: factor geometry in the Frattini quotient

@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §5/§7: the bridge gluing lemma for coherence (`bridge_coherent`)

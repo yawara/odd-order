@@ -5,8 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.PGroup
 public import Mathlib.GroupTheory.Sylow
 
 /-!

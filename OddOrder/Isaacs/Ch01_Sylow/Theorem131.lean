@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.Data.Finite.Perm
 
 /-!
 # Theorem131

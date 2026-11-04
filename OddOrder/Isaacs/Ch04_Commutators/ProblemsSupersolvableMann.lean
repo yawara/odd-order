@@ -7,6 +7,14 @@ module
 
 public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 public import OddOrder.Isaacs.Ch04_Commutators.Mann
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Isaacs Chapter 4 — Problem 4B.5 (超可解群の `M(G)`)

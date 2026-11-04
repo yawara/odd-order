@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-public import OddOrder.GroupTheory.CardSupInf
-public import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.FeitThompson
+import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 
 /-!
 # Peterfalvi Part II, Ch. III: the subgroup `QK`

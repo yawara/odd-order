@@ -1,7 +1,11 @@
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
-public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35Prelim
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
 
 /-!
 # BG Theorem 3.10(a): module-level core

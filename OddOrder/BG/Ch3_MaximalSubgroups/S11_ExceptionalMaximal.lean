@@ -5,14 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelianFamily
-public import OddOrder.GroupTheory.NarrowPGroup
-public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.PRank
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG §11: Exceptional Maximal Subgroups

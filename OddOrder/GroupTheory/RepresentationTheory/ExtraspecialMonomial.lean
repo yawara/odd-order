@@ -7,6 +7,9 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.BurnsideBasis
 public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Rat.Floor
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 
 /-!
 # The monomial action of an intertwiner on the Burnside basis (BG (2.11))

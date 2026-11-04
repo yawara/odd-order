@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.AnalyticRelayer
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.AnalyticRelayer
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # Peterfalvi §13 (pp. 85–86) — Core-typed order consequences

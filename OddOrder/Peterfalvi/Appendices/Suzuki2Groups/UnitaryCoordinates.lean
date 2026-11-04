@@ -7,6 +7,12 @@ module
 
 public import OddOrder.Algebra.HermitianCocycle
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The unitary coordinates of a Hermitian twisted product

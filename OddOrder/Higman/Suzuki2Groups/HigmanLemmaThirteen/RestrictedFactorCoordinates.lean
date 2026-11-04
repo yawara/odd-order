@@ -7,6 +7,10 @@ module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: coordinates on a restricted factor

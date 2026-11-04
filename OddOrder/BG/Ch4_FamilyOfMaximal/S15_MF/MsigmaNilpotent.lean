@@ -1,6 +1,21 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
 
 /-!
 # MsigmaNilpotent

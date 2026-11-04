@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S05_TICyclic
-public import OddOrder.GroupTheory.RepresentationTheory.SupportedSpanOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.SupportedSpanOrthogonality
 
 /-!
 # The `ω`-grid spans `CF(W)` — Fourier expansion over the cyclic-TI grid

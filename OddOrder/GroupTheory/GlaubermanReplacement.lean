@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # Glauberman Replacement Theorem (Gorenstein Thm 2.7)

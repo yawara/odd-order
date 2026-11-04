@@ -5,12 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCParameter
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeBTypeB
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeB
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeC
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeBTypeB
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeB
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeC
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCParameter
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
 
 /-!
 # Higman's Lemma 13: contradiction in the exponent-four branch

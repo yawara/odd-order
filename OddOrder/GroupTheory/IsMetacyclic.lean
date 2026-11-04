@@ -6,9 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 
 /-!
 # Metacyclic Groups

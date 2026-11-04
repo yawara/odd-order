@@ -11,6 +11,9 @@ public import OddOrder.GroupTheory.ConjClassSet
 public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.TISubset
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Maximal subgroup types for BG/Peterfalvi

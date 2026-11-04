@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
-public import OddOrder.GroupTheory.RepresentationTheory.CyclicEndConjCount
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.CyclicEndConjCount
+import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
 
 /-!
 # Towards Bender–Glauberman Theorem 2.5 (the divisibility conclusion)

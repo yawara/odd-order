@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the conjugate summand split

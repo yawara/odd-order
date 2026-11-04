@@ -1,8 +1,13 @@
 module
 
 public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
-public import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
-public import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+import OddOrder.Peterfalvi.S09_Building78C
 
 /-!
 # Peterfalvi (14.9): the T-side prime-TI anchor

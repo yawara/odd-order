@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Summing a class function over a `p`-section

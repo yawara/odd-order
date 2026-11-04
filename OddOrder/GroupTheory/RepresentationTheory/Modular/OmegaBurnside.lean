@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # Navarro (4.19): the character formula for `|Ω_{K,L}|`

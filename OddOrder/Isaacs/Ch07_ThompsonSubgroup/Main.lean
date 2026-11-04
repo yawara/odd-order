@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Basic
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
+import Mathlib.Algebra.Order.Star.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Basic
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
 
 /-!
 # TAIL

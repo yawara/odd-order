@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommutingFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
 
 /-!
 # Higman's Lemma 13: Frattini subgroup of a pairwise join

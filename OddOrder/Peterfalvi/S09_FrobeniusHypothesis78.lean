@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S09_FrobeniusSibley
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S09_CertificateDischarge -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (7.8) for a Frobenius family — assembling the `Hypothesis78`

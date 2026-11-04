@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.HigmanSims
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAut
@@ -13,6 +13,11 @@ public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwentyFou
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8C (pp. 256–257)

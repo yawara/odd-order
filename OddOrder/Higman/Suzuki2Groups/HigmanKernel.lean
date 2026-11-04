@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
-public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman Lemma 3: the kernel of the quotient endomorphism family

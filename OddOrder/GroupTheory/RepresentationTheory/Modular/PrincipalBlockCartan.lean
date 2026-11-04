@@ -5,9 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.SubgroupSumWedderburn
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.Algebra.NormalPSubgroupTrivialAction
+import OddOrder.Algebra.SubgroupSumBlockAction
+import OddOrder.Algebra.SubgroupSumWedderburn
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 
 /-!
 # Navarro (6.13): the Cartan matrix of the principal block

@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import OddOrder.GroupTheory.ConjClassCardinality
 
 /-!
 # TAIL

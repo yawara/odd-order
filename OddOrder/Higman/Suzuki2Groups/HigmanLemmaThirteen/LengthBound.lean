@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourContradiction
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourProperDescent
-public import OddOrder.Mathlib.Subgroup
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourContradiction
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourProperDescent
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman's Lemma 13: the Xi-length bound

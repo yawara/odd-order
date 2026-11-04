@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.PElementSum
-public import OddOrder.Mathlib.MonoidAlgebra
 public import OddOrder.GroupTheory.PFactorPairCount
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # `Ĝ_p · Ĝ⁰` counts the factorisations `g = x y`

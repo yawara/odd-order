@@ -5,15 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-public import Mathlib.Basic.Complex.Basic
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.Algebra.MonoidAlgebra.MapDomain
-public import Mathlib.RingTheory.SimpleModule.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.Inertia
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-public import Mathlib.RingTheory.DedekindDomain.Basic
+public import Mathlib.Analysis.Complex.Order
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Clifford's theorem on irreducible characters of a normal subgroup

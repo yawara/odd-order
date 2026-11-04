@@ -3,12 +3,16 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 public import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 public import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
 public import OddOrder.Isaacs.Ch10_MoreTransfer.PrincipalIdeal
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # OddOrder.Isaacs.Ch10 — More Transfer Theory (hub)

@@ -1,7 +1,22 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 
 /-!
 # BG Proposition 16.1 taxonomy + Theorems I/II (Peterfalvi が消費する出力)

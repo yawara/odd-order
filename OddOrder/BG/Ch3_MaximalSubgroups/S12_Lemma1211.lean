@@ -5,7 +5,32 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Lemma 12.11 — τ₂ の `M* ∈ ℳ(N_G(A))` への移送

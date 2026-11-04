@@ -5,13 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
-public import Mathlib.RingTheory.Norm.Transitivity
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import Mathlib.RingTheory.RootsOfUnity.Lemmas
+public import Mathlib.NumberTheory.Cyclotomic.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Norm.Transitivity
+import Mathlib.RingTheory.RootsOfUnity.Lemmas
+import OddOrder.Algebra.AlgInt
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Peterfalvi (1.10): cyclotomic congruences of character values

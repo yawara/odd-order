@@ -8,6 +8,11 @@ module
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 public import OddOrder.Algebra.QuadraticTraceCorrection
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Twisted-product coordinates on the Hermitian root group

@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
-public import OddOrder.Peterfalvi.Appendices.SemilinearField
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 
 /-!
 # Coordinates on `S ⧸ Q₀`

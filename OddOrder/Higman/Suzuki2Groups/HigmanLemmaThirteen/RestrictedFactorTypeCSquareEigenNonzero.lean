@@ -7,7 +7,9 @@ module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareNonzero
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareNonzero
 
 /-!
 # Higman's Lemma 13: type-C square brackets on Frobenius eigenvectors

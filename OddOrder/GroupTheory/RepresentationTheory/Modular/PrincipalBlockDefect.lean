@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.GroupAlgebraDefectGroup
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.Algebra.DefectNumber
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+import OddOrder.Algebra.GroupAlgebraDefectGroup
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 
 /-!
 # The principal block has full defect

@@ -7,6 +7,11 @@ module
 
 public import OddOrder.Algebra.SubgroupTruncation
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Continuity.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Plumbing between the three group algebras of Navarro (5.2)

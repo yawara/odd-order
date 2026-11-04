@@ -1,6 +1,10 @@
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 
 /-!
 # Isaacs §4D — the Baer trick, construction layer (Lem 4.37, pp. 141-144)

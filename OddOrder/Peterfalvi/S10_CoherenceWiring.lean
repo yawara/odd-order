@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §10–16: the coherence-wiring bridge to (6.8)

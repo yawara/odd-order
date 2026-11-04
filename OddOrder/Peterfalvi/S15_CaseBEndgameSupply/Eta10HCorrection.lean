@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
 /-!
 # Peterfalvi §13 (pp. 82–84) — Core-typed H-side `η₁₀` correction

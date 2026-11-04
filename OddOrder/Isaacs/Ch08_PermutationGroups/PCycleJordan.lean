@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Jordan
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
-public import Mathlib.Data.Nat.Prime.Factorial
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.GroupTheory.GroupAction.Jordan
+import Mathlib.GroupTheory.Sylow
+import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the `p`-cycle Jordan theorem (Thm 8.23)

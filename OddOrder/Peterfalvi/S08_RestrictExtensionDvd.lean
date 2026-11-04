@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_XBlockCounting
-public import OddOrder.Peterfalvi.S08_SibleyRestrictionLemmas
+public import OddOrder.Peterfalvi.S08_CoherenceBasic
+import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
+import OddOrder.Peterfalvi.S08_SibleyRestrictionLemmas
 
 /-!
 # S08_RestrictExtensionDvd

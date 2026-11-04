@@ -5,16 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.DirectSum.LinearMap
-public import Mathlib.Algebra.MvPolynomial.Equiv
-public import Mathlib.Data.Nat.ChineseRemainder
-public import Mathlib.FieldTheory.IsAlgClosed.Classification
-public import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
-public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-public import Mathlib.LinearAlgebra.Semisimple
-public import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
-public import Mathlib.RingTheory.RootsOfUnity.Complex
 public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import Mathlib.Algebra.DirectSum.LinearMap
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.FieldTheory.IsAlgClosed.Classification
+import Mathlib.LinearAlgebra.Eigenspace.Semisimple
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 
 /-!
 # Peterfalvi (1.9): cyclotomic Galois automorphisms acting on character values

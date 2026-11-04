@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Basic
 public import OddOrder.Algebra.CommutatorSpan
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
-public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
+import Mathlib.FieldTheory.Finite.Basic
 
 /-!
 # Group elements and their `p'`-parts agree in the `p`-radical

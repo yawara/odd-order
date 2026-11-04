@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Order.BigOperators.Ring.Finset
-public import Mathlib.Data.Fin.VecNotation
-public import Mathlib.Tactic.FinCases
-public import Mathlib.Tactic.Linarith
-public import Mathlib.Tactic.Ring
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # The three half-sum columns of Navarro p. 142

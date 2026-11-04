@@ -6,11 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Data.Nat.ModEq
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.Tactic.Group
+import Mathlib.Tactic.Group
 
 /-!
 # Conjugacy of commuting coprime products

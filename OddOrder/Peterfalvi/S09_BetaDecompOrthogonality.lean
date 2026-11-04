@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S09_Building78C
 
 /-!
 # Peterfalvi §7 — (7.8.c) building blocks: induced principal character and `betaDecomp`

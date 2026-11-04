@@ -7,8 +7,9 @@ module
 
 public import Mathlib.GroupTheory.Sylow
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 
 /-!
 # The unitary root group as a Sylow subgroup and a Suzuki 2-group

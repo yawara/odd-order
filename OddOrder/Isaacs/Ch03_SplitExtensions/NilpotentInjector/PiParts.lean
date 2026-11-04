@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
 
 /-!
 # 部分群の Hall `π`-部分

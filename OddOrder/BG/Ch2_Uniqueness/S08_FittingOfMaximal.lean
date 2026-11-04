@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.S08_SCN3Map
+public import OddOrder.BG.AppB_PuigB3B4
+public import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppB_Thm62
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch2_Uniqueness.S08_SCN3Map
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # TAIL

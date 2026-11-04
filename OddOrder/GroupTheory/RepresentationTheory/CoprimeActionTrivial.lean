@@ -6,8 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.Data.Nat.Choose.Sum
-public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Coprime action — trivial step

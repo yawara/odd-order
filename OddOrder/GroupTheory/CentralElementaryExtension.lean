@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.ZMod
 public import Mathlib.GroupTheory.GroupExtension.Basic
-public import Mathlib.LinearAlgebra.QuadraticForm.Basis
-public import Mathlib.Tactic.Group
+public import Mathlib.LinearAlgebra.Basis.Defs
+public import Mathlib.LinearAlgebra.DFinsupp
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # Central elementary extensions are determined by their square map

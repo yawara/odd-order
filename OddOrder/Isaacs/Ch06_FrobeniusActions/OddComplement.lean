@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.GroupTheory.ElementaryAbelian
 public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # Odd Frobenius complements: prime-order subgroups are normal (Huppert V.8.18 b)

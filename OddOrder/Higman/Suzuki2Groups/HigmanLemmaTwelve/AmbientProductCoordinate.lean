@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 12: the ambient `F × F` coordinate on `P / Φ(P)`

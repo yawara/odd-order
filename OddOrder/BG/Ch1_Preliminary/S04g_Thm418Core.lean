@@ -5,10 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 public import OddOrder.BG.Ch1_Preliminary.PLength
-public import OddOrder.GroupTheory.OpResidual
-public import OddOrder.Mathlib.Subgroup
+public import OddOrder.GroupTheory.ChiefFactor
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # BG §4H: Theorem 4.18 — rank-2 solvable structure (core proof)

@@ -5,7 +5,25 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Corollary 12.10

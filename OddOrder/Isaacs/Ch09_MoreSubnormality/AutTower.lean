@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
+import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 
 /-!
 # Isaacs Ch. 9 — §9B: Theorem 9.10 (Wielandt automorphism tower), p. 278

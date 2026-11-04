@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5D
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 5D.4 — `O^p` と `A^p` の部分群への制限 (書籍 p. 170)

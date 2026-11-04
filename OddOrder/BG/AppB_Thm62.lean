@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppB_PuigB3B4
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG Theorem 6.2 一般形: `Z(L(S))·O_{p'}(G) ⊴ G`

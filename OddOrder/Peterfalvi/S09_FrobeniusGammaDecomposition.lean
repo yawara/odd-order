@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
-public import OddOrder.Peterfalvi.S09_FrobeniusParity
+public import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+import OddOrder.Peterfalvi.S09_FrobeniusParity
 
 /-!
 # Frobenius-family Gamma decomposition (Peterfalvi 7.10)

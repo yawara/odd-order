@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ChermakDelgado
+import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Isaacs Problems 1G (書籍 p. 43) — Chermak–Delgado 周辺

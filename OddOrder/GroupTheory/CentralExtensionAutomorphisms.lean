@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CentralElementaryExtension
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.Mathlib.SchurZassenhausConj
+public import Mathlib.GroupTheory.GroupExtension.Defs
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.LinearAlgebra.Basis.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CentralElementaryExtension
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Isomorphisms of central elementary extensions along coordinate changes

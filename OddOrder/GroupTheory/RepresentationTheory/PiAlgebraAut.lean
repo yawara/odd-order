@@ -5,12 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Algebra.Equiv
 public import Mathlib.Algebra.Algebra.Pi
-public import Mathlib.Algebra.GroupWithZero.Idempotent
-public import Mathlib.Algebra.BigOperators.Pi
-public import Mathlib.Algebra.Order.BigOperators.Group.Finset
-public import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Algebra.BigOperators.Pi
+import Mathlib.Algebra.GroupWithZero.Idempotent
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
 /-!
 # Algebra automorphisms of `ι → k` permute the standard idempotents

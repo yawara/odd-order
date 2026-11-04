@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_YsetInner
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: coherent-adjoin machinery

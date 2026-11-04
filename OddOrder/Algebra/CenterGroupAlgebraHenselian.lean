@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.AdicCompletePi
-public import OddOrder.Algebra.IdempotentLift
-public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import Mathlib.RingTheory.Henselian
+import OddOrder.Algebra.AdicCompletePi
+import OddOrder.Algebra.IdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # `Z(𝒪G)` is Henselian at `I·Z(𝒪G)`

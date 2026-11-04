@@ -5,7 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 
 /-!
 # BG §12: Theorem 12.12 — three-case assembly

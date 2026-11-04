@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
-public import OddOrder.BG.AppC_LemmaC2
-public import OddOrder.Peterfalvi.S16_NonExistenceG
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppC_LemmaC2
+import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM
 
 /-!
 # BG Appendix C: The Final Contradiction

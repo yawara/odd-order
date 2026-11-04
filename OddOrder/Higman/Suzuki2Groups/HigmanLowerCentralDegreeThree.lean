@@ -7,6 +7,7 @@ module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
 public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # Higman's degree-three lower-central bracket

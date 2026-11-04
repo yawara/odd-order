@@ -5,15 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.ElementaryAbelianLinear
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 public import Mathlib.GroupTheory.Exponent
-public import Mathlib.Data.ZMod.Units
-public import Mathlib.Data.ZMod.QuotientGroup
-public import Mathlib.LinearAlgebra.Basis.VectorSpace
-public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.GroupTheory.IndexNormal
-public import Mathlib.Tactic.NormNum.Prime
+public import Mathlib.Data.Nat.Totient
+public import Mathlib.GroupTheory.Subgroup.Simple
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.GroupTheory.IndexNormal
+import Mathlib.LinearAlgebra.Basis.VectorSpace
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.ElementaryAbelianLinear
 
 /-!
 # The automorphism group of a commutative group

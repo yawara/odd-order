@@ -1,6 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 
 /-!
 # Peterfalvi §13 — reusable norm and arithmetic estimates

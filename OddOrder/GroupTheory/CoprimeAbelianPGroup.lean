@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main
 public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # Gorenstein "Finite Groups" Chapter 3 §2: p′-automorphisms of abelian p-groups

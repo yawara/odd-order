@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Nilpotent groups with cyclic abelianization are cyclic

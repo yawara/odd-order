@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # `(SK) ∪ (SKtS)` is a subgroup

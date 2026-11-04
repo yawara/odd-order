@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-public import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.Homocyclic
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 
 /-!
 # The center of a Suzuki 2-group is homocyclic

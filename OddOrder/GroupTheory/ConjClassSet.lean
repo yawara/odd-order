@@ -5,11 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Conj
-public import Mathlib.Algebra.Group.Subgroup.Lattice
-public import Mathlib.Tactic.Group
 public import Mathlib.GroupTheory.Index
-public import Mathlib.Data.Set.Card
+import Mathlib.Tactic.Group
 
 /-!
 # Conjugacy-closure of a subset `𝒞_G(T)`

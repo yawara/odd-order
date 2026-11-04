@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CentralElementaryExtension
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+public import Mathlib.Algebra.Algebra.ZMod -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.GroupTheory.CentralElementaryExtension
 
 /-!
 # Twisted products with corresponding diagonals are isomorphic

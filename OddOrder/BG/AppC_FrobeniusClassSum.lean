@@ -5,18 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Set.Card.Arithmetic
-public import OddOrder.BG.AppC_NormSet
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
-public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-public import OddOrder.Mathlib.SemidirectProduct
-public import OddOrder.Peterfalvi.S08_CoherenceTheorems
 public import OddOrder.BG.AppC_NormOneInduce
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppC_NormSet
+import OddOrder.GroupTheory.ConjClassCardinality
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # BG Appendix C: Frobenius Class-Sum Bridge

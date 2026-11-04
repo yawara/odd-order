@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RepresentationTheory.Subrepresentation
+public import Mathlib.RepresentationTheory.Basic
+import Mathlib.RepresentationTheory.Maschke
 
 /-!
 # Maschke: invariant complements of subrepresentations

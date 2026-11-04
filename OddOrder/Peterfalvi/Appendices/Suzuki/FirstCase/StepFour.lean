@@ -5,8 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
-public import OddOrder.GroupTheory.WielandtFixedPoint
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
 
 /-!
 # Peterfalvi Part II, Ch. II, step (4): `|Q| = |C_Q(P)|^p`

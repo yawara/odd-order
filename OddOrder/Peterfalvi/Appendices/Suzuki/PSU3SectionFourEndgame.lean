@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgameCore
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourIntrinsic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3BarOrbit
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgameCore
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: `λ = 1` and the trace relation

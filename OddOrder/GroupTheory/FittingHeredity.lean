@@ -5,9 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.QuotientGroup.Basic
 public import OddOrder.Isaacs.Ch01_Sylow.Basic
-public import OddOrder.Mathlib.QuotientGroup
+import OddOrder.Mathlib.QuotientGroup
 
 /-!
 # Heredity of "`X/F(X)` is nilpotent" for subgroups and quotients

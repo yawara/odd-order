@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ_Setup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
 
 /-!
 # Isaacs FGT Ch.7 — the normal-J theorem, closing steps (Thm 7.6, pp. 209-214)

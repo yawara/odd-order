@@ -6,8 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.BlockIdempotent
-public import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.Algebra.CenterIdempotentLift
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
 
 /-!
 # Block idempotents over `𝒪`

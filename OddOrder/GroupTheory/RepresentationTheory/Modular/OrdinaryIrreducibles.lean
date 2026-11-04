@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionOfOrdinary
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionOfOrdinary
 
 /-!
 # `Irr(G)` and the decomposition matrix

@@ -5,9 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Basic
 public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.Tactic.Group
+import Mathlib.Tactic.Group
 
 /-!
 # Trivial Intersection (TI) Subsets

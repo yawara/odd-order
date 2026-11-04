@@ -1,6 +1,11 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndTDefs
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # Peterfalvi (14.6) — trapping the case-A Sylow center

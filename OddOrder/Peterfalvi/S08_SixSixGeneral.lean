@@ -6,9 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_SixFiveGeneral
-public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart2
+public import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart2 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (6.6) for a general kernel: the `X`-set and its degree data

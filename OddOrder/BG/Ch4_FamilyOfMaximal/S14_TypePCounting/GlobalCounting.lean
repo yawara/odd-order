@@ -1,6 +1,28 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # TAIL

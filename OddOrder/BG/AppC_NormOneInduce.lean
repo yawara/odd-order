@@ -5,17 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Set.Card.Arithmetic
-public import OddOrder.BG.AppC_NormSet
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 public import OddOrder.Mathlib.SemidirectProduct
-public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+public import OddOrder.BG.AppC_NormSetBasic
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
 
 /-!
 # BG Appendix C — the norm-one Frobenius kernel: induction layer

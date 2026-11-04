@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
 public import OddOrder.GroupTheory.MackeyTransfer
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.GroupTheory.TransferTransitivity
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 
 /-!
 # Isaacs §10A — Yoshida's theorem (pp. 295-296, 303-304)

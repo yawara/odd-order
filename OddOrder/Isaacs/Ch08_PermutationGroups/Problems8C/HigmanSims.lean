@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.Subgroup.Simple
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 /-!
 # Isaacs Problem 8C.4 (p. 257) — 次数 100, 点安定化群が単純で軌道長 22, 77

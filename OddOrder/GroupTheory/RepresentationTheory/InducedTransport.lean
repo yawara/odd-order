@@ -6,8 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 
 /-!
 # Transport lemmas for induced class functions

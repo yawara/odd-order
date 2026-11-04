@@ -7,7 +7,13 @@ module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
 # Peterfalvi Part II, Ch. IV §2: `D` is a Frobenius complement

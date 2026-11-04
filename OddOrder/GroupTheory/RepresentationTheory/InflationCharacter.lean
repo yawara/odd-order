@@ -5,14 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Inflation of irreducible characters

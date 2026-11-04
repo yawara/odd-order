@@ -1,6 +1,9 @@
 module
 
 public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
+import OddOrder.Peterfalvi.S07_CoherenceGalois
 
 /-!
 # Isometry105

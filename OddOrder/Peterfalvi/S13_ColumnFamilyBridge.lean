@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S13_SixTwoImageData
-public import OddOrder.Peterfalvi.S13_Orthogonality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S13_Orthogonality
 
 /-!
 # The §13 column `R`-family is the (5.3)(b) certain-type family

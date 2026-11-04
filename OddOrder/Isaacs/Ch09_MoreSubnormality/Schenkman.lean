@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Frattini
-public import OddOrder.Mathlib.Subgroup
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Ch. 9 — §9B: Schenkman's theorem (Lemmas 9.19–9.20, Theorems 9.21–9.22, p. 282)

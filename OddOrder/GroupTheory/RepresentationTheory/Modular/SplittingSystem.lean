@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 

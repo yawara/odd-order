@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.CriticalSubgroup
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # Narrow p-Groups

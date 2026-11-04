@@ -6,9 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.SubgroupSum
-public import OddOrder.Algebra.SubgroupSumBlockAction
 public import OddOrder.GroupTheory.OpResidual
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+import Mathlib.FieldTheory.PurelyInseparable.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.Algebra.SubgroupSumBlockAction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # Navarro (6.9)/(6.10): the kernel of a block

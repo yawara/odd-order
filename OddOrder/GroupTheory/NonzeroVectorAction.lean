@@ -5,11 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-public import Mathlib.LinearAlgebra.Basis.VectorSpace
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # The action of the linear automorphism group on the non-zero vectors

@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
 
 /-!
 # The mappings `f`, `g`, `h` of the standard `PSU(3, q)` model

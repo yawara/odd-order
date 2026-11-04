@@ -6,7 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch1_Preliminary.S06_Thm64
-public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import OddOrder.GroupTheory.FittingHeredity
+import OddOrder.GroupTheory.NormalHallHeredity
 
 /-!
 # BG §6: Theorem 6.4 — 場合 2 (`π(F(G)) ⊆ π(H)`) と定理本体

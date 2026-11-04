@@ -1,4 +1,4 @@
-module
+module -- shake: keep-all
 
 public import OddOrder.Algebra.PowSubOneDvd
 public import OddOrder.Algebra.AugmentationIdeal
@@ -738,6 +738,7 @@ public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
+public import OddOrder.BG.Ch3_MaximalSubgroups.S13_FittingHallInvariance
 public import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
@@ -850,6 +851,7 @@ public import OddOrder.Peterfalvi.S11_NineElevenTIWitness
 public import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
 public import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 public import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.ConjugationOrbits
 public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 public import OddOrder.Peterfalvi.S12_Noncoherence
 public import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
@@ -1060,3 +1062,4 @@ public import OddOrder.Peterfalvi.Appendices.FeitSibleyCoherentImage
 public import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 public import OddOrder.FeitThompson
 public import OddOrder.AxiomsCheck
+import Mathlib.Data.Nat.Choose.Multinomial

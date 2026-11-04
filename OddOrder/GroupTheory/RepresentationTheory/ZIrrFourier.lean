@@ -5,10 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.NatInt
-public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-public import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.IsReal
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 
 /-!
 # Fourier coefficients of virtual characters

@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # BG §1: coprime `Ω₁`-rigidity (Theorem 1.11, Corollary 1.12)

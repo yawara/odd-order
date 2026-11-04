@@ -5,11 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
-public import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
 public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.Peterfalvi.S08_YsetInner
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 /-!
 # Peterfalvi (6.2), general kernel: the induced family `S(X)`

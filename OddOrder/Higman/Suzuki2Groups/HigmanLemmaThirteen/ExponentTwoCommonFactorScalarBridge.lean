@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorAmbientInclusion
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorRange
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoScalarReparameterization
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorAmbientInclusion
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorRange
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoScalarReparameterization
 
 /-!
 # Higman Lemma 13: scalar alignment of a common pairwise factor

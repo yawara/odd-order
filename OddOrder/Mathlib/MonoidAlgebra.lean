@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.MonoidAlgebra.Defs
 public import Mathlib.Algebra.MonoidAlgebra.MapDomain
 
 /-!

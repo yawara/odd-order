@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.QuotientGroup.Finite
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Tactic.Ring
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.GroupTheory.Coset.Card
+import Mathlib.GroupTheory.QuotientGroup.Basic
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # 第二同型定理の位数式

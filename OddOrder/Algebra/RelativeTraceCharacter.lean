@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Trace
 public import OddOrder.Algebra.GroupAlgebraConjugation
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.FreeModule.Basic
+public import Mathlib.RingTheory.Finiteness.Defs
+public import OddOrder.Algebra.RelativeTrace
+import Mathlib.LinearAlgebra.Trace
 
 /-!
 # Characters of relative traces

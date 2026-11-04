@@ -5,10 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
-public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the type-B conclusion

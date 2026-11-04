@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_BridgeCoherent
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
+public import OddOrder.Peterfalvi.S08_YsetInner -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (5.6) / Isaacs 7.14: the general mixed-degree coherence adjoin

@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Subgroup.Centralizer
 public import OddOrder.Algebra.GroupAlgebraConjugation
-public import OddOrder.Mathlib.MonoidAlgebra
+public import OddOrder.Algebra.RelativeTrace
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Class sums and the centre of the group algebra

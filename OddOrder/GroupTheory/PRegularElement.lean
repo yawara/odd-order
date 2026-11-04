@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.Data.Nat.Factorization.Basic
 
 /-!
 # `p`-elements, `p`-regular elements, and the `p` / `p'` decomposition

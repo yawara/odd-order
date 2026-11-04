@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
-public import OddOrder.Peterfalvi.S05_TICyclic
 public import OddOrder.GroupTheory.ConjClassSet
 
 /-!

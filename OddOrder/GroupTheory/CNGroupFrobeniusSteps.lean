@@ -5,15 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-public import OddOrder.GroupTheory.ThreeStepGroup
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.GroupTheory.FittingSelfCentralizing
-public import OddOrder.GroupTheory.NilpotentCoprimeCommute
-public import OddOrder.GroupTheory.FixedPointFreeConjugation
-public import OddOrder.GroupTheory.SylowCovering
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # CN-group structure — Gorenstein Lemma 1.2 and Theorem 1.5 Steps 2-3

@@ -1,7 +1,7 @@
 module
 
 public import Mathlib.RepresentationTheory.Subrepresentation
-public import OddOrder.Mathlib.Subgroup
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Subrepresentation kernel helpers

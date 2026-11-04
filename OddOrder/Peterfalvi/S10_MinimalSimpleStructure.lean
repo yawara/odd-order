@@ -5,8 +5,29 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
-public import OddOrder.Peterfalvi.S10_TypePSupport
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
+public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_ConjugationTransport
+import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+import OddOrder.Peterfalvi.S10_TypePSupport
 
 /-!
 # TAIL

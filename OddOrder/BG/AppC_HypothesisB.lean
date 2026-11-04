@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_NormSet
+public import OddOrder.BG.AppC_NormSetBasic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # BG Appendix C: the hypotheses (A) and (B) of Theorem C

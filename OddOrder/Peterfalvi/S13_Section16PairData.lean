@@ -1,9 +1,12 @@
 module
 
-public import OddOrder.Peterfalvi.S13_CoreStructure
-public import OddOrder.Peterfalvi.S13_Orthogonality
-public import OddOrder.Peterfalvi.S06_MuColumnBridge
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # S13_Section16PairData

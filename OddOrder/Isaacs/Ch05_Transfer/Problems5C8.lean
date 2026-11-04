@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 5C.8 — 最小奇素数 `p` で `p^3 ∤ |G|` なら正規 `p`-補群 (p. 163)

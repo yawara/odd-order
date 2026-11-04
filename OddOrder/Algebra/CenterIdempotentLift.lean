@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.CenterGroupAlgebraHenselian
-public import OddOrder.Algebra.GroupAlgebraConjugation
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+import OddOrder.Algebra.GroupAlgebraConjugation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 
 /-!
 # Lifting the block idempotents from `Z(FG)` to `Z(𝒪G)`

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
-public import OddOrder.Peterfalvi.S09_ParityPrimitive
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
+import OddOrder.Peterfalvi.S09_ParityPrimitive
 
 /-!
 # Peterfalvi (7.9): the parity step `⟨Δ₁, Δ₂⟩` is even, at Hypothesis (7.9) generality

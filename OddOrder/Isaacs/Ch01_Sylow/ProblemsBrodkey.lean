@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # Isaacs Problems 1F (pp. 40–41) — Brodkey 周辺

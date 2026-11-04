@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart2
 public import OddOrder.Peterfalvi.S08_SibleyHypothesisBasic
 public import OddOrder.Peterfalvi.S08_SixSixGeneral
 

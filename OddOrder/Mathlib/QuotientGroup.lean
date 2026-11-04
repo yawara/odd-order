@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Coset.Card
 public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.Coset.Card
 
 /-!
 # Injectivity of the maps induced on subgroup quotients

@@ -1,6 +1,8 @@
 module
 
-public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Peterfalvi (7.9) — two-family non-orthogonality + orthogonal integer decomposition

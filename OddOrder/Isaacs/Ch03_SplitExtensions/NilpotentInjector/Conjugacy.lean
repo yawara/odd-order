@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
 
 /-!
 # Isaacs Problem 3C.8 — nilpotent injector の共役性

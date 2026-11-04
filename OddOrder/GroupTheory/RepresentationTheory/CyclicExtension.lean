@@ -5,9 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Irreducible
 public import OddOrder.GroupTheory.RepresentationTheory.Inertia
 
 /-!

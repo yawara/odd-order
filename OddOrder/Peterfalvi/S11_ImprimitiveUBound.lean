@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-public import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
-public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+import Mathlib.Data.ZMod.Units
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
 
 /-!
 # Peterfalvi (9.7)(a): the non-Galois imprimitive `u`-bound `u ≤ (p^q − 1)/(p − 1)`

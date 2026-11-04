@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.FrobeniusCyclicModule
-public import OddOrder.BG.AppC_Problem1SameCoset
+public import OddOrder.BG.AppC_Problem1Trace
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_Problem1SameCoset
 
 /-!
 # BG Appendix C, Problem 1: the pair-composition calculus

@@ -5,15 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.LinearGroupSimple
-public import OddOrder.GroupTheory.ElementaryAbelianLinear
-public import OddOrder.GroupTheory.CommGroupAut
-public import Mathlib.FieldTheory.Finiteness
 public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
-public import Mathlib.LinearAlgebra.Dimension.Free
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.FieldTheory.Finiteness
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CommGroupAut
+import OddOrder.GroupTheory.ElementaryAbelianLinear
+import OddOrder.GroupTheory.LinearGroupSimple
 
 /-!
 # Isaacs, Finite Group Theory — Problem 8C.6 (p. 257), the corrected classification

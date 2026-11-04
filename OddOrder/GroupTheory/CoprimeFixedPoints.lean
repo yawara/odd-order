@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CoprimeAction
-public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Multiplicativity of coprime fixed points across a chief step

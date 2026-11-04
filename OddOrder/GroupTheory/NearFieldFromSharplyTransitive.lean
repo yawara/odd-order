@@ -5,16 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.GroupWithZero.Action.Defs
-public import Mathlib.Algebra.GroupWithZero.Units.Basic
-public import Mathlib.Algebra.Group.Action.Basic
-public import Mathlib.Algebra.Group.Action.End
 public import Mathlib.Algebra.GroupWithZero.Action.End
-public import Mathlib.Algebra.Group.TypeTags.Basic
 public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.Perm.Basic
-public import Mathlib.Tactic.Abel
 public import OddOrder.Peterfalvi.Appendices.NearFieldClass
+import Mathlib.Tactic.Abel
 
 /-!
 # Near-field from a sharply transitive additive action

@@ -6,8 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.Alternating
-public import Mathlib.GroupTheory.Perm.Centralizer
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.GroupTheory.Perm.Centralizer
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 
 /-!
 # Isaacs Problem 1C.5 — `A_{p+1}` の Sylow `p`-正規化群の位数

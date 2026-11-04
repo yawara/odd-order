@@ -1,4 +1,4 @@
-module
+module -- shake: keep-all
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
@@ -24,3 +24,7 @@ public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelation
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc

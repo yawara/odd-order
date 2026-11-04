@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.GroupTheory.CyclicSylowBurnside
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CyclicSylowBurnside
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
 
 /-!
 # Isaacs Problem 5C.7 — `|G| = 3^a · 5 · 11` なら Sylow-3 は正規 (p. 163)

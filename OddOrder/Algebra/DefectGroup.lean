@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
 public import OddOrder.Algebra.RelativeTrace
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.Sylow
 
 /-!
 # Defect groups

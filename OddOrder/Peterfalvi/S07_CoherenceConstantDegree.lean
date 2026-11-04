@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence
+public import Mathlib.Combinatorics.Matroid.Basic
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceExtensionTau2
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (5.7): the *standalone* constant-degree coherence theorem

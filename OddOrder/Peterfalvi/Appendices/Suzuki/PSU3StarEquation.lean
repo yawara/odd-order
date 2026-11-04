@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: the equation `(∗∗)` and its consequences

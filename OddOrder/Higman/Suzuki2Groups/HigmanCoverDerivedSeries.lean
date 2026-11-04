@@ -5,7 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian
+public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman Lemma 8: derived and power series of a cover

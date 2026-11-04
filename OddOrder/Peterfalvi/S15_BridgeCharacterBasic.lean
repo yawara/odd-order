@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_ComplementStructure
+public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Peterfalvi.S06_CertainTypeStructure
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # Peterfalvi §15 — the bridge character: opening layer

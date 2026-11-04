@@ -7,6 +7,12 @@ module
 
 public import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
 public import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
+public import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The rank-one hypothesis from a degree-`p` action of order `p(p-1)`

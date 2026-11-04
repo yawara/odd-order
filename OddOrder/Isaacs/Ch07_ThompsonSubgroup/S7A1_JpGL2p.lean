@@ -6,24 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import Mathlib.GroupTheory.FiniteAbelian.Basic
-public import Mathlib.GroupTheory.IndexNormal
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
-public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-public import Mathlib.LinearAlgebra.Matrix.Notation
-public import Mathlib.Tactic.LinearCombination
-public import OddOrder.GroupTheory.OmegaSubgroup
 public import OddOrder.GroupTheory.ThompsonSubgroup
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.Isaacs.Ch05_Transfer.Main
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.FiniteAbelian.Basic
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 1: J(P) def, Thm 7.1 stmt, Lem 7.3 GL(2,p) lemma

@@ -5,12 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 public import OddOrder.Peterfalvi.S04_DadeIsometry
 public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-public import Mathlib.GroupTheory.FiniteAbelian.Duality
-public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import Mathlib.Analysis.Complex.Polynomial.Basic -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 
 /-!
 # Peterfalvi §5: TI-Subsets with Cyclic Normalizers

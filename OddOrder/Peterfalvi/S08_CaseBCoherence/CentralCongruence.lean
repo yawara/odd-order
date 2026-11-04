@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCore
-public import OddOrder.Peterfalvi.S07_CoherenceGalois
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.Peterfalvi.S08_DegreeSums.CoherenceGlue
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S08_XBlockCounting
 
 /-!
 # Peterfalvi §8 case-(B): central congruence and coefficient bounds

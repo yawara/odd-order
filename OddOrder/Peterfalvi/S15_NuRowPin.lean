@@ -1,6 +1,13 @@
 module
 
-public import OddOrder.Peterfalvi.S15_CaseACoherenceT
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
+import OddOrder.Peterfalvi.S15_CaseACoherenceT
+import OddOrder.Peterfalvi.S15_NineElevenSevenEightT
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
 /-!
 # Peterfalvi (13.3.c)-`T` — the ν-row pin machinery (coherence-generic)

@@ -5,12 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Lagrange
 public import Mathlib.LinearAlgebra.Eigenspace.Basic
-public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
-public import Mathlib.Algebra.DirectSum.LinearMap
 public import OddOrder.Algebra.LagrangeInterpolationRing
-public import OddOrder.Algebra.ValuationRingFreeModule
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import Mathlib.RingTheory.Valuation.ValuationRing
+import Mathlib.Algebra.DirectSum.LinearMap
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+import OddOrder.Algebra.ValuationRingFreeModule
 
 /-!
 # Diagonalisability from a split squarefree annihilating polynomial

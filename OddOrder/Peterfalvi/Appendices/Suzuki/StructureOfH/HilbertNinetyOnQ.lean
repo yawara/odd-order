@@ -5,8 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
-public import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # `C_{S/Q₀}(P) ≠ 1` from Hilbert 90

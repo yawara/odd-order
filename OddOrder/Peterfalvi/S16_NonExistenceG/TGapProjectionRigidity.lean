@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapPrimeTI
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
 
 /-!
 # Peterfalvi (11.9)(a): T-side eta-grid coefficient relations

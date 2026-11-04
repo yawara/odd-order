@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicGraphPreimage
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicInvariantContradiction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeParameterBranching
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicGraphPreimage
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicInvariantContradiction
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge -- shake: keep (abbrevs bound by `letI` in statements are unfolded away)
 
 /-!
 # Higman's Lemma 13: contradiction in the all-isomorphic parameter branch

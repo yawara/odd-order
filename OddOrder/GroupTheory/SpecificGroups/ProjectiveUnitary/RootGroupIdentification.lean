@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.AnisotropicNormForm
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupTwistedCoordinates
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
+public import OddOrder.Algebra.QuadraticFrobenius
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.AnisotropicNormForm
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupTwistedCoordinates
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
 
 /-!
 # An anisotropic twisted product over `𝐅_{q²}` is the unitary root group

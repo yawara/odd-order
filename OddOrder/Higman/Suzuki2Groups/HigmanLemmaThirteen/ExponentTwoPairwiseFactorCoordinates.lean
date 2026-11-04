@@ -6,10 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorData
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseClassification
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseClassification
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorData
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseJoins
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FixedFactorPairRelation
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman's Lemma 13: actual pairwise factors over the common coordinate
@@ -470,7 +476,6 @@ universe uP
 
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.Suzuki2Group
-open OddOrder.RepresentationTheory
 open OddOrder.Isaacs.Ch03
 open Module
 open scoped IsMulCommutative

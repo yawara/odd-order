@@ -7,7 +7,9 @@ module
 
 public import OddOrder.Algebra.CentralCharacterBlock
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 
 /-!
 # The block of an ordinary character

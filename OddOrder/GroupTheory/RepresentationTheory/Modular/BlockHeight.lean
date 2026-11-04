@@ -7,8 +7,9 @@ module
 
 public import OddOrder.Algebra.AugmentationIdeal
 public import OddOrder.Algebra.DefectNumber
-public import OddOrder.Algebra.RelativeTraceCharacter
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+public import OddOrder.Algebra.GroupAlgebraConjugation
+import OddOrder.Algebra.RelativeTraceCharacter
 
 /-!
 # The height of an ordinary character is non-negative

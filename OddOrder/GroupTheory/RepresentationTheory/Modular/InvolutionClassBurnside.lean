@@ -6,10 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
-public import OddOrder.GroupTheory.UniqueInvolutionSylow
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.UniqueInvolutionSylow
 
 /-!
 # Navarro p. 144: the Burnside step at the class of an involution

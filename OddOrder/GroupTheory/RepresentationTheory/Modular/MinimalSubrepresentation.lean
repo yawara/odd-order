@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.SimpleModule.Basic
+import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 
 /-!
 # A nonzero finite-dimensional representation has an irreducible subrepresentation

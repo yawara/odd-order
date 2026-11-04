@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.QuaternionRecognition
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.QuaternionRecognition
+import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.13/6.14 D/Q/SD recognition + Thm 6.12 first

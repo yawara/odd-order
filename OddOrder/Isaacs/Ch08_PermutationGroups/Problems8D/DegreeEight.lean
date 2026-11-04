@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.PGroup
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+public import Mathlib.GroupTheory.GroupAction.Primitive
+import Mathlib.Combinatorics.SimpleGraph.Init
+import Mathlib.GroupTheory.PGroup
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.2 (p. 269) — 次数 8 の原始置換群は 2-transitive

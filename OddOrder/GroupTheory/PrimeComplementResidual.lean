@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Mathlib.Subgroup
 public import Mathlib.GroupTheory.Sylow
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Prime-complement residuals

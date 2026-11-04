@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.OpResidual
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.SetLike.Fintype
 
 /-!
 # `A`-invariant `π`-subgroup families `ℋ_H(A;π)` and `ℋ_H*(A;π)`

@@ -7,12 +7,7 @@ module
 
 public import Mathlib.GroupTheory.SpecificGroups.Quaternion
 public import Mathlib.GroupTheory.Abelianization.Defs
-public import Mathlib.GroupTheory.Coset.Card
-public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Data.Fintype.Perm
-public import Mathlib.Logic.Equiv.Option
-public import Mathlib.SetTheory.Cardinal.NatCard
-public import Mathlib.Algebra.Group.End
+import Mathlib.Data.Fintype.Perm
 
 /-!
 # Odd automorphism groups of the quaternion group `Q₈`

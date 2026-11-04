@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.AffineLine
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
@@ -12,6 +12,7 @@ public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PermutationChara
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.SharplyThreeTransitive
+import Mathlib.CategoryTheory.Category.Init
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8A (pp. 235–236)

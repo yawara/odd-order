@@ -6,8 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_LemmaC3_Setup
-public import OddOrder.Mathlib.Subgroup
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # BG Appendix C, Lemma C.3: the conjugate prime line `P₁ = W₂^y`

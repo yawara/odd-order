@@ -5,13 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Artinian.Ring
-public import Mathlib.RingTheory.Ideal.Quotient.Operations
-public import Mathlib.RingTheory.Jacobson.Semiprimary
-public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 public import OddOrder.Algebra.BlockIdempotent
-public import OddOrder.Algebra.SplitSemisimpleCount
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import OddOrder.Algebra.SplitSemisimpleCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
 /-!
 # Brauer's count: as many blocks as `p`-regular classes

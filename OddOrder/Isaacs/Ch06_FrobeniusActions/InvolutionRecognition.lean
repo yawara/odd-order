@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Isaacs FGT Ch.6 — involution recognition helpers for Lemma 6.13 (pp. 192-193)

@@ -5,7 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppE_RegularOperator
+public import OddOrder.BG.AppE_CentralizerDecomposition
+import Mathlib.Algebra.Group.Pointwise.Set.Card
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_CollectionFormula
+import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG Appendix E, Theorem E.3, Step 3: `Ω₁(R)` has exponent `p`

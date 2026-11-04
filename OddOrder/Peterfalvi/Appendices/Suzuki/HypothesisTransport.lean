@@ -6,7 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Transporting the standing hypothesis along an isomorphism of actions

@@ -7,6 +7,8 @@ module
 
 public import OddOrder.GroupTheory.WielandtAssembly
 public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.GroupTheory.CoprimeFixedPoints
 
 /-!
 # Peterfalvi (9.1): per-chief-factor discharge of the Wielandt identity

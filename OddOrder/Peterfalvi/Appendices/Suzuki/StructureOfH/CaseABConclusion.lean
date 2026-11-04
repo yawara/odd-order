@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 
 /-!
 # Cases (a) and (b) of Ch. III §1 give the conclusion of Theorem A

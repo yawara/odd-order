@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Action.Defs
 public import Mathlib.GroupTheory.Index
 
 /-!

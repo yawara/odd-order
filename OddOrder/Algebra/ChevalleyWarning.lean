@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.ChevalleyWarning
-public import Mathlib.LinearAlgebra.Basis.Bilinear
+public import Mathlib.Algebra.CharP.Defs
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.FieldTheory.ChevalleyWarning
 
 /-!
 # A quadratic-map consequence of Chevalley--Warning

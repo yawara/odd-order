@@ -8,10 +8,12 @@ module
 public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 public import OddOrder.Peterfalvi.S07_PivotCoherence
 public import OddOrder.Peterfalvi.S11_NineElevenBridgeBase
-public import OddOrder.Peterfalvi.S10_SubcoherentTypeP
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
-public import OddOrder.Peterfalvi.S11_NineElevenCoherence
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+public import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 
 /-!
 # The (9.9.b) dichotomy, the `R`-family dispatch, and case (9.7.b) — §9 level

@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorParameterCoherence
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorParameterCoherence
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 
 /-!
 # Higman Lemma 13: normalized factor-coordinate coherence

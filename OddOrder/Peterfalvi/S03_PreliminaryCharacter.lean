@@ -5,15 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-public import OddOrder.GroupTheory.RepresentationTheory.Clifford
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
-public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
-public import OddOrder.Peterfalvi.S02_Notation
+public import Mathlib.Analysis.Complex.Norm
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Peterfalvi §3: Preliminary Results from Character Theory

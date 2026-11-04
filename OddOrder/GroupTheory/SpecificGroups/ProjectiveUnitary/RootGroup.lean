@@ -7,6 +7,7 @@ module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 public import Mathlib.GroupTheory.PGroup
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # The Hermitian root group and unital for `PSU(3,q)`

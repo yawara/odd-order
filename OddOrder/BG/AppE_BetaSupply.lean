@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppE_EigenvalueCombinatorics
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_EigenvalueCombinatorics
 
 /-!
 # BG `(E.23)`: the `β`-eigenvalue supply from the 2-step centralizer hypothesis

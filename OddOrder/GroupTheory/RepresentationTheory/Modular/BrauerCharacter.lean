@@ -6,10 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.Algebra.DirectSum.LinearMap
-public import OddOrder.Algebra.EigenspaceDecomposition
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+import Mathlib.Algebra.DirectSum.LinearMap
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.Algebra.EigenspaceDecomposition
 
 /-!
 # Brauer characters

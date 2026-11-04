@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.GroupTheory.FixedSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Fintype.Lattice
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Isaacs §3E: Hartley–Turull cluster (Lemmas 3.31–3.34, pp. 105-108)

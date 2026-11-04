@@ -5,15 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Units.Equiv
-public import Mathlib.Algebra.GroupWithZero.Invertible
-public import Mathlib.Data.Fintype.Card
-public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Tactic.Group
-public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 public import OddOrder.GroupTheory.TISubset
+public import OddOrder.GroupTheory.RepresentationTheory.IsReal
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Classical induction sums for class functions

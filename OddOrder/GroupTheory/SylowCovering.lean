@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Index
 
 /-!
 # A subgroup containing a full Sylow subgroup for every prime is everything

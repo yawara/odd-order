@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.QuaternionRecognition
-public import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
+public import Mathlib.GroupTheory.Solvable
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.SetLike.Fintype
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.QuaternionRecognition
 
 /-!
 # Isaacs §3F の演習 (書籍 pp. 110-111)

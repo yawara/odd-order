@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBTransport
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_DegreeSums.CoherenceGlue
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.Peterfalvi.S08_CaseBTransport
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §8 case-(B): constituent pinning and orthogonality

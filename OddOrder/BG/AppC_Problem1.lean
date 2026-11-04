@@ -5,11 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Commute.Defs
-public import Mathlib.Algebra.Group.Basic
 public import OddOrder.Algebra.PowerMonomialIndependence
-public import OddOrder.Algebra.PaleySpanning
-public import OddOrder.BG.AppC_LemmaC3_ConjugateLine
+public import OddOrder.BG.AppC_LemmaC3_Setup
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Algebra.PaleySpanning
+import OddOrder.BG.AppC_FrobeniusBasics
+import OddOrder.BG.AppC_LemmaC3_ConjugateLine
 
 /-!
 # BG Appendix C, Problem 1: the group-theoretic core

@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3BSolvability
 
 /-!
 # Isaacs Chapter 3 — Problems §3B: 超可解群 (supersolvable groups)

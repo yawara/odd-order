@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 public import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 
 /-!
 # BG §3: the orbit-parity contradiction closing Theorem 3.6 ((3.38), mmd L1154-L1196)

@@ -5,17 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_PivotCoherence
-public import OddOrder.Peterfalvi.S07_UnionPairBridge
 public import OddOrder.Peterfalvi.S11_NineElevenSubcoherentBridge
-public import OddOrder.Peterfalvi.S11_NineElevenBridgeBase
-public import OddOrder.Peterfalvi.S11_NineElevenRFamily
-public import OddOrder.Peterfalvi.S10_SubcoherentTypeP
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
-public import OddOrder.Peterfalvi.S11_NineElevenCoherence
-public import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
-public import OddOrder.Peterfalvi.S11_NineElevenTIWitness
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_UnionPairBridge
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # The case (9.7.a) residual chain — §9 level

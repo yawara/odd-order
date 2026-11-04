@@ -6,8 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Invariants
-public import Mathlib.LinearAlgebra.Projection
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Wielandt's fixed-point formula — the module-level counting (Peterfalvi (9.1))

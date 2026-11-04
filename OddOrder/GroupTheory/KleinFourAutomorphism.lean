@@ -5,8 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Fintype.Card
-public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Automorphisms of order three of a Klein four group

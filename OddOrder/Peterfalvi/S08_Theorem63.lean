@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
 
 /-!
 # Peterfalvi (6.2)/(6.3): the coherence-break degree bound and the `≤ 4|L:K|² + 1` index bound

@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.12 (交換子でない導来部分群の元)

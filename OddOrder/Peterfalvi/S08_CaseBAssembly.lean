@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CaseBAssembly.BranchBundles
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §8: Case (B) coherence — the per-`φ` constituent dispatch and `X ∪ Y` assembly

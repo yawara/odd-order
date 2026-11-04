@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
-public import OddOrder.GroupTheory.WielandtFixedPoint
-public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
 
 /-!
 # `|N| = |C_N(X)|^{|X|}` for `K`-invariant `2`-subgroups

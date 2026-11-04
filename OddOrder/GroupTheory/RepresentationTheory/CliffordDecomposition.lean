@@ -5,10 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
-public import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
-public import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # The constructive Clifford decomposition (toward Peterfalvi (1.7)(c))

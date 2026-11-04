@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.GroupAlgebraConjugation
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.Algebra.GroupAlgebraConjugation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The primitive central idempotents of `K[G]`

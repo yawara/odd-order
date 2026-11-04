@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S04_DadeIsometry.MobiusAssembly
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Peterfalvi §4: Dade maps, adjoints, and isometries

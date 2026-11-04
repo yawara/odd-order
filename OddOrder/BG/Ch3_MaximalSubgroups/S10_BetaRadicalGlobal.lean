@@ -5,9 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG §10 β-radical spine — Prop 10.14 (β(G)-prime の global 構造)

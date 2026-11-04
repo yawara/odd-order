@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketFaithfulness
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAmbientBracketFaithfulness
 
 /-!
 # Higman's Lemma 13: ambient bracket zero implies commutativity

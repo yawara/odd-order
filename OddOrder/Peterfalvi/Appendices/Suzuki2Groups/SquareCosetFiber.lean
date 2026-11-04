@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the square fiber of a summand

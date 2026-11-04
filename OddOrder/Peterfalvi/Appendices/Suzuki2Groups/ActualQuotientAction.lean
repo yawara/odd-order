@@ -6,7 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Appendix III: the actual `K`-action on `Q / Q₀`

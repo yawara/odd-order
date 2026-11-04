@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.GroupAlgebraConjugation
+public import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # The sum of a subgroup in the group algebra

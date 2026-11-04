@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 public import OddOrder.GroupTheory.TISubset
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 
 /-!
 # Real classes under a TI Sylow setup: the Peterfalvi (6.7.3) real-class atom

@@ -1,6 +1,12 @@
 module
 
-public import OddOrder.Peterfalvi.S15_CaseASylowCenter
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Data.ZMod.Units
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Peterfalvi (14.6) — the order of `Ω₁(Z(R))` in case A

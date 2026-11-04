@@ -1,6 +1,19 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 
 /-!
 # BG §15 — Theorem 15.2, the type-`P1` forcing layer

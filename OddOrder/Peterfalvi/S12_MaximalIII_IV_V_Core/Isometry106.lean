@@ -1,6 +1,11 @@
 module
 
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
 
 /-!
 # Isometry106

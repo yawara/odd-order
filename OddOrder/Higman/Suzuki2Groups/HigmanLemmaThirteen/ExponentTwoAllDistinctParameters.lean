@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterArithmetic
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman Lemma 13: the all-distinct exponent-two parameter check

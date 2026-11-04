@@ -6,10 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
-public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: the plane model of `Q ⧸ Q₀`

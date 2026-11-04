@@ -6,9 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.ZGroup
-public import OddOrder.GroupTheory.CardSupInf
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.GroupTheory.SchurZassenhaus
+import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Isaacs Problem 5C.4 — Z-群の部分群 (p. 163)

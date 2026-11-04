@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Artinian.Ring
-public import Mathlib.RingTheory.Idempotents
-public import Mathlib.RingTheory.Nilpotent.Basic
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.Group.Idempotent
+public import Mathlib.RingTheory.Artinian.Defs
+public import Mathlib.RingTheory.Ideal.Defs
+import Mathlib.RingTheory.Artinian.Module
+import Mathlib.RingTheory.Idempotents
 
 /-!
 # Rosenberg's lemma

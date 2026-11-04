@@ -5,7 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A1_JpGL2p
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+public import Mathlib.RingTheory.DedekindDomain.Basic
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+public import Mathlib.FieldTheory.Finiteness -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A1_JpGL2p
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 2: Lem 7.3 (formal) + Thm 7.5 normal-P + action

@@ -5,17 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Ring.Equiv
-public import Mathlib.Algebra.Ring.Aut
-public import Mathlib.Algebra.Group.End
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import Mathlib.Algebra.Ring.AddAut
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.FieldTheory.Perfect
 public import Mathlib.LinearAlgebra.QuadraticForm.Basic
-public import Mathlib.Algebra.CharP.Two
-public import Mathlib.Algebra.CharP.Algebra
-public import OddOrder.Algebra.QuadraticMapCoordinates
+import OddOrder.Algebra.QuadraticMapCoordinates
 
 /-!
 # Semilinear extension: additive automorphisms multiplicative on a generating scalar set

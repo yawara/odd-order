@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_Section9Counts
-public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
-public import OddOrder.Peterfalvi.S09_CertificateDischarge
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S09_CertificateDischarge
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetupBasic
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
 
 /-!
 # S12_MaximalBasic

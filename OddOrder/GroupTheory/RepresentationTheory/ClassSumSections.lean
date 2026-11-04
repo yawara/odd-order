@@ -5,33 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Analysis.Complex.Polynomial.Basic
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.RepresentationTheory.Character
-public import Mathlib.LinearAlgebra.Trace
-public import Mathlib.Algebra.Algebra.Subalgebra.Basic
-public import Mathlib.Algebra.Group.Conj
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
-public import OddOrder.GroupTheory.TISubset
-public import OddOrder.Algebra.AlgInt
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import OddOrder.GroupTheory.ConjClassSet
-public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-public import OddOrder.GroupTheory.ConjClassCardinality
-public import OddOrder.Mathlib.Sylow
-public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-public import Mathlib.RingTheory.Finiteness.Basic
-public import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
-public import Mathlib.RingTheory.Localization.FractionRing
-public import Mathlib.RingTheory.Polynomial.RationalRoot
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ConjClassSet
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Class sums — indexing, structure coefficients, and the pair action
@@ -54,7 +37,6 @@ open scoped MonoidAlgebra
 -- 類和の中核 (定義・係数・中心性) は `ClassSumCore` に一般係数環版で 1 本化されている。
 open OddOrder.GroupTheory.CenterClassSum
 open Module (finrank)
-open Representation
 
 variable {G : Type*} [Group G]
 

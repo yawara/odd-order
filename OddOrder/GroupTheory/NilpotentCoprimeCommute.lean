@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import Mathlib.GroupTheory.Nilpotent
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Coprime-order elements of a finite nilpotent group

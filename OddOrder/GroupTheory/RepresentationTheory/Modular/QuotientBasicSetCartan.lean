@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
+public import OddOrder.Algebra.RelativeTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
 
 /-!
 # The basic set of `G` read through a central `p`-subgroup: `C_𝓑 = |N| (1 + δ)`

@@ -1,7 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
-public import OddOrder.Peterfalvi.S07_Coherence.CoherenceExtensionTau2
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Fin.Tuple.Sort
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (5.6.2)-(5.6.3), (6.8) — coherence-union extension τ₂, orthogonal coherent union, (6.6)

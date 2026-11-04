@@ -6,7 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
 
 /-!
 # Peterfalvi Appendix IV: the `Q₁`-component of induced members (step (3), Part B prep)

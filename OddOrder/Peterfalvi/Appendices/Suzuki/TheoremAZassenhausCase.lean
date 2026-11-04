@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
 
 /-!
 # Peterfalvi Part II, Ch. III §1: the case `V = 1`, and the induction of Theorem A

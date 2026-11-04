@@ -7,11 +7,9 @@ module
 
 public import Mathlib.Algebra.Field.ZMod
 public import Mathlib.Algebra.Module.Pi
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.LinearAlgebra.Span.Basic
-public import Mathlib.Tactic.Ring
-public import Mathlib.Tactic.NormNum.Prime
-public import Mathlib.Tactic.FinCases
+public import Mathlib.LinearAlgebra.Span.Defs
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # BG Proposition E.4 is false as printed: the Lie-ring core of the counterexample

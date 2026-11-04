@@ -6,10 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.Quaternion
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Tactic.Push
 
 /-!
 # Elementary facts about the quaternion group of order `8`

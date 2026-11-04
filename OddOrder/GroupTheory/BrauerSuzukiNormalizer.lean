@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Transfer
 public import OddOrder.GroupTheory.BrauerSuzukiSetup
-public import OddOrder.GroupTheory.SylowNormalRelIndex
+import Mathlib.GroupTheory.Transfer
+import OddOrder.GroupTheory.SylowNormalRelIndex
 
 /-!
 # Brauer–Suzuki: the structure of `N = N_G(T)` (Gorenstein Ch. 12, Lemma 1.2)

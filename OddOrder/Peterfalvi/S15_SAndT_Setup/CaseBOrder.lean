@@ -1,6 +1,11 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # Peterfalvi (13.15), case-(b) order determination

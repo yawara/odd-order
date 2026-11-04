@@ -5,17 +5,27 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.AInvariantPiSubgroups
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelianFamily
-public import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
-public import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+public import OddOrder.GroupTheory.ChiefFactor
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch2_Uniqueness.S07_Hypothesis75
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # S09_ChiefSeriesStabilizer

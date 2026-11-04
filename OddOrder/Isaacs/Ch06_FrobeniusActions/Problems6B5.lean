@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.IsSubnormal
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 6B.5 — subnormal 部分群からなる分割を持つ群は冪零 (書籍 p. 196)

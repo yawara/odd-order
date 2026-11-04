@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
-public import OddOrder.GroupTheory.FittingSelfCentralizing
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 3C.8 — nilpotent injector の定義と `C(p)`

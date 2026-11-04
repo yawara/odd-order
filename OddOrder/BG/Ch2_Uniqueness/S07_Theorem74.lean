@@ -6,20 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.AppA_PStability
-public import OddOrder.BG.Ch1_Preliminary.PLength
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-public import OddOrder.BG.Ch1_Preliminary.S06_Additional
-public import OddOrder.GroupTheory.MaximalSubgroup
 public import OddOrder.GroupTheory.AInvariantPiSubgroups
 public import OddOrder.GroupTheory.SCN
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import Mathlib.GroupTheory.IsSubnormal
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 
 /-!
 # S07_Theorem74

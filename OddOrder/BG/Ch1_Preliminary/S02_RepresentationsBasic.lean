@@ -5,27 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S02_RepresentationPropositions
-public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RepresentationTheory.Submodule
-public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.LinearAlgebra.Charpoly.BaseChange
-public import Mathlib.LinearAlgebra.Determinant
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import Mathlib.LinearAlgebra.TensorProduct.Finiteness
-public import Mathlib.LinearAlgebra.TensorProduct.Tower
-public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import OddOrder.Isaacs.Ch05_Transfer.Main
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Sylow
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.RepresentationTheory.Maschke
 
 /-!
 # S02_RepresentationsBasic
@@ -216,8 +204,6 @@ Frobenius Actions であって Clifford 章ではない). したがって本節�
 namespace OddOrder.BG.Ch1.S02
 
 open scoped Pointwise
-open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
-  baseChangeRepresentation_faithful)
 
 /-! ## §2F: Odd-Order Two-Dim Representation (Thm 2.6, mmd L774-793)
 

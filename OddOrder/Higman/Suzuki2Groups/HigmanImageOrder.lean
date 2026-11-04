@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanKernel
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanKernel
 
 /-!
 # Higman Lemma 3: the image and quotient have order two

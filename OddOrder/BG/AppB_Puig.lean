@@ -5,11 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.Order.OrderIsoNat
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
-public import OddOrder.GroupTheory.ThompsonSubgroup
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
 
 /-!
 # BG Appendix B: The Puig Subgroup `L(S)`

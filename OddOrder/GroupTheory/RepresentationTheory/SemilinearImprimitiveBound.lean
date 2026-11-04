@@ -6,10 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Data.Fintype.Pi
-public import Mathlib.Basic.Finite.Prod
-public import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
-public import Mathlib.GroupTheory.Coset.Card
+public import Mathlib.Algebra.Group.Subgroup.Defs
+import Mathlib.GroupTheory.Coset.Card
 
 /-!
 # The imprimitive order bound: `|U| ≤ (p − 1)^(q−1)`

@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockConnected
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockConnected
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPrincipalBlock
 
 /-!
 # Navarro (7.6): the principal blocks of `G` and `G/N` have the same `IBr`

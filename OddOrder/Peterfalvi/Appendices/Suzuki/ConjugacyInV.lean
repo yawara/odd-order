@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 
 /-!
 # Peterfalvi Part II, Ch. I §3: conjugacy inside `V`

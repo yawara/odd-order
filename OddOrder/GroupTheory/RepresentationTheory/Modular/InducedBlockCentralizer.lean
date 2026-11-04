@@ -7,6 +7,10 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The block induced from the centraliser of a `p`-element

@@ -1,6 +1,14 @@
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
 
 /-!
 # Peterfalvi (9.8)-(9.10) — character counts in the two Clifford cases

@@ -5,10 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Subgroup.Center
 public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Tactic.Group
+import Mathlib.Tactic.Group
 
 /-!
 # 中心的交換子の双線形性

@@ -7,7 +7,8 @@ module
 
 public import OddOrder.GroupTheory.CoprimeAction
 public import OddOrder.GroupTheory.WielandtPerFactorDischarge
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 
 /-!
 # Peterfalvi (9.1): Wielandt's fixed-point formula (assembled) and the (13.17.b) engine

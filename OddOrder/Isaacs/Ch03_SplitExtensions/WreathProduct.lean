@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.RegularWreathProduct
-public import Mathlib.Data.ZMod.Basic
 
 /-!
 # Isaacs §3A: general wreath product over a `G`-set (pp. 73-76)

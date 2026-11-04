@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (4.10): the four-corner Dade identity

@@ -6,12 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.Algebra.Group.Commutator
-public import Mathlib.GroupTheory.Commutator.Basic
-public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-public import OddOrder.GroupTheory.IsExtraspecial
-public import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 
 /-!
 # Faithful representations of extraspecial `p`-groups (BG §2 Thm 2.5 / Gor 5.5.5)

@@ -1,7 +1,14 @@
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
-public import OddOrder.Peterfalvi.S15_CaseAContradiction
+public import OddOrder.Peterfalvi.S13_CoreStructure
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.Peterfalvi.S15_CaseAContradiction
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_SAndT
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
 
 /-!
 # Peterfalvi §14: the subgroup L and the T/S case-B data

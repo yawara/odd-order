@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C1
-public import OddOrder.Mathlib.SemidirectProduct
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.SemidirectProduct
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Problem 6C.1(b) — 位数 4 の固定点自由自己同型では冪零にならない例 (書籍 p. 197)

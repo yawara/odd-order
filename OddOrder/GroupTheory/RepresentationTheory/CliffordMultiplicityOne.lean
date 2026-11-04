@@ -6,10 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
-public import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RepresentationTheory.Semisimple
-public import Mathlib.LinearAlgebra.Dimension.Constructions
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.RingTheory.SimpleRing.Congr
+import Mathlib.RingTheory.SimpleRing.Matrix
+import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
 
 /-!
 # Multiplicity one: the restriction `V_H` is irreducible (BG Prop 2.2(a), the `m = 1` finish)

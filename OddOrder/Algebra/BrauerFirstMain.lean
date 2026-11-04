@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BrauerDefect
 public import OddOrder.Algebra.ClassSum
-public import OddOrder.Algebra.DefectGroupConjugacy
-public import OddOrder.Algebra.GroupAlgebraDefectGroup
+public import OddOrder.Algebra.BrauerHomomorphism
+public import OddOrder.Algebra.DefectGroup
+import Mathlib.GroupTheory.Sylow
+import Mathlib.RingTheory.Nilpotent.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import OddOrder.Algebra.DefectGroupConjugacy
+import OddOrder.Algebra.GroupAlgebraDefectGroup
+import OddOrder.Algebra.MackeyFormula
+import OddOrder.Algebra.Rosenberg
 
 /-!
 # `Br_D` does not kill a block idempotent with defect group `D`

@@ -5,11 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 
 /-!
 # Navarro (5.2) in block language

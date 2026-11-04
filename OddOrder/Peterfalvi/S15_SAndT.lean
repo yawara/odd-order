@@ -5,16 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_BridgeCharacter
-public import OddOrder.Peterfalvi.S15_CaseASylowCenter
-public import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
-public import OddOrder.Peterfalvi.S15_CaseAOmegaFixedPointFree
-public import OddOrder.Peterfalvi.S15_CaseAContradiction
-public import OddOrder.Peterfalvi.S15_SSideGaloisFieldModel
-public import OddOrder.Peterfalvi.S16_PairingCoherence
-public import OddOrder.Peterfalvi.S16_PairingBessel
-public import OddOrder.Peterfalvi.S16_GridExpansion
 public import OddOrder.Peterfalvi.S15_SAndTGrid
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+import OddOrder.Peterfalvi.S09_ParityPrimitive
+import OddOrder.Peterfalvi.S15_BridgeCharacter
+import OddOrder.Peterfalvi.S15_ComplementStructure
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # TAIL — (13.19.c) dichotomy + (14.5) complement exclusion

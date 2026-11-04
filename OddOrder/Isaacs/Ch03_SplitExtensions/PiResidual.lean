@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.Order.Minimal
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The `π`-residual `O^π(G)` (Isaacs Problem 1B.8(a))

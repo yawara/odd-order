@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.PairGap
-public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Floor
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.DedekindDomain.Basic
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 
 /-!
 # Higman's Lemma 11: the trace formula

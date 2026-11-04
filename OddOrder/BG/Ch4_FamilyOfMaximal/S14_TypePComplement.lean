@@ -3,9 +3,17 @@ Copyright (c) 2026 OddOrder contributors. All rights reserved.
 -/
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-public import OddOrder.GroupTheory.AInvariantComplement
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+public import OddOrder.GroupTheory.MaxNilpotentNormalHall
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
 # Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`

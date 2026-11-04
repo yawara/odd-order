@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Structural properties of the unitary root group

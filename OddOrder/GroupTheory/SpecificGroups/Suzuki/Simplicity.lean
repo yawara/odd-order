@@ -6,9 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.FixedPointFree
-public import Mathlib.GroupTheory.Nilpotent
-public import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
-public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
+import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 
 /-!
 # Simplicity of the standard Suzuki group

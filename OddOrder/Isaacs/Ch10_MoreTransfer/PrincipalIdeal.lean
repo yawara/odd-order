@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.PrincipalIdealTheorem
-public import OddOrder.GroupTheory.TransferTransitivity
+public import Mathlib.GroupTheory.Abelianization.Defs
+public import Mathlib.GroupTheory.Transfer
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.PrincipalIdealTheorem
+import OddOrder.GroupTheory.TransferTransitivity
 
 /-!
 # Isaacs §10C — Principal ideal theorem (Furtwängler) and Alperin–Kuo (pp. 310-319)

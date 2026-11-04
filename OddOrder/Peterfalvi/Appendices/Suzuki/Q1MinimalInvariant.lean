@@ -6,8 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
-public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-public import OddOrder.GroupTheory.MinimalInvariantNormal
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 
 /-!
 # Peterfalvi Part II: minimal invariant subgroups of the odd part `Q₁`

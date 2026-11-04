@@ -5,10 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
-public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs Thm 6.24: Frobenius kernels are nilpotent (Thompson) (p. 196)

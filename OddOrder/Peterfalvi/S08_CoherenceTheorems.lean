@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCore
-public import OddOrder.Peterfalvi.S08_Theorem65c2
-public import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
-public import OddOrder.Peterfalvi.S08_PGroupReduction
+public import OddOrder.Peterfalvi.S08_XBlockCounting
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CaseBSeedGlue -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_PGroupReduction -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_Theorem65c2 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems

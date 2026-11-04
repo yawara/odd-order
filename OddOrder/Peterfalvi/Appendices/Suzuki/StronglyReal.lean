@@ -6,6 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # Peterfalvi Part II, Ch. I §3: strongly real elements

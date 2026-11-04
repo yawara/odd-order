@@ -6,10 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Algebra.Subalgebra.Basic
-public import Mathlib.Algebra.Group.Conj
 public import Mathlib.Algebra.MonoidAlgebra.Basic
-public import Mathlib.Tactic.Group
-public import OddOrder.Mathlib.MonoidAlgebra
+import Mathlib.Tactic.Group
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Class sums in a monoid algebra, indexed by conjugacy classes

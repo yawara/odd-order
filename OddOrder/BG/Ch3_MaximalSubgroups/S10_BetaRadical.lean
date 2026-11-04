@@ -5,7 +5,25 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S07_Hypothesis75
+import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalGlobal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 
 /-!
 # BG §10 β-radical spine — Cor 10.9 + Prop 10.10

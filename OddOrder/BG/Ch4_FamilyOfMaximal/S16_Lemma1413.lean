@@ -5,7 +5,33 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-! # BG Lemma 14.13(a): a non-disjoint signalizer forces Frobenius type
 

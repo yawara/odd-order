@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BlockOfSimpleModule
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.Jacobson.Radical
+public import OddOrder.Algebra.CentralCharacter
+import Mathlib.RingTheory.Jacobson.Semiprimary
+import OddOrder.Algebra.BlockOfSimpleModule
+import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
 /-!
 # The block of a representation whose centre acts by a scalar

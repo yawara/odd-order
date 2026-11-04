@@ -5,34 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Analysis.Complex.Polynomial.Basic
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Subrepresentation
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.LinearAlgebra.Trace
-public import Mathlib.Algebra.Algebra.Subalgebra.Basic
-public import Mathlib.Algebra.Group.Conj
-public import Mathlib.GroupTheory.PGroup
 public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import OddOrder.GroupTheory.TISubset
 public import OddOrder.Algebra.AlgInt
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import OddOrder.GroupTheory.ConjClassSet
-public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-public import OddOrder.GroupTheory.ConjClassCardinality
-public import OddOrder.Mathlib.Sylow
-public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
-public import Mathlib.RingTheory.Finiteness.Basic
-public import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
-public import Mathlib.RingTheory.Localization.FractionRing
-public import Mathlib.RingTheory.Polynomial.RationalRoot
 public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
-public import Mathlib.Algebra.Group.ConjFinite
+public import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Semisimple
+import OddOrder.GroupTheory.ConjClassCardinality
+public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Mathlib.Sylow
 
 /-!
 # ClassSumCongruence

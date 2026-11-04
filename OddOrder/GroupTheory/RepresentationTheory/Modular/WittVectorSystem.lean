@@ -7,7 +7,6 @@ module
 
 public import Mathlib.RingTheory.WittVector.Complete
 public import Mathlib.RingTheory.WittVector.DiscreteValuationRing
-public import Mathlib.Algebra.CharP.Algebra
 public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 

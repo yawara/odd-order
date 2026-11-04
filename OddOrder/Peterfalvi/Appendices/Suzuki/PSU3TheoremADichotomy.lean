@@ -5,8 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. IV §4, opening paragraph: the dichotomy that closes Theorem A

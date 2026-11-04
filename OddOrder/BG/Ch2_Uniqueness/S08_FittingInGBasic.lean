@@ -5,15 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-public import OddOrder.BG.AppB_Thm62
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.SCN
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
+import OddOrder.GroupTheory.FittingSelfCentralizing
 
 /-!
 # BG §8 — `fittingInG` / `cFittingInG`: definitions and basic API

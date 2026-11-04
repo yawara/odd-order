@@ -5,12 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-public import OddOrder.GroupTheory.CriticalSubgroup
 public import OddOrder.GroupTheory.HallCollection
-public import OddOrder.GroupTheory.HallPetresco
 public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.RegularPGroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.HallPetresco
+import OddOrder.GroupTheory.RegularPGroup
 
 /-!
 # BG Appendix E, E.1 and E.2: the collection formula and regular `p`-groups

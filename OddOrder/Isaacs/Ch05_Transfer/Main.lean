@@ -6,10 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
-public import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentMaximal
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-public import OddOrder.Isaacs.Ch05_Transfer.SylowTwoDirectFactor
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # TAIL

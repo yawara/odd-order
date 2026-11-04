@@ -5,7 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.BrauerSuzukiQ8.CharacterCore
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.RelativeTrace
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.BrauerSuzukiQ8.CharacterCore
+import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the induction on `|G|` and the final statements

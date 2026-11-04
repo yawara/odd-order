@@ -5,8 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
-public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
 
 /-!
 # BG Theorem 3.10 for elementary abelian `M` — the reducible-module induction (issue 8013, piece 5)

@@ -5,16 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Tactic.Group
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
-public import OddOrder.GroupTheory.DihedralAut
-public import OddOrder.GroupTheory.SubgroupInAmbient
+public import Mathlib.GroupTheory.SpecificGroups.Dihedral
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.DihedralAut
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)

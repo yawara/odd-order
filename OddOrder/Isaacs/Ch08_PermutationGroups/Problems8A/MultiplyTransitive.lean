@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+public import Mathlib.GroupTheory.Solvable
+public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 可解な多重推移群

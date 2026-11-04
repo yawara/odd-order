@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceGeometry
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceGeometry
 
 /-!
 # Higman's Lemma 13: a graph over a third coordinate axis

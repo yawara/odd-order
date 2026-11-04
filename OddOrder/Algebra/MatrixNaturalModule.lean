@@ -6,9 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import Mathlib.RingTheory.Artinian.Ring
-public import Mathlib.RingTheory.SimpleModule.WedderburnArtin
-public import Mathlib.RingTheory.SimpleRing.Matrix
+public import Mathlib.RingTheory.Artinian.Defs
+public import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.RingTheory.SimpleModule.WedderburnArtin
+import Mathlib.RingTheory.SimpleRing.Matrix
 
 /-!
 # The natural module of a matrix algebra is simple

@@ -5,13 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Commutator.Basic
 public import Mathlib.GroupTheory.Frattini
-public import Mathlib.GroupTheory.Subgroup.Center
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.GroupTheory.FrattiniPGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # Extraspecial p-Groups

@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Tactic.Group
-public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.Coset.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # A set closed under right translation by a subgroup has divisible cardinality

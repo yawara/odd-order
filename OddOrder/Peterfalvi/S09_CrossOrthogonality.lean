@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Cross-orthogonality of coherent images (Peterfalvi (7.9) §1 primitive)

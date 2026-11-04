@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.ZMod.Basic
 public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
 
 /-!

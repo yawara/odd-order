@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Basic
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+public import Mathlib.FieldTheory.Perfect
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # Higman's Suzuki 2-group types C and D

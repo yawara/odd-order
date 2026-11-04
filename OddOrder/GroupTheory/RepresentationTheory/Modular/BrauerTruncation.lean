@@ -6,8 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.BrauerHomomorphism
-public import OddOrder.Algebra.SubgroupTruncation
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The Brauer homomorphism as a map into `k[H]`

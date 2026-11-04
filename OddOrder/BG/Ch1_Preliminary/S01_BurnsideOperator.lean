@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG §1C — Frattini + Burnside operator lemmas (Lem 1.7-1.10)

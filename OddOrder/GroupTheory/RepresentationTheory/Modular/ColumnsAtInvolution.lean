@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
+public import OddOrder.Algebra.RelativeTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.PRegularQuotient
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
 
 /-!
 # The columns `D^t_j` of the "analysis at `t`": Navarro p. 141, equation (3)

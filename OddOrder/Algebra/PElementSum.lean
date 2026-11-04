@@ -7,7 +7,8 @@ module
 
 public import OddOrder.Algebra.SubgroupSum
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.SylowContaining
+public import Mathlib.GroupTheory.Sylow
+import OddOrder.GroupTheory.SylowContaining
 
 /-!
 # The sum of the `p`-elements, and the sum of the `p`-regular elements

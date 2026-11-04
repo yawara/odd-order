@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 
 /-!
 # The inverse of the Cartan matrix is block diagonal

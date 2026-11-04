@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
 
 /-!
 # The change-of-basis matrix `U` of Navarro (7.3) is integral

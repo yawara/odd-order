@@ -5,17 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
-public import OddOrder.GroupTheory.ThompsonSubgroup
 public import OddOrder.GroupTheory.NarrowPGroup
 public import OddOrder.BG.Ch1_Preliminary.PLength
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
-public import Mathlib.Algebra.Group.Commutator
-public import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
 
 /-!
 # BG §6: Additional Results — the normal-J hub (FT critical)

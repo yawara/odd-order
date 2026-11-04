@@ -7,7 +7,7 @@ module
 
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
-public import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.GroupTheory.Commutator.Finite
 
 /-!
 # Isaacs Ch. 9 — §9A: the layer E(G) と Theorem 9.7 (pp. 274-275)

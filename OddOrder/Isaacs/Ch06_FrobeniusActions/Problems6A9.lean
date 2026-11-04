@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 6A.9 の準備 — TI 仮説の下での `X` の構造 (書籍 p. 186)

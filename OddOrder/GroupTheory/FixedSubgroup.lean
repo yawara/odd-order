@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.End
-public import Mathlib.Algebra.Group.Subgroup.Basic
 public import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
-public import Mathlib.GroupTheory.GroupAction.Basic
+public import Mathlib.Algebra.Group.Action.End
+public import Mathlib.Algebra.Group.Subgroup.Ker
+public import Mathlib.GroupTheory.GroupAction.Defs
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Data.Finset.Attr
 
 /-!
 # Fixed subgroup of an automorphic action

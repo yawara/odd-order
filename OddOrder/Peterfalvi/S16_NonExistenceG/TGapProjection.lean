@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
 public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (11.9)/(14.9): T-side eta-grid projection data

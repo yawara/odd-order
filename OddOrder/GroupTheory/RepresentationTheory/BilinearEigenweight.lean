@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Basis.Bilinear
-public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.LinearAlgebra.Basis.Defs
+public import Mathlib.LinearAlgebra.DFinsupp
+import Mathlib.Algebra.Field.IsField
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Weights of an equivariant bilinear map

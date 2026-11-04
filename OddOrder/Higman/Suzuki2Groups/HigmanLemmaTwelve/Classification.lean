@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 12: the B/C/D classification endpoint

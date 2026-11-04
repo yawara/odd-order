@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BrauerSuzukiEndgame
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 
 /-!
 # The degrees in the basic set of Navarro (7.4) are odd integers

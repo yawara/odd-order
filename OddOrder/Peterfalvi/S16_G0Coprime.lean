@@ -5,11 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT
-public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
 public import OddOrder.Peterfalvi.S16_CoreLemmas
-public import OddOrder.GroupTheory.ConjClassSet
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.CoprimeConjugacy
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # Peterfalvi (14.11.3), support half: generic elements have order prime to `pq`

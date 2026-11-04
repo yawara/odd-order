@@ -1,7 +1,19 @@
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
-public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupMCore
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndT
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
+import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
 
 /-!
 # BetaVanishing

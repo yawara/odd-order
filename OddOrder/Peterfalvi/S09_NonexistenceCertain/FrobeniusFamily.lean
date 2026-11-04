@@ -1,6 +1,8 @@
 module
 
 public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # TAIL

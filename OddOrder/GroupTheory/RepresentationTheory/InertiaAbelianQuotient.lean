@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
 public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # Abelian inertia quotient `I(θ)/H` from an abelian complement

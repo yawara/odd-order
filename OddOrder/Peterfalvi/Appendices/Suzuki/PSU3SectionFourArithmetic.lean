@@ -5,12 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Field.Basic
-public import Mathlib.Algebra.Field.Subfield.Basic
-public import Mathlib.Tactic.Ring
-public import Mathlib.Tactic.FieldSimp
-public import Mathlib.Tactic.LinearCombination
-public import OddOrder.Algebra.FixedPointDensity
+public import Mathlib.Algebra.Field.Subfield.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Ring.RingNF
+import OddOrder.Algebra.FixedPointDensity
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: solving (5) and (6)

@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBCoherence2
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §8: Case (B) endgame — `S` is coherent (the (6.8.3) extension)

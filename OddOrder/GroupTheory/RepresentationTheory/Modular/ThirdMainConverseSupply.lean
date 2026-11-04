@@ -5,10 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.Algebra.GroupAlgebraBlocks
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
+import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 
 /-!
 # The converse of the third main theorem, with all of Külshammer's side conditions discharged

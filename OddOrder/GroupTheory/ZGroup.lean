@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
 public import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!

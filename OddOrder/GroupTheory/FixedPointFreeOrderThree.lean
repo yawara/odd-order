@@ -7,8 +7,6 @@ module
 
 public import Mathlib.GroupTheory.FixedPointFree
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.Tactic.Group
 
 /-!
 # Fixed-point-free automorphisms of order three

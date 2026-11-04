@@ -6,11 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Data.Nat.ModEq
-public import Mathlib.Data.Nat.Factorization.Basic
-public import Mathlib.Algebra.BigOperators.Associated
-public import Mathlib.Tactic.Ring
-public import Mathlib.Tactic.Group
+public import Mathlib.Data.Nat.Factorization.Defs
+import Mathlib.Algebra.BigOperators.Associated
+import Mathlib.Tactic.Group
 
 /-!
 # π-part / π′-part decomposition of a group element

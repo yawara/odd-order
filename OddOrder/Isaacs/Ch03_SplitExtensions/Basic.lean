@@ -5,19 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
 public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.Frattini
-public import Mathlib.GroupTheory.SchurZassenhaus
-public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.GroupTheory.Solvable
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.Mathlib.Subgroup
-public import OddOrder.Mathlib.SchurZassenhausConj
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
-public import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Basic
@@ -60,7 +57,6 @@ Thm 3.4 は Ch.1 Thm 1.37 Brodkey に依存 (Ch.1 §1F = `Ch01_Sylow/Main.lean` 
 
 namespace OddOrder.Isaacs.Ch03
 
-open SemidirectProduct
 open scoped Pointwise
 
 

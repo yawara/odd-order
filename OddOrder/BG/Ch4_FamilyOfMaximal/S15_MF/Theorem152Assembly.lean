@@ -1,6 +1,26 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.MsigmaNilpotent
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.MsigmaNilpotent
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # Theorem152Assembly

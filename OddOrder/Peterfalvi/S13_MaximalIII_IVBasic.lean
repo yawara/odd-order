@@ -5,11 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_SixTwoGeneral
-public import OddOrder.Peterfalvi.S13_SixTwoBridge
-public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
-public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Prop109
+import OddOrder.Peterfalvi.S13_SixTwoBridge
 
 /-!
 # S13_MaximalIII_IVBasic

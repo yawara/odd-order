@@ -6,10 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.LinearAlgebra.Dimension.Free
-public import Mathlib.Data.ZMod.Units
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.FieldTheory.Finiteness
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.FieldTheory.Finiteness
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The scalar character of a line (a `1`-dimensional `𝔽_p`-representation)

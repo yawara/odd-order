@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.Classification
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.RingTheory.Finiteness.Prod
+import OddOrder.Higman.Suzuki2Groups.Classification
 
 /-!
 # Exponent four for Higman's Suzuki 2-groups

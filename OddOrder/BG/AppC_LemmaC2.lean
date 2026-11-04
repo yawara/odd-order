@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_FrobeniusClassSum
+public import OddOrder.BG.AppC_NormSetBasic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppC_FrobeniusClassSum
+import OddOrder.BG.AppC_NormSet
 
 /-!
 # BG Appendix C: Lemma C.2 Packaging

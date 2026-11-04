@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
 
 /-!
 # The Wedderburn splitting of `K[G]` is a block splitting

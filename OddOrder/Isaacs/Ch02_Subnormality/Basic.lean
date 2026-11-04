@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.IsSubnormal
-public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Basic

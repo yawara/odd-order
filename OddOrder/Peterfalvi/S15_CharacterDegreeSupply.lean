@@ -5,9 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayerCore
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.SwappedNuGridSupply
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHomBasic
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayerCore
+import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import OddOrder.Peterfalvi.S15_SAndT_Setup.SwappedNuGridSupply
+import OddOrder.Peterfalvi.S15_Tau1T
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — the (13.3.b)/(13.4) dichotomy supplies

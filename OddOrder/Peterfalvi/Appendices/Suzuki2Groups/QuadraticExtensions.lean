@@ -5,12 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.GroupTheory.GroupExtension.Basic
 public import Mathlib.LinearAlgebra.QuadraticForm.Basis
-public import Mathlib.Tactic.Abel
 public import OddOrder.GroupTheory.PRank
-public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+public import Mathlib.GroupTheory.GroupExtension.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Peterfalvi Appendix III: central extensions from quadratic maps

@@ -5,7 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 
 /-!
 # BG §12: Lemma 12.8(d)(e)(f) and assembly

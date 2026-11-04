@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
 
 /-!
 # Higman Lemma 3: covariance and the zero-or-one conclusion

@@ -6,8 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.DefectGroup
-public import OddOrder.Algebra.MackeyFormula
-public import OddOrder.Algebra.Rosenberg
+import Mathlib.Data.Rat.Floor
+import Mathlib.RingTheory.Nilpotent.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import OddOrder.Algebra.MackeyFormula
+import OddOrder.Algebra.Rosenberg
 
 /-!
 # The defect groups of an idempotent are conjugate

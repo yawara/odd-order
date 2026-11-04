@@ -5,7 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+public import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
+public import OddOrder.GroupTheory.NarrowPGroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # BG §5: Narrow `p`-Groups

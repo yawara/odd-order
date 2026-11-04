@@ -5,10 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SchurZassenhaus
 public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.Sylow
-public import OddOrder.Mathlib.Subgroup
+public import Mathlib.GroupTheory.Complement
+import Mathlib.GroupTheory.SchurZassenhaus
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)

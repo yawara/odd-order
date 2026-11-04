@@ -1,6 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S15_CaseAOmegaCenter
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 
 /-!
 # Peterfalvi (14.6) — the fixed-point-free action on the case-A Sylow center

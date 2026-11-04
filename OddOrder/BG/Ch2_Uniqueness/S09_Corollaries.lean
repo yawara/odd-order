@@ -7,16 +7,20 @@ module
 
 
 
-public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
-public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.AInvariantPiSubgroups
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelianFamily
-public import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §9: Corollaries 9.2, 9.3 and Lemma 9.4 (centralizer & rank criteria)

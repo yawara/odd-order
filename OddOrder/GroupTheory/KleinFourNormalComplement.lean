@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.KleinFourSylowFusion
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.KleinFourAutomorphism
+import OddOrder.GroupTheory.KleinFourSylowFusion
 
 /-!
 # Klein four Sylow `2`-subgroups: two non-conjugate involutions force a normal `2`-complement

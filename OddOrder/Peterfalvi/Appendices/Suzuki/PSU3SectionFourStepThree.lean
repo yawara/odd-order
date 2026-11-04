@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourIntrinsic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 
 /-!
 # Ch. IV §4, steps (2) and (3) on `U/Z(U)` and back in `G`

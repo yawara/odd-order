@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CaseBXunionY
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import OddOrder.Peterfalvi.S08_CaseBAssembly.BranchBundles -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §8: case-(B) the textbook `X`-coherence on the certain-type columns

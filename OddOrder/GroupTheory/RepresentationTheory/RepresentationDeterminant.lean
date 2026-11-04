@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Determinant
-public import Mathlib.RepresentationTheory.Basic
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 
 /-!
 # The determinant character of a representation

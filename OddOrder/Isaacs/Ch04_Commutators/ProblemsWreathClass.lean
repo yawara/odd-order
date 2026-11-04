@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Nat.Choose.Sum
 public import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
+public import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Choose.Sum
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.8(d): 正則 wreath product の冪零類

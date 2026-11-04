@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Nilpotent
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Normal `p`-complements of nilpotent groups, and their uniqueness

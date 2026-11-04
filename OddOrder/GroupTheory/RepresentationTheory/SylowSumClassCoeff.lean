@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.PElementSum
-public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.Algebra.PElementSum
+import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # The class sum of `W · L̂` in terms of a single Sylow subgroup

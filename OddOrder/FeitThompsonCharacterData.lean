@@ -1,9 +1,10 @@
 module
 
-public import OddOrder.FeitThompsonNuGrid
-public import OddOrder.Peterfalvi.S13_TypeDetermination
-public import OddOrder.FeitThompsonPairProducer
-public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+public import OddOrder.FeitThompsonSetup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.FeitThompsonNuGrid
+public import OddOrder.Peterfalvi.S10_TypePSupportA0 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Feit–Thompson Section 16 character data

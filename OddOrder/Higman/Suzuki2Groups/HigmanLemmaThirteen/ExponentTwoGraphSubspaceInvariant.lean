@@ -5,10 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: invariant graph subspaces

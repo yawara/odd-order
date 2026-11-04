@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBCoherence2
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
 
 /-!
 # Peterfalvi (5.2.e)/(5.3.b): reducible-column vs irreducible-break cross-orthogonality

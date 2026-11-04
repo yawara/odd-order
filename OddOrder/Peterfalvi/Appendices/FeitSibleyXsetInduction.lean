@@ -5,7 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: the `𝒳`-relative `S`-side induction (step (3) Part B)

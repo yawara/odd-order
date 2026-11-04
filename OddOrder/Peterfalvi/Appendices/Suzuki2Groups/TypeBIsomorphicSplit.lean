@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Peterfalvi Appendix III, Theorem (e), forward direction: setup

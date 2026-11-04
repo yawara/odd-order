@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RingTheory.Finiteness.Basic
 
 /-!
 # `G`-invariant lattices in a representation over the fraction field

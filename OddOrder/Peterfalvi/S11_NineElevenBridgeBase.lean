@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_PivotCoherence
 public import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
-public import OddOrder.Peterfalvi.S11_NineElevenCoherence
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # The §9 family sits inside the (8.15.3) family — the subcoherence bridge (base layer)

@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 public import Mathlib.LinearAlgebra.Dimension.Finrank
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.LinearAlgebra.DFinsupp
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # GL(2,p) transvection: transitivity on lines (BG Lemma 10.13(c) core)

@@ -5,8 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10HCorrection
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10Correction
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10Correction
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.Eta10HCorrection
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
 
 /-!
 # Peterfalvi §13 (pp. 84–86) — Core-typed analytic norm estimates

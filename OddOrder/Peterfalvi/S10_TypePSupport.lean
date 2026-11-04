@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+public import OddOrder.Peterfalvi.S10_StructureSetup
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.Peterfalvi.S10_ConjugationTransport
+import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 
 /-!
 # Peterfalvi (8.13) for the book-literal type-`𝒫` support `A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#`

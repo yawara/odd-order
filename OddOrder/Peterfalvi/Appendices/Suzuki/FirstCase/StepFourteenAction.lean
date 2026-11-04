@@ -6,6 +6,20 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteen
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (14): the action of `N_G(RΣ)` on `𝒜₂`

@@ -7,7 +7,15 @@ module
 
 public import OddOrder.Algebra.QuadraticFrobenius
 public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.LinearAlgebra.BilinearMap
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The relative trace of `𝐅_{q²}/𝐅_q`, and correcting a bilinear form into `𝐅_q`

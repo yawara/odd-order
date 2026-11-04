@@ -1,7 +1,8 @@
 module
 
-public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
 public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (14.8): pure key-inequality arithmetic

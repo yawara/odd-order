@@ -6,6 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi Part II, Chapter I §2 — reassociating the semilinear product

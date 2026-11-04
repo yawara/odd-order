@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Polynomial.Roots
+public import Mathlib.Algebra.Polynomial.Degree.Defs
+public import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Polynomial.BigOperators
+import Mathlib.Algebra.Polynomial.Div
 
 /-!
 # Lagrange interpolation over a commutative ring with separated nodes

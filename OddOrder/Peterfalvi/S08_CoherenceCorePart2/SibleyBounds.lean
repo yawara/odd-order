@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_DegreeSums
+import Mathlib.Algebra.Order.Ring.Star
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: Sibley bounds and X-set coherence

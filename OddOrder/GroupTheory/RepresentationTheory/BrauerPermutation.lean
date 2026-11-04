@@ -5,17 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Conj
-public import Mathlib.Data.Nat.Prime.Basic
-public import Mathlib.GroupTheory.OrderOfElement
 public import Mathlib.LinearAlgebra.Matrix.Permutation
-public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Tactic.Group
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.IsReal
-public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 
 /-!
 # Brauer's permutation lemma

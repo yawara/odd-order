@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
-public import Mathlib.Data.ZMod.Basic
+public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.Solvable
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.5 (半直積の導来長)

@@ -5,10 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Order.Ring.Defs
-public import Mathlib.Algebra.Ring.Basic
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.Tactic.Ring
+public import Mathlib.Algebra.Ring.Defs
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # The last step of Brauer–Suzuki: three sign relations force `χ_1(t) = χ_1(1)`

@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorCopyTransport
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.NormalizedFactorCoordinateCoherence
 
 /-!
 # Higman Lemma 13: transport between prescribed pairwise factors

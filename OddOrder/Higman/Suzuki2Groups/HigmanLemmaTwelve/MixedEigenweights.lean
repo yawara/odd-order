@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: the mixed weight equation

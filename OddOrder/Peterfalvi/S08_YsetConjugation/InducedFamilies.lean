@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.GroupTheory.TISubsetCounting
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.TISubsetCounting
 
 /-!
 # Peterfalvi §8: induced degree-one families

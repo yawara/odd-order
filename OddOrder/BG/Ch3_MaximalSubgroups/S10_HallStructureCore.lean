@@ -5,20 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.Setup
 public import OddOrder.BG.Ch1_Preliminary.PLength
-public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-public import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
-public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-public import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.NarrowPGroup
-public import OddOrder.GroupTheory.CentralProduct
-public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.GroupTheory.OmegaSubgroup
 public import OddOrder.GroupTheory.ElementaryAbelianFamily
-public import OddOrder.Isaacs.Ch05_Transfer.Main
+public import OddOrder.BG.Ch2_Uniqueness.S08_FittingInGBasic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04g_Thm418Core
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §10: The Subgroups `M_α` and `M_σ` — Core (定義層 + Thm 10.1 + Thm 10.2 前半)

@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
 /-!
 # BG §2F — fixed submodules and quotients: the main layer
@@ -22,8 +26,6 @@ imports this leaf, so downstream imports are unchanged.
 
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise
-open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
-  baseChangeRepresentation_faithful)
 
 
 private theorem mem_fixedOnSubmoduleAndQuotientSubgroup

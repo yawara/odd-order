@@ -7,6 +7,9 @@ module
 
 public import OddOrder.GroupTheory.OmegaSubgroup
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi Appendix III: central involutions

@@ -6,13 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S05_TICyclic
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
-public import Mathlib.FieldTheory.Minpoly.IsConjRoot
-public import Mathlib.LinearAlgebra.Basis.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # S05_NormThree

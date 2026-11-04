@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-public import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
 # Peterfalvi Appendix III: invariant summands under a Frobenius action

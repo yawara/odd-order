@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: a new invariant Frattini preimage

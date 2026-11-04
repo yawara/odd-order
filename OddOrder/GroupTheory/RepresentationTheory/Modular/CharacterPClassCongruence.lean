@@ -6,8 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
 
 /-!
 # Gorenstein Lemma 7.5: integer-valued elements of `ch_R(G)` are constant mod `p` on `p`-classes

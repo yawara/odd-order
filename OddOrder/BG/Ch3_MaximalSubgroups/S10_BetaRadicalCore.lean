@@ -5,9 +5,26 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
-public import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+public import OddOrder.GroupTheory.CentralProduct
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
+import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # BG §10 β-radical spine — Core (Thm 10.6 / Cor 10.7 / Lem 10.8)

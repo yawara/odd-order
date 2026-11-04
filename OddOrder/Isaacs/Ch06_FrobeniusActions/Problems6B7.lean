@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.IndexNormal
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B6
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.IndexNormal
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B6
 
 /-!
 # Isaacs Problem 6B.7 — 指数 2 の巡回部分群を持つ非可換 2-群 (書籍 p. 196)

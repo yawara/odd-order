@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 
 /-!
 # The trivial character inside the basic set of Navarro (7.4)

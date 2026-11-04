@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 
 /-!
 # BG Theorem 2.5 at the group level, with `hVP` discharged for an extraspecial `P`

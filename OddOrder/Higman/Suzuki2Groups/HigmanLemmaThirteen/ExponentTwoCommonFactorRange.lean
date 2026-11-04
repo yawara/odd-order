@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 13: the ambient range of one common pairwise factor

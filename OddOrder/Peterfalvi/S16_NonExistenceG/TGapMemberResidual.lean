@@ -1,9 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
-public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
-public import OddOrder.Peterfalvi.S13_Orthogonality
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
+public import OddOrder.Peterfalvi.S12_Prop109
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapCross
 
 /-!
 # Peterfalvi §11.8 (pp. 50–57): member residual non-orthogonality

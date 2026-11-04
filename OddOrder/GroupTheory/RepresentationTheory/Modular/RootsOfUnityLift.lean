@@ -6,9 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RingTheory.Henselian
-public import Mathlib.Algebra.Polynomial.Identities
 public import Mathlib.RingTheory.RootsOfUnity.Basic
-public import Mathlib.Algebra.EuclideanDomain.Field
+import Mathlib.Algebra.EuclideanDomain.Field
+import Mathlib.Algebra.Polynomial.Identities
 
 /-!
 # Lifting roots of unity along the residue map of a Henselian local ring

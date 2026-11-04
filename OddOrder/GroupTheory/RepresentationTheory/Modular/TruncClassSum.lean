@@ -7,6 +7,12 @@ module
 
 public import OddOrder.Algebra.SubgroupTruncation
 public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The trace of a `G`-class on a subgroup

@@ -5,11 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
-public import OddOrder.GroupTheory.KleinFourAutomorphism
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.SylowContaining
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.KleinFourAutomorphism
+import OddOrder.GroupTheory.SylowContaining
 
 /-!
 # A single class of involutions for a Klein four Sylow `2`-subgroup

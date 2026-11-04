@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.AlgClosedIdempotentLift
 public import OddOrder.Algebra.CenterIdempotentLift
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import OddOrder.Algebra.AlgClosedIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 
 /-!
 # Block idempotents over a coefficient ring that splits the ordinary side

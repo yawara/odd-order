@@ -1,6 +1,9 @@
 module
 
 public import OddOrder.FeitThompsonSection16Core
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S06_MuColumnBridge
 
 /-!
 # Feit–Thompson Section 16 character-grid setup

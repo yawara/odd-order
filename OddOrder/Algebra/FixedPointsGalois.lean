@@ -6,10 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.FieldTheory.Fixed
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.Algebra.CharP.Subring
-public import Mathlib.Algebra.Ring.Action.End
-public import Mathlib.Algebra.Ring.Action.Subobjects
+import Mathlib.FieldTheory.Finite.Basic
 
 /-!
 # The Galois correspondence for a group of field automorphisms

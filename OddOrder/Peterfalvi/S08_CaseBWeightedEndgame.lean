@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBEnumeration
-public import OddOrder.Peterfalvi.S08_CaseBEndgame
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
+import OddOrder.Peterfalvi.S08_CoherenceCorePart2.SibleyBounds
 
 /-!
 # Peterfalvi §6.8.3 — case-(B) norm-weighted endgame

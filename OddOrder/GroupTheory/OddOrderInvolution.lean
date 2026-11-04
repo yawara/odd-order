@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Algebra.Group.Subgroup.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Odd-order groups contain no involution

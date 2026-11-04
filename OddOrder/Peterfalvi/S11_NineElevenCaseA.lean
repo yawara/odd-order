@@ -5,14 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S13_MaximalIII_IV
 public import OddOrder.Peterfalvi.S07_Subcoherent
-public import OddOrder.Peterfalvi.S11_NineElevenCoherence
-public import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
 public import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
-public import OddOrder.Peterfalvi.S11_NineElevenTIWitness
-public import OddOrder.Peterfalvi.S13_CoreStructure
-public import OddOrder.Peterfalvi.S13_SixTwoBridge
+public import OddOrder.Peterfalvi.S12_HcBound
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTIWitness
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S13_CoreStructure
 
 /-!
 # Peterfalvi (9.11), case (9.7.a): the maximality-induction entry point

@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S10_StructureSetup
 public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 
 /-!
 # Peterfalvi (8.15), claim 2: Hypothesis (4.6) for a type-`P` maximal, `H = M_F` / `H = M_s`

@@ -1,6 +1,10 @@
 module
 
 public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # CharacterEstimate

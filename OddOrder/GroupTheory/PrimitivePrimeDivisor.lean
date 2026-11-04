@@ -5,12 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.NumberTheory.Multiplicity
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Algebra.Order.Ring.GeomSum
-public import Mathlib.Algebra.Ring.GeomSum
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.NumberTheory.Multiplicity
 
 /-!
 # Primitive prime divisors of `(p^q - 1)/(p - 1)` for `q` an odd prime

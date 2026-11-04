@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
 # Peterfalvi Section 14: witness Frobenius and intersection structure

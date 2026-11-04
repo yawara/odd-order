@@ -6,7 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
+public import Mathlib.RingTheory.DedekindDomain.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 
 /-!
 # Gorenstein Lemma 7.4: descending from `ℤ[ω]`-coefficients to `ℤ`-coefficients

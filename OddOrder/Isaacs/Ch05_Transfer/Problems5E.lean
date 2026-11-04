@@ -5,9 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5D6
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 
 /-!
 # Isaacs Problem 5E.2 — 真部分群がすべて超可解なら可解 (書籍 p. 175)

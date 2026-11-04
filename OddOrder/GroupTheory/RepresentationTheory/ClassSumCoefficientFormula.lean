@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
 
 /-!
 # Character Formula for Class-Sum Coefficients

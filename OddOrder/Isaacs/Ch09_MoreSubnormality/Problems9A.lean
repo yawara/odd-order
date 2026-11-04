@@ -5,11 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.NoncommCoprod
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.Holomorph
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.GroupTheory.NoncommCoprod
+import OddOrder.GroupTheory.PRank
 
 /-!
 # Isaacs §9A の演習 (書籍 p. 277)

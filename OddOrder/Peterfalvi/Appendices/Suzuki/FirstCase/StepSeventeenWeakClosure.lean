@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSixteen
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteen
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteenLV
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSixteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (17): weak closure of `Z₁PΣ`

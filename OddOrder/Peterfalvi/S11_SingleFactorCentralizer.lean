@@ -5,10 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-public import OddOrder.Peterfalvi.S07_Subcoherent
-public import OddOrder.Peterfalvi.S08_CoherenceWeighted
-public import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S07_Subcoherent
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
 
 /-!
 # S11_SingleFactorCentralizer

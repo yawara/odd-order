@@ -1,6 +1,14 @@
 module
 
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 
 /-!
 # CaseBXi

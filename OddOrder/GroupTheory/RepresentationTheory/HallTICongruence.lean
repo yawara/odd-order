@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-public import OddOrder.GroupTheory.TISubset
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.ConjClassCardinality
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 
 /-!
 # The `(6.7)` central-character congruence for a normal Hall TI-subgroup

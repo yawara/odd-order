@@ -6,8 +6,22 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
-public import OddOrder.BG.Ch1_Preliminary.S05b_Thm420Hall
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05b_Thm420Hall
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG Theorem 11.7: `M_σ A ⊴ M`

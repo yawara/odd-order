@@ -7,8 +7,8 @@ module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutators
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: restricted mixed terms in the ambient Frattini square

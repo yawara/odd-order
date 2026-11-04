@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_UnionPairBridge
 public import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (9.11.7)–(9.11.8): the coherent-pair adjunction and the case-(a) endgame

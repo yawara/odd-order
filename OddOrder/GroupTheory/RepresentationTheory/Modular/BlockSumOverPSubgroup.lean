@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Summing a block over a `p`-subgroup collapses to the identity

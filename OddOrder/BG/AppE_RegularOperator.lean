@@ -6,6 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppE_FurtherResults
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.ZMod.Units
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 
 /-!
 # BG Appendix E, Theorem E.3: the regular-operator eigenvalue count

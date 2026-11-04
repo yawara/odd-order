@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_BridgeCharacter
 public import OddOrder.Peterfalvi.S16_PairingCoherence
-public import OddOrder.Peterfalvi.S16_PairingBessel
-public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.Peterfalvi.S15_BridgeCharacterBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S15_BridgeCharacter
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # (13.19) Type-I orthogonality — producer / grid-facts layer

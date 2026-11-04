@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.GlaubermanZStar.Reduction
-public import OddOrder.GroupTheory.BrauerSuzukiGeneral
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.BrauerSuzuki
+import OddOrder.GroupTheory.BrauerSuzukiGeneral
+import OddOrder.GroupTheory.IsolatedInvolution
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # Glauberman's `Z*`-theorem: Step 5 — a second involution in `P`

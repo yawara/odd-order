@@ -5,20 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
-public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-public import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
-public import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG §3: Theorem 3.4 (coprime action, fixed-point-free complement)

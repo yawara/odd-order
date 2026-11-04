@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.AlgClosedSplitting
 public import OddOrder.Algebra.BlockIdempotent
-public import OddOrder.Algebra.GroupAlgebraDefectGroup
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.Algebra.DefectGroup
+public import OddOrder.Algebra.GroupAlgebraConjugation
+import Mathlib.Data.Rat.Floor
+import Mathlib.RingTheory.FiniteLength
+import OddOrder.Algebra.AlgClosedSplitting
+import OddOrder.Algebra.GroupAlgebraDefectGroup
 
 /-!
 # The blocks of `k[G]` over an algebraically closed field

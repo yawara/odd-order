@@ -6,8 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.Algebra.GaloisRationalInteger
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Galois transport of virtual-character inner products

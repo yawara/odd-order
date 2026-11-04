@@ -6,9 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_CaseACoherence
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
-public import OddOrder.Peterfalvi.S15_Tau1T
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.TISubsetCounting
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — τ₁-supply engines and the character-degree core

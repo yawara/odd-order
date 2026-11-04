@@ -6,8 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Perm.Cycle.Type
-public import OddOrder.GroupTheory.PiElementDecomposition
+import OddOrder.GroupTheory.PiElementDecomposition
 
 /-!
 # Suzuki 2-groups

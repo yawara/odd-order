@@ -1,6 +1,8 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Canonicalization

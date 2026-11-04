@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11.4): the Mackey norm `‖α‖² = a + 1 + (q−1)a²/u` and `Supp(α) ⊆ A(M)`

@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Nat.Choose.Dvd
-public import OddOrder.GroupTheory.HallPetresco
 public import OddOrder.GroupTheory.OmegaSubgroup
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.HallPetresco
 
 /-!
 # `p`-groups of class less than `p`

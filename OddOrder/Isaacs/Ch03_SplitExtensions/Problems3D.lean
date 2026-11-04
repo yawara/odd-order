@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
 public import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
 
 /-!
 # Isaacs §3D の演習 (書籍 p. 95)

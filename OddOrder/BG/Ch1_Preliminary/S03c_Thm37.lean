@@ -5,15 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CriticalSubgroup
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
-public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 public import OddOrder.GroupTheory.ChiefFactor
-public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG §3D: toward Theorem 3.7 (Frobenius kernel nilpotency)

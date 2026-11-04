@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_MaximalBasic
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # S12_Prop109

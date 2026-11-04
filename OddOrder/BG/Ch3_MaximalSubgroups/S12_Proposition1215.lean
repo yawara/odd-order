@@ -5,12 +5,24 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # BG §12 Proposition 12.15 — σ(M)-subgroup / maximal interaction

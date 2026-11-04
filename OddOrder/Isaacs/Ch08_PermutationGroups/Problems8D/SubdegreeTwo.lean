@@ -6,8 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.GroupAction.Primitive
-public import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
-public import Mathlib.GroupTheory.IndexNormal
+import Mathlib.GroupTheory.IndexNormal
+import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.1 (p. 269) — subdegree 2 をもつ原始群

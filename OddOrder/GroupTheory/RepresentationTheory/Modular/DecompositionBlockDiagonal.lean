@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The decomposition matrix is block diagonal

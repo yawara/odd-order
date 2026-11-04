@@ -7,7 +7,8 @@ module
 
 public import Mathlib.GroupTheory.Sylow
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+public import Mathlib.RepresentationTheory.Character
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # A character vanishing off the `p`-regular elements has degree divisible by `|G|_p`

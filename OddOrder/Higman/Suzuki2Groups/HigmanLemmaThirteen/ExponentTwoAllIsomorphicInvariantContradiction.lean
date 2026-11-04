@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphContradiction
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeTermGraphPreimage
+public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientLayerBridge
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphCommutativity
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoInvariantGraphContradiction
 
 /-!
 # Higman's Lemma 13: the all-isomorphic invariant graph is impossible

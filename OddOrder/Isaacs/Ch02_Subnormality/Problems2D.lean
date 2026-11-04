@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch02_Subnormality.Problems
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch02_Subnormality.Problems
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # Isaacs Chapter 2 — Problems §2D: `G = NA` での `|A| < |N|` (p. 64)

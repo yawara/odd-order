@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Navarro (6.14): Külshammer's formula, the `z = Ĝ⁰` instance of (4.23)

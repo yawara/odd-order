@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 
 /-!
 # Higman's Lemma 6: the triple-bracket contradiction

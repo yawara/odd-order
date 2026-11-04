@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Tactic.NormNum.Ineq
+import Mathlib.Tactic.NormNum.Pow
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
 
 /-!
 # Higman Lemma 13: normalized factor-parameter coherence

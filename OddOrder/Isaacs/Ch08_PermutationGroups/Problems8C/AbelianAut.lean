@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.Tactic.NormNum.Prime
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Isaacs, Finite Group Theory — Problem 8C.6 (p. 257)

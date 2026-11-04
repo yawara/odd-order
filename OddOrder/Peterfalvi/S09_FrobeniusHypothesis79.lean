@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (7.9) two-family datum for a Frobenius family

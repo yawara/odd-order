@@ -6,17 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.FieldTheory.Finite.Trace
-public import Mathlib.LinearAlgebra.Basis.Defs
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import Mathlib.LinearAlgebra.Dual.Lemmas
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-public import Mathlib.NumberTheory.Multiplicity
-public import Mathlib.RingTheory.TensorProduct.Basic
-public import Mathlib.RingTheory.TensorProduct.Finite
-public import Mathlib.RepresentationTheory.Irreducible
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.RingTheory.Trace.Defs
+import Mathlib.Algebra.Module.ZMod
+import Mathlib.FieldTheory.Finite.Trace
+import Mathlib.NumberTheory.Multiplicity
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # Frobenius-conjugate coordinates for finite-field Singer models

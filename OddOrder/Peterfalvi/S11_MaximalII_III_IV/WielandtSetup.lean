@@ -1,23 +1,17 @@
 module
 
-public import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
-public import OddOrder.Peterfalvi.S10_CoherenceWiring
-public import OddOrder.GroupTheory.CoprimeAction
-public import OddOrder.GroupTheory.WielandtFixedPoint
-public import OddOrder.GroupTheory.CoprimeFixedPoints
-public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-public import OddOrder.GroupTheory.AInvariantPiSubgroups
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-public import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-public import OddOrder.Mathlib.SchurZassenhausConj
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetupBasic
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.GroupTheory.WielandtFixedPoint
 
 /-!
 # Peterfalvi (9.1)-(9.4) — Wielandt fixed-point formula, type II-IV setup, Frobenius action

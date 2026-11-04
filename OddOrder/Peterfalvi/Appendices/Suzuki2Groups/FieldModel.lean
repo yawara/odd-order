@@ -5,13 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Polynomial.SpecificDegree
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.LinearAlgebra.Pi
 public import Mathlib.RingTheory.AdjoinRoot
-public import Mathlib.Algebra.CharP.Two
-public import Mathlib.Tactic.ComputeDegree
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.Algebra.Polynomial.SpecificDegree
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Perfect
 
 /-!
 # Peterfalvi Appendix III, Proposition 1: the field model of `B(n, 1, ε)`

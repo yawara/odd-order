@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
 
 /-!
 # Isaacs Problem 6A.8 — 正規部分群と Lemma 6.5 の集合 `X` (書籍 p. 186)

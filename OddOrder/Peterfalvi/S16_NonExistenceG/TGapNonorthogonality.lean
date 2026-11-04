@@ -1,6 +1,14 @@
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapMemberResidual
+public import OddOrder.Peterfalvi.S12_MaximalTypesSetup
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_GridRigidity
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_Props109To1011
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi §§3, 11, 15 (pp. 5–9, 50–57, 75–86): grid rigidity and omega exhaustion

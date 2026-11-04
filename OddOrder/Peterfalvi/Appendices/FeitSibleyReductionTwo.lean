@@ -6,6 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (2) machinery (pp. 146–147)

@@ -5,17 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki
-public import OddOrder.Peterfalvi.Appendices.SemilinearField
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-public import OddOrder.GroupTheory.ElementaryAbelian
 public import OddOrder.Peterfalvi.Appendices.NearFieldClass
-public import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
-public import OddOrder.GroupTheory.SolvableTwoTransitive
-public import OddOrder.GroupTheory.BrauerSuzuki
-public import OddOrder.GroupTheory.BrauerSuzukiEndgame
-public import OddOrder.GroupTheory.BrauerSuzukiQ8
-public import OddOrder.GroupTheory.BrauerSuzukiGeneral
+public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.FeitThompson
+import OddOrder.GroupTheory.BrauerSuzuki
+import OddOrder.GroupTheory.BrauerSuzukiGeneral
+import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
+import OddOrder.GroupTheory.SolvableTwoTransitive
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # Peterfalvi Appendix II, Proposition 1 — the affine near-field model of a rank-one group

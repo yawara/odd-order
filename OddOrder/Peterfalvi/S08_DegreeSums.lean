@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_DegreeSums.CoherenceGlue
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: base blocks and degree sums

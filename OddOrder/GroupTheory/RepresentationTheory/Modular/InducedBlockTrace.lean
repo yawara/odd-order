@@ -5,11 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.EigenCornerInverse
-public import OddOrder.Algebra.EigenTraceVanishing
-public import OddOrder.Algebra.GroupAlgebraIdeal
 public import OddOrder.Algebra.SubgroupTruncation
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
+public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+public import OddOrder.GroupTheory.PRegularElement
+import OddOrder.Algebra.EigenCornerInverse
+import OddOrder.Algebra.EigenTraceVanishing
+import OddOrder.Algebra.GroupAlgebraIdeal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
 
 /-!
 # Navarro (5.7): `χ(f_b h) = 0`

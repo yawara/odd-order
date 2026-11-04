@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.DirectSum.LinearMap
+public import Mathlib.LinearAlgebra.Trace
+import Mathlib.Algebra.DirectSum.LinearMap
 
 /-!
 # The trace splits along a pair of complementary invariant subspaces

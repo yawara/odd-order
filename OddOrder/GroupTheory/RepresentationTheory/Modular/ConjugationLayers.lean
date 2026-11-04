@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.ZMod.Basic
 public import OddOrder.Algebra.GroupAlgebraConjugation
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.Mathlib.MonoidAlgebra
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Splitting an `h`-invariant element into `p` cyclically permuted layers

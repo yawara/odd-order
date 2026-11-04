@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Theorem131
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+import OddOrder.Isaacs.Ch01_Sylow.Theorem131
 
 /-!
 # Isaacs Problem 7A.2 — `SL(2,3)` の位数 `8` の正規部分群 (書籍 p. 209)

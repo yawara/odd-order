@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.CStarAlgebra.Classes
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi §6 (4.5): Clifford theory of the certain-type characters

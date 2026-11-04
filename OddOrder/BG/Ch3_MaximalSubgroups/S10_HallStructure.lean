@@ -6,8 +6,21 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
-public import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
-public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
+public import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # BG §10: Theorem 10.2 後半 — `M_σ`/`M_α` の Hall 同定と `M_σ ≠ ⊥`

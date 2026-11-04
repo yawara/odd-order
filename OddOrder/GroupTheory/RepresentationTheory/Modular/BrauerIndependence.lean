@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.SplitSemisimpleCount
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
 /-!
 # The block traces are independent on the `p`-regular classes

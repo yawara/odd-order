@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
-public import OddOrder.Peterfalvi.S08_GeneralAdjoin
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+import Mathlib.GroupTheory.FixedPointFree
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S08_GeneralAdjoin
 
 /-!
 # Peterfalvi Appendix IV: The Feit-Sibley Theorem

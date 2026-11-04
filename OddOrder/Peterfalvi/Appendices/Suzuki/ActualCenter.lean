@@ -7,6 +7,13 @@ module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 public import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 
 /-!
 # The actual Suzuki center and its Higman filtration

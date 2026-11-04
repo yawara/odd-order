@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.Subgroup.Centralizer
 public import OddOrder.Algebra.GroupAlgebraConjugation
-public import OddOrder.Algebra.PGroupOrbitSum
+public import Mathlib.GroupTheory.PGroup
+import OddOrder.Algebra.PGroupOrbitSum
 
 /-!
 # The Brauer homomorphism

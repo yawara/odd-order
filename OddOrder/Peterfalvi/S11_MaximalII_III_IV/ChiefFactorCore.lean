@@ -1,7 +1,15 @@
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
+public import OddOrder.Peterfalvi.S07_Coherence.DifferenceImage
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # ChiefFactorCore

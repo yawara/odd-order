@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman's Lemma 13: common coordinates on the middle Frattini layer

@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
 public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.GroupTheory.Sylow
 
 /-!
 # The number of `p`-regular elements is prime to `p`

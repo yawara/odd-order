@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Mann
 public import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
-public import Mathlib.GroupTheory.IsSubnormal
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch04_Commutators.Mann
 
 /-!
 # Isaacs Chapter 4 — Problems 4C (安定化群)

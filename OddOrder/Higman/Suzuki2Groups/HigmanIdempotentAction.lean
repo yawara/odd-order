@@ -5,12 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
-public import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
-public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
+import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
 
 /-!
 # Higman Lemma 3: the actual idempotent action on `A / A²`

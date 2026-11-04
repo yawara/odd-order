@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 
 /-!
 # Higman's Lemma 13: normalized restricted-factor coordinates

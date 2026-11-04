@@ -6,8 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourModel
+public import OddOrder.GroupTheory.RankOneBNPair
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Ch. IV §4, step (2): the Proposition of Ch. III §3 on `U/Z(U)`

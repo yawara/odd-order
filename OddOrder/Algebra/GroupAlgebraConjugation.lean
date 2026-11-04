@@ -6,9 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.MonoidAlgebra.Basic
-public import Mathlib.Algebra.MonoidAlgebra.MapDomain
 public import Mathlib.Algebra.Ring.Action.End
-public import OddOrder.Algebra.RelativeTrace
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # The group algebra as a `G`-algebra under conjugation

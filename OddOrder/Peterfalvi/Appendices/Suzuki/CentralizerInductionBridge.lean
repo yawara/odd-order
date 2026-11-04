@@ -6,9 +6,17 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 
 /-!
 # Peterfalvi Part II, Ch. I §3: applying induction to the centralizer quotient

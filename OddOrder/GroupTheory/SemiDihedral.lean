@@ -6,8 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Data.ZMod.Basic
-public import Mathlib.GroupTheory.SpecificGroups.Quaternion
-public import Mathlib.Tactic.LinearCombination
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+public import Mathlib.Tactic.Ring.Basic -- shake: keep (used by a proof inside an exposed definition)
+public import Mathlib.Tactic.LinearCombination.Lemmas -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Semidihedral group

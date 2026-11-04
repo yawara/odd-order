@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.OddOrderInvolution
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 
 /-!
 # Peterfalvi Part II, Ch. I §3: distinguished elements in the centralizer quotient

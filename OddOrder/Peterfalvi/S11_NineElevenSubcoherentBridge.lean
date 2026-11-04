@@ -5,15 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_PivotCoherence
-public import OddOrder.Peterfalvi.S11_NineElevenBridgeBase
 public import OddOrder.Peterfalvi.S11_NineElevenRFamily
-public import OddOrder.Peterfalvi.S10_SubcoherentTypeP
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
-public import OddOrder.Peterfalvi.S11_NineElevenCoherence
-public import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
-public import OddOrder.Peterfalvi.S11_NineElevenTIWitness
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+public import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTIWitness
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # The §9 family sits inside the (8.15.3) family — the subcoherence bridge

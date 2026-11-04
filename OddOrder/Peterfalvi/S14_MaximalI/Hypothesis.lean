@@ -1,15 +1,16 @@
 module
 
-public import OddOrder.Peterfalvi.S13_MaximalIII_IV
-public import OddOrder.Peterfalvi.S10_CoherenceWiring
-public import OddOrder.Peterfalvi.S09_CertificateDischarge
-public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
-public import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
-public import OddOrder.Algebra.GaloisRationalInteger
-public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeConjugacy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S09_Building78C
 
 /-!
 # Peterfalvi (12.1)-(12.2.b) — type-I hypothesis, Dade domain, R(χ) families

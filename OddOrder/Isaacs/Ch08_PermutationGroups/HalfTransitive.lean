@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: half-transitive actions (Thm 8.9, Lem 8.10)

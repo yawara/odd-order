@@ -7,8 +7,14 @@ module
 
 public import OddOrder.GroupTheory.FixedSubgroup
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Mathlib.SchurZassenhausConj
-public import OddOrder.Mathlib.SemidirectProduct
+public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Ch.4 → Ch.3 forward dependencies (coprime action machinery)

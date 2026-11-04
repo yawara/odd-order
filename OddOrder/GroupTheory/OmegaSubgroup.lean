@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import Mathlib.Algebra.Group.Subgroup.Map
-public import Mathlib.GroupTheory.Commutator.Basic
 public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # Omega Subgroups

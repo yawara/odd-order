@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+public import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.Commutator.Finite
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 
 /-!
 # The Burnside basis of `End_F V` (BG (2.11))

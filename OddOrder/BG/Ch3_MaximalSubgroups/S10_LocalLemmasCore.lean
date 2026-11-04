@@ -5,13 +5,28 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
-public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-public import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
-public import OddOrder.GroupTheory.NilpotentCoprimeCommute
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
 
 /-!
 # BG §10 局所補題 — Core (Prop 10.11, Lemma 10.12)

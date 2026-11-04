@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_HypothesisB
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # BG Appendix C: basic facts about `H = P ⋊ U` and its prime-field line

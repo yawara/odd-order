@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (20): `α₁ = α₂`

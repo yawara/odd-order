@@ -5,13 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.GroupAction.Basic
-public import Mathlib.GroupTheory.Index
 public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Data.Set.Card
-public import Mathlib.Algebra.Order.BigOperators.Group.Finset
-public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.GroupTheory.GroupAction.Defs
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.GroupTheory.Index
 
 /-!
 # Free-action orbit count

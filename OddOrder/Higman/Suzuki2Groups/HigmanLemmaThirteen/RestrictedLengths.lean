@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: lengths of the lifted invariant factors

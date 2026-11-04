@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
-public import OddOrder.Algebra.FixedPointsGalois
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.FixedPointsGalois
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 
 /-!
 # `C_V(C_{Q₀}(P)) = PW` — the theorem of Galois in the semilinear model

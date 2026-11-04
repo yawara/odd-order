@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+public import OddOrder.GroupTheory.FrattiniPGroup -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+public import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman Lemma 7: the cover power overlap

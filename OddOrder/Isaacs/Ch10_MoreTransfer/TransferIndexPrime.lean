@@ -5,10 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Transfer
-public import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 public import OddOrder.GroupTheory.TransferTransitivity
-public import OddOrder.GroupTheory.FrattiniPGroup
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Frattini
+public import Mathlib.GroupTheory.RegularWreathProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs §10A — transfer evaluation at prime index and wreath criteria (pp. 300-302)

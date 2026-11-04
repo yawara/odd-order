@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Analysis.Complex.Polynomial.Basic
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 
 /-!
 # Row orthogonality of irreducible characters (first orthogonality), discharged

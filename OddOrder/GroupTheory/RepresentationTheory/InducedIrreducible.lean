@@ -5,14 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.Inertia
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.Clifford
-public import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Frobenius irreducibility of induced characters ([Is] Theorem 6.34)

@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.IndexNormal
-public import Mathlib.GroupTheory.Sylow
 public import Mathlib.GroupTheory.DoubleCoset
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)

@@ -6,8 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-public import OddOrder.BG.Ch1_Preliminary.S06_Additional
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG Theorem 3.8 — `⁅K, R⁆ ⊆ F(K)` for a coprime action (LMS LNS 188, §3, mmd L1221-1259)

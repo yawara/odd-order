@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CosetInvariantCard
 public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
+import OddOrder.GroupTheory.CosetInvariantCard
 
 /-!
 # Inducing the indicator of a subset of a subgroup

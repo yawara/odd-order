@@ -5,10 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven
 public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
 public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+public import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: models for the ξ-length-two factors

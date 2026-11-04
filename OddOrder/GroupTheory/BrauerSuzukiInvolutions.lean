@@ -6,8 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.BrauerSuzukiSetup
-public import OddOrder.GroupTheory.UniqueInvolutionSylow
-public import Mathlib.GroupTheory.Sylow
+import OddOrder.GroupTheory.UniqueInvolutionSylow
 
 /-!
 # Brauer–Suzuki: counting involutions (Gorenstein Ch. 12, Lemma 1.7)

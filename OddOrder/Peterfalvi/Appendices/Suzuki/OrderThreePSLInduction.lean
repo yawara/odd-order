@@ -6,9 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.OddOrderInvolution
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 
 /-!
 # Peterfalvi Part II, Ch. I §3 Lemma 4: the order-three PSL subgroup

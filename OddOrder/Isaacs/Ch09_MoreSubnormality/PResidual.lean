@@ -5,11 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
 public import Mathlib.GroupTheory.IsSubnormal
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.Order.Minimal
 
 /-!
 # The `p`-residual `O^p(G)` (Isaacs Ch. 9 §9C 準備)

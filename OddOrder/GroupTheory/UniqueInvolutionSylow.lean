@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Sylow
-public import OddOrder.GroupTheory.QuaternionTwoFacts
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import OddOrder.GroupTheory.QuaternionTwoFacts
 
 /-!
 # A Sylow `2`-subgroup with a unique involution

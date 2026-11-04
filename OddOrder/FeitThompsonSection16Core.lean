@@ -1,11 +1,18 @@
 module
 
-public import OddOrder.BG.AppC_FinalContradiction
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
-public import OddOrder.Peterfalvi.S06_MuColumnBridge
 public import OddOrder.Peterfalvi.S13_CoreStructure
-public import OddOrder.Peterfalvi.S13_Orthogonality
 public import OddOrder.Peterfalvi.S13_Section16PairData
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+public import OddOrder.Peterfalvi.S16_CoreLemmas
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppC_FinalContradiction
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+public import OddOrder.Peterfalvi.S10_BGInterface -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S14_MaximalI.TypeICovering
 
 /-!
 # Feit–Thompson Section 16 carriers and type-`P` setup

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Flat.TorsionFree
-public import Mathlib.RingTheory.LocalRing.Module
+public import Mathlib.LinearAlgebra.FreeModule.Basic
+public import Mathlib.RingTheory.Valuation.ValuationRing
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.LocalRing.Module
 
 /-!
 # Finite torsion-free modules over a valuation ring are free

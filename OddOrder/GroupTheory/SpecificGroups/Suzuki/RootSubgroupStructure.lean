@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 
 /-!
 # The standard root subgroup of the Suzuki permutation group

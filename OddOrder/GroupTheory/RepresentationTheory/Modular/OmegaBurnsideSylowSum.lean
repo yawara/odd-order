@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.Algebra.SubgroupSum
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.PElementSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 
 /-!
 # Navarro (4.23): cancelling `|K|` from the `Ω_{K,L}` formula

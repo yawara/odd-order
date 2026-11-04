@@ -6,12 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Field.Subfield.Basic
-public import Mathlib.Algebra.Ring.Subring.Basic
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.FieldTheory.Finiteness
-public import Mathlib.Tactic.FieldSimp
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.Tactic.Ring
+public import Mathlib.Algebra.CharP.Defs
+import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Tactic.Ring.Basic -- shake: keep (used by a proof inside an exposed definition)
+public import Mathlib.Algebra.Field.IsField -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Additive subgroups of a field that are closed under inversion

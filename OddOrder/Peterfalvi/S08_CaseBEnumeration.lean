@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBAssembly
-public import OddOrder.Peterfalvi.S08_CaseBHortho
-public import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S08_CaseBAssembly -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_CaseBHortho -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §6.8.2 — case-(B) conjugate-pair cover of the `X`-set

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 
 /-!
 # Higman Lemma 13: primitivity of a factor eigenvalue

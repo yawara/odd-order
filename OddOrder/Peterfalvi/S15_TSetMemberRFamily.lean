@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_BridgeCharacter
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+public import OddOrder.Peterfalvi.S16_GridExpansion -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §9/§13 — the (5.2.d) member `R`-families for the `T`-instance §9 family

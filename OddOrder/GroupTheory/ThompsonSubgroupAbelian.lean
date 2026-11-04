@@ -5,13 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
-public import Mathlib.GroupTheory.Commutator.Basic
-public import OddOrder.GroupTheory.ThompsonSubgroup
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
 public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
-public import OddOrder.Isaacs.Ch04_Commutators.Mann
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Abelian Thompson Subgroup `J_a(P)` (Gorenstein 版)

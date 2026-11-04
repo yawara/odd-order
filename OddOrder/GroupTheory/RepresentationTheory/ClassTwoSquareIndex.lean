@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.PGroup
-public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-! # Faithful irreducibles of `p`-groups with center of order `p`, and the square-index theorem
 
@@ -33,8 +36,6 @@ contradiction.  In the Coq formalization this is the `extraspecial`-order step o
 @[expose] public section
 
 namespace OddOrder.RepresentationTheory
-
-open _root_.OddOrder.RepresentationTheory.Representation
 
 variable {P : Type*} [Group P]
 

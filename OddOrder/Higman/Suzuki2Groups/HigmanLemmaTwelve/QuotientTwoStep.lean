@@ -6,7 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: the two-step Frattini quotient

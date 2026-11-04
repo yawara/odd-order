@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.IsolatedInvolution
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Glauberman's `Z*`-theorem: the statement and how its hypothesis travels
@@ -32,8 +38,6 @@ of an image divides the order of the element.  That is exactly why (7.8) is prov
 -/
 
 @[expose] public section
-
-open OddOrder.Isaacs.Ch03
 
 open scoped Pointwise commutatorElement
 

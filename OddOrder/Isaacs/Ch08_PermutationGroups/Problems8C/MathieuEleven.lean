@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 
 /-!
 # Isaacs Problem 8C.2 (p. 256) — 次数 11, 位数 7920 の置換群は単純

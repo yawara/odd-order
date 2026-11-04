@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import Mathlib.Data.Set.Card
-public import Mathlib.Data.Set.Finite.Lemmas
 public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Thompson Subgroup `J(P)`

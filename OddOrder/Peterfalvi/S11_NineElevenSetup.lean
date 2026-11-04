@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11) — coherence: setup layer

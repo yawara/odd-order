@@ -5,11 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FieldArithmetic
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
-public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
-public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+public import OddOrder.GroupTheory.RankOneBNPair
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
 /-!
 # Peterfalvi Part II, Ch. IV §2: the orbit count of step (8)

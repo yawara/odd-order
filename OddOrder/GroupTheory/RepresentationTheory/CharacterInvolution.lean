@@ -5,8 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Projection
-public import Mathlib.LinearAlgebra.Trace
 public import Mathlib.RepresentationTheory.Character
 
 /-!

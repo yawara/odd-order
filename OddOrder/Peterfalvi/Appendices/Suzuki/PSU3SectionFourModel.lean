@@ -6,7 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+public import Mathlib.GroupTheory.Schreier
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
 
 /-!
 # Ch. IV §4, step (2): the standing hypothesis on `U/Z(U)`

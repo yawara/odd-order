@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
 
 /-!
 # Isaacs §3F の演習 — `SL(2,3)` (書籍 pp. 110-111, Problems 3F.4 / 3F.5)

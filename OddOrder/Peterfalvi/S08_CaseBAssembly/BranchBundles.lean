@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
 
 /-!
 # Peterfalvi §8 case-(B): branch infrastructure and bundles

@@ -7,6 +7,11 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The decomposition numbers of an ordinary representation

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.DefectGroup
+import Mathlib.Data.Rat.Floor
 
 /-!
 # The defect of a block

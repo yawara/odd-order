@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Algebra.Subalgebra.Basic
-public import Mathlib.RingTheory.Artinian.Ring
-public import OddOrder.Algebra.DefectGroupConjugacy
 public import OddOrder.Algebra.GroupAlgebraConjugation
-public import OddOrder.Algebra.Rosenberg
+public import OddOrder.Algebra.DefectGroup
+import Mathlib.Data.Rat.Floor
+import Mathlib.RingTheory.Artinian.Module
+import OddOrder.Algebra.DefectGroupConjugacy
+import OddOrder.Algebra.Rosenberg
 
 /-!
 # Defect groups in the group algebra

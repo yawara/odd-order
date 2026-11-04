@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
-public import OddOrder.GroupTheory.TransferInvariantTransversal
-public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.Transfer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.TransferInvariantTransversal
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
 
 /-!
 # Peterfalvi Part II, Ch. II, step (9): `p = f`

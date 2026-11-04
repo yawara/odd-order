@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_CrossOrthogonality
-public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_CrossOrthogonality
 
 /-!
 # `hzeta_cross` from conjugate images (Peterfalvi (7.9), coq `disjoint_coherent_ortho`)

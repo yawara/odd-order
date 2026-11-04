@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Higman.Suzuki2Groups.ExponentFour
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
 
 /-!
 # The square-root fibre `{y ∈ S | y² = s}` and its `K`-symmetry

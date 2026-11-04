@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.ClassSumOffCentralizer
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
+public import Mathlib.GroupTheory.PGroup
+public import OddOrder.Algebra.BlockIdempotent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.ClassSumOffCentralizer
 
 /-!
 # The induced central character is the Brauer homomorphism — Navarro (4.14), first part

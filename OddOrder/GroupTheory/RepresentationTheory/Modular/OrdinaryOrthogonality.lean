@@ -7,6 +7,12 @@ module
 
 public import Mathlib.RepresentationTheory.Character
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.WittVector.IsPoly
 
 /-!
 # Orthogonality of the ordinary irreducible characters over the splitting field

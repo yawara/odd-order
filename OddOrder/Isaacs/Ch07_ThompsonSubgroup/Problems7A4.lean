@@ -6,9 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Sylow
-public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
-public import Mathlib.GroupTheory.Commutator.Finite
+public import Mathlib.LinearAlgebra.Matrix.ProjectiveSpecialLinearGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.GroupTheory.Commutator.Finite
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+public import Mathlib.RingTheory.LocalRing.Basic -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problem 7A.4 — `SL(2,q)` と `PSL(2,q)` の Sylow `p`-部分群はちょうど `q+1` 個

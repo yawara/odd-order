@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # BG §3: Lemma 3.2 and Theorem 3.5 without the solvability hypothesis

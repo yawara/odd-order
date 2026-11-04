@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310FixedPointSplit
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
 
 /-!
 # BG Theorem 3.10 for elementary abelian `M`, GROUP form (issue 3011, piece 2)

@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 
 /-!
 # Isaacs Problem 7A.1 — 単純群の冪零な極大部分群は `2`-群 (書籍 p. 209)

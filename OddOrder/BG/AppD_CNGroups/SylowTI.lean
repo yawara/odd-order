@@ -5,7 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
+public import OddOrder.BG.AppD_CNGroups.Basic
+public import OddOrder.GroupTheory.SubgroupInAmbient
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Focal
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 
 /-!
 # BG Appendix D, Lemmas D.1 and D.2

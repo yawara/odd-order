@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
+public import Mathlib.LinearAlgebra.Trace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Data.Nat.Totient
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 
 /-!
 # Navarro (5.2): the core computation

@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
 # Navarro (7.7): `χ(u v) = χ(u)` for `v` in the `p'`-core of `C_G(u)`

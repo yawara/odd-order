@@ -1,10 +1,20 @@
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Core
-public import OddOrder.BG.Ch1_Preliminary.S03e_WeightSpan
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
-public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import OddOrder.BG.Ch1_Preliminary.S03e_WeightSpan
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Core
+import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
 
 /-!
 # BG Theorem 3.10(a): module core terminal (abelian kernel)

@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+public import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+public import OddOrder.GroupTheory.MinimalInvariantNormal -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: the Frattini layers

@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Isaacs Ch. 3 — Lemma 3.1: split extension の同型を除く一意性 (pp. 69-70)

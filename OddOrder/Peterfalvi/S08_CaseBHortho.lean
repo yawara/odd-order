@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CrossOrthogonality
+public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
+import OddOrder.Peterfalvi.S08_CrossOrthogonality
 
 /-!
 # Peterfalvi §8: case (B) — certain-type column vs break-pair cross-orthogonality

@@ -6,8 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.DefectNumber
-public import OddOrder.Algebra.GroupAlgebraDefectGroup
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.GroupAlgebraConjugation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.GroupAlgebraDefectGroup
 
 /-!
 # The defect of a block of `kG`

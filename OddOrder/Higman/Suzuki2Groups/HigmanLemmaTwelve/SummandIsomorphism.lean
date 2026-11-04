@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+public import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 
 /-!
 # Isomorphic summands force Frobenius-conjugate eigenvalues

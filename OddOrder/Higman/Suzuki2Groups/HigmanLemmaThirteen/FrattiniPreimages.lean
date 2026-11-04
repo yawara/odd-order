@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientSummands
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientSummands
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: Frattini preimages of quotient summands

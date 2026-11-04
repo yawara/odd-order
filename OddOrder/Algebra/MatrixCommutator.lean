@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Matrix.Basis
 public import Mathlib.LinearAlgebra.Matrix.Trace
 public import OddOrder.Algebra.CommutatorSpan
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # The commutator span of a matrix algebra is the trace-zero subspace

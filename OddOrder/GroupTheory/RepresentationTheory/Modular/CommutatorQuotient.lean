@@ -6,9 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Pi
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.Quotient.Defs
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.LinearAlgebra.Dimension.OrzechProperty
 
 /-!
 # `kG ⧸ [kG, kG]` is graded by conjugacy classes

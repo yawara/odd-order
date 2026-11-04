@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import OddOrder.Algebra.CommutatorSpanHom
-public import OddOrder.Algebra.CommutatorSpanPi
-public import OddOrder.Algebra.MatrixCommutator
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.Isomorphisms
+public import Mathlib.LinearAlgebra.Matrix.Trace
+public import OddOrder.Algebra.CommutatorSpan
+import Mathlib.LinearAlgebra.Dimension.Constructions
+import OddOrder.Algebra.CommutatorSpanHom
+import OddOrder.Algebra.CommutatorSpanPi
+import OddOrder.Algebra.MatrixCommutator
 
 /-!
 # `dim (A ⧸ T')` counts the blocks of a split semisimple quotient

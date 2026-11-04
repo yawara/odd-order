@@ -7,6 +7,8 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Signed irreducible families induced from a TI-subset

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
 
 /-!
 # Isomorphic central-quotient summands force Frobenius-conjugate eigenvalues

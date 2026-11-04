@@ -5,13 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Blocks
-public import Mathlib.GroupTheory.Index
 public import Mathlib.GroupTheory.Subgroup.Simple
-public import Mathlib.Tactic.Group
 public import Mathlib.GroupTheory.GroupAction.SubMulAction.OfStabilizer
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
+public import Mathlib.Data.Nat.Prime.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
+public import Mathlib.GroupTheory.GroupAction.ConjAct
 
 /-!
 # 点安定化群が単純な推移作用 (Isaacs Problems 8C.3 / 8C.4 の共通部分)

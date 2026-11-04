@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
-public import OddOrder.Peterfalvi.S16_GridExpansion
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (5.3.b) / (14.9), `S`-side coherent images are orthogonal to the shared `η`-grid

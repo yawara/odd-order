@@ -6,9 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Sequence
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (15): the sequence of (11) exhausts the orbit

@@ -6,6 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S05_Isometry32
+public import OddOrder.Peterfalvi.S05_NormThree
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.FieldTheory.Minpoly.IsConjRoot
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # TAIL

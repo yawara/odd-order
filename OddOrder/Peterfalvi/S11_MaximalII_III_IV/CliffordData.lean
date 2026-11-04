@@ -1,6 +1,14 @@
 module
 
 public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.Mathlib.SchurZassenhausConj -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # TAIL

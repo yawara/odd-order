@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
-public import OddOrder.Isaacs.Ch01_Sylow.Theorem131
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.Theorem131
 
 /-!
 # Isaacs Problem 1C.4 — 位数 120 の群の指数 3 または 5 の部分群

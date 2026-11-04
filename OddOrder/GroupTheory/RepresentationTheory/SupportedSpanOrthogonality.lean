@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi (1.3.a), the restriction–complement equivalence core

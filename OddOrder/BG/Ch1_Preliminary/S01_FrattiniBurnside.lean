@@ -5,20 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import OddOrder.BG.Ch1_Preliminary.S01_SolvableBasics
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.GroupTheory.ChiefFactor
-public import OddOrder.GroupTheory.FittingSelfCentralizing
-public import OddOrder.GroupTheory.FrattiniPGroup
-public import OddOrder.GroupTheory.CriticalSubgroup
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.GroupTheory.AInvariantPiSubgroups
-public import Mathlib.Order.Minimal
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # S01_FrattiniBurnside

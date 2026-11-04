@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.MatrixNaturalModule
-public import OddOrder.Algebra.ModuleAlongSurjection
 public import OddOrder.Algebra.PiSimpleModule
+import OddOrder.Algebra.ModuleAlongSurjection
 
 /-!
 # The simple modules of a product of matrix algebras

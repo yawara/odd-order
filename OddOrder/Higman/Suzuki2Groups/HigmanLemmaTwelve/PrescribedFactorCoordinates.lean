@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 12: factor coordinates over the prescribed common centre

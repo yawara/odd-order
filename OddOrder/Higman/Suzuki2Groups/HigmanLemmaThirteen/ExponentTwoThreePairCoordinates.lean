@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFullPreimageGeometry
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorCoordinates
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorModels
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFullPreimageGeometry
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPrescribedFactorTransport
 
 /-!
 # Higman's Lemma 13: simultaneous coordinates on the three factor pairs

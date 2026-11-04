@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 
 /-!
 # Peterfalvi Part II, Ch. II, step (8): the case `Q₁ ≠ 1`

@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Data.Finset.Attr
 
 /-!
 # Commutators with subgroup joins modulo a normal subgroup

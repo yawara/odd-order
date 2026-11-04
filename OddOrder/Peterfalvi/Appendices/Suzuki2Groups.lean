@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.Higman.Suzuki2Groups
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
@@ -23,6 +23,9 @@ public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismClassification
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBIsomorphicSplit
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Appendix III: On Suzuki 2-Groups

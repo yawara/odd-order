@@ -5,14 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.GroupTheory.GroupAction.Blocks
 public import Mathlib.GroupTheory.GroupAction.Primitive
-public import Mathlib.GroupTheory.GroupAction.Jordan
-public import Mathlib.GroupTheory.Perm.Cycle.Type
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
-public import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.GroupTheory.GroupAction.Jordan
+import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
+import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — `n`-巡回が生成する原始群

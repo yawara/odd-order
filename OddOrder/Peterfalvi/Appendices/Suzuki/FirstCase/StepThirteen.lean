@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 
 /-!
 # Peterfalvi Part II, Ch. II, step (13): `C_G(Z₁)` is a `3`-group — preliminaries

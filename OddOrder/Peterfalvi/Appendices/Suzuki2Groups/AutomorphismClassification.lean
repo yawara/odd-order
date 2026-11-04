@@ -5,14 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.FieldTheory.Finite.GaloisField
-public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Peterfalvi Appendix III, Proposition 2: automorphisms of `B(n, 1)`

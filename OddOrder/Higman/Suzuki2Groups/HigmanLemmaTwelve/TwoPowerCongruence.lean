@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Combinatorics.Colex
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.Tactic.LinearCombination
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Combinatorics.Colex
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # Binary uniqueness modulo `2 ^ n - 1`

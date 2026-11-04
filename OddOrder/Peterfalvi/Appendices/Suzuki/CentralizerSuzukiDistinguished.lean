@@ -5,11 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Perfect
-public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
-public import OddOrder.GroupTheory.SylowTransport
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+import OddOrder.GroupTheory.SylowTransport
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the distinguished Suzuki pair

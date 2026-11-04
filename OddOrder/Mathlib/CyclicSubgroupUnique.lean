@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
+public import Mathlib.Algebra.Group.Subgroup.Ker
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
 
 /-!
 # Subgroups of a finite cyclic group are determined by their order

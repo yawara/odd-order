@@ -4,13 +4,27 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
 
-public import Mathlib.GroupTheory.Perm.Cycle.Type
-public import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
-public import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
-public import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
-public import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
-public import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
 public import OddOrder.GroupTheory.CentralProduct
+public import OddOrder.GroupTheory.IsExtraspecial
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S04_ExtraspecialCommutator
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S04b_Thm412
+import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
+import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
+import OddOrder.BG.Ch1_Preliminary.S04f_AutOrderConstraints
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # S04f_Omega1

@@ -6,11 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Algebra.ZMod
-public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.LinearAlgebra.Basis.VectorSpace
-public import Mathlib.LinearAlgebra.Prod
 public import OddOrder.GroupTheory.CentralElementaryExtension
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+public import Mathlib.RingTheory.DedekindDomain.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # Peterfalvi Appendix III: Suzuki 2-group types A and B

@@ -5,7 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.GroupTheory.IsMetacyclic
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # BG §4 — Proposition 4.11 (Huppert)

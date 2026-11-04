@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CyclicShiftEigenspace
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.CyclicShiftEigenspace
 
 /-!
 # Eigenspace count for a monomial permutation operator (orbit assembly of BG (2.11))

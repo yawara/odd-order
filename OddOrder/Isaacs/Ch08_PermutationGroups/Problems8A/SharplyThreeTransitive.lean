@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.CharP.Two
 public import Mathlib.LinearAlgebra.Projectivization.Action
-public import Mathlib.LinearAlgebra.Projectivization.Cardinality
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.LinearAlgebra.Projectivization.Cardinality
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — `SL(2, q)` は射影直線に sharply 3-transitive

@@ -5,15 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppE_CollectionFormula
-public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-public import OddOrder.GroupTheory.CriticalSubgroup
-public import OddOrder.GroupTheory.HallCollection
-public import OddOrder.GroupTheory.HallPetresco
-public import OddOrder.GroupTheory.RegularPGroup
-public import OddOrder.GroupTheory.OmegaSubgroup
 public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowAutomorphisms
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # BG Appendix E — the 1991 Feit–Thompson regular-operator layer (E.3/E.4 opening)

@@ -6,6 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.FeitSibley
+public import Mathlib.GroupTheory.Complement
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 
 /-!
 # Peterfalvi Appendix IV: coherence of `𝒮(Q')` (pp. 145–146)

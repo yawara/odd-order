@@ -7,7 +7,7 @@ module
 
 public import OddOrder.Algebra.CentralCharacter
 public import OddOrder.Algebra.SubgroupSum
-public import OddOrder.Algebra.TraceMulLeft
+import OddOrder.Algebra.TraceMulLeft
 
 /-!
 # Counting the Wedderburn blocks killed by a normal subgroup

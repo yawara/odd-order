@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
-public import OddOrder.Peterfalvi.S12_TypeVCaseC
-public import OddOrder.Peterfalvi.S13_Lemmas113To115
-public import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S12_MaximalBasic
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.Peterfalvi.S12_TypeIICrossIsometryPair
+import OddOrder.Peterfalvi.S12_TypeVCaseC
+import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
+import OddOrder.Peterfalvi.S13_Lemmas113To115
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 
 /-!
 # S12_Noncoherence — the unconditional Peterfalvi (10.8)

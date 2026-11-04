@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 
 /-!
 # Navarro (7.4): a basic set for the principal block of a Klein four group

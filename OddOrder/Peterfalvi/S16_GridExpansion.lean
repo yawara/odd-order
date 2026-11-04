@@ -1,7 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup
-public import OddOrder.Peterfalvi.S05_GridRigidity
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S05_GridRigidity
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # Peterfalvi (3.6)–(3.8): the grid-coefficient theory of the `W`-grid

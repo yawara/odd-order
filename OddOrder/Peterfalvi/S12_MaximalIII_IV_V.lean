@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_Props109To1011
-public import OddOrder.Peterfalvi.S12_MaximalTypesSetup
 public import OddOrder.Peterfalvi.S10_Theorem88CaseB
+public import OddOrder.Peterfalvi.S12_HcBound
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_MaximalTypesSetup
+import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
 # TAIL

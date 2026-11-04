@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_ComplementStructure
 public import OddOrder.Peterfalvi.S15_BridgeCharacterBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (13.18): the bridge characters `β_j` and `Γ`

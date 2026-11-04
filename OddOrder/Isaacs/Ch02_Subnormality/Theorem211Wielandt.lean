@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
 
 /-!
 # Theorem211Wielandt

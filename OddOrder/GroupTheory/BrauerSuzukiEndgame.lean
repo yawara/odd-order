@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.BrauerSuzukiCounting
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.GroupTheory.BrauerSuzukiSetup
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Transfer
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.BrauerSuzukiCounting
+import OddOrder.GroupTheory.BrauerSuzukiInvolutions
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Brauer–Suzuki: the group-theoretic endgame (Gorenstein Ch. 12, pp. 376–377)

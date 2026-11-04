@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.EigenspaceDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+public import Mathlib.RepresentationTheory.Character
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.Algebra.DirectSum.LinearMap
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.Algebra.EigenspaceDecomposition
 
 /-!
 # Character values as sums of roots of unity

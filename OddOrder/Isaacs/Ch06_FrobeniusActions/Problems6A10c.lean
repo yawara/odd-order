@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A8
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A8
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
 
 /-!
 # Isaacs Problem 6A.10(c) — 可解な場合の Frobenius の定理 (書籍 p. 186)

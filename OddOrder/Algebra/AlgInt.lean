@@ -5,14 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Basic.Complex.Basic
-public import Mathlib.RingTheory.Polynomial.RationalRoot
-public import Mathlib.Algebra.Order.BigOperators.Group.Multiset
-public import Mathlib.Algebra.Polynomial.Monic
 public import Mathlib.Analysis.Complex.Norm
-public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
-public import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
-public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import Mathlib.RingTheory.Coprime.Basic
+public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
+import Mathlib.RingTheory.Polynomial.RationalRoot
 
 /-!
 # Algebraic-integer congruences in `ℂ`

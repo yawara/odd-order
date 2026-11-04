@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.RingTheory.Idempotents
+import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 
 /-!
 # Isotypic decomposition of a representation via the central idempotents (Peterfalvi (9.1), I-2)

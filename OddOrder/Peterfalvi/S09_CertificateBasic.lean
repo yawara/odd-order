@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+public import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Peterfalvi §9 — certificate discharge: opening layer

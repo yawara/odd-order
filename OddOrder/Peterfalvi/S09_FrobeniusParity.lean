@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_TwoFamiliesParity
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
+import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 
 /-!
 # Peterfalvi (7.9) conclusion for a Frobenius family (pp. 41-42)

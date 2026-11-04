@@ -7,9 +7,11 @@ module
 
 public import Mathlib.Algebra.Module.Lattice
 public import Mathlib.LinearAlgebra.Trace
-public import OddOrder.Algebra.ValuationRingFreeModule
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
-public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.RingTheory.Valuation.ValuationRing
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.Algebra.ValuationRingFreeModule
 
 /-!
 # Ordinary representations and their invariant lattices

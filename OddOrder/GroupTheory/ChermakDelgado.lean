@@ -5,13 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.SetTheory.Cardinal.NatCard
-public import Mathlib.Data.Fintype.Lattice
 public import Mathlib.GroupTheory.Index
 public import Mathlib.GroupTheory.Subgroup.Simple
-public import Mathlib.Tactic.Ring
-public import OddOrder.Mathlib.Subgroup
+import Mathlib.Data.Fintype.Lattice
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Chermak-Delgado measure, lattice, and subgroup

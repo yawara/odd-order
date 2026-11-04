@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import Mathlib.Algebra.Group.Action.Prod
+public import Mathlib.GroupTheory.GroupAction.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 置換指標のべき乗平均

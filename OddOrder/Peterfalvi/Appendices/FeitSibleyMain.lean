@@ -5,7 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyConclusion
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.FeitSibleyConclusion
+import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgame
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley Theorem, final assembly (pp. 146–150)

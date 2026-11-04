@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
-public import OddOrder.Peterfalvi.S09_FrobeniusEstimate
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S09_FrobeniusCrossOrtho
+public import OddOrder.Peterfalvi.S09_FrobeniusEstimate -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The conjugate family index for a Frobenius member (Peterfalvi (7.9))

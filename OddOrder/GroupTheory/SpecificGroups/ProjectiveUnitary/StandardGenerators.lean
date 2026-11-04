@@ -6,8 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
-public import Mathlib.GroupTheory.Perm.Option
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Standard root, torus, and Weyl generators for `PSU(3,q)`

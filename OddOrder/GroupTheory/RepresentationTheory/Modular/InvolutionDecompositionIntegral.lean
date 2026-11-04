@@ -7,7 +7,11 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality -- shake: keep (needed by an `example`)
 
 /-!
 # The generalized decomposition numbers at an involution are rational integers

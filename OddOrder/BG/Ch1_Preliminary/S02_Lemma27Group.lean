@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-public import OddOrder.GroupTheory.CommGroupAut
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.CommGroupAut
+import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
 
 /-!
 # BG §2 Lemma 2.7 in the book's own shape (`Q ⊆ Aut(P)`)

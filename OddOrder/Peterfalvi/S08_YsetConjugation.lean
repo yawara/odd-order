@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_YsetConjugation.InducedFamilies
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: filtration and Y-set conjugation

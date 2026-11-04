@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorsTypeCCCrossCommutator
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniCrossCommutatorContradiction
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniCrossCommutatorContradiction
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorsTypeCCCrossCommutator
 
 /-!
 # Higman's Lemma 13: the exponent-four type-C/type-C branch

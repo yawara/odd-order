@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 public import OddOrder.Peterfalvi.S07_RetargetScaled
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi (5.6.3): the corrected-extension-image coherence adjoin for a **reducible** break

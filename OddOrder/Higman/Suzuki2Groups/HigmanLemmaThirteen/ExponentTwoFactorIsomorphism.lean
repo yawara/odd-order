@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: factor isomorphism from a common square parameter

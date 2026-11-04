@@ -6,10 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import Mathlib.Tactic.Group
 public import Mathlib.GroupTheory.Index
-public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The induced representation, as `H`-equivariant functions

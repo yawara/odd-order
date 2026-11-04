@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C10
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problem 5C.11 — `H ⊆ Z(N_G(H))` なる Hall 部分群 (p. 164)

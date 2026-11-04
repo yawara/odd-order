@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # A coprime fixed-point-free automorphism fixes only the trivial conjugacy class

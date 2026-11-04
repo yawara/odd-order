@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dual.Lemmas
 public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import Mathlib.Combinatorics.Matroid.Init
+public import Mathlib.LinearAlgebra.FreeModule.PID -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 
 /-!
 # Brauer's permutation lemma, unconditional form

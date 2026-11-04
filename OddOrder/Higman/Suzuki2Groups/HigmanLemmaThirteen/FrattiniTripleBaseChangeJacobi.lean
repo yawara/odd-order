@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleJacobi
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleJacobi
 
 /-!
 # Higman's Lemma 13: Jacobi after scalar extension

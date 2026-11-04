@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
 
 /-!
 # Isaacs Problem 3C.7 (書籍 p. 91) — Carter 部分群の定義と基本性質

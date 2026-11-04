@@ -5,14 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.IsSubnormal
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 public import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs Chapter 2 — Problems §2A / §2B (Subnormality)

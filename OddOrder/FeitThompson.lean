@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.FeitThompsonCharacterData
+public import OddOrder.FeitThompsonNuGrid
+public import OddOrder.FeitThompsonPairProducer
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S06_CertainTypeSupport -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Feit–Thompson Section 16 assembly and odd-order theorem

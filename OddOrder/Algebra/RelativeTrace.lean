@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Algebra.Subalgebra.Operations
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.Index
-public import Mathlib.Tactic.Group
+import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Relative traces of a `G`-algebra

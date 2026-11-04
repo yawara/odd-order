@@ -5,15 +5,26 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S04_DadeIsometry
-public import OddOrder.Peterfalvi.S09_NonexistenceCertain
-public import OddOrder.GroupTheory.MaximalSubgroupType
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
-public import OddOrder.Peterfalvi.S10_BGInterface
+public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
 # S10_StructureSetup

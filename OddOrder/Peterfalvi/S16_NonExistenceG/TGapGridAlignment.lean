@@ -1,6 +1,11 @@
 module
 
 public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapNonorthogonality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_GridRigidity
+import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi §11.8: T-side grid enumeration alignment

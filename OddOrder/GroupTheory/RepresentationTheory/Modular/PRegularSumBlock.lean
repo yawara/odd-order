@@ -6,8 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.PElementSum
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 
 /-!
 # The block characters of `Ĝ⁰`

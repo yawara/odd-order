@@ -1,7 +1,11 @@
 module
 
 public import OddOrder.Peterfalvi.S15_NuRowPin
-public import OddOrder.Peterfalvi.S15_CaseACoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S15_CaseACoherence
 
 /-!
 # The bundled coherent extension `τ₁T` (Peterfalvi (13.2.d)/(13.3.c) at `T`)

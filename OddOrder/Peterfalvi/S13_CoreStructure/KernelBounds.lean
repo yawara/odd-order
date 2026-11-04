@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S13_MaximalIII_IV
-public import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
-public import OddOrder.Peterfalvi.S07_PivotCoherence
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.Peterfalvi.S13_Lemmas113To115
 
 /-!
 # Peterfalvi Section 13: kernel bounds for the core structure ((11.6))

@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Frobenius-family selected-character estimate (Peterfalvi 7.8.b)

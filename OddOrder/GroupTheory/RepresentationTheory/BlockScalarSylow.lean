@@ -6,9 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.RingTheory.ZMod.UnitsCyclic
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Sylow subgroups at the sharp two-block scalar bound

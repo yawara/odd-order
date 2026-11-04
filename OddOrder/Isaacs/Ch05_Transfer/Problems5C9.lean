@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 
 /-!
 # Isaacs Problem 5C.9 — 非可換単純・偶数位数・`8 ∤ |G|` なら `3 ∣ |G|` (p. 163)

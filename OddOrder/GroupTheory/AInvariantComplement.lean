@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
 
 /-!
 # Invariant Schur–Zassenhaus (complement form)

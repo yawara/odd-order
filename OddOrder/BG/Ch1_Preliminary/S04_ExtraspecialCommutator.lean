@@ -5,7 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+public import OddOrder.GroupTheory.IsExtraspecial
+import Mathlib.Algebra.Module.ZMod
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.GroupTheory.Schreier
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.DedekindDomain.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG §4E — the extraspecial commutator constraint (Lemma 4.15)
@@ -20,7 +32,6 @@ imports this leaf, so downstream imports are unchanged.
 @[expose] public section
 
 namespace OddOrder.BG.Ch1.S04
-open OddOrder.BG.Ch1.S02
 
 
 /-! ## 4E: Lemma 4.15 (extraspecial commutator constraint) (BG mmd L1632)

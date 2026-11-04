@@ -5,14 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Pointwise.Set.Card
-public import Mathlib.LinearAlgebra.Eigenspace.Zero
 public import Mathlib.GroupTheory.RegularWreathProduct
-public import OddOrder.Isaacs.Ch04_Commutators.Main
 public import OddOrder.GroupTheory.ElementaryAbelian
 public import OddOrder.GroupTheory.IsMetacyclic
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.CriticalSubgroup
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.LinearAlgebra.Eigenspace.Zero
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 
 /-!
 # Isaacs §10A — structure of class-generated index-`p` elementary abelian setups (pp. 295-301)

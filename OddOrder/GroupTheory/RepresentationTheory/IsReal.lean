@@ -5,11 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Star.Basic
-public import Mathlib.Algebra.Star.Module
-public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+public import Mathlib.LinearAlgebra.Complex.Module
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Real (self-conjugate) class functions

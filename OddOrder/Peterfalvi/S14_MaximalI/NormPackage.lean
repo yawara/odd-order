@@ -6,6 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S14_MaximalI.RhoMEvaluation
+public import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.Peterfalvi.S09_CertificateDischarge
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
 # Peterfalvi (12.16) — the witness value/norm package and the final contradiction

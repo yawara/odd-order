@@ -1,6 +1,11 @@
 module
 
 public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
 
 /-!
 # Peterfalvi (14.8)-(14.9) — key inequality, T is type II

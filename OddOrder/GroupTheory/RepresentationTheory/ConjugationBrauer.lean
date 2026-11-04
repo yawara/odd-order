@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 
 /-!
 # Brauer's permutation lemma for ambient conjugation

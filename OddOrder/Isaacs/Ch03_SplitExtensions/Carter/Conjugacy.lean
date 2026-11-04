@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
 
 /-!
 # Isaacs Problem 3C.7(b) — Carter 部分群の共役性
@@ -44,7 +48,7 @@ public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
 
 namespace OddOrder.Isaacs.Ch03
 
-open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
+open Pointwise
 
 section /- 3C.7(b): Carter 部分群の共役性 -/
 

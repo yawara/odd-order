@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence
-public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
+public import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 
 /-!
 # Peterfalvi §5 (5.3)(a): the subcoherent `R`-datum producer (`irr_subcoherent`)

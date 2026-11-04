@@ -6,8 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.QuadraticForm.Basic
-public import Mathlib.LinearAlgebra.Basis.Defs
-public import Mathlib.Data.ZMod.Basic
 
 /-!
 # Coordinates of quadratic maps over `𝔽₂`

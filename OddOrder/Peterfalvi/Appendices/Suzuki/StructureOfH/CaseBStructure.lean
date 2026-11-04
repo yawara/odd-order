@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Case (b) of Peterfalvi Part II, Ch. III §1, in its own terms

@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
-public import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs §9C の演習 (書籍 pp. 288-289)

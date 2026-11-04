@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Projectivization.Action
-public import Mathlib.GroupTheory.GroupAction.Iwasawa
-public import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration
+import Mathlib.GroupTheory.GroupAction.Iwasawa
+public import Mathlib.LinearAlgebra.Projectivization.Action -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: `PSL(n,q)` is simple (Thm 8.33)

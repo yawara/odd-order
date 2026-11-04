@@ -5,18 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.Frattini
-public import Mathlib.GroupTheory.SchurZassenhaus
 public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.GroupTheory.Solvable
-public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.Mathlib.Subgroup
-public import OddOrder.Mathlib.SchurZassenhausConj
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+public import Mathlib.GroupTheory.PGroup
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Main
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 
 /-!

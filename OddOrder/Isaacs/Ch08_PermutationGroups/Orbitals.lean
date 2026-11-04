@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Basic
-public import Mathlib.Data.Set.Card
 public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Algebra.Group.Action.Pretransitive
+public import Mathlib.GroupTheory.GroupAction.Defs
+import Mathlib.Data.Set.Card
+import Mathlib.GroupTheory.GroupAction.Basic
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: orbitals (Lem 8.34)

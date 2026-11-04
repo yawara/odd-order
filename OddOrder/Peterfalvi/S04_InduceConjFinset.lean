@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.CoprimeConjugacy
+public import Mathlib.Algebra.Torsor.Defs -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # S04_InduceConjFinset

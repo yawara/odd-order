@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.NormalPSubgroupTrivialAction
-public import OddOrder.Algebra.SubgroupSumBlockAction
-public import OddOrder.GroupTheory.ThreeStepGroup
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.Algebra.SubgroupSum
+import OddOrder.Algebra.NormalPSubgroupTrivialAction
+import OddOrder.Algebra.SubgroupSumBlockAction
+import OddOrder.GroupTheory.ThreeStepGroup
 
 /-!
 # The kernel of the principal block

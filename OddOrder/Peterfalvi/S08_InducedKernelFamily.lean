@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # Peterfalvi (6.1): the induced family `S(X)` for a general kernel, and the (6.6) `X`-set

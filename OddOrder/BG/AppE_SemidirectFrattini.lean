@@ -6,7 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppE_ExponentP
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_FurtherResults
+import OddOrder.GroupTheory.MaxNilpotentNormalHall
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Appendix E, Theorem E.3, Step 4: `B` fixes `R₀`

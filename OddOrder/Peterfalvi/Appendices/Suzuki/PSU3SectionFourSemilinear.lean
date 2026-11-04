@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
-public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: `η` acts semilinearly on `E`

@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 6B.4 — 部分が互いに可換な分割 (書籍 p. 195)

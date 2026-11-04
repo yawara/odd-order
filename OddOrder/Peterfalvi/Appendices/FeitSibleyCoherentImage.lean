@@ -5,12 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
-public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.Peterfalvi.Appendices.FeitSibley
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 
 /-!
 # Peterfalvi Appendix IV: member images under the coherent extension

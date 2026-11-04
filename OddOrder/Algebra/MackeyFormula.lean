@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import OddOrder.Algebra.RelativeTrace
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
 
 /-!
 # Mackey's formula for relative traces

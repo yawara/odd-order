@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.Algebra.Module.Equiv.Basic
 public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 
 /-!

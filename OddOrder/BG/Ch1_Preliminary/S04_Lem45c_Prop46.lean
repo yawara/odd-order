@@ -5,13 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import Mathlib.GroupTheory.Nilpotent
-public import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.GroupTheory.OmegaSubgroup
 public import OddOrder.GroupTheory.NarrowPGroup
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # BG §4B: Lemma 4.5(c) and Proposition 4.6 (normal `E_{p²}` inside a noncyclic normal subgroup)

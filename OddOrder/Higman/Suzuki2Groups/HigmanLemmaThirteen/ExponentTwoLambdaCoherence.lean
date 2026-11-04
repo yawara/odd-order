@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman Lemma 13: quotient-eigenvalue coherence

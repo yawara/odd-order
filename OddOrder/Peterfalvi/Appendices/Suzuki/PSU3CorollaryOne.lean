@@ -5,10 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
+import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
+import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
 
 /-!
 # Peterfalvi Part II, Ch. IV §3, Corollary 1

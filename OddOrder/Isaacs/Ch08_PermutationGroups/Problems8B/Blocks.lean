@@ -5,11 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Blocks
-public import Mathlib.GroupTheory.GroupAction.Primitive
 public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — block と原始性

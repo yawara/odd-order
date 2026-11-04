@@ -5,11 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.SchurZassenhaus
-public import Mathlib.Data.SetLike.Fintype
-public import OddOrder.Isaacs.Ch01_Sylow.Main
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.Data.Rat.Floor
 
 /-!
 # O_π(G): the π-residual / largest normal π-subgroup (definitional skeleton)

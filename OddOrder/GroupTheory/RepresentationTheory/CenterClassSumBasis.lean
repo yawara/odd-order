@@ -5,12 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.MonoidAlgebra.Basic
-public import Mathlib.Algebra.Algebra.Subalgebra.Basic
-public import Mathlib.Algebra.Group.Conj
 public import Mathlib.LinearAlgebra.Basis.Basic
-public import Mathlib.Tactic.Group
 public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The class-sum basis of the centre of a group algebra (general field)

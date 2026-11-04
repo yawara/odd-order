@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
-public import OddOrder.GroupTheory.RepresentationTheory.SubgroupAverageTrace
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
+import OddOrder.GroupTheory.RepresentationTheory.SubgroupAverageTrace
 
 /-!
 # Dickson's theorem: `|G|_p` divides `Φ_φ(1)`

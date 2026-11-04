@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.GlaubermanReplacement
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.GlaubermanReplacement
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Glauberman の `Z(J)`-定理 (Gorenstein Thm 2.10 / 2.11)

@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
-public import OddOrder.GroupTheory.PGroupRelIndex
+public import Mathlib.GroupTheory.Sylow
+import OddOrder.GroupTheory.PGroupRelIndex
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Isaacs Ch. 9 — §9D: Bartels の定理 (9.28) (pp. 290-293)

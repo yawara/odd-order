@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeBSquareEigenNonzero
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeBEigenfamilyCrossCommutator
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeBSquareEigenNonzero
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeBEigenfamilyCrossCommutator
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
 
 /-!
 # Higman's Lemma 13: the cross commutator of two restricted type-B factors

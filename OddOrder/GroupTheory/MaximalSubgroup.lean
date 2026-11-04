@@ -5,12 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Lattice
-public import Mathlib.Algebra.Group.Subgroup.Order
-public import Mathlib.Data.Fintype.Basic
-public import Mathlib.Data.Fintype.EquivFin
-public import Mathlib.Data.Finset.Max
 public import Mathlib.Order.Atoms
+public import Mathlib.Algebra.Group.Subgroup.Map
+public import Mathlib.Basic.Finite.Defs
+import Mathlib.Algebra.Group.Subgroup.Ker
+import Mathlib.Data.Finset.Max
+import Mathlib.Data.Fintype.EquivFin
 
 /-!
 # Maximal subgroup families `ℳ`, `ℳ(H)` and the uniqueness predicate `𝒰`

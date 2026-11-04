@@ -5,9 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_NineElevenSevenEight
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
+public import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S15_NineElevenSevenEight
+import OddOrder.Peterfalvi.S15_NineElevenSteps
+import OddOrder.Peterfalvi.S15_SAndT_Setup.MuColumnPin
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.8) — the `S`-instance caseA coherence endgame and assembly

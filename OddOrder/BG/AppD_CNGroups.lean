@@ -3,11 +3,19 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.BG.AppD_CNGroups.Basic
 public import OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection
 public import OddOrder.BG.AppD_CNGroups.SylowTI
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # BG Appendix D: CN-Groups of Odd Order

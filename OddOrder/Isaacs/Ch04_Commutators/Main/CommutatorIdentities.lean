@@ -1,15 +1,14 @@
 module
 
-public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.Solvable
-public import Mathlib.LinearAlgebra.Dual.Lemmas
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-public import OddOrder.Mathlib.SemidirectProduct
-public import OddOrder.Mathlib.Subgroup
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Module.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.LinearAlgebra.Dual.Lemmas
+import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs §4A (part 1) — commutator identities, coatom lemmas, Lem 4.5/4.6 (pp. 113-122)

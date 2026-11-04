@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Jacobson.Semiprimary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
 /-!
 # Every Brauer character decomposes into irreducible ones

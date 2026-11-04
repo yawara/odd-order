@@ -5,17 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.SimpleModule.Basic
-public import Mathlib.RingTheory.Ideal.Quotient.Operations
-public import Mathlib.Algebra.MonoidAlgebra.Basic
-public import Mathlib.Algebra.GroupWithZero.Units.Fintype
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.Data.Nat.GCD.Basic
-public import Mathlib.Data.Nat.Prime.Factorial
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import OddOrder.GroupTheory.PrimitivePrimeDivisor
+import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.GroupTheory.PrimitivePrimeDivisor
 
 /-!
 # The Singer mechanism: irreducible abelian linear actions realize fields

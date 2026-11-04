@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_SAndTBasic
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 
 /-!
 # S15_Gate3

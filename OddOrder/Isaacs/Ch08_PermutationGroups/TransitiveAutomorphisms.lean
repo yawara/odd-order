@@ -7,6 +7,10 @@ module
 
 public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
 public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: transitive automorphism actions (Lem 8.8)

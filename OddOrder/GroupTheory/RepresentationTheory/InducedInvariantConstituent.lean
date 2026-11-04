@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # The general Peterfalvi (1.7.b): equal-degree induced constituents (abelian inertia quotient)

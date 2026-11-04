@@ -7,7 +7,15 @@ module
 
 public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
 public import OddOrder.Peterfalvi.S12_TypeVSibley
-public import OddOrder.Peterfalvi.S13_SixTwoImageData
+public import OddOrder.Peterfalvi.S07_PivotCoherence
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S13_SixTwoBridge -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S13_SixTwoImageData
 
 /-!
 # S13_Lemmas113To115

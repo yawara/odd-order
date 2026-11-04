@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-public import OddOrder.GroupTheory.TransferInvariantTransversal
 public import OddOrder.GroupTheory.TransferTransitivity
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.TransferInvariantTransversal
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
 
 /-!
 # Peterfalvi Part II, Ch. II, step (12): the transfer contradiction

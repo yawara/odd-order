@@ -5,14 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.Equiv.Basic
-public import Mathlib.Tactic.Abel
-public import Mathlib.Tactic.Module
-public import Mathlib.Algebra.Group.Subgroup.Basic
 public import Mathlib.LinearAlgebra.Matrix.Transvection
 public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
-public import Mathlib.LinearAlgebra.Dimension.Free
+public import Mathlib.GroupTheory.GroupAction.Ring
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 
 /-!
 # Transvections, coordinate-free

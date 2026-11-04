@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Higman Lemma 12: assembling the B/C/D classification

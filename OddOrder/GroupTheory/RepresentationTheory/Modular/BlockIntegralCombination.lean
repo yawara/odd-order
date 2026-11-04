@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
 
 /-!
 # Navarro (3.16): `IBr(B)` is a `ℤ`-combination of `{χ⁰ : χ ∈ Irr(B)}`

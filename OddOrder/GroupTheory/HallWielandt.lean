@@ -7,8 +7,12 @@ module
 
 public import OddOrder.GroupTheory.MackeyTransfer
 public import OddOrder.GroupTheory.WeaklyClosed
-public import OddOrder.GroupTheory.FrattiniPGroup
-public import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
 
 /-!
 # The Hall–Wielandt transfer theorem (odd `p`, abelian weakly closed `A`)

@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 public import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgameSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley endgame (steps (4)–(8))

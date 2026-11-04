@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-public import OddOrder.Isaacs.Ch04_Commutators.Main
 public import OddOrder.GroupTheory.IsExtraspecial
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs Chapter 4 — Problems §4A (Commutators)

@@ -5,18 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.GroupTheory.Coset.Card
 public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.Index
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.SetTheory.Cardinal.NatCard
-public import Mathlib.Order.Setoid.Basic
-public import Mathlib.Tactic.Group
 public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.LinearAlgebra.Span.Defs
+import Mathlib.Order.Hom.CompleteLattice
 
 /-!
 # Auxiliary `Subgroup` lemmas

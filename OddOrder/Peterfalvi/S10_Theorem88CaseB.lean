@@ -7,8 +7,10 @@ module
 
 public import OddOrder.GroupTheory.MaximalSubgroupType
 public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-public import OddOrder.GroupTheory.TISubset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # Peterfalvi Section 10, Theorem (8.8) case (b) and result (8.9)

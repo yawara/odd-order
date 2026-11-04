@@ -1,7 +1,14 @@
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S15_SAndT -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
+import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # Peterfalvi §16 — comparing L and M: opening layer

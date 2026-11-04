@@ -6,8 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.Algebra.Group.Subgroup.Ker
-public import Mathlib.Tactic.Group
+import Mathlib.Tactic.Group
 
 /-!
 # Holomorph `Hol(G) = G ⋊ Aut(G)`

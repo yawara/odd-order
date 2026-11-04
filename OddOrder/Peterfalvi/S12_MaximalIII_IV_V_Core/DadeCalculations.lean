@@ -1,6 +1,9 @@
 module
 
 public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
 
 /-!
 # TAIL

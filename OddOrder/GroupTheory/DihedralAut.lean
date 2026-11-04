@@ -6,11 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.Dihedral
-public import Mathlib.Data.ZMod.Aut
-public import Mathlib.Algebra.Group.End
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.Tactic.Group
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # 二面体群の自己同型群 `Aut(D_{2n})` (`n` 奇数)

@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupIdentification
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.AnisotropicNormForm
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupIdentification
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: `Q` in the unitary coordinates of `PSU(3, q)`

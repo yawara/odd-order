@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Character
-public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The central character of a class sum, read off the character

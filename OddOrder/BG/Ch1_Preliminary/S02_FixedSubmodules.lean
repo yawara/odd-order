@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S02_RepresentationsBasic
 public import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # S02_FixedSubmodules
@@ -19,8 +21,6 @@ Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line l
 
 namespace OddOrder.BG.Ch1.S02
 open scoped Pointwise
-open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
-  baseChangeRepresentation_faithful)
 
 
 /-- A prime divisor of `|G|` makes `G` nontrivial, hence `⊤ : Subgroup G` is

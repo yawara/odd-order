@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 13: commutators into the Frattini square

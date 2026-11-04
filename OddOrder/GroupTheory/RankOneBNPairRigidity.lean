@@ -7,7 +7,8 @@ module
 
 public import OddOrder.GroupTheory.RankOneBNPair
 public import OddOrder.GroupTheory.PrimeComplementResidual
-public import OddOrder.Mathlib.SchurZassenhausConj
+import Mathlib.GroupTheory.Nilpotent
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # The rigidity Lemma of a rank-one split BN-pair

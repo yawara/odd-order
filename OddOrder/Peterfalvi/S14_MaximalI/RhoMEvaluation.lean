@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
-public import OddOrder.Peterfalvi.S14_MaximalI.PairCoherence
-public import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.Peterfalvi.S14_MaximalI.DadeContradiction
+import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
+import OddOrder.Peterfalvi.S14_MaximalI.PairCoherence
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 
 /-!
 # Peterfalvi (12.15), first claim — the `ρ_M`-evaluation `ψ^{ρ_M}(g) = ψ(g)` on `K^#`

@@ -5,11 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Primitive
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 public import Mathlib.GroupTheory.Sylow
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
-public import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
 # 素数次数の置換群 (Isaacs Problems 8C の準備)

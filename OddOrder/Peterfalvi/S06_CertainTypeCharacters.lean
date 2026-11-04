@@ -8,7 +8,13 @@ module
 public import OddOrder.Peterfalvi.S05_SigmaIsometry
 public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi §6 (4.3.b): the certain-type characters

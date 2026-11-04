@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_LemmaC3_ScalarCalculus
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: relations (C.4)--(C.7) and the (C.5) normal forms

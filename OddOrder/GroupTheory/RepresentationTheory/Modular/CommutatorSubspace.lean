@@ -5,11 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.MonoidAlgebra.Basic
-public import Mathlib.Algebra.Group.ConjFinite
-public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-public import Mathlib.Tactic.Group
-public import Mathlib.Tactic.NoncommRing
+public import Mathlib.Algebra.MonoidAlgebra.Module
+import Mathlib.Algebra.MonoidAlgebra.Basic
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NoncommRing
 
 /-!
 # The commutator subspace of a group algebra

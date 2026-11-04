@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: transport of the restricted zeroth layer

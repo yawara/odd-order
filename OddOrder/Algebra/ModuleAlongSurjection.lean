@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Ideal.Quotient.Operations
 public import Mathlib.RingTheory.SimpleModule.Basic
 
 /-!

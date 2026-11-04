@@ -1,7 +1,9 @@
 module
 
-public import OddOrder.FeitThompsonSetup
-public import OddOrder.Peterfalvi.S13_TypeDetermination
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.FeitThompsonSection16Core -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S12_Noncoherence -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S13_TypeDetermination -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # FeitThompsonPairProducer

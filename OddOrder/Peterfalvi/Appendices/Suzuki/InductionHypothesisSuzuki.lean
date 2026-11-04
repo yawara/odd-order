@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
 /-!
 # Peterfalvi Part II, Chapter I §3, Lemma 1 — the `Sz(q)` target

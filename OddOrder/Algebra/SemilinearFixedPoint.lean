@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.Algebra.Algebra.ZMod
 public import OddOrder.Algebra.FixedPointsGalois
+import Mathlib.Algebra.Algebra.ZMod
+import Mathlib.FieldTheory.Finite.Basic
 
 /-!
 # Automorphisms of a finite field are Frobenius powers

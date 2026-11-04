@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.SemidirectProduct
 
 /-!

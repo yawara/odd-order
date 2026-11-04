@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.ProblemsStabilityGroup
+public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 
 /-!
 # Isaacs Chapter 4 — Problems 4D (coprime action)

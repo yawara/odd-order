@@ -5,12 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.Algebra.Module.ZMod
 public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-public import OddOrder.Mathlib.Subgroup
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # `φ`-invariant subgroups as subrepresentations of `elabRepresentation`

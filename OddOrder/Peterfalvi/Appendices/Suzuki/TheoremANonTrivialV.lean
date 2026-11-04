@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.TheoremB
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.TheoremB
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
 
 /-!
 # Peterfalvi Part II, Ch. III §1: hypothesis (C1), and Theorem A for `V ≠ 1`

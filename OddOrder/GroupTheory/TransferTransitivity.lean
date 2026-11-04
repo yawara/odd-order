@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Abelianization.Defs
-public import Mathlib.GroupTheory.PGroup
 public import Mathlib.GroupTheory.Transfer
 
 /-!

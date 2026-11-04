@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 
 /-!
 # The `p`-sections partition the conjugacy classes

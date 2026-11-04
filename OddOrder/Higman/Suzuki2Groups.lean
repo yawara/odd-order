@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
@@ -40,6 +40,10 @@ public import OddOrder.Higman.Suzuki2Groups.Classification
 public import OddOrder.Higman.Suzuki2Groups.ExponentFour
 public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 public import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Higman: Suzuki 2-groups

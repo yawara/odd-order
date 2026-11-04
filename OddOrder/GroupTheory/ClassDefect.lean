@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # The `p`-defect of a conjugacy class

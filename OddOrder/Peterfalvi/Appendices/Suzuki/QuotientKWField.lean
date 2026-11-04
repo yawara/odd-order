@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
-public import OddOrder.Peterfalvi.Appendices.SemilinearField
 public import OddOrder.Algebra.QuadraticFrobenius
+public import Mathlib.GroupTheory.NoncommCoprod
+public import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. III §3: the field `E = 𝐅_{q²}` on `S ⧸ Q₀`

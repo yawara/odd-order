@@ -7,14 +7,9 @@ module
 
 public import OddOrder.GroupTheory.ElementaryAbelian
 public import Mathlib.GroupTheory.Frattini
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
-public import Mathlib.GroupTheory.Subgroup.Center
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.Algebra.Group.Commutator
-public import Mathlib.Algebra.Group.Subgroup.Order
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Frattini Subgroup of a finite p-group

@@ -5,15 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
-public import OddOrder.Peterfalvi.S05_SigmaIsometry
-public import OddOrder.Peterfalvi.S06_CertainTypeClifford
-public import OddOrder.Peterfalvi.S06_CertainTypeSupport
-public import OddOrder.Peterfalvi.S07_Coherence
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import OddOrder.Peterfalvi.S07_Coherence.DifferenceImage
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S06_CertainTypeSupport -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # Prime-TI residue characters (Peterfalvi (4.5), Feit–Thompson (13.2–13.3))

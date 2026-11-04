@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.PRank
-public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.Algebra.Group.Action.End
+public import Mathlib.Data.ZMod.Defs
+public import Mathlib.GroupTheory.GroupAction.Hom
+public import Mathlib.GroupTheory.QuotientGroup.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.RepresentationTheory.Basic -- shake: keep (used only in an `example`)
+import OddOrder.GroupTheory.PRank -- shake: keep (used only in an `example`)
 
 /-!
 # `ZMod n`-modules with a group action: the missing `SMulCommClass`

@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.TensorProduct.Basis
-public import Mathlib.RingTheory.TensorProduct.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Logic.Equiv.PartialEquiv
+import Mathlib.Tactic.Continuity.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # A lattice recovers its ambient space after base change

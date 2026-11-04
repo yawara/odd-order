@@ -7,7 +7,12 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 
 /-!
 # Navarro (5.10): the `B`-parts inherit vanishing on a `p`-section

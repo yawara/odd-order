@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.LinearAlgebra.Matrix.Action
+import Mathlib.Algebra.Field.IsField
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Matrix.Basic
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 
 /-!
 # Isaacs Problems 6A.2 / 6A.3 の共通土台 — モノミアル行列による Frobenius complement

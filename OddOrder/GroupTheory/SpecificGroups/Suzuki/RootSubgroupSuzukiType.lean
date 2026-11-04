@@ -6,9 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
-public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
-public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.GroupTheory.Sylow
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 
 /-!
 # The standard Suzuki root as a Sylow subgroup and a Suzuki 2-group

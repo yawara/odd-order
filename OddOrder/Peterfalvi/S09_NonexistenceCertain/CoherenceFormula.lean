@@ -1,6 +1,7 @@
 module
 
 public import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # TAIL

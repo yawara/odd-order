@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.InvolutionRecognition
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs FGT Ch.6 — Theorem 6.12, the enlargement steps (pp. 192-193)
@@ -24,8 +28,6 @@ are unchanged.
 
 namespace OddOrder.Isaacs.Ch06
 
-
-open OddOrder.GroupTheory
 
 
 /-! ### The first enlargement step in Theorem 6.12 -/

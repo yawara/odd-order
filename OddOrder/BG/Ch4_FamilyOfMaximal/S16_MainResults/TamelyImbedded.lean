@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
 
 /-! # BG §16, Remark after Theorem II: tamely imbedded subsets
 

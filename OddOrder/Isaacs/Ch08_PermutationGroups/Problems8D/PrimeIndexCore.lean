@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.PGroup
 public import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # 指数が素数の部分群の `p`-元は核に入る (Isaacs Problem 8D.6 の Hint)

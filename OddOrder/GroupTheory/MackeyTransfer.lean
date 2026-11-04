@@ -7,7 +7,7 @@ module
 
 public import Mathlib.GroupTheory.Transfer
 public import Mathlib.GroupTheory.DoubleCoset
-public import OddOrder.GroupTheory.TransferTransitivity
+import OddOrder.GroupTheory.TransferTransitivity
 
 /-!
 # Mackey transfer (Isaacs Thm 10.10)

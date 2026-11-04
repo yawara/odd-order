@@ -7,10 +7,11 @@ module
 
 public import Mathlib.RepresentationTheory.Irreducible
 public import OddOrder.GroupTheory.Homocyclic
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # Higman Lemma 1: successive Agemo layers

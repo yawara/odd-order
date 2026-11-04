@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.ZMod.Units
-public import Mathlib.GroupTheory.Perm.Cycle.Type
-public import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.GroupTheory.Perm.Cycle.Type
+import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
 
 /-!
 # Isaacs Problem 7A.6 — 一般四元数群の自己同型群の奇素因数

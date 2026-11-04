@@ -5,10 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
-public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.Higman.Suzuki2Groups.Classification
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
 
 /-!
 # The two `K`-subgroups of `S` of order `q²`

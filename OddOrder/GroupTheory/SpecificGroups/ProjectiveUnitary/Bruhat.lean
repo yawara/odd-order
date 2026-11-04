@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Bruhat decomposition for the standard projective unitary group

@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.SupportedSpanOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.SupportedSpanOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi Section 3, result (1.3)

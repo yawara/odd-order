@@ -5,9 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_TypeIIColumnPin
 public import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
 public import OddOrder.Peterfalvi.S13_Section16PairData
+public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Peterfalvi.S12_TypeIIColumnPin
 
 /-!
 # Peterfalvi (8.8)/(10.7): the σ-agreement bridge for the type-P pair grid transpose

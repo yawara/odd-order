@@ -5,10 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.FiniteAbelian.Basic
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import OddOrder.GroupTheory.FrattiniPGroup
 public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.FiniteAbelian.Basic
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # Homocyclic finite abelian 2-groups

@@ -5,7 +5,24 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
+public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3BarOrbit
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3ModelTwistOdd
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: the Proposition, and Corollary 1, off the model

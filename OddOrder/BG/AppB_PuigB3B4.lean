@@ -6,8 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppB_Puig
-public import OddOrder.BG.AppA_PStability
-public import Mathlib.GroupTheory.GroupAction.ConjAct
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.BG.AppA_PStability
 
 /-!
 # BG Appendix B: Lemma B.3 + Theorem B.4 (Puig, = Thm 6.2 代替)

@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
-public import OddOrder.Mathlib.SemidirectProduct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+public import Mathlib.GroupTheory.SemidirectProduct -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs §3F: cyclic quotient extensions (pp. 105-112)

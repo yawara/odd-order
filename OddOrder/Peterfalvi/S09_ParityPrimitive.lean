@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # Peterfalvi (7.9) parity primitive — real virtual characters over a group of odd order

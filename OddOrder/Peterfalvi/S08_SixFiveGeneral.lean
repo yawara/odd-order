@@ -6,9 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
-public import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.GroupTheory.NilpotentAbelianization
+public import OddOrder.GroupTheory.ChiefFactor
+import OddOrder.GroupTheory.NilpotentAbelianization
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Peterfalvi (6.5) for a general kernel: the (6.3.b) coherence input

@@ -1,6 +1,10 @@
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
+public import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
 
 /-!
 # Peterfalvi (5.6.1) — the character family bundle

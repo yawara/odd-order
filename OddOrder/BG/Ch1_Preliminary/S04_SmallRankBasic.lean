@@ -5,26 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.IndexNormal
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.Index
-public import Mathlib.SetTheory.Cardinal.NatCard
-public import Mathlib.Data.Nat.Choose.Dvd
-public import Mathlib.Data.Nat.Factorization.Basic
-public import Mathlib.Algebra.Module.ZMod
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
-public import OddOrder.BG.Ch1_Preliminary.S02_Representations
-public import OddOrder.GroupTheory.CriticalSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.GroupTheory.FrattiniPGroup
-public import OddOrder.GroupTheory.IsExtraspecial
 public import OddOrder.GroupTheory.IsMetacyclic
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.SCN
-public import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # S04_SmallRankBasic
@@ -90,8 +84,6 @@ Lemma 4.17 の本体は `S04_PGroupsSmallRank`、Cor 4.19 は `S04g_Cor419` に�
 
 
 namespace OddOrder.BG.Ch1.S04
-
-open OddOrder.BG.Ch1.S02
 
 
 /-! ## §4B: existence of elementary abelian `E_{p²}` subgroups (Lemma 4.5(a))

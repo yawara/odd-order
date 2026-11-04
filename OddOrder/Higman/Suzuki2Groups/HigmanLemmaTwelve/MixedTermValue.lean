@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
+public import Mathlib.Algebra.Module.ZMod -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Higman Lemma 12: the mixed-term value (functional-equation core)

@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problem 6B.3 — Thm 6.21 の coprime 仮定は落とせない (書籍 p. 195)

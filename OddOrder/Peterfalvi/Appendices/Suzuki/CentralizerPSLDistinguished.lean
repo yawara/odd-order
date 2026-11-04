@@ -5,9 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+import OddOrder.GroupTheory.SylowTransport
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the distinguished PSL pair

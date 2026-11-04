@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 
 /-!
 # Navarro (5.8) for the ordinary irreducibles

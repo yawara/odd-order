@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleDiagonalAxis
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleBaseChangeJacobi
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleDiagonalAxis
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleSupport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleBaseChangeJacobi
 
 /-!
 # Higman's Lemma 13: vanishing of type-B diagonal middle brackets

@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanMaximalNormalAbelian
 
 /-!
 # Higman's Lemma 13: the ξ-length-four reduction

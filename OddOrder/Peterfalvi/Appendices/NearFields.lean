@@ -5,17 +5,25 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki
-public import OddOrder.Peterfalvi.Appendices.SemilinearField
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-public import OddOrder.GroupTheory.ElementaryAbelian
 public import OddOrder.Peterfalvi.Appendices.NearFieldClass
-public import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
-public import OddOrder.GroupTheory.SolvableTwoTransitive
-public import OddOrder.GroupTheory.BrauerSuzuki
 -- Re-export Proposition 1 (split out to `RankOneAffineModel.lean` for the file-length limit) so
 -- downstream importers of `NearFields` still see `RankOneHypothesis` / `rankOne_affine_nearField`.
-public import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.FieldTheory.Fixed
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RepresentationTheory.Submodule
+import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.Henselian -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.RelativeTrace
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Peterfalvi Appendix II: On Near-Fields

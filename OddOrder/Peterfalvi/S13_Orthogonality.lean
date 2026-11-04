@@ -5,12 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S13_CoreStructure
-public import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
-public import OddOrder.Peterfalvi.S11_NineElevenCaseA
-public import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
-public import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
-public import OddOrder.Peterfalvi.S07_BridgeCoherent
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
+public import OddOrder.Peterfalvi.S12_Section9Counts
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_BridgeCoherent
+import OddOrder.Peterfalvi.S09_Building78C
+import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.Peterfalvi.S12_MaximalTypesSetup
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_MaximalIII_IV
 
 /-!
 # Peterfalvi Section 13: the (11.8.6) orthogonality endpoint — unconditional `𝒮(H₀C)` coherence

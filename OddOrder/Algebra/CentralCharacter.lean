@@ -5,8 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Matrix.Basis
-public import Mathlib.Algebra.Ring.Subring.Basic
 public import OddOrder.Algebra.PiMatrixSimpleModules
 
 /-!

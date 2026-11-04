@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.10 (中心の指数が小さい `p`-群の導来部分群)

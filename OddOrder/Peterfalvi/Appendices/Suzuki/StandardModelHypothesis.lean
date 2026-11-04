@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The standard `PSU(3, ℓ)` model satisfies Peterfalvi's hypothesis

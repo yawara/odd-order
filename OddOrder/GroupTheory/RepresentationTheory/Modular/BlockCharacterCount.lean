@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BlockPartitionedMatrix
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.BlockPartitionedMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 
 /-!
 # Navarro (5.12): `k(B) = ∑_i ∑_{b^G = B} l(b)`

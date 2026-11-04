@@ -6,10 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
 public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs Ch. 9 — §9C: Thompson–Wielandt (Theorems 9.23/9.24), pp. 285–288

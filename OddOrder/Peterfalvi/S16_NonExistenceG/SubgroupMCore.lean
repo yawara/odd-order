@@ -1,9 +1,19 @@
 module
 
-public import OddOrder.Peterfalvi.S16_PairingBessel
-public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
 public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
-public import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
+public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_ComplementStructure
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndT
+public import OddOrder.Peterfalvi.S16_GridExpansion -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequality
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
+import OddOrder.Peterfalvi.S16_PairingBessel
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (14.10)-(14.11) — the `M`-carrier and the norm-cascade/parity groundwork

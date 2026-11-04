@@ -6,9 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
-public import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
-public import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman Lemma 7: abelian normal covers

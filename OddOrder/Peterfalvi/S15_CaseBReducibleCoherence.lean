@@ -6,6 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_SSetMemberRFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S08_CoherenceWeighted
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi §9/§13 — caseB coherence and the (5.6) pair bound of the honest `S`-instance family

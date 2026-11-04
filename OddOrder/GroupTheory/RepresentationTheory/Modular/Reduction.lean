@@ -5,11 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.LocalRing.Module
-public import Mathlib.LinearAlgebra.TensorProduct.Tower
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 public import OddOrder.Algebra.AugmentationIdeal
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.Algebra.EigenspaceDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 
 /-!
 # Reduction of an `𝒪`-lattice modulo the maximal ideal

@@ -6,6 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
+public import OddOrder.Peterfalvi.S11_NineElevenSetup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_Subcoherent
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11.2): the TI-witness `U₁ ∩ U₁^w = C` for `w ∈ W₁^#`

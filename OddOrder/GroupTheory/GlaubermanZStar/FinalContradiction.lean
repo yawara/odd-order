@@ -5,11 +5,24 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.GlaubermanZStar.CharacterCore
-public import OddOrder.GroupTheory.GlaubermanZStar.CharacterIdentity
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+public import Mathlib.FieldTheory.PurelyInseparable.Basic
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import OddOrder.GroupTheory.GlaubermanZStar.Fusion
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Valuation.LocalSubring
+import OddOrder.GroupTheory.GlaubermanZStar.CharacterCore
+import OddOrder.GroupTheory.GlaubermanZStar.CharacterIdentity
+import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
 
 /-!
 # Glauberman's `Z*`-theorem: Step 9 and the final contradiction

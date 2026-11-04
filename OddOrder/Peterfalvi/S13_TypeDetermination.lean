@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_Noncoherence
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+public import OddOrder.Peterfalvi.S13_Section16PairData
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_Orthogonality
 
 /-!
 # S13_TypeDetermination — Peterfalvi (13.2.a) and the κ-ordered maximal pair

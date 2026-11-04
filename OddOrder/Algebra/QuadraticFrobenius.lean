@@ -6,11 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.FixedPointsGalois
-public import OddOrder.Algebra.PowSubOneDvd
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
-public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.FieldTheory.Perfect
-public import Mathlib.Algebra.CharP.Subring
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.PowSubOneDvd
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # The `q`-power Frobenius of a field of order `q²`

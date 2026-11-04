@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.SemilinearFixedPoint
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import Mathlib.GroupTheory.PGroup
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Algebra.Ring.Aut
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.PGroup
+import OddOrder.Algebra.SemilinearFixedPoint
+import OddOrder.GroupTheory.FreeActionOrbitCount
 
 /-!
 # A fixed point on a free orbit, from Hilbert 90

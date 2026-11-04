@@ -6,8 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Sylow
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-public import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 点安定化群・正規部分群の軌道

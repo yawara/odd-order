@@ -1,6 +1,22 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.QuadraticTerm
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.Peterfalvi.S09_CertificateDischarge
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+import OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
 # Peterfalvi (12.13)-(12.17) + (8.8) case-(b) dichotomy
@@ -1431,17 +1447,3 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (inner_self_induce_eq_one_of_frobeniusGroup hC (θ 0) hθ0_ne) a ha hsmall
 
 end OddOrder.Peterfalvi.S14
-
-#print axioms OddOrder.Peterfalvi.S14.frobenius_typeI_induced_char_constituents
-#print axioms OddOrder.Peterfalvi.S14.fixed_conjClass_eq_one_of_typeF
-#print axioms OddOrder.Peterfalvi.S14.coherent_extension_mem_span_imageFamily
-#print axioms OddOrder.Peterfalvi.S14.coherent_extension_constituent_mem_span_Rset
-#print axioms OddOrder.Peterfalvi.S14.constituent_diffImage_inner_zero_of_disjoint
--- `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` transitively cites
--- `nonconjugate_typeI_R_orthogonal` (12.3).  The (12.3) bar-trick descent
--- (`constituent_diffImage_inner_zero_of_disjoint`, axiom-clean, 2026-07-03) closed the geometric
--- obligation `nonconjugate_diffImage_inner_zero`; the rest of its chain runs through the §10
--- (8.18.c)/(8.15) support pins and the (12.2.a) constituent obligation
--- `typeI_induced_char_constituents` ((8.2.c)).  Those were `sorry`-stated when this block was
--- written and have since been proved, so the exclusion below is now only historical.
-

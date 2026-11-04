@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Induction of class functions as a sum over cosets (division-free)

@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Gorenstein Lemma 7.7: class functions whose values are divisible by `|G|`

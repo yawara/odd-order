@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
 /-!
 # The `KW`-orbits of `Q/Q₀`

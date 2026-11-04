@@ -1,17 +1,15 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI
-public import OddOrder.Peterfalvi.S07_Subcoherent
-public import OddOrder.Peterfalvi.S10_CoherenceWiring
-public import OddOrder.Peterfalvi.S09_CertificateDischarge
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
-public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-public import OddOrder.GroupTheory.WielandtFixedPoint
-public import OddOrder.Algebra.GaloisRationalInteger
-public import OddOrder.GroupTheory.TISubsetCounting
-public import Mathlib.Algebra.BigOperators.ModEq
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S10_BGInterface
+public import OddOrder.Peterfalvi.S10_TypePSupport -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S12_Noncoherence
+public import OddOrder.Peterfalvi.S13_NonGaloisExclusion -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 
 /-!
 # SubcoherenceInputs

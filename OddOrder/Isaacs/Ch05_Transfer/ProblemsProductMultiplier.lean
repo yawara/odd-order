@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CentralCommutatorPower
 public import OddOrder.GroupTheory.CentralProduct
 public import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CentralCommutatorPower
 
 /-!
 # Isaacs Problem 5A.8(b) — 互いに素な直積の Schur 乗数

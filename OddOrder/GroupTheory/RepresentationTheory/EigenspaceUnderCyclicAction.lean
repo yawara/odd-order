@@ -5,15 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dimension.Finrank
 public import Mathlib.LinearAlgebra.Eigenspace.Basic
-public import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
-public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
-public import Mathlib.LinearAlgebra.Span.Basic
-public import Mathlib.Algebra.DirectSum.Module
-public import Mathlib.Algebra.Polynomial.RingDivision
-public import Mathlib.FieldTheory.KummerExtension
 public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.FieldTheory.KummerExtension
 
 /-!
 # Eigenspaces under a Cyclic Action

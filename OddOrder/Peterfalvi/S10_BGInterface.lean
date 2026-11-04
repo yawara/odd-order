@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.MaximalSubgroupType
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
 
 /-!
 # Peterfalvi §10 ↔ BG §16 interface (shared-notation consumption layer)

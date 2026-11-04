@@ -1,6 +1,29 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma138
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.MsigmaNilpotent
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Assembly
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # TAIL

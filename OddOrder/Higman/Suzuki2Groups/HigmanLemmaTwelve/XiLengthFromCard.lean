@@ -6,13 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
-public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import OddOrder.Algebra.PowSubOneDvd
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.PowSubOneDvd
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # ξ-length from the group order: the counting half

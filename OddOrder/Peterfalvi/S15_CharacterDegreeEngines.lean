@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+public import OddOrder.Peterfalvi.S15_Tau1T
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S15_CaseACoherence
 
 /-!
 # Peterfalvi §13 (pp. 75-86) — the `T`-side chosen-base (7.6) datum and distinguished index

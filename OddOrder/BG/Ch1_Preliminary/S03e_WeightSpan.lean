@@ -1,10 +1,12 @@
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-public import Mathlib.LinearAlgebra.Semisimple
-public import Mathlib.LinearAlgebra.Eigenspace.Semisimple
-public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-public import Mathlib.FieldTheory.Separable
+public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35Prelim
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.Eigenspace.Pi
+import Mathlib.LinearAlgebra.Eigenspace.Semisimple
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Weight spaces span the whole space (abelian kernel, algebraically closed field)

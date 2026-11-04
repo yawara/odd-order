@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+public import Mathlib.GroupTheory.Sylow
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 
 /-!
 # Isaacs Problems 1E (pp. 37–38) — Sylow 計数の道具立てと 1E.1–1E.5

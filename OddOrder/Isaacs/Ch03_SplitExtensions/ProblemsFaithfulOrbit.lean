@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Main
 public import OddOrder.Mathlib.SemidirectProduct
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch01_Sylow.Main
 
 /-!
 # Isaacs Chapter 3 — Problem 3A.6 (忠実な軌道の存在)

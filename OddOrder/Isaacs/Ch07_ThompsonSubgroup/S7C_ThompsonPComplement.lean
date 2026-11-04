@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.7 — §7C Thompson normal p-complement (pp. 215–219)

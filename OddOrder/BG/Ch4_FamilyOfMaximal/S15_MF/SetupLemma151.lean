@@ -1,11 +1,29 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
-public import OddOrder.Mathlib.Subgroup
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 
 /-!
 # BG §15 notation + Lemma 15.1 (U M_sigma auxiliary structure)

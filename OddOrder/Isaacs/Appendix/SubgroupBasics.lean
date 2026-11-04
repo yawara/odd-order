@@ -5,14 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Appendix.DirectDiamond
-public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 public import Mathlib.GroupTheory.Frattini
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Data.Set.Card
-public import Mathlib.Order.SupIndep
-public import Mathlib.Data.Finset.Lattice.Fold
-public import Mathlib.Data.Finset.Max
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Isaacs, *Finite Group Theory*, Appendix — elementary subgroup facts

@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Bruhat coordinates for the projective unitary group

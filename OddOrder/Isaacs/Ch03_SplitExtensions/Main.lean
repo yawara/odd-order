@@ -5,11 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.CrossedHomomorphism
-public import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
-public import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
-public import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.Mathlib.Subgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
 
 /-!
 # TAIL
@@ -19,7 +22,6 @@ Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, 
 @[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
-open SemidirectProduct
 open scoped Pointwise
 
 section /- 3D: π-separable + Hall-Higman (pp. 89-95) -/

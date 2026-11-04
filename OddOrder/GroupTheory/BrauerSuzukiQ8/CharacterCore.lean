@@ -5,14 +5,38 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
-public import OddOrder.GroupTheory.CentralInvolutionNormalComplement
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDegreeOdd
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.FieldTheory.PurelyInseparable.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.RootsOfUnity.Minpoly
+import Mathlib.RingTheory.Valuation.LocalSubring
+import OddOrder.Algebra.BrauerSuzukiEndgame
+import OddOrder.Algebra.GroupAlgebraBlocks
+import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
+import OddOrder.GroupTheory.CentralInvolutionNormalComplement
+import OddOrder.GroupTheory.CentralSylowComplement
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDegreeOdd
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
+import OddOrder.GroupTheory.UniqueInvolutionSylow
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the character-theoretic core (Navarro pp. 139–146)

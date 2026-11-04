@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
+import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
 
 /-!
 # Peterfalvi §13 (pp. 81–83) — the `T`-side `η₁₀` correction supply

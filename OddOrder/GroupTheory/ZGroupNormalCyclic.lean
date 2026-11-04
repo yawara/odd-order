@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-public import OddOrder.GroupTheory.PiElementDecomposition
 public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.PiElementDecomposition
 
 /-!
 # Elements killed by the order of a cyclic normal subgroup of a `Z`-group

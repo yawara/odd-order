@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyCoherentImage
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.Peterfalvi.Appendices.FeitSibleyCoherentImage
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
 
 /-!
 # Peterfalvi Part II, Ch. III, Theorem C: `Q` is a `2`-group

@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_NormSet
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import OddOrder.BG.AppC_NormSetBasic
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.RepresentationTheory.Basic
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # Galois-field models for faithful conjugation actions

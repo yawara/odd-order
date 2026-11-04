@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.Dihedral
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
+public import Mathlib.GroupTheory.GroupAction.Primitive
+import Mathlib.Data.Rat.Floor
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problem 8B.6 (p. 249) の結論 — `G ≅ D₂ₚ`

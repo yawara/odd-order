@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Algebra.Ring.Equiv
+public import Mathlib.Algebra.Group.Subgroup.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.Index
 
 /-!
 # An endomorphism fixing more than half the points is the identity

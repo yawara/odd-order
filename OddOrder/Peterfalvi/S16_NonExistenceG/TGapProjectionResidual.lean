@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
+public import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentProjectionRigidity
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjection
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeIICoherence
 
 /-!
 # Peterfalvi (11.9)(a): nonzero T-side eta-projection residual

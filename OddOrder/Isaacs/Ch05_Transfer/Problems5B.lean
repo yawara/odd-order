@@ -5,11 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.Group
-public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.GroupTheory.Transfer
-public import Mathlib.GroupTheory.Abelianization.Defs
-public import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.GroupTheory.Transfer
+import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
 
 /-!
 # Isaacs Chapter 5 — Problems 5B (transfer evaluation / Dietzmann)

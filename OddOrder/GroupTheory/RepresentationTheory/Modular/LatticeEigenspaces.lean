@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.EigenspaceDecomposition
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+public import OddOrder.Algebra.LagrangeInterpolationRing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+import Mathlib.RingTheory.Flat.TorsionFree
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+import OddOrder.Algebra.EigenspaceDecomposition
 
 /-!
 # Eigen-decomposition over the coefficient ring of a `p`-modular system

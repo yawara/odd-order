@@ -6,6 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # BG §5: Narrow `p`-Groups — Theorem 5.3 / Corollary 5.4

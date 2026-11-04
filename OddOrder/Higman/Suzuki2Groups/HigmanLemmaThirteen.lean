@@ -1,4 +1,4 @@
-module
+module -- shake: keep-all
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
@@ -119,3 +119,4 @@ public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourDescen
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourContradiction
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourProperDescent
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthBound
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset

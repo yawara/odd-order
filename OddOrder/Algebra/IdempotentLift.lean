@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RingTheory.Henselian
-public import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # Lifting idempotents along a Henselian ideal

@@ -6,12 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.Quaternion
-public import Mathlib.GroupTheory.Index
-public import Mathlib.GroupTheory.OrderOfElement
 public import Mathlib.Tactic.Group
-public import Mathlib.Tactic.Linarith
-public import Mathlib.Tactic.Positivity
-public import Mathlib.Tactic.Ring
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # 一般化四元数群の認識 (recognition)

@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Brauer–Suzuki: the generalized quaternion Sylow setup (Gorenstein Ch. 12, p. 373)

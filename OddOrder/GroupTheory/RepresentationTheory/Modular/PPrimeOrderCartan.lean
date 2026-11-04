@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.FieldTheory.PurelyInseparable.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 
 /-!
 # The Cartan matrix of a `p'`-group is the identity

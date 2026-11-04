@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_SixTwoGeneral
 public import OddOrder.Peterfalvi.S08_GeneralAdjoin
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 /-!
 # Peterfalvi (6.2)/(6.3) from the Hypothesis (5.2) image families — the oracle-free book form

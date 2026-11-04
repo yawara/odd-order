@@ -5,11 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.AugmentationIdeal
-public import OddOrder.GroupTheory.PRegularElementCount
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
-public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.PRegularElementCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # A character of the principal block does not vanish on all `p`-singular elements

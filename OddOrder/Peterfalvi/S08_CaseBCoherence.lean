@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §8: Case (B) coherence (`X ∪ Y` is coherent in case (B))

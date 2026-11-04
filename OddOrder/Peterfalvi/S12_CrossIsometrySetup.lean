@@ -6,9 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
-public import OddOrder.Peterfalvi.S09_CrossOrthogonality
-public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
 
 /-!
 # Peterfalvi §12 — the type-II cross-isometry pair: opening layer

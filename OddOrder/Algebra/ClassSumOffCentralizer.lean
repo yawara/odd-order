@@ -6,9 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.BlockIdempotent
-public import OddOrder.Algebra.NormalPSubgroupTrivialAction
-public import OddOrder.Algebra.PGroupOrbitSum
 public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.NormalPSubgroupTrivialAction
+import OddOrder.Algebra.PGroupOrbitSum
 
 /-!
 # Class sums that miss `C_G(O_p(G))` are killed by every central character

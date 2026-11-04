@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
-public import OddOrder.Peterfalvi.Appendices.NearFields
+public import OddOrder.Algebra.RelativeTrace
+public import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II, Ch. II, step (2): the rank-one centralizer quotient

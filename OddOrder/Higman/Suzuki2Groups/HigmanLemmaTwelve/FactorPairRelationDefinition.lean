@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+public import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
 
 /-!
 # Higman's Lemma 12: normalized factor-pair relations

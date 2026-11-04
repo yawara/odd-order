@@ -6,8 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SpecificGroups.Dihedral
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Isaacs Chapter 2 — Problems §2B: involution と二面体群 (p. 57)

@@ -5,11 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorScalarBridge
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaCoherence
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaPrimitivity
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseMixedTermSupport
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorAmbientEigenvectors
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorScalarBridge
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaCoherence
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaPrimitivity
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseMixedTermSupport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
 
 /-!
 # Higman Lemma 13: aligned cancellation across two pairwise joins

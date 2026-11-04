@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Basis.VectorSpace
-public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
-public import Mathlib.RingTheory.Localization.Integer
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
 # The irreducible Brauer characters are a basis of the `p`-regular class functions

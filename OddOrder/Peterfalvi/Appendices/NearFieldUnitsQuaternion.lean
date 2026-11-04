@@ -6,8 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.NearFieldClass
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
 # Units of the near-field of order 9 are quaternion

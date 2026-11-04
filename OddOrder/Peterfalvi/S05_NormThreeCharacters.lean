@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S05_NormThree
+public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import Mathlib.Analysis.CStarAlgebra.Classes
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_NormThree
 
 /-!
 # Peterfalvi §5 — norm-`3` virtual characters and the signed-triple-grid statement

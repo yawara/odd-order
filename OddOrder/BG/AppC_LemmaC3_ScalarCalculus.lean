@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_LemmaC3_ConjugateLine
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: the scalar calculus `s^x` and the words `M₁, M₂, M₃`

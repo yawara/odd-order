@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Jordan
-public import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
+public import Mathlib.GroupTheory.GroupAction.Primitive
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.GroupTheory.GroupAction.Jordan
+import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: Bochert's theorem (Thm 8.26)

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.TensorProduct.Basis
-public import Mathlib.RingTheory.TensorProduct.Basic
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.LinearAlgebra.FreeModule.Basic
+public import Mathlib.LinearAlgebra.TensorProduct.Tower
+import Mathlib.LinearAlgebra.TensorProduct.Basis
 
 /-!
 # Scalars descend along base change on a free module

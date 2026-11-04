@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_CertificateDischarge
+public import OddOrder.Peterfalvi.S09_Building78C
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (7.6) for a Frobenius family — the induced-family coherent datum

@@ -1,15 +1,23 @@
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-public import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
-public import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
-public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
-public import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
-public import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
-public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 public import OddOrder.GroupTheory.ZGroup
+public import OddOrder.GroupTheory.IsExtraspecial
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S02_Representations
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+import OddOrder.BG.Ch1_Preliminary.S03e_Thm35Prelim
+import OddOrder.BG.Ch1_Preliminary.S03f_OrbitParity
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG §3: Theorem 3.6 — the (3.29)–(3.38) endgame
@@ -43,7 +51,7 @@ IH-free, so the induction lives entirely in `S03f_Thm36.thm36_aux`, which ends b
 namespace OddOrder.BG.Ch1.S03f
 
 open scoped commutatorElement Pointwise IsMulCommutative
-open OddOrder.GroupTheory OddOrder.Isaacs.Ch04 OddOrder.BG.Ch1.OperatorQuotientAction
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch04
 
 set_option maxHeartbeats 2400000 in
 -- the `IsMulCommutative` scoped instances (priority 50) cycle with `CommMagma.to_isCommutative`;

@@ -6,8 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.DoubleCoset
-public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Peterfalvi Part II, Ch. I §3: the order-three rank-one subgroup

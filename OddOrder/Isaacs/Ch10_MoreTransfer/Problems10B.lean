@@ -6,13 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.IsMetacyclic
-public import OddOrder.GroupTheory.MaschkeComplement
-public import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 public import Mathlib.Data.ZMod.Units
-public import Mathlib.Data.Nat.Totient
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.Algebra.Field.ZMod
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.ElementaryAbelianLinear
+import OddOrder.GroupTheory.MaschkeComplement
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 
 /-!
 # Isaacs, Finite Group Theory — Problems 10B (書籍 p. 312)

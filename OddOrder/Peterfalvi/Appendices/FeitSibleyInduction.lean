@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (1) chief-factor induction support (pp. 146–147)

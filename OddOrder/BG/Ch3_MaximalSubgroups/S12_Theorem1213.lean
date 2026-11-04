@@ -5,11 +5,28 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
-public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+public import OddOrder.GroupTheory.IsExtraspecial
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # BG §12: Theorem 12.13 — every nonabelian `p`-subgroup of `G` lies in `𝒰`

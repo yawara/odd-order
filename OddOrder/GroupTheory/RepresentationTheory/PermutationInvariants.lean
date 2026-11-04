@@ -6,9 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Invariants
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.LinearAlgebra.Basis.Basic
-public import Mathlib.LinearAlgebra.Dimension.Free
 
 /-!
 # Invariants of a permutation representation have dimension = number of orbits

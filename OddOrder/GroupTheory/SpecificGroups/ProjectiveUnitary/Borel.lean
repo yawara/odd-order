@@ -7,6 +7,7 @@ module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
 public import Mathlib.GroupTheory.SemidirectProduct
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # The standard Borel subgroup of the projective unitary permutation group

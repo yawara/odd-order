@@ -6,9 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 
 /-!
 # The determinant-one torus does not act faithfully on `Ω₁(S₀)`

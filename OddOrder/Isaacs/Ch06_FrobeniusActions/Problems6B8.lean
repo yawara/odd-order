@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
-public import Mathlib.GroupTheory.Commutator.Finite
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+import OddOrder.Isaacs.Ch06_FrobeniusActions.InvolutionRecognition
 
 /-!
 # Isaacs Problem 6B.8 — Taussky-Todd (書籍 p. 196)

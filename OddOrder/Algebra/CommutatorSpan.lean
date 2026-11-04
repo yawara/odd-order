@@ -6,9 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Algebra.Defs
-public import Mathlib.LinearAlgebra.Span.Basic
-public import Mathlib.LinearAlgebra.Quotient.Basic
-public import OddOrder.Algebra.WordExpansion
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.LinearAlgebra.Quotient.Defs
+public import Mathlib.LinearAlgebra.Span.Defs
+import Mathlib.Algebra.Order.Ring.Nat
+import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Tactic.Abel -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
+import OddOrder.Algebra.WordExpansion
 
 /-!
 # The commutator span of an algebra is closed under `p`-th powers

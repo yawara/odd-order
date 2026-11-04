@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.GlaubermanZStar.Basic
-public import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
+import OddOrder.GroupTheory.GlaubermanZStar.Basic
+import OddOrder.GroupTheory.IsolatedInvolution
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
 
 /-!
 # Glauberman's `Z*`-theorem: the inductive reduction (Navarro (7.9), Steps 1–4)

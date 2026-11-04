@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-public import OddOrder.Peterfalvi.Appendices.SemilinearField
+public import Mathlib.Algebra.Ring.Aut
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 
 /-!
 # `K` as the multiplicative group of a field, with the twist coming from `V`

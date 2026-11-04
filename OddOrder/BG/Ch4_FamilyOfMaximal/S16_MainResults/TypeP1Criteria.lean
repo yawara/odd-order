@@ -1,7 +1,17 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
 
 /-!
 # TypeP1Criteria

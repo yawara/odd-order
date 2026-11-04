@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_Props109To1011
+public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_Props109To1011
 
 /-!
 # Peterfalvi §12 — maximal types III/IV/V: opening layer

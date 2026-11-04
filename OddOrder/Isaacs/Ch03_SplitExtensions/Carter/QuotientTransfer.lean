@@ -5,8 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
-public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Carter 部分群 (Isaacs 3C.7) — 商群への往復

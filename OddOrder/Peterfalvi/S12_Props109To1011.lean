@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S12_Prop109
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
 
 /-!
 # TAIL

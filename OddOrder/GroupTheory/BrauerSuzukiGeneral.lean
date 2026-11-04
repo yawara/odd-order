@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.BrauerSuzuki
-public import OddOrder.GroupTheory.BrauerSuzukiEndgame
-public import OddOrder.GroupTheory.BrauerSuzukiQ8
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.BrauerSuzuki
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.BrauerSuzukiQ8.Induction
 
 /-!
 # Brauer–Suzuki: the theorem for an arbitrary generalized quaternion Sylow `2`-subgroup

@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Peterfalvi (7.8.b) for a Frobenius family — the `ζ`-norm estimate

@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NoncommRing
 
 /-!
 # Higman Lemma 3: a chosen commuting idempotent family on `A / A²`

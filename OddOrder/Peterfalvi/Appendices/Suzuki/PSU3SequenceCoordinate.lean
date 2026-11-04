@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FieldArithmetic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Sequence
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, steps (13) and (16): the sequence of (11) in coordinates

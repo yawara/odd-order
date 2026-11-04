@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Peterfalvi Appendix III: the free orbit of K-subgroups

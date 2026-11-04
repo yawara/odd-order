@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
 public import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
@@ -51,6 +51,10 @@ public import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.FieldAction
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

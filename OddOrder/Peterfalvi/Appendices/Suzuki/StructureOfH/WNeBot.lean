@@ -5,10 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Case (3) of the Ch. III §1 Proposition: `W ≠ 1`

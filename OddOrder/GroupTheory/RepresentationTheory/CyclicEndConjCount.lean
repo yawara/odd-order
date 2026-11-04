@@ -5,7 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.ZMod.Defs
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Counting lemmas for BG Prop 2.4(j)(k)

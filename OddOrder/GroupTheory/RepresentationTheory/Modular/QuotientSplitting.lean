@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.NormalPSubgroupTrivialAction
-public import OddOrder.GroupTheory.PRegularQuotient
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.NormalPSubgroupTrivialAction
+import OddOrder.GroupTheory.PRegularQuotient
 
 /-!
 # The splitting of `k[G/P]` induced by a splitting of `k[G]`

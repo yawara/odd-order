@@ -7,6 +7,8 @@ module
 
 public import OddOrder.Peterfalvi.S08_GeneralAdjoin
 public import OddOrder.Peterfalvi.S07_RetargetScaled
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi (5.6): the **norm-weighted** coherence adjoin for an arbitrary isometry `τ`

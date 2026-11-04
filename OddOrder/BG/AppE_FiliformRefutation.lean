@@ -6,7 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppE_FiliformGroup
-public import OddOrder.BG.AppE_FurtherResults
+public import OddOrder.BG.AppE_CentralizerDecomposition
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import Mathlib.Tactic.NormNum.Prime -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG Proposition E.4, as printed, is false: the assembled refutation

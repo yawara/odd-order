@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.SchurZassenhaus
-public import Mathlib.GroupTheory.Complement
 public import OddOrder.GroupTheory.SCN
-public import OddOrder.GroupTheory.SylowNormalRelIndex
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.SylowNormalRelIndex
 
 /-!
 # Bender–Glauberman Proposition 4.4(b) — `C_G(A) = A × H` for `A ∈ SCN(R)`

@@ -5,12 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Algebra.ZMod
-public import Mathlib.Algebra.Ring.Action.End
 public import Mathlib.Algebra.Ring.AddAut
-public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.GroupTheory.SemidirectProduct
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Algebra.Ring.Aut
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # Peterfalvi Part II, Chapter I §2 — the semilinear affine group

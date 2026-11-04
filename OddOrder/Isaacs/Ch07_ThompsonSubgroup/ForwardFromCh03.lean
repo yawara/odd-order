@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 
 /-!
 # Ch.7 → Ch.3 forward dependency: Isaacs Thm 3.15 (converse of Hall E)

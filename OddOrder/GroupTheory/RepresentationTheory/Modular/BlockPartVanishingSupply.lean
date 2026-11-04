@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.GroupAlgebraBlocks
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.Algebra.GroupAlgebraBlocks
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
 
 /-!
 # Discharging the `hweak` hypothesis of Külshammer's formula

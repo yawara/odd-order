@@ -5,15 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-public import Mathlib.Algebra.BigOperators.Ring.Finset
-public import Mathlib.Algebra.Group.Conj
-public import Mathlib.Algebra.GroupWithZero.Invertible
 public import Mathlib.Algebra.Module.Pi
-public import Mathlib.Algebra.Module.Submodule.Basic
 public import Mathlib.Algebra.Star.Basic
-public import Mathlib.Data.Fintype.Card
 public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Algebra.Module.Submodule.Defs
+import Mathlib.Algebra.BigOperators.Ring.Finset
 
 /-!
 # Class functions on a group

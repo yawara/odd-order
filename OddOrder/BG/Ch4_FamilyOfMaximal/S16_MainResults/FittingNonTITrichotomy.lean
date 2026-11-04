@@ -5,7 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.WitnessPGroup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 
 /-!
 # BG Theorem 15.7(e): the non-TI Fitting structure

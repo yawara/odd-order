@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFirstAlignedParameterBranch
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
-public import OddOrder.Isaacs.Appendix.SubgroupBasics
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoThreeParameterBranching
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFirstAlignedParameterBranch
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPairwiseFactorCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoPrescribedFactorTransport
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoQuotientFactorGeometry
+import OddOrder.Isaacs.Appendix.SubgroupBasics
 
 /-!
 # Higman's Lemma 13: the three aligned parameter branches

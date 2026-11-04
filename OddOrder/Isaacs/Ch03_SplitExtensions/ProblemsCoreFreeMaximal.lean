@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
 
 /-!
 # Isaacs Problem 3C.5 (書籍 p. 91) — 核が自明な極大部分群
@@ -49,7 +55,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.5 の形式化
 
 namespace OddOrder.Isaacs.Ch03
 
-open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
+open Pointwise
 
 section /- 3C: Problem 3C.5 (p. 91) -/
 

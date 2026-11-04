@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
-public import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
+public import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
 
 /-!
 # Frobenius-family B-sum estimate (Peterfalvi 7.10)

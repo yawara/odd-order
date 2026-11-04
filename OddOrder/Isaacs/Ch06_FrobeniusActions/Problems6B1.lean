@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6B.1 — Frobenius 補群は Frobenius 群を含まない (書籍 p. 195)

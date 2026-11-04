@@ -6,11 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
+public import OddOrder.Algebra.SubgroupTruncation
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.GroupAlgebraConjugation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 
 /-!
 # Brauer's second main theorem — Navarro (5.2)

@@ -5,9 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
-public import OddOrder.Isaacs.Ch04_Commutators.Mann
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch04_Commutators.Mann
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. I §2: Proposition 1 (the structure of `Q`)

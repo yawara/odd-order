@@ -5,12 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-public import OddOrder.GroupTheory.CoprimeFixedPoints
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
-public import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the standing hypothesis and step (1)'s discriminators

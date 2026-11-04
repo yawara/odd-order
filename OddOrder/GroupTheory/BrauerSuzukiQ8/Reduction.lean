@@ -5,15 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.BrauerSuzukiEndgame
-public import OddOrder.GroupTheory.CardSupInf
-public import OddOrder.GroupTheory.CentralSylowComplement
 public import OddOrder.GroupTheory.QuaternionTwoFacts
-public import OddOrder.GroupTheory.SylowContaining
-public import OddOrder.GroupTheory.SubgroupInAmbient
 public import OddOrder.Isaacs.Ch05_Transfer.Main
-public import OddOrder.Mathlib.QuotientGroup
-public import Mathlib.Algebra.Group.Action.Pointwise.Finset
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.Algebra.Group.Action.Pointwise.Finset
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.BrauerSuzukiCounting
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.CentralSylowComplement
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.GroupTheory.SylowContaining
+import OddOrder.Mathlib.QuotientGroup
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the group-theoretic reduction (Navarro p. 139)

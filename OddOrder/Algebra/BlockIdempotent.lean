@@ -7,7 +7,9 @@ module
 
 public import Mathlib.RingTheory.Idempotents
 public import OddOrder.Algebra.CentralCharacter
-public import OddOrder.Algebra.SeparatingSubalgebra
+import Mathlib.RingTheory.LocalRing.Basic
+import OddOrder.Algebra.CentralIdempotentModule
+import OddOrder.Algebra.SeparatingSubalgebra
 
 /-!
 # Block idempotents

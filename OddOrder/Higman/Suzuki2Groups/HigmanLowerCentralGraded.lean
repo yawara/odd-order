@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
-public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
-public import OddOrder.GroupTheory.FrattiniPGroup
 public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's elementary lower-central layers

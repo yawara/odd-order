@@ -5,9 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
 public import Mathlib.GroupTheory.GroupAction.Primitive
-public import Mathlib.Data.Fintype.Pigeonhole
+import Mathlib.Data.Fintype.Pigeonhole
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: orbital graphs (Thm 8.35, Lem 8.36)

@@ -5,10 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.FieldTheory.PurelyInseparable.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.TorsionFree
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 
 /-!
 # The trivial character lies in the principal block

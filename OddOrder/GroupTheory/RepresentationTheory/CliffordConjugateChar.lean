@@ -5,13 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.Isaacs.Ch01_Sylow.Main
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Conjugate characters of the constituents of a restriction (toward BG Prop 2.2(a)'s `hconj`)

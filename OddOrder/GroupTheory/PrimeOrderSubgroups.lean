@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Normal subgroups of prime order in `p`-groups are central

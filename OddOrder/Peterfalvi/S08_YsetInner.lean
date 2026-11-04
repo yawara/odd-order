@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi §8: nilpotent descent and Y-set inner products

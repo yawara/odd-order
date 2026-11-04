@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RingTheory.Idempotents
-public import Mathlib.Algebra.DirectSum.Module
+public import Mathlib.Algebra.DirectSum.Basic
+import Mathlib.Algebra.DirectSum.Module
 
 /-!
 # Internal direct sum from a complete orthogonal family of idempotent endomorphisms

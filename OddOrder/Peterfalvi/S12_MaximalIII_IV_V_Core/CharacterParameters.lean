@@ -1,6 +1,10 @@
 module
 
 public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.MuGridConstruction
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S06_CertainTypeStructure
 
 /-!
 # Peterfalvi (10.2)-(10.4) — character parameters and coherent extension

@@ -5,13 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 public import OddOrder.GroupTheory.ElementaryAbelian
 public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RingTheory.SimpleModule.Basic
-public import Mathlib.RingTheory.IntegralDomain
-public import Mathlib.RingTheory.ZMod.UnitsCyclic
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Data.ZMod.Units
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 
 /-!
 # Bender–Glauberman Lemma 2.7: `(ℤ/q)²` acting faithfully on `(ℤ/p)²`

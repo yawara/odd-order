@@ -1,22 +1,14 @@
 module
 
-public import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
-public import OddOrder.Peterfalvi.S10_CoherenceWiring
 public import OddOrder.GroupTheory.CoprimeAction
-public import OddOrder.GroupTheory.WielandtFixedPoint
-public import OddOrder.GroupTheory.CoprimeFixedPoints
-public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-public import OddOrder.GroupTheory.AInvariantPiSubgroups
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-public import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-public import OddOrder.Mathlib.SchurZassenhausConj
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_StructureSetup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §11 — the Wielandt setup: opening layer

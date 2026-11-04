@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S06_CertainTypeSupport
-public import OddOrder.Peterfalvi.S06_CertainTypeStructure
-public import OddOrder.Peterfalvi.S05_GridTrichotomy
+public import OddOrder.Peterfalvi.S06_CertainHypothesis46
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_GridTrichotomy
+import OddOrder.Peterfalvi.S06_CertainTypeStructure
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 
 /-!
 # Peterfalvi (4.8): equal-degree certain-type differences are σ-isometric

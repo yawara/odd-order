@@ -1,7 +1,15 @@
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
-public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerMulGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Isaacs §4D 後半 — Baer trick (Lem 4.37) と応用 (pp. 141-146)

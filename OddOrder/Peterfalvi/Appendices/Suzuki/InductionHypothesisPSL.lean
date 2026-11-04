@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.LinearAlgebra.Projectivization.Cardinality
-public import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import Mathlib.LinearAlgebra.Projectivization.Action
+public import OddOrder.GroupTheory.PrimeComplementResidual
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.LinearAlgebra.Projectivization.Cardinality
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
 /-!
 # Peterfalvi Part II, Chapter I §3, Lemma 1 — the `PSL(2,q)` target

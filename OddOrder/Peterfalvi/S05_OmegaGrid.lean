@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S05_SigmaIsometry
+public import OddOrder.Peterfalvi.S05_TICyclic
 
 /-!
 # Peterfalvi §5: the (3.3) ω-grid indexed by `Fin |W₁| × Fin |W₂|`

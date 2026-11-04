@@ -5,12 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
-public import Mathlib.GroupTheory.Index
 public import Mathlib.GroupTheory.IsSubnormal
-public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # Isaacs Ch. 9 — §9D: strong conjugacy, `X^{(G)}`, Lem 9.29 / 9.30 (pp. 289-291)

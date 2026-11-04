@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 
 /-!
 # Restricting an irreducible Brauer character to a `p'`-subgroup

@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.Data.Set.Card
-public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The affine "midpoint line" condition (C) and Glauberman–Norton Proposition 6

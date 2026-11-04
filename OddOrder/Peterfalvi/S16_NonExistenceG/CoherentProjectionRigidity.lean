@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S16_GridExpansion
-public import OddOrder.Peterfalvi.S16_PairingBessel
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+public import OddOrder.Peterfalvi.S16_PairingCoherence
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # Peterfalvi (13.19.c, pp. 85–87; 14.11.2, p. 89): coherent projection rigidity

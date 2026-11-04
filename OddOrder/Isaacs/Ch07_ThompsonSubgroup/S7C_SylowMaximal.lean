@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
 
 /-!
 # Isaacs FGT Ch.7 — Theorem 7.1 Step 4: the Sylow subgroup is maximal (pp. 218–219)

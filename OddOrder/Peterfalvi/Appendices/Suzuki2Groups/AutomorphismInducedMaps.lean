@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.End
 public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Induced maps of automorphisms of an anisotropic quadratic extension

@@ -7,6 +7,10 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The generalized decomposition matrix

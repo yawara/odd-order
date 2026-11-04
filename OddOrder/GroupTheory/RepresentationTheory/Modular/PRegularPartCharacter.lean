@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.PRegularProjection
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.PRegularProjection
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 
 /-!
 # Navarro (2.15): `θ̂(x) = θ(x_{p'})` is a virtual character

@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+public import OddOrder.Peterfalvi.S11_NineElevenSetup
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTIWitness
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
 
 /-!
 # Peterfalvi (9.11.1)–(9.11.4) — step lemmas of the `S`-instance caseA campaign

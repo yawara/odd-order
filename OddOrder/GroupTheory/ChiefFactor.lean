@@ -5,15 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.Data.SetLike.Fintype
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 
 /-!
 # Chief factors

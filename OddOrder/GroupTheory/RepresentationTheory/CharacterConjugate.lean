@@ -5,11 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Analysis.Complex.Basic
-public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.LinearAlgebra.Matrix.PosDef
-public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.Basic.Complex.Basic
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.LinearAlgebra.Matrix.PosDef
 
 /-!
 # Conjugate of a character: `χ(g⁻¹) = conj (χ(g))`

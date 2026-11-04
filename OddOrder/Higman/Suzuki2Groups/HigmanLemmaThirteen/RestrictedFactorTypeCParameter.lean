@@ -5,8 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 
 /-!
 # Higman's Lemma 13: the type-C parameter equation

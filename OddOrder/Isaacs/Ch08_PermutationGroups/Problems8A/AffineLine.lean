@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Field.Basic
 public import Mathlib.Algebra.GroupWithZero.Units.Equiv
 public import Mathlib.GroupTheory.Solvable
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.Tactic.Ring
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Ring.RingNF
+public import Mathlib.Tactic.Ring.Basic -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 1 次元アフィン群

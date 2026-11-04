@@ -6,6 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S13_CoreStructure.KernelBounds
+public import OddOrder.Peterfalvi.S13_Lemmas113To115
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S13_ElementaryAbelianKernel
+import OddOrder.Peterfalvi.S13_MaximalIII_IV
 
 /-!
 # Peterfalvi Section 13: centralization and elementary-abelian core structure

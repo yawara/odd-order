@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DicksonDivisibility
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+public import Mathlib.GroupTheory.Sylow
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DicksonDivisibility
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Osima (3.8), the `p`-regular half: `|G|_p` divides `∑_{i ∈ A} χ_i(1) χ_i(x)`

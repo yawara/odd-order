@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
 
 /-!
 # Isaacs Chapter 2 — Problems §2C: N-群 (p. 61)

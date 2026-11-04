@@ -6,8 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.GroupAction.Primitive
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
 public import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problem 8D.4 (p. 269) — `k_m` と `m` の比較

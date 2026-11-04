@@ -7,7 +7,14 @@ module
 
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
-public import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
+public import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman Lemma 3: final case split

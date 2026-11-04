@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
+public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 
 /-!
 # Navarro (3.13.a): a block idempotent acts as `0` or `1`

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.GroupTheory.OpResidual
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Maximal nilpotent normal Hall subgroups

@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.Peterfalvi.S08_RetargetReducible
 public import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi §5/§8: the norm-weighted (5.6) coherence-break engine

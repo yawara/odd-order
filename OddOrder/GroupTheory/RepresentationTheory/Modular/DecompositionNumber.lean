@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 
 /-!
 # Uniqueness of the decomposition numbers

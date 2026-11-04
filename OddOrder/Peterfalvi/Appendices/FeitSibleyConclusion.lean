@@ -5,10 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
-public import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
+import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
 
 /-!
 # Peterfalvi Appendix IV: the (8) conclusion (p. 150)

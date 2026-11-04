@@ -6,10 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.GroupTheory.CriticalSubgroup
 public import OddOrder.GroupTheory.IsMetacyclic
-public import Mathlib.RingTheory.ZMod.UnitsCyclic
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.RingTheory.ZMod.UnitsCyclic
+import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # Normal type-`(p,p)` subgroups inside a normal elementary abelian subgroup

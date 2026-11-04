@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Problems
-public import Mathlib.GroupTheory.Commutator.Finite
+public import OddOrder.GroupTheory.IsExtraspecial
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Problems
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.5 (extraspecial `p`-群の構造)

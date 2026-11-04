@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_Problem1SameCoset
+public import OddOrder.BG.AppC_Problem1
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_Problem1Lattice
 
 /-!
 # BG Appendix C, Problem 1: extracting the exponent from the witness

@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
-public import Mathlib.Algebra.Central.Matrix
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.Algebra.Central.Matrix
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 
 /-!
 # Transporting the centre along an algebra isomorphism

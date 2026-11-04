@@ -5,8 +5,27 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # BG §12: Theorem 12.12 — Case 3 (abelian Sylow `p`), building blocks

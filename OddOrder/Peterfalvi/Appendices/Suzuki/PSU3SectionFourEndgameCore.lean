@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.FixedPointDensity
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the field-theoretic endgame

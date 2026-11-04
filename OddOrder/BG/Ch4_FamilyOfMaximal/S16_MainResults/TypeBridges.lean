@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeVSinger
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG Section 16: type classification and Theorem A bridges

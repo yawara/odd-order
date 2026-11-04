@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Abelianization.Defs
 public import Mathlib.GroupTheory.OrderOfElement
 public import Mathlib.GroupTheory.Solvable
 

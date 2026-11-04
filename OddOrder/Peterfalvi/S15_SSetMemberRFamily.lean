@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_BridgeCharacter
+public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S08_YsetInner
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S15_BridgeCharacter
+public import OddOrder.Peterfalvi.S16_GridExpansion -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §9/§13 — the (5.2.d) member `R`-families for the honest `S`-instance §9 family

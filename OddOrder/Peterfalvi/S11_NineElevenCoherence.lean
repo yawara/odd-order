@@ -5,8 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
-public import OddOrder.Peterfalvi.S11_NineElevenSetup
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S07_Subcoherent
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S11_NineElevenSetup
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # TAIL

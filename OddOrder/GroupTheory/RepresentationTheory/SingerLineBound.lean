@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.Algebra.MonoidAlgebra.Defs
+public import Mathlib.RingTheory.SimpleModule.Basic
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # The Singer line bound: `|C| ∣ (p^q − 1)/(p − 1)`

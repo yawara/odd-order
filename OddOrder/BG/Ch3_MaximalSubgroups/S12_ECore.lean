@@ -5,15 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.Setup
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
-public import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
-public import OddOrder.GroupTheory.MaximalSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelianFamily
-public import OddOrder.GroupTheory.NarrowPGroup
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 
 /-!
 # BG §12: The Subgroup `E` — 定義層 + 証明済みコア

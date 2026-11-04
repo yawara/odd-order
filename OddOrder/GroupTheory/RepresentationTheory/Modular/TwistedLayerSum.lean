@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.CharP.Lemmas
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
+public import OddOrder.Algebra.GroupAlgebraConjugation
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.Algebra.CharP.Lemmas
+import Mathlib.Algebra.Field.IsField
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
 
 /-!
 # The twisted layer sum `s = ∑ ω^{-i} w_i`

@@ -5,13 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
-public import OddOrder.Peterfalvi.S08_YsetInner
-public import OddOrder.Peterfalvi.S06_CertainHypothesis46
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
-public import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
-public import OddOrder.Peterfalvi.S08_CaseBCoherence2
+public import OddOrder.Peterfalvi.S08_YsetConjugation.InducedFamilies
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S12_TICyclicSigmaBridge
 
 /-!
 # Peterfalvi (10.10) case (a): type-V Sibley coordinates

@@ -5,28 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Int.ModEq
-public import Mathlib.Data.Nat.ModEq
-public import Mathlib.Data.Set.Card
-public import Mathlib.Data.Set.Card.Arithmetic
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.GroupTheory.FixedPointFree
-public import Mathlib.GroupTheory.GroupAction.Basic
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.GroupAction.FixedPoints
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.Index
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.SpecificGroups.ZGroup
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.NumberTheory.Multiplicity
-public import Mathlib.SetTheory.Cardinal.Finite
-public import OddOrder.GroupTheory.SemiDihedral
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-public import OddOrder.Isaacs.Ch04_Commutators.Main
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Frobenius action basics, Lemma 6.5 TI counting,

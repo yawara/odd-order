@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch05_Transfer.Basic
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-! # Isaacs Cor 5.19 (一般形): Sylow 2 が strict-max cyclic 直積因子を持てば非単純 (p. 167)
 

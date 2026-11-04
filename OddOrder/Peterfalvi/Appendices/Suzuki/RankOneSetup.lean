@@ -5,9 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 public import OddOrder.GroupTheory.RankOneBNPair
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 
 /-!
 # Hypotheses (A1)–(A3) give a rank-one split BN-pair

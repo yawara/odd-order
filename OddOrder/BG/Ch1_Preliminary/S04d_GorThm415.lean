@@ -5,13 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
-public import OddOrder.GroupTheory.CriticalSubgroup
 public import OddOrder.GroupTheory.SCN
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.GroupTheory.FrattiniPGroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # Gorenstein "Finite Groups" Lemma 4.14 — the engine of `dₙ(P) ≤ 2 ⇒ d(P) ≤ 2`

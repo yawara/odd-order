@@ -6,9 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Algebra.Pi
-public import Mathlib.Algebra.BigOperators.Pi
 public import Mathlib.LinearAlgebra.Pi
 public import OddOrder.Algebra.CommutatorSpan
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # The commutator span of a finite product of algebras

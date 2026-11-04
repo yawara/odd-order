@@ -1,7 +1,22 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TypeP1Forcing
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Basic
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG Theorem 15.2 — §14-gated conditional helpers

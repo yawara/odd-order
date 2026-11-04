@@ -1,16 +1,15 @@
 module
 
-public import OddOrder.BG.AppC_NormSet
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
-public import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import OddOrder.Peterfalvi.S15_SAndT
-public import OddOrder.Peterfalvi.S16_CaseBOrder
-public import OddOrder.BG.AppC_LemmaC3_FixedPointFree
 public import OddOrder.Peterfalvi.S16_CoreLemmas
-public import OddOrder.Peterfalvi.S16_G0Coprime
-public import OddOrder.Peterfalvi.S16_GridExpansion
-public import OddOrder.Peterfalvi.S16_PairingBessel
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
 
 /-!
 # TSideTypeP

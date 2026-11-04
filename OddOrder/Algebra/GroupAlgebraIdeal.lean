@@ -7,8 +7,8 @@ module
 
 public import Mathlib.Algebra.MonoidAlgebra.Basic
 public import Mathlib.RingTheory.Ideal.Maps
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
-public import OddOrder.Mathlib.MonoidAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The extended ideal `I·R[G]`

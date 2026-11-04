@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsSylowCounting
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsSylowCounting
 
 /-!
 # Isaacs Problems 1E (p. 38) — 1E.6 / 1E.7 / 1E.8

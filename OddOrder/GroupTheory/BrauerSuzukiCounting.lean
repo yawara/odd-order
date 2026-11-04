@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 public import OddOrder.GroupTheory.BrauerSuzukiCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumSections
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.BrauerSuzukiInvolutions
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Brauer–Suzuki: counting involution pairs (Gorenstein Ch. 12, towards Lemma 1.8)

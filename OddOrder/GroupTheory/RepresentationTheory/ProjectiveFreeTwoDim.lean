@@ -6,11 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Projectivization.Action
-public import Mathlib.LinearAlgebra.Projectivization.Cardinality
 public import Mathlib.RepresentationTheory.Irreducible
-public import OddOrder.BG.Ch1_Preliminary.S02_Representations
-public import OddOrder.GroupTheory.FreeActionOrbitCount
-public import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+public import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.LinearAlgebra.Projectivization.Cardinality
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S02_Representations
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
 
 /-!
 # Free projective actions in dimension two

@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S01_Introduction
 
 /-!
 # Peterfalvi §2: Notation

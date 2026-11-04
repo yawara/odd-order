@@ -5,12 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BlockOfSimpleModule
-public import OddOrder.Algebra.TraceIsCompl
-public import OddOrder.GroupTheory.MaschkeComplement
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
-public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.LinearAlgebra.Trace
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.Algebra.TraceIsCompl
+import OddOrder.GroupTheory.MaschkeComplement
+import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 
 /-!
 # Every ordinary character decomposes into irreducible ones

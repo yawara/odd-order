@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S09_FrobeniusGammaDecomposition
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
+import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 
 /-!
 # Frobenius-family Gamma norm estimate (Peterfalvi 7.8.b)

@@ -6,6 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Step (4) of the Ch. III §3 Proposition: the `K₁W₁`-action on the model

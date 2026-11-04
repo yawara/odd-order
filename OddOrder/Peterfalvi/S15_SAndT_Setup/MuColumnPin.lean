@@ -1,8 +1,11 @@
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
-public import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
-public import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
+import OddOrder.Peterfalvi.S15_SSetMemberRFamily
 
 /-!
 # Peterfalvi (13.3.c) — the `μ`-column pin machinery (coherence-generic)

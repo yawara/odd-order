@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+public import Mathlib.GroupTheory.Index
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Isaacs Ch. 2 — Lemma 2.14: dihedral structure from two involutions (pp. 56-57)

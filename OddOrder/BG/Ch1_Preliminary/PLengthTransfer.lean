@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch1_Preliminary.PLength
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG Lemma 1.21 — `p`-length one の移送補題 (foundation)

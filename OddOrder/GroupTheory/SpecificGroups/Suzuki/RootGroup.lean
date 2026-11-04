@@ -7,7 +7,6 @@ module
 
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Subgroup.Center
 
 /-!
 # The root group of a Suzuki group

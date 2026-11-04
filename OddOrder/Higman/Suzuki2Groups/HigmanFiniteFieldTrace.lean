@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.ChevalleyWarning
-public import Mathlib.FieldTheory.Finite.Trace
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.FieldTheory.Perfect
+public import Mathlib.RingTheory.Trace.Defs
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.RingTheory.Trace.Basic
+import OddOrder.Algebra.ChevalleyWarning
 
 /-!
 # Higman Lemma 10: finite-field trace

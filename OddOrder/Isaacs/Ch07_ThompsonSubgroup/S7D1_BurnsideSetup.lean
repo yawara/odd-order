@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7D part 1: Burnside p^a q^b setup (Thm 7.8 stmt,

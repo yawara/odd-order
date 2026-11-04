@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_CentralizerCenter
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
 
 /-!
 # Isaacs FGT Ch.7 — Theorem 7.1 Step 6: the quotient complement is abelian (p. 219)

@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.CenterIdempotentLift
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.Algebra.CenterIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 
 /-!
 # The lattice central character and the Wedderburn central character agree

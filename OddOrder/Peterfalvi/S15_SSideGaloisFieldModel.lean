@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_GaloisFieldModel
-public import OddOrder.Peterfalvi.S15_CaseAContradiction
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import OddOrder.Peterfalvi.S15_SAndTDefs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_GaloisFieldModel
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
+import OddOrder.Peterfalvi.S15_CaseAContradiction
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Peterfalvi (14.6) — the S-side Galois-field model

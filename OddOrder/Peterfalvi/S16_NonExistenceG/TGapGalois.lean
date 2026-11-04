@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
-public import OddOrder.Peterfalvi.S07_CoherenceGalois
-public import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
+public import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
+public import OddOrder.Peterfalvi.S16_NonExistenceG.TSideTypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S08_CaseBCoherence.CentralCongruence
+import OddOrder.Peterfalvi.S16_GridExpansion
 
 /-!
 # Peterfalvi (11.9)(a): Galois transport of the T-side bridge

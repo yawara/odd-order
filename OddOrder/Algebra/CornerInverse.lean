@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Nilpotent.Basic
-public import OddOrder.Algebra.JacobsonCentralSubring
+public import Mathlib.RingTheory.Jacobson.Radical
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+import Mathlib.RingTheory.Jacobson.Ideal
+import Mathlib.RingTheory.Nilpotent.Basic
+import OddOrder.Algebra.JacobsonCentralSubring
 
 /-!
 # Inverting in a corner — Navarro (5.4)

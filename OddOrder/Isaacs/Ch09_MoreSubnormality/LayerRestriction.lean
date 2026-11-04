@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
+import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 
 /-!
 # Isaacs Ch. 9 — §9C: Lemma 9.25 (E(G) = E(H) when F(G) = 1), p. 283

@@ -5,13 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310FixedPointSplit
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310GroupForm
-public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.GroupTheory.MinimalInvariantNormal
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-public import Mathlib.Algebra.Group.Action.End
+public import OddOrder.GroupTheory.FixedSubgroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310FixedPointSplit
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310GroupForm
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Theorem 3.10 for a general nilpotent `M` — the group-level Case-1 induction

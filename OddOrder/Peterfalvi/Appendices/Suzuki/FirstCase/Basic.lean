@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
-public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 
 /-!
 # Peterfalvi Part II, Ch. II: hypothesis (B1) and first consequences

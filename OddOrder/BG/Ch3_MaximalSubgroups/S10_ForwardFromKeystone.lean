@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 
 /-!
 # BG §10 forward dependencies on the representation-theory keystone (BG Thm 3.6)

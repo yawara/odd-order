@@ -5,12 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.TISubset
 public import OddOrder.GroupTheory.ConjClassSet
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Conjugation-invariant sums over the saturation of a TI-subset

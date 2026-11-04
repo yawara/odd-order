@@ -6,11 +6,17 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
-public import OddOrder.GroupTheory.CentralExtensionAutomorphisms
-public import OddOrder.GroupTheory.CentralElementaryExtension
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
-public import OddOrder.Algebra.FrobeniusExponentPairs
-public import OddOrder.Algebra.QuadraticTraceCorrection
+public import Mathlib.RingTheory.Ideal.Quotient.HasFiniteQuotients.Basic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.FrobeniusExponentPairs
+import OddOrder.Algebra.QuadraticTraceCorrection
+import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`

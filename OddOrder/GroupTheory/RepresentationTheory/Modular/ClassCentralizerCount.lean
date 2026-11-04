@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Subgroup.Centralizer
 
 /-!
 # A `p`-subgroup sees a conjugacy class only through its centraliser

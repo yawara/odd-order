@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # The kernel-interval degree-square sum `∑_{N ≤ ker χ, K ⊄ ker χ} χ(1)² = |G/N| − |G/K|`

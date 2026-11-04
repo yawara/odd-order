@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_ImprimitiveUBound
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-!
 # Peterfalvi (9.7.b) — the chief-factor Galois-field model

@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Data.ZMod.Units
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S02_Representations
+import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessFrobenius
+import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowCyclic
 
 /-!
 # Peterfalvi Section 14: minimal-counterexample representation bounds

@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Basic.Complex.Basic
-public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
-public import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Isometry on orthonormal difference pairs

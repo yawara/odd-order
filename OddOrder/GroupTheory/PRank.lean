@@ -6,13 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.Algebra.Order.GroupWithZero.Canonical
 public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-public import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
-public import Mathlib.LinearAlgebra.Dimension.Free
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.LinearAlgebra.FreeModule.PID -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
+import OddOrder.Mathlib.Subgroup
+public import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # p-Rank of a Group

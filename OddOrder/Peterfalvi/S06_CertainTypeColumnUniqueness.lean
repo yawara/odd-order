@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi (5.8), the uniqueness rider: a third equal-degree column forces the first case

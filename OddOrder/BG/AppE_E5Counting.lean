@@ -5,7 +5,25 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppE_CorollaryE5
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.AppE_CorollaryE5
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.ElemAbelianNeighbor
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
 
 /-!
 # BG Corollary E.5: final assembly and the `(E.33)`/`(E.34)` counting

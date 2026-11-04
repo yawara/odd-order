@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanSpectrumBilinear
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 
 /-!
 # Higman's classification of Suzuki 2-groups of length two

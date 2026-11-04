@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Ker
-public import Mathlib.GroupTheory.Index
-public import Mathlib.GroupTheory.QuotientGroup.Finite
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.Index
 
 /-!
 # 可換群の冪核 `Ω` と冪像 `℧`

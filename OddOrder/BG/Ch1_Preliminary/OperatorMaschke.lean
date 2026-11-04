@@ -5,14 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.GroupTheory.PRank
 public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.ElementaryAbelian
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RepresentationTheory.Submodule
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.Algebra.Module.ZMod
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RepresentationTheory.Submodule
 
 /-!
 # BG §4 — N-4: Maschke A-invariant complement bridge

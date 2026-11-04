@@ -5,11 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
-public import OddOrder.GroupTheory.RepresentationTheory.CyclicCharacterExtension
-public import OddOrder.GroupTheory.RepresentationTheory.ExtensionLinearTwist
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+public import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CyclicCharacterExtension
+import OddOrder.GroupTheory.RepresentationTheory.ExtensionLinearTwist
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # The canonical extension along a prime-cyclic quotient (toward Isaacs 6.28)

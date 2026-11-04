@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_Problem1SkewCalculus
-public import OddOrder.BG.AppC_Problem1Exponent
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Algebra.PaleySpanning
+import OddOrder.BG.AppC_Problem1Exponent
 
 /-!
 # BG Appendix C, Problem 1: the endgame — the κ-conspiracy refuted

@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
-public import Mathlib.GroupTheory.Perm.Option
 
 /-!
 # Standard root, torus, and Weyl permutations of the Suzuki ovoid

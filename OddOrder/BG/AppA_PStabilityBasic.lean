@@ -5,21 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-public import Mathlib.LinearAlgebra.Dimension.Finite
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import Mathlib.RepresentationTheory.Subrepresentation
-public import Mathlib.Order.OrderIsoNat
-public import Mathlib.RingTheory.Artinian.Module
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.BG.Ch1_Preliminary.S02_Representations
-public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-public import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
-public import OddOrder.GroupTheory.ChiefFactor
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RepresentationTheory.Basic
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.BG.Ch1_Preliminary.S02_Representations
+import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # AppA_PStabilityBasic

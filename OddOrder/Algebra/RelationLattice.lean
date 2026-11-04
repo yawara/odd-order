@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dual.Lemmas
 public import OddOrder.Algebra.PowerMonomialIndependence
+public import Mathlib.FieldTheory.Separable
+import Mathlib.RingTheory.Trace.Basic
 
 /-!
 # The relation lattice of BG Appendix C, Problem 1

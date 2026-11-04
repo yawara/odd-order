@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
-public import Mathlib.FieldTheory.Perfect
-public import Mathlib.Algebra.CharP.Frobenius
 public import OddOrder.Peterfalvi.Appendices.NearFields
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Appendix II: the exceptional near-field `F_{r²,2}` (p. 138)

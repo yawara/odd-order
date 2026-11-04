@@ -1,6 +1,13 @@
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-!
 # InertiaLift

@@ -6,7 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+public import Mathlib.GroupTheory.Frattini
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman Lemma 3: Frattini consequences

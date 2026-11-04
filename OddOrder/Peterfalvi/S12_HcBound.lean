@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
-public import OddOrder.Peterfalvi.S08_SixTwoGeneral
-public import OddOrder.GroupTheory.PiElementDecomposition
+public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S08_SixTwoGeneral
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 
 /-!
 # S12_HcBound

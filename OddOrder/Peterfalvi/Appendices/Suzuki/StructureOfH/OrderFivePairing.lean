@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
 public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
 
 /-!
 # The last non-conjugacy of Peterfalvi Part II, Ch. III §2 (p. 119)

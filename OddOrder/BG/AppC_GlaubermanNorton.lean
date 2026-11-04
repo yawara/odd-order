@@ -5,10 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Extension
-public import OddOrder.Algebra.FiniteFieldIrreducibleCount
-public import OddOrder.BG.AppC_LemmaC2
 public import OddOrder.BG.AppC_AffineLineCondition
+public import OddOrder.BG.AppC_NormSetBasic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.Extension
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Ideal.Quotient.HasFiniteQuotients.Basic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.FiniteFieldIrreducibleCount
+import OddOrder.BG.AppC_LemmaC2
+import OddOrder.BG.AppC_NormSet
 
 /-!
 # BG Appendix C, Remark (IV): the Glauberman–Norton sharpening `p ≤ 3`

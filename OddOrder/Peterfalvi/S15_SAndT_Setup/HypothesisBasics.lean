@@ -1,10 +1,17 @@
 module
 
 public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
-public import OddOrder.Peterfalvi.S11_ImprimitiveUBound
-public import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
-public import OddOrder.Peterfalvi.S11_CaseAOddPartBound
-public import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+public import OddOrder.Peterfalvi.S07_Subcoherent
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeP1Criteria
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_TypeDetermination
 
 /-!
 # TAIL

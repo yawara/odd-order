@@ -5,12 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
-public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Subrepresentation
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
 
 /-!
 # BG Theorem 3.10, general (non-abelian) kernel — the K₀ reduction (issue 8013, piece 3)

@@ -1,7 +1,16 @@
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHomBasic
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHomBasic
 
 /-!
 # InnerCompHom

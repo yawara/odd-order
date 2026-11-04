@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.Peterfalvi.S10_Theorem88CaseB
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.Peterfalvi.S09_FrobeniusCardG0LowerBound
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
 
 /-!
 # Peterfalvi (12.17) + the (8.8) case-(b) dichotomy

@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
-public import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
 # Higman's abelian invariant-subgroup lemma

@@ -5,9 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
-public import Mathlib.LinearAlgebra.QuadraticForm.Basis
-public import Mathlib.Algebra.CharP.Two
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+public import OddOrder.Higman.Suzuki2Groups.HigmanSpectrumBilinear
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+public import Mathlib.CategoryTheory.Types.Basic -- shake: keep (its `@[congr]` lemma is in the congr set `simp` uses in an exposed definition)
 
 /-!
 # Higman's square map on the first lower-central layer

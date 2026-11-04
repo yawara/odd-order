@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # Peterfalvi Appendix III: uniqueness of the invariant two-summand split

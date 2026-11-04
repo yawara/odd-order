@@ -5,14 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Transfer
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 public import Mathlib.GroupTheory.Focal
-public import Mathlib.GroupTheory.Schreier
-public import Mathlib.GroupTheory.SpecificGroups.ZGroup
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.Isaacs.Ch05_Transfer.CentralTransfer
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # Basic

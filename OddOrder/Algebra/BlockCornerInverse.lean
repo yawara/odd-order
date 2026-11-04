@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.BlockIdempotent
-public import OddOrder.Algebra.CornerInverse
+import OddOrder.Algebra.CornerInverse
 
 /-!
 # Inverting in the corner of a block — the characteristic-`p` half of Navarro (5.5)

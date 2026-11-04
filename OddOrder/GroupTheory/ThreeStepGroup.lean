@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-public import OddOrder.GroupTheory.CardSupInf
-public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Three-step groups (Gorenstein, Ch. 12 §1)

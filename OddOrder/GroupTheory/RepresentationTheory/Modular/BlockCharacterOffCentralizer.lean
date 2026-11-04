@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+public import Mathlib.GroupTheory.PGroup
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Algebra.ClassSumOffCentralizer
 
 /-!
 # A central character of `H` only sees the coefficients on `C_G(P)`

@@ -6,8 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.PermutationCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.PermutationCharacter
+import OddOrder.Peterfalvi.S08_YsetInner.CharacterBreaks
 
 /-!
 # Peterfalvi Part II, Ch. III: `⟨Ind λ, Ind λ⟩ = 2` (Theorem C, step (7))

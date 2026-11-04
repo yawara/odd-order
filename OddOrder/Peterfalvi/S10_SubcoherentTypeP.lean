@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 public import OddOrder.Peterfalvi.S07_Subcoherent
-public import OddOrder.Peterfalvi.S08_SixTwoGeneral
-public import OddOrder.Peterfalvi.S10_TypePSupportA0
 public import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S10_TypePSupport -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S10_TypePSupportA0 -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (8.15), claim 3: Hypothesis (5.2) for the type-`P` induced family

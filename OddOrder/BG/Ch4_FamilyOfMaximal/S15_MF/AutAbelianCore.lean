@@ -1,10 +1,17 @@
 module
 
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
-public import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
-public import OddOrder.Mathlib.Subgroup
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.GroupTheory.FittingSelfCentralizing
 
 /-!
 # BG §15 — notation and the Aut-abelian core

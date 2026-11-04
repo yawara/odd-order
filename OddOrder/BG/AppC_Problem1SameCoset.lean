@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.InverseClosedSubgroup
 public import OddOrder.BG.AppC_Problem1Trace
+public import OddOrder.Algebra.PaleySpanning
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Algebra.InverseClosedSubgroup
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Problem 1: the same-coset obstruction

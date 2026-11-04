@@ -5,18 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Fin
-public import Mathlib.Algebra.BigOperators.Ring.Finset
 public import Mathlib.Algebra.Ring.Defs
 public import Mathlib.Algebra.Group.Subgroup.Defs
-public import Mathlib.Dynamics.PeriodicPts.Lemmas
-public import Mathlib.Tactic.Ring
-public import Mathlib.Tactic.Push
-public import Mathlib.Algebra.Group.Fin.Basic
-public import Mathlib.Algebra.BigOperators.GroupWithZero.Action
-public import Mathlib.GroupTheory.QuotientGroup.Defs
-public import Mathlib.Tactic.Abel
-public import Mathlib.Tactic.NoncommRing
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.Fintype.Pi
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.Dynamics.PeriodicPts.Defs
+import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.Group.Fin.Basic
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.GroupTheory.QuotientGroup.Defs
+import Mathlib.Tactic.NoncommRing
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # The noncommutative binomial expansion

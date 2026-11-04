@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # Peterfalvi (5.6.3): re-targeting for a **non-orthonormal** (reducible) break character

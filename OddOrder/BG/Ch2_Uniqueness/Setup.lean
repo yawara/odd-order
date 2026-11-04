@@ -6,11 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.Subgroup.Simple
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Nilpotent
 public import Mathlib.SetTheory.Cardinal.Finite
 public import OddOrder.GroupTheory.MaximalSubgroup
+import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # The fixed minimal counterexample `G` (BG §7)

@@ -5,17 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.SolvablePrimeIndex
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateDirectSum
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 public import Mathlib.GroupTheory.Solvable
-public import Mathlib.Data.Set.Finite.Lemmas
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateDirectSum
+import OddOrder.GroupTheory.SolvablePrimeIndex
 
 /-!
 # Fong–Swan: `dim M ∣ |G|` for an absolutely irreducible solvable-group module (BG Lemma 2.3)

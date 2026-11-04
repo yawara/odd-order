@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
-public import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
+import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
 
 /-!
 # Peterfalvi §13 (pp. 80–83) — Core-typed `λ` correction supply

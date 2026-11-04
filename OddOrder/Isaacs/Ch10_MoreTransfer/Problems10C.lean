@@ -6,13 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.AugmentationIdeal
-public import Mathlib.LinearAlgebra.Basis.SMul
-public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import Mathlib.LinearAlgebra.Matrix.Trace
-public import Mathlib.LinearAlgebra.Matrix.Reindex
-public import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
-public import Mathlib.Analysis.Complex.Polynomial.Basic
-public import OddOrder.Mathlib.MonoidAlgebra
+public import Mathlib.Analysis.Complex.Norm
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Isaacs, *Finite Group Theory*, Problems 10C (pp. 324)

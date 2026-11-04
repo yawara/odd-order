@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
-public import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
+public import Mathlib.RepresentationTheory.Invariants
+import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 
 /-!
 # Orbit count for the σ-action on `Z(k[G])` via the class-sum basis

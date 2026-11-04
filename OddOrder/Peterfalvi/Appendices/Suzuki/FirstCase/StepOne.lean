@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.FieldAction
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (1): fixed points on `Q₀`

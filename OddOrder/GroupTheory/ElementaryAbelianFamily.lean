@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Elementary abelian subgroup families `ℰ_p^n(G)`

@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Index
 
 /-!
 # Relative indices inside a `p`-group

@@ -5,10 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Data.Rat.Floor
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 
 /-!
 # Brauer's third main theorem: the principal block induces the principal block

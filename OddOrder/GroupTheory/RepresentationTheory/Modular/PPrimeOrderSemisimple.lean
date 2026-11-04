@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Maschke
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 
 /-!
 # `k[Q]` is split semisimple when `p ∤ |Q|`

@@ -6,8 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.BrauerHomomorphism
-public import OddOrder.Algebra.ClassSum
-public import OddOrder.GroupTheory.PGroupRelIndex
+public import OddOrder.Algebra.RelativeTrace
+import OddOrder.Algebra.ClassSum
+import OddOrder.GroupTheory.PGroupRelIndex
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The kernel of the Brauer homomorphism

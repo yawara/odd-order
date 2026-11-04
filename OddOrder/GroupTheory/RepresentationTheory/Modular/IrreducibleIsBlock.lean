@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BlockOfSimpleModule
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # An irreducible representation has one of the irreducible Brauer characters

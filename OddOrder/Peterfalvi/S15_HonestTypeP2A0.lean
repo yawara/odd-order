@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup
-public import OddOrder.Peterfalvi.S10_TypePSupportA0
-public import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 public import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
 public import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.TSideDegrees
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S10_TypePSupportA0 -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 
 /-!
 # Peterfalvi (8.10)/(8.15): the honest type-`P₂` `A₀`-support `A₀(S) = A(S) ∪ V^S`

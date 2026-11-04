@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problems 6A.6 / 6A.7 / 6A.11 — Lemma 6.5 の仮説 (TI 条件) の演習 (書籍 pp. 185-186)

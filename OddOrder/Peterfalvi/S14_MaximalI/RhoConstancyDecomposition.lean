@@ -1,6 +1,10 @@
 module
 
 public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 
 /-!
 # Peterfalvi §12 — (12.3)-(12.5) 直交性と分解データ (前半)

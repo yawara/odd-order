@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart2
+public import OddOrder.Peterfalvi.S08_CoherenceCorePart2 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi §8 — the Sibley–Dade hypothesis: opening layer

@@ -6,8 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.GroupTheory.ElementaryAbelian
-public import Mathlib.GroupTheory.GroupAction.ConjAct
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Minimal `L`-invariant normal subgroups are elementary abelian

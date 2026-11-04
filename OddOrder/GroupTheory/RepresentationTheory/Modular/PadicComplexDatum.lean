@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.GroupAlgebraBlocks
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+public import Mathlib.NumberTheory.Padics.Complex
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.GroupAlgebraBlocks
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 
 /-!
 # The complete datum of a finite group over `𝓞_ℂ_[p]`

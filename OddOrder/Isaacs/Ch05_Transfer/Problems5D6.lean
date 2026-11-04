@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch05_Transfer.Main
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
+import OddOrder.Isaacs.Ch05_Transfer.Problems5D5
 
 /-!
 # Isaacs Problem 5D.6 — `A^p(G) ∩ P = P'` かつ `P'` 可換 (書籍 p. 170)

@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dimension.Free
 public import Mathlib.RepresentationTheory.Character
 
 /-!

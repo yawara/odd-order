@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBCrossZero
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCrossCommutatorInclusion
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleTypeCBCrossZero
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCrossCommutatorInclusion
 
 /-!
 # Higman's Lemma 13: cross commutators of type-C/B eigenfamily spans

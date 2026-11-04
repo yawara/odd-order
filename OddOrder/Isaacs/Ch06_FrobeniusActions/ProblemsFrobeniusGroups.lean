@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.FittingSelfCentralizing
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
 
 /-!
 # Isaacs Problems 6A — Frobenius 群そのものの演習 (書籍 p. 185)

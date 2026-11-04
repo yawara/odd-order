@@ -6,7 +6,23 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenSylow
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.NonsplitTorus
+public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.NonsplitTorus
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThirteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 
 /-!
 # Peterfalvi Part II, Ch. II, step (15): the cyclic subgroup `L` of order `9`

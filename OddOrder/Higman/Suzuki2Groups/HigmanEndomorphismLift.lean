@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.StdBasis
-public import OddOrder.GroupTheory.Homocyclic
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Higman Lemma 3: the one-minus-two endomorphism lift

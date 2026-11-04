@@ -6,8 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Group.End
-public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Tactic.Group
+public import Mathlib.Algebra.Group.Subgroup.Defs
+import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Tactic.Group
 
 /-!
 # Stability helpers for the coprime Frobenius kernel argument (Peterfalvi (9.1) corollary (i))

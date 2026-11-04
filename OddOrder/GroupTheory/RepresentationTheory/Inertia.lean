@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.Group
-public import Mathlib.GroupTheory.QuotientGroup.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+public import Mathlib.GroupTheory.Coset.Defs
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Conjugation action on class functions and the inertia group

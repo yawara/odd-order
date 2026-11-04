@@ -6,16 +6,17 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.Tactic.Group
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.Algebra.Group.End
-public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.Data.ZMod.QuotientGroup
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.RingTheory.ZMod.UnitsCyclic
-public import Mathlib.FieldTheory.Finite.GaloisField
-public import OddOrder.GroupTheory.ElementaryAbelian
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+public import Mathlib.GroupTheory.Nilpotent -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Isaacs Chapter 3 — Problems §3A: semidihedral 群と一般化四元数群 (3A.1, 3A.2)

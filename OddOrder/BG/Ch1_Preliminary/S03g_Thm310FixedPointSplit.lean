@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
-public import Mathlib.Algebra.Group.Action.End
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
 
 /-!
 # BG Theorem 3.10 — coprime fixed-point order split across an invariant normal subgroup

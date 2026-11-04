@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+public import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
+public import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+public import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Frobenius-family lower bound (Peterfalvi 7.10)

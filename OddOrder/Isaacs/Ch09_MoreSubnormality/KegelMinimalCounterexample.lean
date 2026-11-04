@@ -7,7 +7,11 @@ module
 
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
 public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Isaacs, Finite Group Theory — Problem 9D.4: Kegel 予想の極小反例 (p. 294)

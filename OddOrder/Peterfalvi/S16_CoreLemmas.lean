@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_LemmaC3_Setup
-public import OddOrder.Peterfalvi.S15_SAndT
+public import OddOrder.BG.AppC_HypothesisB
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # S16_CoreLemmas

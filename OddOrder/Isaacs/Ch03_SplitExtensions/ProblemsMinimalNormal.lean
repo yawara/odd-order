@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
-public import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+public import Mathlib.GroupTheory.Complement
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # Isaacs Problem 3C.4 (書籍 p. 90) — 自己中心化極小正規部分群は分裂する

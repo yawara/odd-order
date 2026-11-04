@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 public import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
-public import Mathlib.GroupTheory.SemidirectProduct
+public import Mathlib.GroupTheory.Index
+import Mathlib.GroupTheory.SemidirectProduct
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: `m`-arrows and the subgroups `K_m` (§8D)

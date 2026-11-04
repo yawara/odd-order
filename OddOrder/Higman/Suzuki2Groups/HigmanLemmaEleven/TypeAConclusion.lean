@@ -6,8 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.ProperExtension
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.PairGap
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 11: the type-A conclusion

@@ -5,11 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-public import OddOrder.Algebra.SemilinearFixedPoint
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RingTheory.SimpleModule.Rank
 public import Mathlib.RingTheory.LittleWedderburn
+public import Mathlib.Algebra.MonoidAlgebra.Defs
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.SimpleModule.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.Algebra.Algebra.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Finiteness
+import Mathlib.RepresentationTheory.Basic
+import Mathlib.RingTheory.SimpleModule.Rank
+import OddOrder.Algebra.SemilinearFixedPoint
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # Peterfalvi, Appendix I, Proposition 2 — the field structure

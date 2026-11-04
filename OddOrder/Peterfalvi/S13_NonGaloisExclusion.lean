@@ -5,10 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S13_TypeIIIGalois
-public import OddOrder.Peterfalvi.S13_TypeDetermination
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-public import OddOrder.GroupTheory.NilpotentAbelianization
+public import OddOrder.Peterfalvi.S12_Section9Counts
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizerBasic
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.NilpotentAbelianization
+import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S13_TypeDetermination
+import OddOrder.Peterfalvi.S13_TypeIIIGalois
 
 /-!
 # Peterfalvi (11.9.c) — the non-Galois `u = a` pin

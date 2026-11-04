@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Clifford
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Pointwise product of class functions; products of characters

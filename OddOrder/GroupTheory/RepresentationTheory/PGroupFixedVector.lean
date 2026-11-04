@@ -5,16 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
 public import Mathlib.RepresentationTheory.Invariants
 public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.Subgroup.Center
-public import Mathlib.Algebra.CharP.Basic
-public import Mathlib.Algebra.CharP.Algebra
-public import Mathlib.Algebra.CharP.Lemmas
-public import Mathlib.Algebra.Module.Torsion.Free
-public import Mathlib.FieldTheory.Finite.Basic
-public import OddOrder.Mathlib.Subgroup
+import Mathlib.Algebra.CharP.Algebra
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # p-Group Fixed Vector on a char-p Vector Space

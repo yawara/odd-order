@@ -5,19 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Fintype.Card
-public import Mathlib.Algebra.Group.Subgroup.Finite
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
 public import Mathlib.Algebra.Module.Submodule.LinearMap
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Tactic.Group
 public import OddOrder.GroupTheory.TISubset
-public import OddOrder.GroupTheory.CoprimeConjugacy
 public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.Peterfalvi.S02_Notation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Tactic.Positivity.Finset
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (2.2) — the Dade hypothesis: core structure

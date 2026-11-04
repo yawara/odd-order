@@ -1,6 +1,11 @@
 module
 
 public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Peterfalvi (5.6.3)/(5.6.2)/(5.5) — the coherence-union extension `τ₂` and its images

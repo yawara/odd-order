@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.Set.Finite.Lemmas
-public import Mathlib.GroupTheory.Sylow
 public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.GroupTheory.Index
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Data.SetLike.Fintype
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # 有限可解群の素数指数正規部分群

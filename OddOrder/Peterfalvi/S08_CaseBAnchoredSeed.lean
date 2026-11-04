@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBAssembly
 public import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
 public import OddOrder.Peterfalvi.S08_CaseBEnumeration
-public import OddOrder.Peterfalvi.S08_CaseBSeedSetup
+public import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
+public import OddOrder.Peterfalvi.S08_CaseBSeedSetup -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §6.8.2 case-(B) — per-column anchored seed (`hXanchored`)

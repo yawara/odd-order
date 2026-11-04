@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.GroupWithZero.Basic
-public import Mathlib.Algebra.Group.Basic
+public import Aesop.BuiltinRules
+public import Mathlib.Algebra.Group.Defs
+public import Mathlib.Algebra.GroupWithZero.Defs
+public import Mathlib.Algebra.Notation.Defs
 
 /-!
 # Near-fields: the `NearField` class

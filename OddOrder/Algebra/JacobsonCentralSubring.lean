@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
-public import Mathlib.RingTheory.Nakayama
-public import Mathlib.RingTheory.Finiteness.Basic
+public import Mathlib.RingTheory.Jacobson.Radical
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+import Mathlib.RingTheory.Nakayama
 
 /-!
 # The radical of a central subring over which the ring is finite

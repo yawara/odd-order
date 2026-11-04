@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
+import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs Ch. 9 — §9B: Theorem 9.13 (order bound), p. 279–282

@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 
 /-!
 # Peterfalvi §8 case-(B): coherence assembly

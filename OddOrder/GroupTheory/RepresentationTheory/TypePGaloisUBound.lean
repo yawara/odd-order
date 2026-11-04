@@ -5,11 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
 public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-public import OddOrder.Mathlib.CyclicSubgroupUnique
 public import Mathlib.RepresentationTheory.Subrepresentation
+public import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Data.ZMod.Units
+import Mathlib.RingTheory.IntegralDomain
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
+import OddOrder.Mathlib.CyclicSubgroupUnique
 
 /-!
 # The `typeP_Galois` `u`-bound dichotomy: `|U| ≤ (p^q − 1)/(p − 1)`

@@ -6,9 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
-public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
+public import OddOrder.Peterfalvi.Appendices.FeitSibley
+public import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 
 /-!
 # Peterfalvi Part II, Ch. III: the Feit–Sibley configuration

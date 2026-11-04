@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+public import OddOrder.GroupTheory.PRank
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 
 /-!
 # BG Theorem 4.20(c) — descending Hall radicals

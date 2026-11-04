@@ -7,8 +7,6 @@ module
 
 public import Mathlib.Algebra.Algebra.Pi
 public import Mathlib.Algebra.Algebra.Subalgebra.Lattice
-public import Mathlib.Algebra.BigOperators.Pi
-public import Mathlib.LinearAlgebra.Pi
 
 /-!
 # A separating subalgebra of a finite product of copies of a field is everything

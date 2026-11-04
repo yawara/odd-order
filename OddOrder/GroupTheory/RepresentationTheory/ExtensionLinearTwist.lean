@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
-public import OddOrder.GroupTheory.RepresentationTheory.CyclicCharacterExtension
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
 
 /-!
 # Extensions of an irreducible character differ by a linear character

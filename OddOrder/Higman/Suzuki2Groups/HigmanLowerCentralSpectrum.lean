@@ -5,26 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-public import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
-public import Mathlib.Algebra.Module.Submodule.Bilinear
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.Combinatorics.Colex
-public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.LinearAlgebra.Basis.Basic
-public import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
-public import Mathlib.LinearAlgebra.Charpoly.BaseChange
-public import Mathlib.LinearAlgebra.Eigenspace.Charpoly
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
-public import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
-public import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RingTheory.Adjoin.PowerBasis
 public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
-public import OddOrder.Higman.Suzuki2Groups.HigmanSpectrumBilinear
+public import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Combinatorics.Colex
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.Higman.Suzuki2Groups.HigmanSpectrumBilinear
 
 /-!
 # Higman's lower-central spectral argument

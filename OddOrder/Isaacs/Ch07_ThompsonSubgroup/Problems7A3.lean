@@ -5,12 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 public import Mathlib.LinearAlgebra.Matrix.Block
 public import Mathlib.LinearAlgebra.Matrix.IsDiag
 public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
-public import Mathlib.Algebra.Group.Pi.Units
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Algebra.Group.Pi.Units
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Isaacs Problem 7A.3 — `GL(n,q)` の Borel 部分群と `N_G(P)` (書籍 p. 209)

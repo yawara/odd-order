@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_XBlockCounting
+public import OddOrder.Peterfalvi.S08_DegreeSums.CoherenceGlue
+import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
+import OddOrder.Peterfalvi.S08_XBlockCounting
 
 /-!
 # Peterfalvi §8 — Sibley–Dade restriction/extension: opening layer

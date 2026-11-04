@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S09_FrobeniusHypothesis76
-public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (6.8) coherence for a Frobenius family — wiring the Sibley datum

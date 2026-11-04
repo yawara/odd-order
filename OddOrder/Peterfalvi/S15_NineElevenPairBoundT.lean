@@ -6,6 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_TSetMemberRFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S08_CoherenceWeighted
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11.1) at `T` — the (5.6) pair-bound world (pp. 87–91)

@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSemidihedral
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.GroupTheory.SemidirectProduct
+public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)

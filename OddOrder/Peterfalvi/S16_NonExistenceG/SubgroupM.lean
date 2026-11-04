@@ -2,6 +2,19 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
 public import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupMCore
+public import OddOrder.Peterfalvi.S16_G0Coprime
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S13_TypeDetermination
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
+import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+import OddOrder.Peterfalvi.S15_ComplementStructure
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SSideGaloisFieldModel
+import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
 
 /-!
 # Peterfalvi (14.4)/(14.6)/(14.11.3) — the `S`/`T`-side Frobenius kernels over the `M`-carrier

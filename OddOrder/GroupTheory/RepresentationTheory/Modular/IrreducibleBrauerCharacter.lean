@@ -7,6 +7,11 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 /-!
 # The irreducible Brauer characters `IBr(G)`

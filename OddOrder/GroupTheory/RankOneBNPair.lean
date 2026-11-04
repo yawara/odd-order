@@ -5,9 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Complement
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import Mathlib.Tactic.Group
 
 /-!
 # The mappings `f`, `g`, `h` of a rank-one split BN-pair

@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
+public import Mathlib.GroupTheory.PGroup
+public import Mathlib.GroupTheory.SpecificGroups.Quaternion
+public import OddOrder.GroupTheory.SemiDihedral
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8
 
 /-!
 # Isaacs Problem 6B.8 — 帰納法本体と主定理の組み立て (書籍 p. 196)

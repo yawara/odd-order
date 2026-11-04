@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S05_SigmaIsometry
-public import OddOrder.Peterfalvi.S05_GridTrichotomy
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_GridTrichotomy
 
 /-!
 # Peterfalvi (3.8): the trichotomy for the `σ`-coefficient grid

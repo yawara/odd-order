@@ -5,26 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RepresentationTheory.Submodule
-public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.LinearAlgebra.Charpoly.BaseChange
-public import Mathlib.LinearAlgebra.Determinant
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import Mathlib.LinearAlgebra.TensorProduct.Finiteness
-public import Mathlib.LinearAlgebra.TensorProduct.Tower
-public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-public import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import OddOrder.Isaacs.Ch05_Transfer.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG §2A-§2E — the basic representation propositions (Prop 2.1-2.4, Thm 2.5)

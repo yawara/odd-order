@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Charpoly.Basic
-public import Mathlib.RingTheory.Coprime.Lemmas
-public import Mathlib.RingTheory.Nakayama
-public import OddOrder.Algebra.AlgClosedFractionField
-public import OddOrder.Algebra.IdempotentLift
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import Mathlib.LinearAlgebra.Charpoly.Basic
+import Mathlib.RingTheory.Nakayama
+import OddOrder.Algebra.AlgClosedFractionField
+import OddOrder.Algebra.IdempotentLift
 
 /-!
 # Idempotents lift over a coefficient ring whose fraction field is algebraically closed

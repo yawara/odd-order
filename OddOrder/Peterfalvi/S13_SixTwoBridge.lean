@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 public import OddOrder.Peterfalvi.S08_SixTwoGeneral
+public import OddOrder.Peterfalvi.S12_Section9Counts
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
 
 /-!
 # Peterfalvi §11 bridge to the general (6.2) index bound (the h56 routine pins)

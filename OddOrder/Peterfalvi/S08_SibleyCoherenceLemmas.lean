@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
+public import OddOrder.Peterfalvi.S08_CoherenceBasic
+import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
+import OddOrder.Peterfalvi.S08_RestrictExtensionDvd
+import OddOrder.Peterfalvi.S08_SibleyRestrictionLemmas
 
 /-!
 # Peterfalvi §8 — Sibley–Dade coherence: opening lemma layer

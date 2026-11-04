@@ -6,8 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi (1.2): vanishing of an irreducible character off trivial subgroup-centralizers

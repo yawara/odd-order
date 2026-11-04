@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.FormalCommutator
+public import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The collecting process on formal words

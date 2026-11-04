@@ -5,10 +5,24 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
-public import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
-public import OddOrder.BG.AppB_PuigB3B4
 public import Mathlib.GroupTheory.SpecificGroups.ZGroup
+public import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppB_PuigB3B4
+import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+import OddOrder.BG.Ch2_Uniqueness.S09_Lemma95
+import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG §10 局所判定補題 (Lemmas 10.3 / 10.4)

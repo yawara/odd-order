@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+public import Mathlib.RepresentationTheory.Character
 
 /-!
 # Character values at an element of order dividing `4` that is real

@@ -6,9 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.GlaubermanZStar.Fusion
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+public import Mathlib.FieldTheory.PurelyInseparable.Basic
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Valuation.LocalSubring
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 
 /-!
 # Glauberman's `Z*`-theorem: Step 8 — the character is constant on `cl(v)·cl(u)`

@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # A bilinear lift of a quadratic map, adapted to a scaling law

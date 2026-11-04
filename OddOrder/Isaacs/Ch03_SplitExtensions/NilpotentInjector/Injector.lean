@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
 
 /-!
 # Isaacs Problem 3C.8 — injector の `{p}`-部分は `C(p)` の Sylow `p`-部分群

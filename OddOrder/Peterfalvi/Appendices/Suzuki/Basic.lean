@@ -6,12 +6,17 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.Sylow
-public import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
-public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
-public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
-public import OddOrder.GroupTheory.OddOrderInvolution
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Peterfalvi Part II: hypotheses (A1)–(A3) and Ch. I §1 Proposition 1

@@ -6,6 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_Problem1Lattice
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Algebra.PaleySpanning
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Problem 1: the trace obstruction

@@ -6,13 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.QuotientGroup.Basic
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Critical subgroups (Gorenstein Thm 5.3.11 / 5.3.13)

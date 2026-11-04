@@ -6,9 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.FixedPointFree
-public import Mathlib.GroupTheory.Nilpotent
-public import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 
 /-!
 # Simplicity of the standard projective unitary group

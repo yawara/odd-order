@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Invariants
 
 /-!
 # The sum of a character over the group counts the invariants

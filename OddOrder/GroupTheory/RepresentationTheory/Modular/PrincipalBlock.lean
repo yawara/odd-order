@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.CentralCharacterBlock
-public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 public import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
 
 /-!

@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Star.Basic
 public import Mathlib.FieldTheory.Finite.Extension
-public import Mathlib.FieldTheory.Finite.Trace
-public import Mathlib.GroupTheory.Coset.Basic
+public import Mathlib.RingTheory.Trace.Defs
+import Mathlib.FieldTheory.Finite.Trace
 
 /-!
 # The quadratic field for three-dimensional projective unitary groups

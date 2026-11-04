@@ -5,7 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+public import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppA_PStability
+import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # BG §8 — `SCN₃` and the Fitting subgroup of a maximal subgroup (scn3_map layer)

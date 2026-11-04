@@ -6,8 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Eigenspace.Basic
-public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-public import Mathlib.LinearAlgebra.Dimension.Finite
 
 /-!
 # Conjugating an operator into a scalar multiple of itself shifts its eigenvalues

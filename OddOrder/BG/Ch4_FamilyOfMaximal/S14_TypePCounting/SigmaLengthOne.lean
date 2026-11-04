@@ -1,6 +1,27 @@
 module
 
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Conjugacy145C
+import Mathlib.Algebra.Group.Pointwise.Set.Card
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
+import OddOrder.GroupTheory.ThompsonSubgroup
 
 /-!
 # TAIL

@@ -6,11 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Basic.Complex.Basic
-public import Mathlib.LinearAlgebra.Span.Basic
 public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Irreducible
 public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 
 /-!
 # The virtual character lattice `ℤ[Irr G]`

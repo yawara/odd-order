@@ -5,12 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.LinearAlgebra.Trace
-public import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
-public import OddOrder.Mathlib.MonoidAlgebra
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Completeness of irreducible characters (work in progress)

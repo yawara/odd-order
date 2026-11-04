@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Maschke
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.RepresentationTheory.Maschke
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 
 /-!
 # Reducibility of a faithful non-cyclic commutative representation over `𝔽_p`

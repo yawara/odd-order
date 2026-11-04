@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.ThompsonSubgroup
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problem 7A.5 — 正規 elementary abelian 部分群は `𝓔(P)` の元を正規化する

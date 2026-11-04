@@ -5,12 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
 
 /-!
 # BG §3E: Proposition 3.9 and Theorem 3.10

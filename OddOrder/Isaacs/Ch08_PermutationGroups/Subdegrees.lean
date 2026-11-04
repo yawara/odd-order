@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import Mathlib.GroupTheory.Index
+public import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
+import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: subdegrees (Thm 8.37, 8.38, Lem 8.39)

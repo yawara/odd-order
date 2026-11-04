@@ -5,13 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.PID
-public import Mathlib.Algebra.Polynomial.Module.AEval
-public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.FieldTheory.Separable
-public import Mathlib.LinearAlgebra.AnnihilatingPolynomial
-public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.Algebra.Module.PID
+import Mathlib.LinearAlgebra.AnnihilatingPolynomial
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # The Frobenius polynomial action on `GaloisField p q` is cyclic

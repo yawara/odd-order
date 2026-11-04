@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 public import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Henselian
+import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # The character table over a splitting field is square

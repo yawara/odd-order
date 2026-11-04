@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBAssembly
-public import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
-public import OddOrder.Peterfalvi.S08_CaseBEnumeration
+public import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S08_CaseBCoherence
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
+import OddOrder.Peterfalvi.S08_CaseBTransport
+import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §8 — the case-B anchored seed: setup layer

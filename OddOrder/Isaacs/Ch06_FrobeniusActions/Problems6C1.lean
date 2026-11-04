@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # Isaacs Problem 6C.1(a) — 素数位数の固定点自由な自己同型 (書籍 p. 197)

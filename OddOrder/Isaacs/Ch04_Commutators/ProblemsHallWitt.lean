@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
-public import OddOrder.Isaacs.Ch04_Commutators.ProblemsNilpotencyClass
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsNilpotencyClass
 
 /-!
 # Isaacs Chapter 4 — Problems 4B.1 / 4B.4 (three subgroups lemma の応用)

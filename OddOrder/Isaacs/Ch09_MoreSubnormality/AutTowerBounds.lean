@@ -5,12 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import Mathlib.GroupTheory.QuotientGroup.Basic
 public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.Index
-public import Mathlib.Data.Fintype.Perm
-public import Mathlib.Tactic.Group
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Data.Fintype.Perm
+import Mathlib.GroupTheory.Coset.Card
+import Mathlib.GroupTheory.QuotientGroup.Basic
+import Mathlib.Tactic.Group
 
 /-!
 # Isaacs Ch. 9 — §9B: Lemma 9.12 / Lemma 9.14 (tower の bounding 補題, pp. 278-279)

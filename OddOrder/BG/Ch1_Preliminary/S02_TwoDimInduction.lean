@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S02_FixedSubmodules
+public import OddOrder.BG.Ch1_Preliminary.S02_FixedQuotientMachinery
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.LinearAlgebra.Charpoly.BaseChange
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import OddOrder.BG.Ch1_Preliminary.S02_FixedSubmodules
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # BG §2F — the odd two-dimensional induction machinery

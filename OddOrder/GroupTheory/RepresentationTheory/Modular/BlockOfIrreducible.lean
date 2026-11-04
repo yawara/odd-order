@@ -6,9 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 
 /-!
 # The block of an ordinary irreducible character

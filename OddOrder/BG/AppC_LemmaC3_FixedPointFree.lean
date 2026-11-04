@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppC_LemmaC3_Step4Capstone
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3 Step 4: the fixed-point-free argument and `s₁ = s⁻¹`

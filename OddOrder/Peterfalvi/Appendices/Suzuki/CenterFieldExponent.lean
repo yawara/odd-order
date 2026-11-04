@@ -6,7 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
-public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.Tactic.Bound
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # The coordinate on `Q₀ = Z(Q)` inside `E`, and the exponent `d`

@@ -5,13 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.AdicCompletion.LocalRing
-public import Mathlib.RingTheory.AdjoinRoot
-public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
-public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
-public import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
-public import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
-public import OddOrder.Algebra.AdicCompletePi
+import Mathlib.RingTheory.AdicCompletion.LocalRing
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
+import OddOrder.Algebra.AdicCompletePi
 
 /-!
 # The cyclotomic extension `A[ζ_n] = A[X]/Φ_n`

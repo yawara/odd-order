@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
-public import OddOrder.Peterfalvi.S08_CaseBCoherence
-public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.Peterfalvi.S08_CaseBCoherence
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # S08_CaseBTransport

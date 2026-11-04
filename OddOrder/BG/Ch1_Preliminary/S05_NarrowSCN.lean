@@ -5,18 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
-public import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
-public import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
-public import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
-public import OddOrder.BG.Ch1_Preliminary.PLength
 public import OddOrder.GroupTheory.NarrowPGroup
 public import OddOrder.GroupTheory.SCN
-public import OddOrder.GroupTheory.OmegaSubgroup
-public import OddOrder.GroupTheory.OpResidual
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.Isaacs.Ch05_Transfer.Main
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
+import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG §5: Narrow `p`-Groups — Lemmas 5.1 / 5.2

@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+public import OddOrder.GroupTheory.CriticalSubgroup
+public import OddOrder.GroupTheory.SubgroupInAmbient
+import Mathlib.Algebra.Order.Star.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # BG §1 tail — §1D-§1G (Thm 1.11-1.13, Lem 1.14-1.16, Thm 1.17-1.20, Lem 1.21-1.22)

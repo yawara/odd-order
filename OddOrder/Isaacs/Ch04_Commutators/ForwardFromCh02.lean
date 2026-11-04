@@ -5,11 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.Solvable
 public import OddOrder.GroupTheory.ElementaryAbelian
-public import OddOrder.Isaacs.Ch02_Subnormality.Main
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Ch.4 → Ch.2 forward dependencies

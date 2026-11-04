@@ -7,7 +7,7 @@ module
 
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
-public import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.PrimeComplementResidual
 
 /-!
 # Isaacs Ch. 9 — §9B: Lemma 9.17 / Corollary 9.18 (p. 281)

@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Alternating
+public import Mathlib.GroupTheory.Subgroup.Simple
+import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs Problems 8C (pp. 256–257) — 位数 120 の単純群は無い

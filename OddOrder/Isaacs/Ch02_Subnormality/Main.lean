@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.DihedralBasics
 public import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
 
 /-!
 # TAIL

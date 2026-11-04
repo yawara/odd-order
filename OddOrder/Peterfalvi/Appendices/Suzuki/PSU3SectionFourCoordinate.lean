@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the linear equation (4)

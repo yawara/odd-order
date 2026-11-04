@@ -1,6 +1,14 @@
 module
 
 public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.SemidirectAut
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # TAIL

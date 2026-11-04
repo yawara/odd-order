@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CoprimeFixedPoints
-public import OddOrder.GroupTheory.MinimalInvariantNormal
+public import OddOrder.GroupTheory.FixedSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.MinimalInvariantNormal
 
 /-!
 # Peterfalvi (9.1): the chief-series assembly of Wielandt's fixed-point formula

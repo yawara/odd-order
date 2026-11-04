@@ -5,18 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
 public import Mathlib.RepresentationTheory.Invariants
 public import Mathlib.RepresentationTheory.Irreducible
 public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
-public import Mathlib.LinearAlgebra.TensorProduct.Basis
-public import Mathlib.LinearAlgebra.TensorProduct.Tower
-public import Mathlib.LinearAlgebra.TensorProduct.Pi
-public import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
-public import Mathlib.RingTheory.Flat.Basic
-public import Mathlib.RingTheory.Flat.Equalizer
-public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+import Mathlib.LinearAlgebra.TensorProduct.Pi
+import Mathlib.RingTheory.Flat.Equalizer
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 
 /-!
 # Scalar extension (base change) of group representations

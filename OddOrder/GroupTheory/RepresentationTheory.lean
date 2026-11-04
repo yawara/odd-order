@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-module
+module -- shake: keep-all
 
 public import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
@@ -39,3 +39,6 @@ public import OddOrder.GroupTheory.RepresentationTheory.SubrepresentationKernel
 public import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
 public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc

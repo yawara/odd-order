@@ -6,10 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.Index
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 
 /-!
 # Peterfalvi Part II, Ch. I §1: Proposition 5 (`V = C_D(s)`, `W = C_D(H∩I)`)

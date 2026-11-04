@@ -6,6 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (8), without `V = W`

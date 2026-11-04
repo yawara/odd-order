@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
-public import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
+import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
 
 /-!
 # Peterfalvi Part II, Ch. I §3, Lemma 5: cyclicity of `W` and `|W| ∣ q + 1`

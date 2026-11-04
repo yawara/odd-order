@@ -6,9 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-public import Mathlib.Data.ZMod.Basic
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionBasics
+public import Mathlib.Algebra.Field.ZMod
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Problems 6A — Frobenius 作用の演習 (書籍 pp. 184-186)

@@ -5,10 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.CenterIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
 
 /-!
 # Navarro (3.9): `Irr(B)` is a single connected component of the Brauer graph

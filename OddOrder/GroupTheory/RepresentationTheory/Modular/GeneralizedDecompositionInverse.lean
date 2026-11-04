@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 
 /-!
 # The generalized decomposition numbers at `x⁻¹`, read inside `C_G(x)`

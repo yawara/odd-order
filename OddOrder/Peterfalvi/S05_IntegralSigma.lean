@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S05_SigmaIsometry
-public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S07_Coherence.DifferenceImage
 
 /-!
 # Peterfalvi §5: the (3.2) σ-isometry as an integral character map

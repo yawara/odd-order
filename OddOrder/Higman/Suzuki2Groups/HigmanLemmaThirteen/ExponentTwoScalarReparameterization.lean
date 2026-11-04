@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoLambdaCoherence
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
 
 /-!
 # Higman Lemma 13: scalar reparameterization of a common factor

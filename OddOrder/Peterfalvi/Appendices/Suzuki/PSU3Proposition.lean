@@ -5,8 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
 
 /-!
 # Peterfalvi Part II, Ch. IV §3: the Proposition

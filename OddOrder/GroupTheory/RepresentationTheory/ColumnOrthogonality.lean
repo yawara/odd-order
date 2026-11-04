@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Second (column) orthogonality of irreducible characters, unconditional form

@@ -7,7 +7,12 @@ module
 
 public import OddOrder.GroupTheory.ChiefFactor
 public import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
-public import Mathlib.GroupTheory.Abelianization.Finite
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import OddOrder.Peterfalvi.S06_CertainHypothesis46
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: degree arithmetic and the Sibley–Dade carrier

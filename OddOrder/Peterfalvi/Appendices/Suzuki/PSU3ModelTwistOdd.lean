@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
+public import OddOrder.Algebra.FrobeniusExponentPairs
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 
 /-!
 # The odd order of the model's twist

@@ -5,7 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.SimpleModule.Isotypic
+public import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.RingTheory.SimpleModule.Isotypic
 
 /-!
 # Independence of pairwise non-isomorphic simple submodules

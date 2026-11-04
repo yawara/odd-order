@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.GlaubermanZStar.FinalContradiction
-public import OddOrder.GroupTheory.BrauerSuzukiEndgame
+public import OddOrder.GroupTheory.BrauerSuzukiGeneral
+public import OddOrder.GroupTheory.GlaubermanZStar.Reduction
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.GlaubermanZStar.Basic
+import OddOrder.GroupTheory.GlaubermanZStar.FinalContradiction
+import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
+import OddOrder.GroupTheory.IsolatedInvolution
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Glauberman's `Z*`-theorem

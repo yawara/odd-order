@@ -5,12 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.FiniteAbelian.Duality
-public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-public import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 
 /-!
 # Gallagher's decomposition for a coprime abelian quotient (toward Isaacs 6.17)

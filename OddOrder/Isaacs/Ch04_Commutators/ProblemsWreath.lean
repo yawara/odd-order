@@ -6,12 +6,17 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Algebra.Field.ZMod
-public import Mathlib.Data.Nat.Choose.Dvd
-public import Mathlib.Algebra.Polynomial.Coeff
-public import Mathlib.Algebra.Polynomial.Div
-public import Mathlib.Algebra.Ring.GeomSum
 public import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
-public import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
+public import Mathlib.Algebra.Polynomial.Basic
+public import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Algebra.CharP.Lemmas
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.RingTheory.Polynomial.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Problems
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.7 (正則 wreath product の元の位数)

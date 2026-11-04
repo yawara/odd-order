@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.GroupTheory.Sylow
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 
 /-!
 # The standard root group is Sylow in PSL(2,F)

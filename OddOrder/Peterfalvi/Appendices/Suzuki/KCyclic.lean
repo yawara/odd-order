@@ -6,8 +6,13 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
-public import OddOrder.Peterfalvi.Appendices.Huppert
-public import OddOrder.FeitThompson
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.FeitThompson
+import OddOrder.GroupTheory.OddOrderInvolution
+import OddOrder.Peterfalvi.Appendices.Huppert
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
 
 /-!
 # Peterfalvi Part II, Ch. I §2, Proposition 2: `K` is a cyclic normal subgroup of `D`

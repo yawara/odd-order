@@ -8,6 +8,14 @@ module
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
 public import OddOrder.GroupTheory.SylowTransport
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+public import Mathlib.GroupTheory.Commutator.Finite -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the PSL centralizer root group

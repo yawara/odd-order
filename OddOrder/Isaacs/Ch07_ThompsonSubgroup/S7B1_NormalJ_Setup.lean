@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
+public import OddOrder.GroupTheory.OmegaSubgroup
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
 /-!
 # Isaacs FGT Ch.7 — normal-J theorem (Thm 7.6), Steps 1-5 + the `V`-setup (pp. 209-214)

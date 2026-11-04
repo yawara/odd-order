@@ -5,10 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
-public import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
-public import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
-public import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.ConjClassCardinality
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
+import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # Peterfalvi (6.7), odd-order assembly

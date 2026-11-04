@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
+public import OddOrder.Algebra.AlgInt
+public import OddOrder.Peterfalvi.S08_CoherenceBasic
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
+import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Peterfalvi.S08_CentralCommutatorRestriction
 
 /-!
 # Peterfalvi (6.8) setting: coherence of `X(Z_c) ∪ Y` and the `(6.7)` congruences

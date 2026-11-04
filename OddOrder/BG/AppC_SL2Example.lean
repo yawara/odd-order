@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.CharP.Two
-public import Mathlib.LinearAlgebra.Matrix.Notation
-public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-public import OddOrder.BG.AppC_FinalContradiction
+public import OddOrder.BG.AppC_HypothesisB
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.AppC_FinalContradiction
 
 /-!
 # BG Appendix C, Remark (II): Peterfalvi's `SL(2, 2^q)` example

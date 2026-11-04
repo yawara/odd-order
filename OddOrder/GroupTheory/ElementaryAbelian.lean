@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.FiniteAbelian.Basic
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.GroupTheory.Sylow
-public import OddOrder.Mathlib.Subgroup
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.FiniteAbelian.Basic
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Elementary Abelian Groups

@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Analysis.Complex.Polynomial.Basic
 public import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
 public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Analysis.Complex.Polynomial.Basic
 
 /-!
 # Extension of an invariant irreducible character along a cyclic quotient

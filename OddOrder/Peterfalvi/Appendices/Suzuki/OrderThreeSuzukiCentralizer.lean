@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-public import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 
 /-!
 # Peterfalvi Part II, Ch. I §3 Lemma 5: centralizers of nontrivial elements of W

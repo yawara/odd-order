@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
-public import OddOrder.Peterfalvi.S12_Props109To1011
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S08_CaseBCoherence2 -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+public import OddOrder.Peterfalvi.S12_Props109To1011 -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (10.10.3)–(10.10.4): type-V case (c) — column characters and the coherence glue

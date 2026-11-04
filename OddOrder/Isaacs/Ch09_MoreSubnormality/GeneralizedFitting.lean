@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
-public import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs Ch. 9 — §9A: generalized Fitting subgroup F*(G) と Thm 9.8 / Cor 9.9 (p. 275)

@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
-public import Mathlib.Order.Interval.Set.Basic
-public import Mathlib.Data.Set.Function
-public import Mathlib.Tactic.Group
+public import Mathlib.Algebra.Group.Pointwise.Set.Basic
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Tactic.Group
 
 /-!
 # Isaacs, *Finite Group Theory*, Appendix — products of two subgroups

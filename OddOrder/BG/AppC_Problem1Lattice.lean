@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.RelationLattice
 public import OddOrder.BG.AppC_Problem1
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import OddOrder.Algebra.PaleySpanning
+import OddOrder.Algebra.RelationLattice
+import OddOrder.BG.AppC_FrobeniusBasics
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # BG Appendix C, Problem 1: the relation lattice of a witness

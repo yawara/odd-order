@@ -5,10 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.LinearIndependent.Basic
-public import Mathlib.Algebra.Group.Units.Hom
-public import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
-public import Mathlib.FieldTheory.Finite.Trace
+public import Mathlib.RingTheory.Trace.Defs
+import Mathlib.FieldTheory.Finite.Trace
 
 /-!
 # Independence of power monomials on the unit group of a field

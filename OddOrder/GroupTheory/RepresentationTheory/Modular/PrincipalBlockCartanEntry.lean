@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CentralSylowComplement
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.CentralSylowComplement
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+import OddOrder.GroupTheory.ThreeStepGroup
 
 /-!
 # Navarro (6.13): the Cartan matrix of `B_0` is the `1 × 1` matrix `(|G|_p)`

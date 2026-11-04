@@ -6,9 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.FieldTheory.Perfect
-public import Mathlib.FieldTheory.Separable
-public import Mathlib.RingTheory.AdjoinRoot
 
 /-!
 # Counting monic irreducible polynomials over a prime field

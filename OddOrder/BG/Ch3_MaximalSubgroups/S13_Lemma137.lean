@@ -6,8 +6,23 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
-public import OddOrder.GroupTheory.CoprimeConjugacy
-public import OddOrder.Mathlib.Subgroup
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
+import OddOrder.GroupTheory.CoprimeConjugacy
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # BG §13: Lemma 13.7 (`E₁E₃` prime on `M_σ`) + prime-action helpers

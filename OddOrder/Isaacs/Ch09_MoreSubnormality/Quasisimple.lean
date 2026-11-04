@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.IsPerfect
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Isaacs Ch. 9 — §9A: quasisimple groups (pp. 271-273)

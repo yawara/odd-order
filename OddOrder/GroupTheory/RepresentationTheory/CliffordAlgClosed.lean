@@ -6,12 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.Algebra.MonoidAlgebra.MapDomain
-public import Mathlib.RingTheory.SimpleModule.Basic
 public import Mathlib.RingTheory.SimpleModule.Isotypic
-public import Mathlib.RingTheory.Artinian.Module
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
-public import Mathlib.Algebra.Module.Submodule.RestrictScalars
 
 /-!
 # Conjugation permutes the simple constituents of a restriction (general field)

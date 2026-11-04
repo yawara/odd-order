@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Order.BigOperators.Group.Finset
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.Index
-public import Mathlib.Tactic.Group
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.Tactic.Group -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Isaacs Problems 8A (pp. 235–236) — 剰余類・指数と軌道

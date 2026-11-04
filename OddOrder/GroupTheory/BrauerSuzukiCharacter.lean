@@ -7,7 +7,13 @@ module
 
 public import OddOrder.GroupTheory.BrauerSuzukiTISubset
 public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+public import OddOrder.GroupTheory.RepresentationTheory.Inertia
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Brauer–Suzuki: the character `θ` on `N` (Gorenstein Ch. 12, Lemma 1.4)

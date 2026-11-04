@@ -5,12 +5,23 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RankOneBNPairRigidity
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
 public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
 public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
 public import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.OddOrderInvolution
+public import OddOrder.GroupTheory.RankOneBNPairRigidity -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 
 /-!
 # Ch. IV §4, step (2): the *intrinsic* standing hypothesis on `U/Z(U)`

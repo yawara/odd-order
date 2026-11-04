@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthBound
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthBound
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
 
 /-!
 # Higman's classification of Suzuki 2-groups

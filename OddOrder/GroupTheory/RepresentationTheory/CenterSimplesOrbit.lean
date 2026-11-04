@@ -8,6 +8,8 @@ module
 public import OddOrder.Algebra.AugmentationIdeal
 public import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
 public import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
+public import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 
 /-!
 # The `MulAut G`-action on the simples, and its compatibility with `centerRep`

@@ -5,13 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-public import Mathlib.Algebra.Group.Submonoid.Membership
-public import Mathlib.Algebra.Group.Subgroup.Pointwise
-public import Mathlib.Algebra.Order.BigOperators.Group.Finset
-public import Mathlib.Basic.Finite.Prod
 public import Mathlib.Data.Set.Finite.Basic
-public import Mathlib.Tactic.Group
+public import Mathlib.Algebra.BigOperators.Group.List.Defs
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Basic.Finite.Prod
+import Mathlib.Tactic.Group
 
 /-!
 # Isaacs Thm 5.10: Dietzmann's theorem (p. 159)

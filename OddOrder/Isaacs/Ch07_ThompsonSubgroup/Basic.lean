@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7D1_BurnsideSetup
+public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ_Setup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplement
 
 /-!
 # Basic

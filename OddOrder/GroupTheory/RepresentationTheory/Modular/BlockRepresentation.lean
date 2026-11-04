@@ -7,7 +7,6 @@ module
 
 public import Mathlib.RepresentationTheory.Basic
 public import OddOrder.Algebra.CentralCharacter
-public import OddOrder.Algebra.PiMatrixSimpleModules
 
 /-!
 # The representation carried by a block

@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+public import OddOrder.GroupTheory.FrattiniPGroup -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 
 /-!
 # Higman's Lemma 13: the ambient zeroth layer in the Frattini quotient

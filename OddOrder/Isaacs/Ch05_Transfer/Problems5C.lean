@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.SchurZassenhaus
 public import OddOrder.GroupTheory.AbelianPowerSubgroups
-public import OddOrder.GroupTheory.WeaklyClosed
 public import OddOrder.Isaacs.Ch05_Transfer.Basic
-public import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.Schreier
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.WeaklyClosed
 
 /-!
 # Isaacs Chapter 5 — Problems 5C (transfer と非単純性)

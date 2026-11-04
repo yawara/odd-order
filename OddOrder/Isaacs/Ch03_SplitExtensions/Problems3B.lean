@@ -5,7 +5,23 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3BSolvability
+public import Mathlib.GroupTheory.Complement
+public import Mathlib.GroupTheory.Frattini
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Chapter 3 — Problems §3B (Schur-Zassenhaus と可解群)

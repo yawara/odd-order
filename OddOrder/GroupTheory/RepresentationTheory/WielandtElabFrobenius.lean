@@ -5,11 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
-public import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 public import OddOrder.GroupTheory.WielandtPerFactorDischarge
-public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import Mathlib.Algebra.Field.ZMod
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
+import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 
 /-!
 # Peterfalvi (9.1): the kernel-FPF identity (†) over `𝔽_p`, via base change

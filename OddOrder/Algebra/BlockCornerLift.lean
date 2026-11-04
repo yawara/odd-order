@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BlockCornerInverse
 public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.Algebra.BlockIdempotent
+import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
+import OddOrder.Algebra.BlockCornerInverse
+import OddOrder.Algebra.CornerInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 
 /-!
 # Navarro (5.5)

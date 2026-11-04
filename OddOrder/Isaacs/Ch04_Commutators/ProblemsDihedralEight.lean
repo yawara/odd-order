@@ -7,6 +7,10 @@ module
 
 public import Mathlib.GroupTheory.SpecificGroups.Dihedral
 public import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathNonCommutator
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.12(c) の `H = D₈` の場合

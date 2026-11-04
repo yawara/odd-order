@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
-public import OddOrder.Mathlib.Subgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SpecificGroups.ZGroup
+import Mathlib.NumberTheory.Multiplicity
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — finite abelian Z-groups, Lemma 6.16, Frobenius group Thm 6.4

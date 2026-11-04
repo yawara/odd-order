@@ -1,6 +1,8 @@
 module
 
 public import OddOrder.Peterfalvi.S09_NonexistenceCertain.NormalCase
+public import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # QuadraticTerm

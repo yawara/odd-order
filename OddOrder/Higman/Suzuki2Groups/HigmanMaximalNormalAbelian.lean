@@ -5,13 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanFinalCase
-public import OddOrder.Higman.Suzuki2Groups.HigmanCoverPowerOverlap
-public import OddOrder.Higman.Suzuki2Groups.HigmanCoverDerivedSeries
-public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
+public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverDerivedSeries
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverPowerOverlap
+import OddOrder.Higman.Suzuki2Groups.HigmanFinalCase
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman Lemma 9: maximal normal invariant abelian subgroups

@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Transfer
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.GroupTheory.Transfer
 
 /-!
 # 巡回 Sylow 部分群と Burnside の正規 `p`-補群定理

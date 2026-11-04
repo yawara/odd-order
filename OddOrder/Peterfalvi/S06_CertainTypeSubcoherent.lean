@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S06_CertainTypeCoherence
-public import OddOrder.Peterfalvi.S06_CertainTypeSupport
-public import OddOrder.Peterfalvi.S08_CrossOrthogonality
 public import OddOrder.Peterfalvi.S08_InducedKernelFamily
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S08_CaseBCoherence2.ConstituentPinning
+public import OddOrder.Peterfalvi.S08_CrossOrthogonality -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S08_YsetInner -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (5.3)(b): subcoherence of an induction family over Hypothesis (4.6)

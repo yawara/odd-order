@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
+public import Mathlib.Algebra.IsPrimePow
+public import Mathlib.GroupTheory.Index
+public import Mathlib.GroupTheory.Solvable
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 
 /-!
 # Isaacs Chapter 3 — Problems §3B (前半: 可解性の判定)

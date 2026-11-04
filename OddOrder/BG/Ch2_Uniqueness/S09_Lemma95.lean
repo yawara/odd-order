@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch2_Uniqueness.S09_ChiefSeriesStabilizer
+public import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+public import OddOrder.GroupTheory.ChiefFactor
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowSCN
+import OddOrder.BG.Ch2_Uniqueness.S09_ChiefSeriesStabilizer
+import OddOrder.BG.Ch2_Uniqueness.S09_Corollaries
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # TAIL

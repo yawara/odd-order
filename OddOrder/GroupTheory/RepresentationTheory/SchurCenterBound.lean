@@ -5,13 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Analysis.Complex.Polynomial.Basic
-public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Irreducible
-public import Mathlib.GroupTheory.Subgroup.Center
-public import Mathlib.GroupTheory.Index
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 public import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 
 /-!
 # Schur's center bound: `χ(1)² ≤ |G : Z|`

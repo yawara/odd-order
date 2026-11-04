@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.CommutatorSpan
+public import Mathlib.Algebra.Algebra.Hom
+import Mathlib.Tactic.NormNum.Inv
+import Mathlib.Tactic.NormNum.Pow
 
 /-!
 # The commutator span and its `p`-radical along algebra maps

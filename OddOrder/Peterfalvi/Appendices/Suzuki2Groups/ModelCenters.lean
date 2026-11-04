@@ -5,8 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 public import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
 
 /-!
 # Centers of the type-B/C/D models have exponent two

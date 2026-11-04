@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BlockCornerLift
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
+public import OddOrder.Algebra.BlockIdempotent
+public import OddOrder.Algebra.CenterIdempotentLift
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
+import OddOrder.Algebra.BlockCornerLift
 
 /-!
 # Navarro (5.6)

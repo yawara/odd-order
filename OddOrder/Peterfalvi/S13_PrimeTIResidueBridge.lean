@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup
-public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
 public import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The `S`-side prime-TI residue grid of the `(13.1)` hypothesis (Peterfalvi §13, issues 9014/9076)

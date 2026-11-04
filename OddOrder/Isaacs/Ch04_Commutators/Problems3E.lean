@@ -5,11 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-public import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
 public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-public import OddOrder.Isaacs.Ch04_Commutators.ProblemsCyclicSylow
+public import OddOrder.GroupTheory.FixedSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsCyclicSylow
 
 /-!
 # Isaacs §3E の演習 (書籍 pp. 106-107)

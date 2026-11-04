@@ -6,6 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): the complement `T = [R, s]` and regularity

@@ -7,6 +7,8 @@ module
 
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 public import Mathlib.RepresentationTheory.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # BG §3B: Lemma 3.3 (Wielandt's fixed-point lemma for Frobenius groups)

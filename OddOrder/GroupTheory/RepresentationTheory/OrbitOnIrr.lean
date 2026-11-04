@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Cardinality of an irreducibly-induced family (the `G/H`-orbit count)

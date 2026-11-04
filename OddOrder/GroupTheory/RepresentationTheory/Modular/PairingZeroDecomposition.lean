@@ -6,7 +6,10 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
 
 /-!
 # Navarro's pairing `[·,·]⁰` in terms of the decomposition numbers

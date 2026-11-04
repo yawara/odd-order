@@ -6,8 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.PRegularCosetSubgroup
-public import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
-public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetInduction
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+public import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.AlgInt
+import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
+import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetInduction
 
 /-!
 # Gorenstein Lemma 7.6, packaged

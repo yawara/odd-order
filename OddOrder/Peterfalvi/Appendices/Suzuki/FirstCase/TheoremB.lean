@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
-public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 
 /-!
 # Peterfalvi Part II, Ch. II: Theorem B

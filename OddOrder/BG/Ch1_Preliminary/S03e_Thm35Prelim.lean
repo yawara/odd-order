@@ -5,15 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Invariants
-public import Mathlib.LinearAlgebra.Eigenspace.Pi
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
-public import Mathlib.GroupTheory.Commutator.Basic
-public import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
-public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-public import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.Eigenspace.Pi
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
 
 /-!
 # BG §3 — Theorem 3.5, the step infrastructure (mmd L925-951)

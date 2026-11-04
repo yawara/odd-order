@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
-public import Mathlib.FieldTheory.Fixed
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi Part II, Ch. II, step (1): the field model adapted to `P`

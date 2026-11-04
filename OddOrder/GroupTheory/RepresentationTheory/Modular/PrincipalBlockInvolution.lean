@@ -5,13 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.SumSquaresFour
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.SumSquaresFour
+import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # Navarro (7.2), character side: `Irr(B_0) = {1_G, χ_1, χ_2, χ_3}` and `χ_i(t) = ±1`

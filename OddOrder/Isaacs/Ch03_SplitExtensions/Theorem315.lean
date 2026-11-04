@@ -7,6 +7,12 @@ module
 
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 public import OddOrder.GroupTheory.OpResidual
+meta import Lean.Meta.Tactic.NormCast
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Theorem315
@@ -16,7 +22,6 @@ Prefix-split from `OddOrder.Isaacs.Ch03_SplitExtensions.Main` (2000-line limit, 
 @[expose] public section
 
 namespace OddOrder.Isaacs.Ch03
-open SemidirectProduct
 open scoped Pointwise
 
 section /- 3C: Hall theory (pp. 83-88) -/

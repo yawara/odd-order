@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S11_NineElevenCoherence
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0Basic
+public import OddOrder.Peterfalvi.S11_NineElevenSetup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S07_Subcoherent
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # Peterfalvi (9.11.2): the two-summand inertia inputs `[U:K₁] = [U:K₂] = a`, `C = K₁ ⊓ K₂`

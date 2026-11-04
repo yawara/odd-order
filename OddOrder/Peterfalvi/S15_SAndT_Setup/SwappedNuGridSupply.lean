@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — the honest ν-grid supply after swapping

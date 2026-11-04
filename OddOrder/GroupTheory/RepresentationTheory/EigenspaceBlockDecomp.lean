@@ -7,6 +7,10 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 public import Mathlib.LinearAlgebra.Trace
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Block decomposition of `End V` (BG Prop 2.4(c)/(g))

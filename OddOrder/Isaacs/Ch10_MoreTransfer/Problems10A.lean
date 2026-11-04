@@ -5,16 +5,23 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CriticalSubgroup
 public import OddOrder.Isaacs.Ch02_Subnormality.Basic
-public import OddOrder.GroupTheory.FrattiniPGroup
-public import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
-public import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
-public import OddOrder.GroupTheory.TransferInvariantTransversal
-public import Mathlib.GroupTheory.IndexNormal
 public import Mathlib.GroupTheory.SpecificGroups.Quaternion
-public import OddOrder.GroupTheory.CommGroupAut
-public import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.GroupTheory.RegularWreathProduct
+public import OddOrder.GroupTheory.ElementaryAbelian
+public import OddOrder.GroupTheory.TransferTransitivity
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CommGroupAut
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.TransferInvariantTransversal
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 
 /-!
 # Isaacs §10A の演習 (書籍 pp. 307-308)

@@ -6,6 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+public import Mathlib.Algebra.Order.Star.Basic -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): `T ⋊ C_Q(P) ≅ F ⋊ F^*`

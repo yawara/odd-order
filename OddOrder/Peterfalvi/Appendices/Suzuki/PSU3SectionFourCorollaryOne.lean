@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
-public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. IV §4 → §3 Corollary 1: `O^{2′}(G) ≅ PSU(3, q)`

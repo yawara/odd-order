@@ -5,17 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.GaloisField
-public import Mathlib.FieldTheory.Finite.Trace
-public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.Algebra.Ring.AddAut
-public import Mathlib.Algebra.Polynomial.Roots
-public import Mathlib.Algebra.Polynomial.SpecificDegree
-public import Mathlib.Algebra.Ring.GeomSum
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.Algebra.Module.ZMod
 public import OddOrder.BG.AppC_NormSetBasic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Algebra.Polynomial.SpecificDegree
 
 /-!
 # BG Appendix C: the finite-field norm-set argument

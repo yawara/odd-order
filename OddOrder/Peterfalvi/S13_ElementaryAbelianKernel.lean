@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.GroupTheory.Nilpotent
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-public import OddOrder.GroupTheory.RepresentationTheory.ClassTwoSquareIndex
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.RepresentationTheory.ClassTwoSquareIndex
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 
 /-! # Peterfalvi (11.7): the chief-kernel triviality frame
 

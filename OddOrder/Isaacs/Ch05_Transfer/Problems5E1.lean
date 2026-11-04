@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5E
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C11
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 
 /-!
 # Isaacs Problem 5E.1 (Itô) — 極小非 `p`-冪零群 (書籍 p. 175)

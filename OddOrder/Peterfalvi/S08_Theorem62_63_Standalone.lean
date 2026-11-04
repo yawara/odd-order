@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+public import Mathlib.GroupTheory.Nilpotent
+public import OddOrder.Peterfalvi.S07_Coherence.NormInequalities
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Peterfalvi (6.2)/(6.3): the *standalone* general (6.1) coherence theorems

@@ -6,9 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.Data.Fintype.Card
-public import Mathlib.Tactic.Group
+public import Mathlib.Basic.Finite.Defs
+import Mathlib.Data.Fintype.Card
+import Mathlib.Tactic.Group
 
 /-!
 # Fixed-point-free conjugation: the twisted map, quotient descent, and involutions

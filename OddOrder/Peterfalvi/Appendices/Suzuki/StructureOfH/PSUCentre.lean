@@ -6,10 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
-public import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
-public import OddOrder.GroupTheory.SylowTransport
-public import OddOrder.GroupTheory.CentralCommutatorPower
-public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.CentralCommutatorPower
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
+import OddOrder.GroupTheory.SylowTransport
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
 
 /-!
 # `Z(F)` has odd order in the `PSU(3, ℓ)` branch

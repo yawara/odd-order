@@ -5,21 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S07_Coherence
-public import OddOrder.Peterfalvi.S06_CertainHypothesis46
-public import Mathlib.GroupTheory.Solvable
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.Complement
-public import Mathlib.GroupTheory.FixedPointFree
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
-public import OddOrder.GroupTheory.SubgroupInAmbient
-public import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
-public import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
-public import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-public import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
-public import Mathlib.GroupTheory.FiniteAbelian.Duality
-public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §8: character expansions and coherence breaks

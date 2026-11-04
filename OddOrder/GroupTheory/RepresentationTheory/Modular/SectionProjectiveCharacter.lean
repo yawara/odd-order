@@ -5,10 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 
 /-!
 # `Φ^x_μ`: a projective indecomposable character of `C_G(x)` spread over the `p`-section

@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
 public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Problems 3C (書籍 pp. 90–91) — Hall 部分群と Sylow system

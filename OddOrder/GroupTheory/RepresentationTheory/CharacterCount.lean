@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import Mathlib.LinearAlgebra.Dimension.Finite
-public import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
-public import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+public import Mathlib.Algebra.CharP.Invertible -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Finiteness of `Irr G` and the bound `|Irr G| ≤ |ConjClasses G|`

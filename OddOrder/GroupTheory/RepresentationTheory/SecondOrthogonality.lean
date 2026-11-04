@@ -5,19 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-public import Mathlib.Algebra.BigOperators.Ring.Finset
-public import Mathlib.Algebra.Group.ConjFinite
-public import Mathlib.Analysis.Normed.Field.Lemmas
-public import Mathlib.Basic.Complex.Basic
-public import Mathlib.Data.Matrix.Basic
-public import Mathlib.GroupTheory.GroupAction.Quotient
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.LinearAlgebra.Matrix.ConjTranspose
-public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-public import Mathlib.SetTheory.Cardinal.Finite
 public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+public import Mathlib.Algebra.Group.ConjFinite -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+public import Mathlib.Topology.Path -- shake: keep (its `@[congr]` lemma is in the congr set `simp` uses here)
 
 /-!
 # Second orthogonality (column orthogonality) of irreducible characters

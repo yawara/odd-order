@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+public import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 
 /-!
 # A class-product identity: `χ(a) χ(b) = c · χ(1)` when `χ` is constant on `cl(a)·cl(b)`

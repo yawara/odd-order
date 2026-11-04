@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourJacobi
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
+public import Mathlib.FieldTheory.Finite.GaloisField
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+public import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman's Lemma 13: common coordinates on the Frattini square

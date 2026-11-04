@@ -5,13 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.ZMod
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.LinearAlgebra.Projection
-public import Mathlib.LinearAlgebra.Quotient.Basic
 public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.Tactic.NoncommRing
-public import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NoncommRing
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
 
 /-!
 # Higman Lemma 3: commuting idempotents modulo two

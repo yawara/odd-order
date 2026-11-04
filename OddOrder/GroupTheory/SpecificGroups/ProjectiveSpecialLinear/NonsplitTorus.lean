@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Extension
-public import Mathlib.Tactic.NormNum.Prime
-public import Mathlib.Tactic.NormNum.GCD
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
-public import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+public import Mathlib.RingTheory.Norm.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.FieldTheory.Finite.Extension
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The nonsplit torus of `SL(2, F)`

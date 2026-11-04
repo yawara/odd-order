@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S06_Additional
-public import OddOrder.GroupTheory.FrattiniPGroup
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.Sylow
-public import Mathlib.Data.Nat.Factorization.Basic
+public import Mathlib.GroupTheory.Complement
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S06_ConjugationBridges
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # BG §6.3(b): the derived subgroup of a solvable group with `|G/G'|` prime

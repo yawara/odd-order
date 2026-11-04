@@ -5,11 +5,18 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_SAndT_Setup
-public import OddOrder.Peterfalvi.S15_HonestTypeP2A0
-public import OddOrder.Peterfalvi.S16_GridExpansion
-public import OddOrder.GroupTheory.RepresentationTheory.InflationInduction
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import OddOrder.Peterfalvi.S15_SAndT_Setup.OrderDetermination
 
 /-!
 # S15_SAndTDefs

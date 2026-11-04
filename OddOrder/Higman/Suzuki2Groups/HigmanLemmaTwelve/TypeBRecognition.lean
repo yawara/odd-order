@@ -5,9 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
-public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoPowerCongruence
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
 
 /-!
 # Peterfalvi Appendix III, Theorem (e): isomorphic summands force type B

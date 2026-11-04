@@ -1,9 +1,15 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
-public import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
-public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 public import OddOrder.Peterfalvi.S14_MaximalI.WitnessSylowBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
 
 /-!
 # WitnessSylowCyclic

@@ -6,9 +6,21 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.Data.Int.ModEq
-public import OddOrder.Algebra.BasicSetColumnShape
-public import OddOrder.Algebra.HalfSumColumns
-public import OddOrder.Algebra.SignRelationSolution
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.Ring.Int.Defs
+public import Mathlib.Algebra.Ring.Parity
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import OddOrder.Algebra.BasicSetColumnShape
+import OddOrder.Algebra.HalfSumColumns
+import OddOrder.Algebra.SignRelationSolution
+import OddOrder.Algebra.SumSquaresFour
+import OddOrder.Algebra.ThreeNormColumn
 
 /-!
 # The endgame of Brauer–Suzuki, assembled — Navarro pp. 142–145

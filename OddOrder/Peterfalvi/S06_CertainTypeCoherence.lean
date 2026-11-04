@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeConjugation
-public import OddOrder.Peterfalvi.S07_Coherence
+public import OddOrder.Peterfalvi.S07_Coherence.FamilyBundleDade
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 
 /-!
 # Peterfalvi (4.9)(b): coherence of the certain-type characters

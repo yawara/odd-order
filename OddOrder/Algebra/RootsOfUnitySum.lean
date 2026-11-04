@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.CharP.Algebra
-public import Mathlib.Analysis.Complex.Polynomial.Basic
-public import Mathlib.FieldTheory.IsAlgClosed.Basic
-public import Mathlib.RingTheory.Localization.FractionRing
-public import OddOrder.Algebra.AlgInt
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.CharZero.Defs
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Data.Fintype.Card
+import Mathlib.Analysis.Complex.Polynomial.Basic
+import OddOrder.Algebra.AlgInt
 
 /-!
 # Roots of unity summing to their count, over an arbitrary field

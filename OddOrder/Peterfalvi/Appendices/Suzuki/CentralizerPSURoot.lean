@@ -6,9 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
-public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
 public import OddOrder.GroupTheory.SylowTransport
 public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+public import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the PSU centralizer root group

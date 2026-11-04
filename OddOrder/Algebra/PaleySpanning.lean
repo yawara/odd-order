@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Algebra.CharP.Defs
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Algebra.Ring.Parity
+public import Mathlib.Data.Fintype.Card
+import Mathlib.FieldTheory.Finite.Basic
 
 /-!
 # The Paley-type spanning set of BG Appendix C, Problem 1

@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C8
 
 /-!
 # Isaacs Problem 5C.10 — 単純群の可換 Sylow-2 が位数 8 なら `7 ∣ |G|` (p. 164)

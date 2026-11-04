@@ -7,6 +7,10 @@ module
 
 public import Mathlib.LinearAlgebra.Matrix.ProjectiveSpecialLinearGroup
 public import OddOrder.GroupTheory.ElementaryAbelian
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # The standard root group and Weyl element of PSL(2,F)

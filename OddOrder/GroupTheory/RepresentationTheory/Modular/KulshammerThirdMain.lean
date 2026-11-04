@@ -5,12 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.PElementSumCount
 public import OddOrder.GroupTheory.PRegularElementCount
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.PFactorPairCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.PElementSumCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
+import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
 
 /-!
 # Külshammer's route to the third main theorem: `e_{B_0}` is read off inside `C_G(Q)`

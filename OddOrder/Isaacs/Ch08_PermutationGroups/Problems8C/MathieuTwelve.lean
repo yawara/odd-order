@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
+public import Mathlib.Algebra.Group.Action.Pretransitive
+public import Mathlib.GroupTheory.Subgroup.Simple
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 /-!
 # Isaacs Problem 8C.3 (p. 256) — 次数 12, 位数 95040 の推移置換群は単純

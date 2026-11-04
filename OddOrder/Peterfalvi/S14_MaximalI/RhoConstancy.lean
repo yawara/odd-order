@@ -1,6 +1,16 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S14_MaximalI.Hypothesis
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
+import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
+import OddOrder.Peterfalvi.S09_Building78C
+import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
 # Peterfalvi §12 — `rho` の定数性

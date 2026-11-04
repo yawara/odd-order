@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
 public import Mathlib.GroupTheory.Focal
 public import Mathlib.GroupTheory.Abelianization.Defs
 

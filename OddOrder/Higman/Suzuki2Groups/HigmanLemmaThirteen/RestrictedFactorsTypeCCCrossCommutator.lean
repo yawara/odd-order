@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorSameMiddleZero
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareEigenNonzero
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeCCEigenfamilyCrossCommutator
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFrattiniCoordinates
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCanonicalAmbientFamily
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordinates
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorSameMiddleZero
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCSquareEigenNonzero
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.TypeCCEigenfamilyCrossCommutator
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareEigenweights
 
 /-!
 # Higman's Lemma 13: the cross commutator of two restricted type-C factors

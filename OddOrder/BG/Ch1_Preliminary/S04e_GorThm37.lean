@@ -5,12 +5,25 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
-public import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
-public import OddOrder.BG.Ch1_Preliminary.S01_Solvable
-public import OddOrder.GroupTheory.CoprimeAbelianPGroup
 public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.GroupTheory.CoprimeAbelianPGroup
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+import OddOrder.Mathlib.SemidirectProduct
 
 /-!
 # Gorenstein "Finite Groups" Theorem 3.7 — minimal `ψ`-invariant ⇒ special structure

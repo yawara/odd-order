@@ -5,12 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Transfer
-public import Mathlib.GroupTheory.Focal
-public import Mathlib.GroupTheory.Schreier
-public import Mathlib.GroupTheory.SpecificGroups.ZGroup
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main
+public import Mathlib.GroupTheory.Sylow
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.GroupTheory.Schreier
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Isaacs §5A-5B — Central transfer: Thm 5.3 / Cor 5.4 / Schur / Cor 5.9

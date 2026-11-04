@@ -5,7 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6A.3 — 位数 `5²·11` の非巡回 Frobenius complement (書籍 p. 185)

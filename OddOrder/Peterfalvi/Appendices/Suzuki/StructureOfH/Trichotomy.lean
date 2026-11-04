@@ -5,8 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
-public import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 
 /-!
 # Peterfalvi Part II, Ch. III §1, Proposition: the three cases for `S`

@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B1
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6B.9 — 可解 EPPO 群の素因数は高々 2 個 (書籍 p. 196)

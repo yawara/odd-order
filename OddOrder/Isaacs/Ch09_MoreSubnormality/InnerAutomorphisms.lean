@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.End
 public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!

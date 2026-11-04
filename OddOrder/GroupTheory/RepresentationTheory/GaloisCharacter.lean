@@ -5,14 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Module.LinearMap.Defs
-public import Mathlib.Basic.Complex.Basic
-public import Mathlib.LinearAlgebra.Matrix.ToLin
-public import Mathlib.LinearAlgebra.Trace
-public import Mathlib.RepresentationTheory.Character
-public import Mathlib.RepresentationTheory.Irreducible
-public import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 public import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 /-!
 # Galois actions on class functions and irreducible characters

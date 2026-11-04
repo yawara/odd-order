@@ -5,9 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Sylow
 public import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
-public import Mathlib.RingTheory.Int.Basic
+import Mathlib.Data.Nat.Prime.Int
+import Mathlib.GroupTheory.Sylow
 
 /-!
 # Degree-`p` faithful transitive actions of order `p(p-1)` are two-transitive

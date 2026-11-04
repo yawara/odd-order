@@ -5,10 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+public import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG §13: Theorem 13.4 (the main step — `C_{M_σ}(P) ⊆ C_{M_σ}(R)`)

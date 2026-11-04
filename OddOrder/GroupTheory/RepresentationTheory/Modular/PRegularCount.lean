@@ -5,9 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import OddOrder.Algebra.CommutatorSpan
+public import OddOrder.GroupTheory.PRegularElement
+import Mathlib.Algebra.Group.ConjFinite
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.LinearAlgebra.Dimension.Constructions
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 
 /-!
 # The `p`-regular classes are a basis of `kG ⧸ T'`

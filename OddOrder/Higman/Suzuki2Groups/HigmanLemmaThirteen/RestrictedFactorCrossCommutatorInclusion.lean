@@ -7,6 +7,7 @@ module
 
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
 public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Higman's Lemma 13: from factor spans to a cross-commutator inclusion

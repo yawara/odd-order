@@ -5,9 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.NumberTheory.Padics.RingHoms
-public import Mathlib.Algebra.CharP.Algebra
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
+public import Mathlib.NumberTheory.Padics.PadicIntegers
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.NumberTheory.Padics.RingHoms
 
 /-!
 # `p`-modular systems

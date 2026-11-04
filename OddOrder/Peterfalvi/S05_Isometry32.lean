@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S05_SignedTripleGrid
+public import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_NormThree
 
 /-!
 # S05_Isometry32

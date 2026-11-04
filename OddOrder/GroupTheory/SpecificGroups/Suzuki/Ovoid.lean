@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
-public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # The anisotropic norm and point carrier of the Suzuki ovoid

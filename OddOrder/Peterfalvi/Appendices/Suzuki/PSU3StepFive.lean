@@ -5,8 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
+public import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+public import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.UnitaryCoordinates
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Peterfalvi Part II, Ch. IV §3 (5): the second case, wired up

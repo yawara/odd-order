@@ -1,6 +1,11 @@
 module
 
 public import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # TAIL

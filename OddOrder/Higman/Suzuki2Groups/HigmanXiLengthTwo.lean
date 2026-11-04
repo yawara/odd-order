@@ -8,6 +8,13 @@ module
 public import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
 public import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
 public import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's ξ-length-two reduction

@@ -1,12 +1,14 @@
 module
 
-public import Mathlib.Algebra.Module.Submodule.LinearMap
-public import Mathlib.Data.Fin.Tuple.Sort
-public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-public import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
-public import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
-public import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
-public import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+public import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+public import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import Mathlib.Combinatorics.Matroid.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+public import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi (5.2) — integral character maps, difference images R(χ), producers

@@ -5,8 +5,6 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.Group.Commutator
-public import Mathlib.GroupTheory.Perm.Cycle.Basic
 public import Mathlib.GroupTheory.Perm.Cycle.Type
 
 /-!

@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.FiniteAbelian.Basic
-public import Mathlib.LinearAlgebra.Matrix.Adjugate
-public import Mathlib.RingTheory.Ideal.Quotient.Defs
+public import Mathlib.Algebra.Algebra.Operations
+public import Mathlib.GroupTheory.Finiteness
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.LinearAlgebra.Quotient.Defs
+public import Mathlib.RingTheory.Ideal.Defs
+import Mathlib.GroupTheory.FiniteAbelian.Basic
 
 /-!
 # Annihilators of modules with finite-index ideal multiples

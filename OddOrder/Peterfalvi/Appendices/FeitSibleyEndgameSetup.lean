@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.OddOrderInvolution
-public import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
+public import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+public import OddOrder.Peterfalvi.S07_Coherence.PsiDecomposition
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Algebra.AlgInt
+import OddOrder.GroupTheory.OddOrderInvolution
+public import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Feit–Sibley — endgame: setup layer

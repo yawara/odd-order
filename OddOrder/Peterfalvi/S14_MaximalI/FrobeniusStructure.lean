@@ -1,7 +1,12 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Mathlib.SchurZassenhausConj
+import OddOrder.Peterfalvi.S09_Building78C
+import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancyDecomposition
 
 /-!
 # Peterfalvi (12.6)-(12.7) — type-I Frobenius structure

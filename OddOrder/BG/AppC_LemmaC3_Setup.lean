@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppC_FrobeniusBasics
+public import OddOrder.BG.AppC_HypothesisB
+public import OddOrder.BG.AppC_NormSet
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.BG.AppC_FrobeniusBasics
 
 /-!
 # BG Appendix C, Lemma C.3: the transported configuration

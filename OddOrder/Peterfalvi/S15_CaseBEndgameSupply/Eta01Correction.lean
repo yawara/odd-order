@@ -5,10 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
-public import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
-public import OddOrder.Peterfalvi.S15_SSetMemberRFamily
+public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
+import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
+import OddOrder.Peterfalvi.S15_SAndT_Setup.Canonicalization
+import OddOrder.Peterfalvi.S15_SAndT_Setup.CoherenceEtaOrthogonality
 
 /-!
 # Peterfalvi §13 (p. 79) — the `S`-side `η₀₁` correction supply (13.8)

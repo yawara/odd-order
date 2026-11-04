@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_Gate3
+public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructureBasic
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S15_Gate3
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S15_SAndTDefs
+import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 
 /-!
 # Complement / maximal-subgroup structure for Peterfalvi §13 (13.17.c)/(13.19.c1)

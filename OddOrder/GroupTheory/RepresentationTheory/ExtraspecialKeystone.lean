@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
-public import OddOrder.GroupTheory.RepresentationTheory.CyclicPermEigenCount
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.GroupTheory.Commutator.Finite
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.CyclicPermEigenCount
 
 /-!
 # Discharging the BG (2.11) keystone for the extraspecial setup

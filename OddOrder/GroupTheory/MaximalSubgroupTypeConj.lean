@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.GroupTheory.MaximalSubgroupType
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Conjugation-invariance of the maximal-subgroup types

@@ -1,17 +1,21 @@
 module
 
-public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
-public import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
-public import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
-public import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
-public import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
-public import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 public import OddOrder.GroupTheory.MaximalSubgroupType
-public import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 public import OddOrder.GroupTheory.PiElementDecomposition
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma137
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
 
 /-!
 # BG §14 — split-extension derived subgroup + kappa(M), type-P families, sigma-length

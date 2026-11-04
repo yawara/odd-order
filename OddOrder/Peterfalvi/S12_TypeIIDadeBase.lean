@@ -5,13 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S12_Section9Counts
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorBasic
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
+import OddOrder.Peterfalvi.S03b_Vanishing
+import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
 # Peterfalvi (8.16): the `S`-side Dade base for a Type-II maximal

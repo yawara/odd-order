@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
+public import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
 
 /-!
 # Eigenspaces of a cyclic shift (single-cycle core of BG (2.11))

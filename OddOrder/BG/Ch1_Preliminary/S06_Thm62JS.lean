@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S06_Additional
-public import OddOrder.BG.AppB_Thm62
-public import OddOrder.BG.AppA_PStability
-public import OddOrder.GroupTheory.GlaubermanZJ
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.BG.AppA_PStability
+import OddOrder.BG.AppB_Thm62
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement
 
 /-!
 # BG Theorem 6.2 一般形 (literal Thompson `J(S)`): `Z(J(S))·O_{p'}(G) ⊴ G` の `O_{p'}` 簡約

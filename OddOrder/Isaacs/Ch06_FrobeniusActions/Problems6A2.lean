@@ -5,8 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Tactic.NormNum.Prime
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
+public import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6A.2 — 奇数位数の非可換 Frobenius complement (書籍 p. 184)

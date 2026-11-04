@@ -5,11 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.SemidirectProduct
 public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 public import OddOrder.GroupTheory.FixedSubgroup
-public import OddOrder.Mathlib.SchurZassenhausConj
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Coprime Actions and Glauberman's Lemma (setup)

@@ -5,13 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Blocks
-public import Mathlib.GroupTheory.GroupAction.Primitive
-public import OddOrder.GroupTheory.CyclicSylowBurnside
-public import OddOrder.GroupTheory.FixedPointFreeConjugation
 public import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
-public import Mathlib.GroupTheory.IndexNormal
+public import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.IndexNormal
+import OddOrder.GroupTheory.CyclicSylowBurnside
+import OddOrder.GroupTheory.FixedPointFreeConjugation
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — 点安定化群の小さい suborbit

@@ -5,8 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
-public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.RepresentationTheory.Invariants
+import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
 
 /-!
 # Free-orbit module count (Peterfalvi (9.1), the kernel-FPF dimension fact (†))

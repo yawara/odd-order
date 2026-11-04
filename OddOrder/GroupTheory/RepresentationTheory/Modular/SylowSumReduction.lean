@@ -5,12 +5,19 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+public import OddOrder.Algebra.PElementSum
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Navarro (4.23) over the valuation ring, and its reduction

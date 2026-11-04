@@ -5,7 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
+public import OddOrder.Isaacs.Ch02_Subnormality.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
 
 /-!
 # Isaacs Problem 3C.7(a) — Carter 部分群の存在
@@ -37,7 +44,7 @@ public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
 
 namespace OddOrder.Isaacs.Ch03
 
-open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
+open Pointwise
 
 section /- 3C.7(a): 存在 -/
 

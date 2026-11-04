@@ -1,6 +1,14 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+public import OddOrder.BG.Ch2_Uniqueness.Setup
+public import OddOrder.GroupTheory.MaximalSubgroupType
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.AutAbelianCore
 
 /-!
 # CentralizerContainment

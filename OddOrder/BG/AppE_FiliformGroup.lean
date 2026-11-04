@@ -7,11 +7,9 @@ module
 
 public import OddOrder.BG.AppE_FiliformCounterexample
 public import Mathlib.Algebra.Group.MinimalAxioms
-public import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
-public import Mathlib.Data.ZMod.QuotientGroup
 public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.PGroup
-public import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The Lazard group of `Q₆`: the group-level counterexample to BG Proposition E.4

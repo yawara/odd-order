@@ -5,8 +5,17 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
 public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
+import OddOrder.GroupTheory.GlaubermanZStar.Reduction
+import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
+import OddOrder.GroupTheory.IsolatedInvolution
 
 /-!
 # Glauberman's `Z*`-theorem: Steps 6 and 7 — the fusion analysis

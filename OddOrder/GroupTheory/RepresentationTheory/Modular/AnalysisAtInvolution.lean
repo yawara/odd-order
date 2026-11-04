@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BrauerSuzukiEndgame
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
+public import Mathlib.RepresentationTheory.Character
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.Algebra.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
 
 /-!
 # The "analysis at `t`", assembled — Navarro pp. 142–145 in one statement

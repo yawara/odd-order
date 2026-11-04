@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.Basic
-public import Mathlib.GroupTheory.Perm.Basic
-public import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+public import Mathlib.Algebra.Group.Subgroup.Actions
+public import Mathlib.Data.Set.Card
+public import Mathlib.GroupTheory.GroupAction.Defs
+import Mathlib.Data.Finite.Perm
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.NormNum.GCD
 
 /-!
 # Isaacs Problem 8D.3 (p. 269) — rank と最大 subdegree による位数の評価

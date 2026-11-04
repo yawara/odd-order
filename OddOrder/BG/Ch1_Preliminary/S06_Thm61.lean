@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppA_PStability
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.BG.AppA_PStability
 
 /-!
 # BG §6: Theorem 6.1 (P. Hall & G. Higman) — 全素数版

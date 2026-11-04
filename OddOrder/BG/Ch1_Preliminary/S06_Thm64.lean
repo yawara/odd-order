@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
-public import OddOrder.GroupTheory.FittingHeredity
-public import OddOrder.GroupTheory.NormalHallHeredity
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.GroupTheory.FittingHeredity
+import OddOrder.GroupTheory.NormalHallHeredity
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # BG §6: Theorem 6.4 — coprime engine and the centralizing-conjugator step

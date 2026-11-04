@@ -5,11 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Pi
-public import Mathlib.Algebra.Module.End
-public import Mathlib.Algebra.Ring.Pi
 public import Mathlib.RingTheory.SimpleModule.Basic
-public import OddOrder.Algebra.CentralIdempotentModule
+import OddOrder.Algebra.CentralIdempotentModule
 
 /-!
 # A simple module over a finite product of rings lives on one factor

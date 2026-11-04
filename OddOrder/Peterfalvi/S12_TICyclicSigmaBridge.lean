@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+public import OddOrder.Peterfalvi.S05_SigmaIsometry
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 
 /-!
 # Peterfalvi (2.5)/(3.2)/(3.5): the generic σ-agreement and transpose bridge

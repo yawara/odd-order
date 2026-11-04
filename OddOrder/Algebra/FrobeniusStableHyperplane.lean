@@ -5,9 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.FieldTheory.Finite.Trace
-public import OddOrder.Algebra.PaleySpanning
-public import OddOrder.Algebra.RelationLattice
+public import Mathlib.RingTheory.Trace.Defs
+import Mathlib.FieldTheory.Finite.Trace
+import OddOrder.Algebra.PaleySpanning
+import OddOrder.Algebra.RelationLattice
+public import Mathlib.FieldTheory.Finite.Basic -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # The kernel of the trace is the only Frobenius-stable hyperplane

@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Algebra.BlockIdempotent
+import Mathlib.RingTheory.LocalRing.Basic
+import Mathlib.RingTheory.Nilpotent.Defs
 
 /-!
 # An algebra map on the centre is the character of a unique block

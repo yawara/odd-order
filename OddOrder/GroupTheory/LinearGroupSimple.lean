@@ -8,6 +8,7 @@ module
 public import OddOrder.GroupTheory.Transvection
 public import OddOrder.GroupTheory.NonzeroVectorAction
 public import Mathlib.GroupTheory.GroupAction.Iwasawa
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
 /-!
 # `GL(V)` is simple over `𝔽₂` in dimension at least three

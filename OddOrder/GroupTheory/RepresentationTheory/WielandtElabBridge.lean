@@ -5,10 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CoprimeAction
 public import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
-public import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
-public import Mathlib.FieldTheory.Finiteness
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.RepresentationTheory.Invariants
+public import OddOrder.GroupTheory.FixedSubgroup
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Rat.Floor
 
 /-!
 # Peterfalvi (9.1): the elementary-abelian chief-factor bridge

@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
-public import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+public import OddOrder.GroupTheory.RankOneBNPair
+public import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 
 /-!
 # Which fields of the standing hypothesis are determined by which

@@ -6,14 +6,17 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.LinearAlgebra.Determinant
-public import Mathlib.LinearAlgebra.Alternating.Basic
-public import Mathlib.RepresentationTheory.Irreducible
 public import OddOrder.GroupTheory.IsExtraspecial
-public import OddOrder.GroupTheory.PRank
-public import OddOrder.GroupTheory.FrattiniPGroup
-public import OddOrder.GroupTheory.RepresentationTheory.SingerField
-public import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+public import Mathlib.Algebra.Field.ZMod
+public import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Singer / symplectic divisibility for extraspecial actions (BG §15.7(e), route B)

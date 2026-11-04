@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — chosen-base `H^#` endgame supply

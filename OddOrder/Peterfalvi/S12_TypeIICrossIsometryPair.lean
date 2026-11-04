@@ -6,10 +6,21 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S12_TypeIIGridTranspose
-public import OddOrder.Peterfalvi.S09_CrossOrthogonality
-public import OddOrder.Peterfalvi.S12_TypeIIFrobenius
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
-public import OddOrder.Peterfalvi.S12_CrossIsometrySetup
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Peterfalvi.S09_CrossOrthogonality
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S12_CrossIsometrySetup
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
 
 /-!
 # Peterfalvi (10.7): the cross-isometry package at the canonical pair

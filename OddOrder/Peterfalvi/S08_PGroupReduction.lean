@@ -5,10 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_CaseBSeedGlue
-public import OddOrder.Peterfalvi.S08_CoherenceCore
-public import OddOrder.Isaacs.Ch04_Commutators.Main
-public import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S08_CaseBSeedGlue
+import OddOrder.Peterfalvi.S08_CoherenceCore
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 /-!
 # Peterfalvi (6.5): reduction to a non-abelian `p`-group — `(6.8)` application

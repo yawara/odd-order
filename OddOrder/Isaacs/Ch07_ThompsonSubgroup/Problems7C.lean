@@ -5,12 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Index
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5D
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
+import OddOrder.Isaacs.Ch05_Transfer.Problems5D
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
 
 /-!
 # Isaacs Problem 7C.1 — Thompson の normal `p`-complement 判定条件

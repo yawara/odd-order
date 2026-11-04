@@ -1,6 +1,12 @@
 module
 
 public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
+public import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+public import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
+public import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+public import Mathlib.GroupTheory.FiniteAbelian.Duality -- shake: keep (used by a proof inside an exposed definition)
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
 
 /-!
 # Peterfalvi (10.2)-(10.4) — the `mu`-grid and its construction

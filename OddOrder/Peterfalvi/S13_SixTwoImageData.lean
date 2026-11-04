@@ -5,8 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S13_SixTwoBridge
 public import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
+public import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+import Mathlib.Tactic.NormNum.Prime
+public import OddOrder.Peterfalvi.S13_SixTwoBridge -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Hypothesis (5.2.d)/(5.2.e) for the §11 induced family — the `InducedFamilyImageData` instance

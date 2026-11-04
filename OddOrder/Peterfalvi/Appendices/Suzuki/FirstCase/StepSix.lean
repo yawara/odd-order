@@ -5,9 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
-public import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
-public import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
+public import Mathlib.Algebra.Ring.Aut
+public import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+public import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.Henselian
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
+import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 
 /-!
 # Peterfalvi Part II, Ch. II, step (6): the arithmetic lemma

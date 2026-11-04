@@ -6,14 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Transfer
-public import Mathlib.GroupTheory.Abelianization.Finite
-public import Mathlib.GroupTheory.Commutator.Basic
 public import Mathlib.LinearAlgebra.Isomorphisms
 public import Mathlib.RingTheory.Ideal.Maps
-public import Mathlib.RingTheory.Finiteness.Finsupp
 public import OddOrder.Algebra.AugmentationIdeal
-public import OddOrder.Algebra.FiniteIndexAnnihilator
-public import OddOrder.Mathlib.MonoidAlgebra
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.RingTheory.DedekindDomain.Basic
+import OddOrder.Algebra.FiniteIndexAnnihilator
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Towards the principal ideal theorem: `Δ(K)Δ(G)` for a normal subgroup

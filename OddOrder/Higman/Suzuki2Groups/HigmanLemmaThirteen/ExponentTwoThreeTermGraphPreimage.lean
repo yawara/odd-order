@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCanonicalInvariantPreimage
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphOverTargetAxisGeometry
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphSubspaceInvariant
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCanonicalInvariantPreimage
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoGraphOverTargetAxisGeometry
 
 /-!
 # Higman's Lemma 13: canonical preimage of a three-term graph

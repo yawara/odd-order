@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
+public import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 
 /-!
 # `IBr(G) ⊆ ℕ · Irr(G)` for a `p'`-group

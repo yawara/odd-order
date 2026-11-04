@@ -5,7 +5,22 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.Ch1_Preliminary.S04_ExtraspecialCommutator
+public import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+public import OddOrder.GroupTheory.OmegaSubgroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S02_Representations
+import OddOrder.BG.Ch1_Preliminary.S04_CommutatorCollection
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
+import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.SelfCentralizingEnlargement
 
 /-!
 # TAIL

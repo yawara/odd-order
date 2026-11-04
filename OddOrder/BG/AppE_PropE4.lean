@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.BG.AppE_BetaSupply
+public import OddOrder.BG.AppE_CentralizerDecomposition
+public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.BG.AppE_AbelianCentralizer
+import OddOrder.BG.AppE_BetaSupply
+import OddOrder.BG.AppE_EigenvalueCombinatorics
+import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.AppE_SemidirectFrattini
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # BG Proposition E.4, corrected: `C_S(Z₂(S))` is abelian of index `p`

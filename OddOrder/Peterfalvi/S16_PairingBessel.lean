@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S16_PairingCoherence
-public import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
+public import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.InducedDegreeSum
 
 /-!
 # Peterfalvi (14.14), the pairing Bessel bounds

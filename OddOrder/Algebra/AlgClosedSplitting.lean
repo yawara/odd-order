@@ -5,9 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.RingTheory.Artinian.Ring
-public import Mathlib.RingTheory.Jacobson.Semiprimary
-public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 
 /-!
 # Splitting a finite-dimensional algebra over an algebraically closed field

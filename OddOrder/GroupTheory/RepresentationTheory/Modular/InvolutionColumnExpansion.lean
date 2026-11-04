@@ -5,12 +5,23 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBlockBijection
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SupportOfGeneralizedDecomposition
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
+public import OddOrder.Algebra.RelativeTrace
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.PRegularQuotient
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBlockBijection
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SupportOfGeneralizedDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 
 /-!
 # `χ(t) = D^t_0 + ψ_1(1) D^t_1 + ψ_2(1) D^t_2` — Navarro p. 141 at `u = 1`

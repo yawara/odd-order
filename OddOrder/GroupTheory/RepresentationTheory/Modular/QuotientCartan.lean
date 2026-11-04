@@ -5,8 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
 
 /-!
 # Navarro (7.6): the Cartan matrices are related by `C = |P| C̄`

@@ -5,10 +5,9 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.GroupAction.ConjAct
-public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.GroupTheory.Sylow
-public import Mathlib.RingTheory.Int.Basic
+public import Mathlib.RingTheory.Coprime.Basic
+import Mathlib.RingTheory.Coprime.Lemmas
 
 /-!
 # Conjugacy-class cardinality: centralizer index and Sylow coprimality

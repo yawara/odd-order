@@ -5,9 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialKeystone
-public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25
-public import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+public import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialMonomial
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.LinearAlgebra.FreeModule.PID
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialKeystone
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Theorem 2.5 at the group level (divisibility part)

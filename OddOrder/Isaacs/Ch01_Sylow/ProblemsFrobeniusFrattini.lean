@@ -5,13 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
 public import OddOrder.Isaacs.Ch01_Sylow.Basic
-public import Mathlib.GroupTheory.Nilpotent
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 public import Mathlib.GroupTheory.Frattini
-public import Mathlib.GroupTheory.Perm.Cycle.Type
-public import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Finite.Perm
+import Mathlib.GroupTheory.Commutator.Finite
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 /-!
 # Isaacs Chapter 1 — Problems §1D (Frobenius complements, Frattini, nilpotency)

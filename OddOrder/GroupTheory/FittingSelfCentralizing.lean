@@ -5,9 +5,7 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.Main
-public import Mathlib.Order.Minimal
-public import Mathlib.GroupTheory.Solvable
+public import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # The Fitting subgroup of a solvable group is self-centralizing

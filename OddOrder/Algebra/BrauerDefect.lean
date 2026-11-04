@@ -5,9 +5,12 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.BrauerKernel
-public import OddOrder.Algebra.DefectGroup
-public import OddOrder.Algebra.MackeyFormula
+public import OddOrder.Algebra.BrauerHomomorphism
+public import OddOrder.Algebra.RelativeTrace
+import Mathlib.Data.Rat.Floor
+import OddOrder.Algebra.BrauerKernel
+import OddOrder.Algebra.MackeyFormula
+import OddOrder.GroupTheory.PGroupRelIndex
 
 /-!
 # The Brauer homomorphism sees only the defect group

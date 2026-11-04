@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
-public import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs Problem 3C.7(b) — 極小正規部分群まわりの部品

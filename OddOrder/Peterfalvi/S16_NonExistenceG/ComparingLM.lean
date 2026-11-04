@@ -1,8 +1,17 @@
 module
 
 public import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
-public import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
-public import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeDataBridges
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
+import OddOrder.Peterfalvi.S14_MaximalI.NormPackage
+import OddOrder.Peterfalvi.S15_ComplementStructure
+import OddOrder.Peterfalvi.S15_SAndTBasic
+import OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLMBasic
+import OddOrder.Peterfalvi.S16_NonExistenceG.KeyInequalityArithmetic
+import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupM
+import OddOrder.Peterfalvi.S16_PairingBessel
 
 /-!
 # TAIL

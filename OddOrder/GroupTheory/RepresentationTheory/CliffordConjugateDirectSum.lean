@@ -5,14 +5,8 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
-public import OddOrder.GroupTheory.RepresentationTheory.SimpleSubmoduleIndependence
-public import Mathlib.Algebra.DirectSum.Module
-public import Mathlib.LinearAlgebra.Dimension.Constructions
-public import Mathlib.GroupTheory.Index
-public import Mathlib.GroupTheory.OrderOfElement
-public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.GroupTheory.RepresentationTheory.SimpleSubmoduleIndependence
 
 /-!
 # The restriction as a direct sum of conjugates (BG Lemma 2.3, case (ii))

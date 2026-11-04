@@ -5,8 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourJacobi
-public import OddOrder.GroupTheory.CommutatorSup
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import OddOrder.GroupTheory.CommutatorSup
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourJacobi
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # Higman's Lemma 13: the final Frattini-square contradiction

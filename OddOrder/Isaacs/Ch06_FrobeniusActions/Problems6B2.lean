@@ -5,7 +5,13 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Basic.Finite.Defs
+public import Mathlib.GroupTheory.GroupAction.Hom
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
 # Isaacs Problem 6B.2 — 既約な忠実可換作用は巡回 (書籍 p. 195)

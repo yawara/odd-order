@@ -6,9 +6,8 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.GroupTheory.Commutator.Basic
-public import Mathlib.GroupTheory.Subgroup.Center
-public import Mathlib.Tactic.Group
-public import Mathlib.GroupTheory.Index
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Tactic.Group
 
 /-!
 # Internal central products of subgroups

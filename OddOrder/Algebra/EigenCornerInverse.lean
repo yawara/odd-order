@@ -5,7 +5,10 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Algebra.CornerInverse
+public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+import OddOrder.Algebra.CornerInverse
 
 /-!
 # Navarro (5.7): the eigenvector acts injectively

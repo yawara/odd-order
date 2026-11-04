@@ -6,16 +6,16 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
-public import OddOrder.Peterfalvi.S08_CrossOrthogonality
-public import OddOrder.Peterfalvi.S12_Section9Counts
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV
-public import OddOrder.Peterfalvi.S04_DadeIsometryBasic
 public import OddOrder.Peterfalvi.S12_TypeIIDadeBase
-public import OddOrder.Peterfalvi.S07_PivotCoherence
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TaxonomyOutput
 public import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
-public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S07_PivotCoherence
+public import OddOrder.Peterfalvi.S08_SixTwoGeneral -- shake: keep (used by a proof inside an exposed definition)
+public import OddOrder.Peterfalvi.S10_BGInterface -- shake: keep (used by a proof inside an exposed definition)
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations
+public import OddOrder.Peterfalvi.S12_Section9Counts -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (10.7): the Type-II `HU`-Frobenius dichotomy assembly

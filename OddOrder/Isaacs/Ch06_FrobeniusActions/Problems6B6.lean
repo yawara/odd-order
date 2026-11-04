@@ -5,10 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Data.ZMod.Basic
-public import Mathlib.Tactic.LinearCombination
-public import Mathlib.RingTheory.Int.Basic
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.RingTheory.Coprime.Lemmas
+import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # Isaacs Problem 6B.6 — 巡回 2-群の位数 2 の自己同型 (書籍 p. 196)

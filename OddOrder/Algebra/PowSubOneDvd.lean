@@ -5,7 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.NumberTheory.Fermat
+public import Aesop.BuiltinRules
+public import Mathlib.Algebra.Group.Nat.Defs
+public import Mathlib.Tactic.ToDual
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # Divisibility among the numbers `aⁿ − 1`

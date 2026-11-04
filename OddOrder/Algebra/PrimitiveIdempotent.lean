@@ -6,8 +6,9 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.RingTheory.Idempotents
-public import OddOrder.Algebra.PiSimpleModule
-public import OddOrder.Algebra.MatrixCommutator
+public import Mathlib.Data.Matrix.Basis
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import OddOrder.Algebra.PiSimpleModule
 
 /-!
 # Lifting the matrix units

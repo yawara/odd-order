@@ -6,6 +6,14 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
+public import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
+public import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi Appendix IV: the Feit–Sibley Theorem — supporting layer (pp. 145–150)

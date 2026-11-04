@@ -6,13 +6,15 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.NumberTheory.Padics.Complex
-public import Mathlib.RepresentationTheory.Maschke
-public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
-public import Mathlib.RingTheory.SimpleModule.IsAlgClosed
-public import Mathlib.RingTheory.Valuation.LocalSubring
-public import OddOrder.Algebra.AlgClosedFractionField
 public import OddOrder.GroupTheory.PRegularElement
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import Mathlib.RingTheory.Valuation.LocalSubring
+import OddOrder.Algebra.AlgClosedFractionField
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
 # A splitting `p`-modular system: the valuation ring of `ℂ_[p]`

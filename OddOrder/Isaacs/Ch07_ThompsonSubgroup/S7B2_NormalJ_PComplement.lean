@@ -5,7 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
+public import OddOrder.GroupTheory.ThompsonSubgroup
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJClose
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7B part 2 + S7C: normal-J close + Thm 7.1 proof + Thm 7.7

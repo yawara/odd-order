@@ -6,8 +6,19 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppD_CNGroups.Basic
-public import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
-public import OddOrder.GroupTheory.CNGroupStructure
+public import OddOrder.BG.AppB_PuigB3B4
+public import OddOrder.GroupTheory.SubgroupInAmbient
+public import OddOrder.GroupTheory.ThreeStepGroup
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Data.EReal.Operations
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.MetricSpace.Bounded
+import OddOrder.BG.AppB_Thm62
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.GroupTheory.CNGroupStructure
 
 /-!
 # BG Appendix D: maximal Sylow intersections in a minimal simple CN-group

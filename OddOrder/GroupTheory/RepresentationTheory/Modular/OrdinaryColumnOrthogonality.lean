@@ -7,6 +7,12 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 
 /-!
 # Second (column) orthogonality over a splitting field

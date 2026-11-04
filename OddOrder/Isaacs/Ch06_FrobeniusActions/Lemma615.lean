@@ -5,7 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
+public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.15 characteristic elementary-abelian p^2 (odd + p=2

@@ -5,12 +5,21 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
+public import Mathlib.GroupTheory.Sylow
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.RingTheory.WittVector.IsPoly
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 
 /-!
 # `χ(x y) = d^x_{χ φ_0}` when `C_G(x)` has a normal `p`-complement

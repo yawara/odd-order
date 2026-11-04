@@ -6,8 +6,20 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.BG.AppA_PStabilityBasic
-public import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 public import OddOrder.GroupTheory.GlaubermanZJ
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+public import OddOrder.Isaacs.Ch05_Transfer.Main
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.RingTheory.DedekindDomain.Basic
+import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.BG.Ch1_Preliminary.S01_BurnsideOperator
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.GroupTheory.ChiefFactor
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
+import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 
 /-!
 # BG Appendix A: p-Stability — Theorems A.4 and A.5
@@ -142,7 +154,7 @@ private theorem centralizer_subgroupOf_normalizer_eq {G : Type*} [Group G] (P : 
       rw [SetLike.mem_coe, Subgroup.mem_subgroupOf]; exact hx
     exact congrArg Subtype.val (h ⟨x, hxN⟩ hmem)
 
-open OddOrder.GroupTheory OddOrder.BG.Ch1.S02 OddOrder.RepresentationTheory in
+open OddOrder.GroupTheory OddOrder.RepresentationTheory in
 open scoped commutatorElement IsMulCommutative in
 /-- **PSTAB — per-chief-factor p-stability** (= Gorenstein 6.5.3 steps 1-3, A.4(c)):
 `M` 有限可解奇数位数, `p` odd, `K ◁ M` を `p`-群, `A ≤ M` を `p`-部分群で `[K,A,A]=1`.

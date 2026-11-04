@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.Algebra.MonoidAlgebra.MapDomain
-public import OddOrder.Algebra.GroupAlgebraConjugation
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.NormNum.Abs
+import Mathlib.Tactic.NormNum.DivMod
+import Mathlib.Tactic.NormNum.OfScientific
+import Mathlib.Tactic.NormNum.Pow
+import OddOrder.Algebra.GroupAlgebraConjugation
 
 /-!
 # Splitting `R[G]` along a subgroup

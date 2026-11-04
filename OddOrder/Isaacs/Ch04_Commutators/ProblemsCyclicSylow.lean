@@ -5,11 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.CyclicSubgroupUniqueness
-public import OddOrder.Isaacs.Ch01_Sylow.Problems
-public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-public import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
-public import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.7 (巡回 Sylow をもつ `p`-可解群)

@@ -5,7 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S15_NineElevenSteps
+public import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S07_UnionPairBridge
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
+import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
+import OddOrder.Peterfalvi.S15_NineElevenSteps
 
 /-!
 # Peterfalvi (9.11.7)–(9.11.8) — the `S`-instance orthogonal-branch refutation

@@ -5,9 +5,16 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 public import OddOrder.GroupTheory.RepresentationTheory.Clifford
-public import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+public import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Clifford's theorem: the constituents of a restriction form a single conjugation orbit

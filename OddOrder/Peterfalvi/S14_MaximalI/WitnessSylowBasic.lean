@@ -1,8 +1,15 @@
 module
 
-public import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
-public import OddOrder.Peterfalvi.S14_MaximalI.CentralizerContainment
-public import OddOrder.Peterfalvi.S13_NonGaloisExclusion
+public import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypeClassification
+public import OddOrder.GroupTheory.MaximalSubgroupType
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch2_Uniqueness.S09_Theorem91
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmasCore
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.LocalTaxonomy
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremAB
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Peterfalvi.S14_MaximalI.FrobeniusStructure
 
 /-!
 # Peterfalvi §14 — witness Sylow cyclic: opening layer

@@ -1,6 +1,13 @@
 module
 
-public import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
+public import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
+import OddOrder.Mathlib.SemidirectProduct
+public import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # ThreeSubgroups

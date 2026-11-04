@@ -6,8 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
-public import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import OddOrder.GroupTheory.PRegularElement
+public import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
 # The standard `p`-modular system

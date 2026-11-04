@@ -7,6 +7,9 @@ module
 
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 public import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Data.Rat.Floor
+import Mathlib.Tactic.Positivity.Finset
 
 /-!
 # `b^G` is defined when `P C_G(P) ≤ H ≤ N_G(P)` — Navarro (4.14)

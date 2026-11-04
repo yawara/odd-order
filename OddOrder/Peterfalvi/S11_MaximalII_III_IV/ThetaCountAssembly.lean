@@ -1,6 +1,15 @@
 module
 
-public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
+public import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.Peterfalvi.S10_StructureSetup
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 
 /-!
 # Peterfalvi (9.8.d) count — def_Itheta reconstruction and assembly

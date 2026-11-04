@@ -5,8 +5,20 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
-public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+public import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
+public import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+public import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
+import OddOrder.GroupTheory.SylowTransport
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # Peterfalvi Part II, Ch. I section 3: the distinguished PSU pair

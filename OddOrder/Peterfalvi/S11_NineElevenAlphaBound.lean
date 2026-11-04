@@ -6,7 +6,11 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
-public import OddOrder.Peterfalvi.S11_NineElevenCaseA
+public import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
+import OddOrder.Peterfalvi.S13_MaximalIII_IV
+public import OddOrder.Peterfalvi.S13_SixTwoBridge -- shake: keep (used by a proof inside an exposed definition)
 
 /-!
 # Peterfalvi (9.11.5)–(9.11.6): the `α`-bound layer of the (9.11) endgame

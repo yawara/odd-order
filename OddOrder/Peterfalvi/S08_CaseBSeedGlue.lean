@@ -6,7 +6,12 @@ Authors: Yawara Ishida
 module
 
 public import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
-public import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
+import OddOrder.Peterfalvi.S08_CaseBCoherence
+import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+import OddOrder.Peterfalvi.S08_DegreeSums
 
 /-!
 # Peterfalvi §6.8.2 — case-(B) full `X(W₂) ∪ Y` coherence seed (the `(P4)` glue)

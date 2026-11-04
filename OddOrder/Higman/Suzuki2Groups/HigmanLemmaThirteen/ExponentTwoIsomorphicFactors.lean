@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
-public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorIsomorphism
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelationDefinition
+public import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorIsomorphism
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
 
 /-!
 # Higman's Lemma 13: two of the exponent-two factors are isomorphic

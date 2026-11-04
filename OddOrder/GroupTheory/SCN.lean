@@ -5,11 +5,11 @@ Authors: Yawara Ishida
 -/
 module
 
-public import Mathlib.GroupTheory.Subgroup.Centralizer
-public import Mathlib.Algebra.Group.Subgroup.Basic
-public import OddOrder.Mathlib.Subgroup
-public import OddOrder.GroupTheory.CriticalSubgroup
 public import OddOrder.GroupTheory.PRank
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.Combinatorics.Matroid.Init
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.GroupTheory.CriticalSubgroup
 
 /-!
 # Self-Centralizing Normal Abelian Subgroups (SCN)

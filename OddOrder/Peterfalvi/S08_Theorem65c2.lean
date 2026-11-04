@@ -5,8 +5,14 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Peterfalvi.S08_Theorem63
-public import OddOrder.Peterfalvi.S08_CaseBAssembly
+public import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+public import OddOrder.Peterfalvi.S08_YsetConjugation
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Tactic.NormNum.Prime
+import OddOrder.Peterfalvi.S08_CaseBAssembly
+import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+import OddOrder.Peterfalvi.S08_CoherenceCorePart2.SibleyBounds
+import OddOrder.Peterfalvi.S08_Theorem63
 
 /-!
 # Peterfalvi (6.2)/(6.3)/(6.5) for case (c2): the certain-type `p`-group reduction chain

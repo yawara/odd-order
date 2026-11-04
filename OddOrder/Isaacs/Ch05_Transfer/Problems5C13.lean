@@ -5,9 +5,15 @@ Authors: Yawara Ishida
 -/
 module
 
-public import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
-public import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
-public import OddOrder.Isaacs.Ch05_Transfer.Problems5C12
+public import OddOrder.Isaacs.Ch05_Transfer.Basic
+import Mathlib.CategoryTheory.Category.Init
+import Mathlib.GroupTheory.SchurZassenhaus
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity.Finset
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 
 /-!
 # Isaacs Problem 5C.13 (Navarro) — 自己正規化 Sylow と `N_G(P')` (p. 164)
